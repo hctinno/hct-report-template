@@ -66,12 +66,14 @@ brand/hct/brand.json
 
 ### 2. 덱 고르기 — 새로 만들지 말고 골라서 내용만 바꾼다
 
-`.claude/skills/blue-report/assets/` 에 완성된 덱이 5종 있다. 용도에 맞는 것을 복사해
+`.claude/skills/blue-report/assets/` 에 완성된 덱이 5종과 레이아웃 카탈로그 1종 있다.
+용도에 맞는 것을 복사해
 **내용만** 교체한다. 레이아웃과 스타일을 새로 설계하지 않는다.
 
 | 파일 | 용도 | 장수 |
 |---|---|---|
-| `deck-internal-report.html` | 사내 보고 (주간·월간) | 9 |
+| `deck-internal-report.html` | 사내 보고 (월간) | 9 |
+| `deck-weekly-report.html` | 조직 주간보고 | 7 |
 | `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |
@@ -116,7 +118,7 @@ assets/deck-viewer.js
 # HTML — 회사명·로고·저작권을 넣어 한 파일로 만든다
 python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
 
-# --deck 은 이름(catalog · internal · sales · project · training) 또는 HTML 파일 경로
+# --deck 은 이름(catalog · internal · weekly · sales · project · training) 또는 HTML 파일 경로
 # 내용을 직접 편집한 덱이면 파일 경로를 준다:
 #   --deck decks-out/my-deck.html
 

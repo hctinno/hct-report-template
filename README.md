@@ -47,13 +47,14 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 
 ---
 
-## 덱 5종
+## 덱 6종
 
-같은 레이아웃을 쓰되 배치 순서가 용도에 맞게 다르다. 사내 보고는 다크 요약이 3번째에 있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤 정리한다).
+같은 레이아웃을 쓰되 배치 순서와 장수가 용도에 맞게 다르다. 조직 주간보고는 매주 반복하므로 목차를 두지 않고 타임라인이 요일 단위다. 사내 보고는 다크 요약이 3번째에 있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤 정리한다).
 
 | 파일 | 용도 | 장수 |
 |---|---|---|
-| `deck-internal-report.html` | 사내 보고 (주간·월간) | 9 |
+| `deck-internal-report.html` | 사내 보고 (월간) | 9 |
+| `deck-weekly-report.html` | 조직 주간보고 | 7 |
 | `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |
@@ -79,7 +80,7 @@ python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
 ```
 
-`--deck` 은 이름(`catalog` · `internal` · `sales` · `project` · `training`) 또는 HTML 파일 경로를 받는다.
+`--deck` 은 이름(`catalog` · `internal` · `weekly` · `sales` · `project` · `training`) 또는 HTML 파일 경로를 받는다.
 
 필요한 것(Pillow · Chromium · node_modules)은 스크립트가 스스로 받는다. 미리 설치하지 않아도 된다. 막으려면 `BLUE_REPORT_NO_INSTALL=1` 을 준다.
 
@@ -105,11 +106,12 @@ python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 
 ```bash
 python3 scripts/verify_repo.py            # 전부
-python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 48장도 남긴다
+python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 55장도 남긴다
 ```
 
-덱 5종을 만들어 `check_deck.py` 로 판정하고, PPTX 4종 생성 · `dist/` 재생성 대조 ·
-한국어 인코딩 · 배포 매니페스트를 함께 본다. 실패가 있으면 종료 코드가 1 이다.
+덱 6종을 만들어 `check_deck.py` 로 판정하고, PPTX 5종 생성과 무결성 · `dist/` 재생성 대조 ·
+한국어 인코딩 · 배포 매니페스트 · 내용 동기화 · 버전 올림을 함께 본다.
+실패가 있으면 종료 코드가 1 이다.
 
 **GitHub Actions 가 push·PR 마다 이 스크립트를 그대로 돌린다**(`.github/workflows/verify.yml`).
 CI 와 로컬이 같은 한 줄을 쓰므로 결과가 갈라지지 않는다. 워크플로를 수동 실행할 때
@@ -157,7 +159,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   README.md                              자기완결 사양서
   references/rules.md                    압축 규칙
   assets/blue-report.css                 토큰 68개 — 단일 소스
-  assets/deck-*.html                     완성 덱 5종
+  assets/deck-*.html                     완성 덱 5종 + 레이아웃 카탈로그
   scripts/check_deck.py                  10항목 자동 점검
   scripts/apply_brand.py                 브랜드 일괄 적용
   scripts/to_pdf.py                      PDF 내보내기
@@ -169,6 +171,7 @@ brand/hct/                               회사 정보와 로고
 docs/CODEX_DECK_PROMPT.md                Codex 등 외부 에이전트용 작업 지시서
 scripts/verify_repo.py                   저장소 전체 점검 — CI 가 이것을 돌린다
 scripts/check_content_sync.py            HTML 덱과 PPTX 내용 갈라짐 검사
+CHANGELOG.md                             판올림 기록. 스킬을 고치면 여기에 적는다
 scripts/install_blue_report_skill.py     오프라인 복사 설치기
 .github/workflows/verify.yml             push·PR 자동 점검
 ```

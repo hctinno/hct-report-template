@@ -19,7 +19,8 @@ blue-report/
 │  ├─ deck-viewer.css          뷰어 껍데기 (디자인 시스템 아님)
 │  ├─ deck-viewer.js           넘김 · 축척 · 쪽번호 자동 · 발표자 노트
 │  ├─ deck-template.html       레이아웃 12종 카탈로그
-│  ├─ deck-internal-report.html   사내 보고 (주간·월간) 9장
+│  ├─ deck-internal-report.html   사내 보고 (월간) 9장
+│  ├─ deck-weekly-report.html     조직 주간보고 7장
 │  ├─ deck-sales-proposal.html    외부 제안·영업 10장
 │  ├─ deck-project-report.html    프로젝트 착수·완료 9장
 │  ├─ deck-training.html          교육·기술 설명 8장
@@ -30,7 +31,7 @@ blue-report/
 │  ├─ tokens.js                blue-report.css 의 토큰을 읽어 온다 (색 값 중복 없음)
 │  ├─ layouts.js               카드 · 칩 · 머리말 · 꼬리말 등 원자 helper
 │  ├─ slides.js                슬라이드 종류별 생성기 11종
-│  ├─ content.js               용도별 덱 4종의 내용
+│  ├─ content.js               용도별 덱 5종의 내용
 │  └─ build.js                 실행 진입점
 └─ scripts/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
@@ -52,13 +53,17 @@ blue-report/
 
 | 용도 | 파일 | 장수 | 구성 |
 |---|---|---|---|
-| 사내 보고 (주간·월간) | `deck-internal-report.html` | 9 | 표지 · 목차 · **요약(다크)** · 지표 표 · 막대 · 비교 2열 · 최대 이슈 · 타임라인 · 결정 요청 |
+| 사내 보고 (월간) | `deck-internal-report.html` | 9 | 표지 · 목차 · **요약(다크)** · 지표 표 · 막대 · 비교 2열 · 최대 이슈 · 타임라인 · 결정 요청 |
+| 조직 주간보고 | `deck-weekly-report.html` | 7 | 표지 · **요약(다크)** · 조직별 표 · 막대 · 지난주 대비 2열 · 요일 타임라인 · 지원 요청 |
 | 외부 제안·영업 | `deck-sales-proposal.html` | 10 | 표지 · 목차 · 문제 · 도넛 · 3단계 · 효과 · 사례 표 · 일정 · 요약(다크) · CTA |
 | 프로젝트 착수·완료 | `deck-project-report.html` | 9 | 표지 · 목차 · 범위 2열 · 타임라인 · 산출물 표 · 달성 막대 · 미달 · 판정(다크) · 승인 요청 |
 | 교육·기술 설명 | `deck-training.html` | 8 | 표지 · 학습 목표 · 3단계 절차 · 방식 비교 · 도넛 · 체크리스트 표 · 요약(다크) · 다음 학습 |
 
 용도가 요청에 드러나면 그대로 고르고, 드러나지 않을 때만 추천을 붙여 묻는 것이 기본 동작이다.
 판단 기준은 `SKILL.md` 2절에 있다.
+
+**주간보고에는 목차가 없다** — 매주 반복하는 보고라 목차가 시간만 쓴다. 타임라인도 주차가
+아니라 요일(월~금) 단위다. 월간 보고와 헷갈리면 주기로 가른다. 매주면 `weekly`, 매달이면 `internal`.
 
 **사내 보고는 요약을 앞에 둔다** — 경영진이 앞부분만 보고 넘어가는 경우가 많다.
 **외부 제안은 요약을 뒤에 둔다** — 문제부터 설득한 뒤 정리하는 순서가 맞는다.

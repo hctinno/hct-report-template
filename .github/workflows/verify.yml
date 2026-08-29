@@ -4,7 +4,7 @@
 #
 #     python3 scripts/verify_repo.py
 #
-# 덱 5종을 만들어 check_deck.py 10항목으로 판정하고, PPTX 4종 생성과
+# 덱 6종을 만들어 check_deck.py 10항목으로 판정하고, PPTX 5종 생성·무결성과
 # dist/ 재생성 대조, 한국어 인코딩, 배포 매니페스트를 함께 본다.
 # `실패` 가 하나라도 있으면 이 워크플로가 빨간불이 된다. `주의` 는 통과다.
 
@@ -33,12 +33,15 @@ permissions:
 
 jobs:
   verify:
-    name: 덱 5종 · PPTX · dist · 인코딩 · 배포
+    name: 덱 6종 · PPTX · dist · 인코딩 · 배포 · 버전
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 버전 올림 검사가 main 과의 갈라진 지점을 봐야 한다. 얕은 클론이면 못 찾는다.
+          fetch-depth: 0
 
       - name: Python
         uses: actions/setup-python@v5

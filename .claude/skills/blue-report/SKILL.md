@@ -22,7 +22,8 @@ description: "\"블루 리포트\" 스타일로 보고서·발표 덱·문서를
 판단 기준은 하나다 — **요청에서 용도가 읽히면 묻지 말고 고른다. 읽히지 않을 때만 묻는다.**
 
 - 읽힐 때 → 고른 덱과 이유를 한 줄로 밝히고 바로 만든다. 뻔한 것을 되묻지 않는다.
-  예: "주간 보고" · "월간 실적" · "팀 현황" → `internal`
+  예: "월간 실적" · "월간 업무 보고" → `internal`
+  "주간 보고" · "이번 주 현황" · "조직 주간보고" · "팀 주간" → `weekly`
   "제안서" · "고객사에 보낼" · "영업" · "견적" → `sales`
   "착수 보고" · "완료 보고" · "킥오프" · "산출물" → `project`
   "교육 자료" · "사내 강의" · "온보딩" · "설명 자료" → `training`
@@ -32,7 +33,8 @@ description: "\"블루 리포트\" 스타일로 보고서·발표 덱·문서를
 
 | 용도 | `--deck` | 파일 | 장수 |
 |---|---|---|---|
-| 사내 보고 (주간·월간) | `internal` | `deck-internal-report.html` | 9 |
+| 사내 보고 (월간) | `internal` | `deck-internal-report.html` | 9 |
+| 조직 주간보고 | `weekly` | `deck-weekly-report.html` | 7 |
 | 외부 제안·영업 | `sales` | `deck-sales-proposal.html` | 10 |
 | 프로젝트 착수·완료 | `project` | `deck-project-report.html` | 9 |
 | 교육·기술 설명 | `training` | `deck-training.html` | 8 |

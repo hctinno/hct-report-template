@@ -1,7 +1,9 @@
 {
   "name": "blue-report",
-  "description": "블루 리포트 디자인 시스템 — 사내 공용 발표 슬라이드. 용도별 덱 4종(사내 보고·외부 제안·프로젝트 보고·교육), 레이아웃 12종, HTML·PDF·PPTX 출력, 자동 점검.",
-  "version": "1.0.0",
-  "author": { "name": "주식회사 에이치시티" },
+  "description": "블루 리포트 디자인 시스템 — 사내 공용 발표 슬라이드. 용도별 덱 5종(사내 보고·조직 주간보고·외부 제안·프로젝트 보고·교육), 레이아웃 12종, HTML·PDF·PPTX 출력, 자동 점검.",
+  "version": "1.1.0",
+  "author": {
+    "name": "주식회사 에이치시티"
+  },
   "homepage": "https://github.com/dytc880915-commits/hct-report-template/tree/main/.claude/skills/blue-report"
 }

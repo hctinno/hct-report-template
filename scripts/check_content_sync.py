@@ -36,6 +36,7 @@ CONTENT_JS = os.path.join(SKILL, "pptx", "content.js")
 # content.js 의 덱 키 → HTML 덱 파일. deck-template.html 은 카탈로그라 PPTX 판이 없다.
 DECKS = {
     "internal": "deck-internal-report.html",
+    "weekly": "deck-weekly-report.html",
     "sales": "deck-sales-proposal.html",
     "project": "deck-project-report.html",
     "training": "deck-training.html",

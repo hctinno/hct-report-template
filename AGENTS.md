@@ -11,7 +11,8 @@ This repository is the HCT shared presentation design system, called **Blue Repo
 - Work in the current checkout root. Paths here are relative to it — never assume a specific drive or directory.
 - Read `.claude/skills/blue-report/README.md` first. It is the self-contained spec: color tokens, type scale, spacing, chart rules, and writing style. `.claude/skills/blue-report/references/rules.md` is the condensed rule list.
 - Start from a finished deck in `.claude/skills/blue-report/assets/`, replacing content only. Do not invent a new visual style.
-  - `deck-internal-report.html` internal weekly/monthly reporting
+  - `deck-internal-report.html` internal monthly reporting
+  - `deck-weekly-report.html` organisation-wide weekly reporting (no agenda slide; weekday timeline)
   - `deck-sales-proposal.html` external proposal and sales
   - `deck-project-report.html` project kickoff and completion
   - `deck-training.html` training and technical explanation

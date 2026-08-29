@@ -6,7 +6,7 @@
     python3 scripts/verify_repo.py --only decks
 
 검사 항목
-  decks     덱 5종을 apply_brand.py 로 만들고 check_deck.py 로 판정한다.
+  decks     덱 6종을 apply_brand.py 로 만들고 check_deck.py 로 판정한다.
             10항목 중 `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
   pptx      build.js 가 돌고 .pptx 4종이 나오는가.
@@ -17,6 +17,9 @@
             여기가 깨지면 다른 PC 에서 `plugin install` 이 실패한다.
   sync      HTML 덱과 pptx/content.js 의 내용이 갈라지지 않았는가.
             같은 내용이 두 곳에 있어 한쪽만 고치기 쉽다.
+  version   스킬 폴더를 고쳤으면 plugin.json 의 version 을 올렸는가.
+            플러그인은 main 을 통째로 받아 가므로 버전이 그대로면
+            받는 쪽이 자기 판을 구분하지 못한다.
 
 종료 코드는 실패가 하나라도 있으면 1, 아니면 0 이다.
 """
@@ -29,13 +32,17 @@ import subprocess
 import sys
 import tempfile
 import unicodedata
+import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILL = os.path.join(ROOT, ".claude", "skills", "blue-report")
 SCRIPTS = os.path.join(SKILL, "scripts")
 BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
 
-DECKS = ["catalog", "internal", "sales", "project", "training"]
+DECKS = ["catalog", "internal", "weekly", "sales", "project", "training"]
+
+# PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
+EXPECTED_PPTX = len(DECKS) - 1
 
 # dist/ 의 두 파일은 빌드 명령이 서로 다르다. 아래가 그 정본이다.
 DIST_BUILDS = [
@@ -92,7 +99,7 @@ def run(cmd, cwd=None):
     return subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True)
 
 
-# ------------------------------------------------------------------- 덱 5종
+# ------------------------------------------------------------------- 덱 6종
 
 def check_decks(log, out_dir, shots_dir):
     for name in DECKS:
@@ -136,10 +143,66 @@ def check_pptx(log, out_dir):
     made = sorted(f for f in os.listdir(out_dir) if f.endswith(".pptx"))
     if r.returncode != 0:
         log.fail("PPTX 생성", (r.stderr.strip().splitlines() or ["build.js 실패"])[-1])
-    elif len(made) != 4:
-        log.fail("PPTX 생성", f"4종이 나와야 하는데 {len(made)}종")
+        return
+    if len(made) != EXPECTED_PPTX:
+        log.fail("PPTX 생성", f"{EXPECTED_PPTX}종이 나와야 하는데 {len(made)}종")
+        return
+    log.ok("PPTX 생성", f"{len(made)}종 — " + ", ".join(made))
+    check_pptx_integrity(log, out_dir, made)
+
+
+def check_pptx_integrity(log, out_dir, made):
+    """생긴 파일이 실제로 열리는가. 파일 개수만 세면 깨진 것도 통과한다.
+
+    .pptx 는 zip 이다. 표준 라이브러리로 열어 압축 무결성과 필수 부품,
+    슬라이드 수를 본다. 슬라이드 수는 content.js 가 선언한 값과 견준다."""
+    try:
+        expect = expected_slide_counts()
+    except Exception as e:
+        log.warn("PPTX 무결성", f"기대 슬라이드 수를 읽지 못했다 — {e}")
+        expect = {}
+
+    bad = []
+    for name in made:
+        path = os.path.join(out_dir, name)
+        try:
+            with zipfile.ZipFile(path) as z:
+                if z.testzip() is not None:
+                    bad.append(f"{name} (압축 손상)")
+                    continue
+                names = z.namelist()
+                if "[Content_Types].xml" not in names:
+                    bad.append(f"{name} ([Content_Types].xml 없음)")
+                    continue
+                n = len([x for x in names
+                         if x.startswith("ppt/slides/slide") and x.endswith(".xml")])
+                want = expect.get(name)
+                if n == 0:
+                    bad.append(f"{name} (슬라이드 0장)")
+                elif want is not None and n != want:
+                    bad.append(f"{name} (슬라이드 {n}장 · content.js 는 {want}장)")
+        except Exception as e:
+            bad.append(f"{name} (열지 못함 — {e})")
+
+    if bad:
+        log.fail("PPTX 무결성", "; ".join(bad))
     else:
-        log.ok("PPTX 생성", f"{len(made)}종 — " + ", ".join(made))
+        total = sum(expect.get(n, 0) for n in made)
+        log.ok("PPTX 무결성", f"{len(made)}종 모두 정상 · 슬라이드 합계 {total}장")
+
+
+def expected_slide_counts():
+    """content.js 가 선언한 덱별 파일명과 슬라이드 수."""
+    script = (
+        "const c = require(%s);\n"
+        "const o = {};\n"
+        "for (const v of Object.values(c)) if (v && v.slides) o[v.file] = v.slides.length;\n"
+        "process.stdout.write(JSON.stringify(o));\n"
+    ) % json.dumps(os.path.join(SKILL, "pptx", "content.js"))
+    r = subprocess.run(["node", "-e", script], capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr.strip()[:200])
+    return json.loads(r.stdout)
 
 
 # ---------------------------------------------------------------------- dist
@@ -290,17 +353,72 @@ def check_plugin(log):
             log.ok("settings.json", "마켓플레이스 이름 일치")
 
 
+# ------------------------------------------------------------------ 버전 올림
+
+def check_version(log):
+    """스킬 폴더가 바뀌었는데 version 이 그대로면 실패.
+
+    기준 브랜치를 찾지 못하는 환경(얕은 클론, main 이 없는 저장소)에서는
+    실패가 아니라 주의로 넘긴다. 없는 것을 근거로 실패시키지 않는다."""
+    base = next((r for r in ("origin/main", "main")
+                 if run(["git", "rev-parse", "--verify", "--quiet", r]).returncode == 0), None)
+    if base is None:
+        log.warn("버전 올림", "기준 브랜치(main)가 없어 건너뜀")
+        return
+
+    # 갈라진 지점 기준으로 본다. 아직 커밋하지 않은 것도 포함하려고 작업 트리와 견준다.
+    mb = run(["git", "merge-base", base, "HEAD"])
+    if mb.returncode != 0:
+        log.warn("버전 올림", "merge-base 를 찾지 못해 건너뜀 "
+                             "(얕은 클론이면 checkout 의 fetch-depth 를 0 으로 둔다)")
+        return
+    ref = mb.stdout.strip()
+
+    rel = os.path.relpath(SKILL, ROOT).replace(os.sep, "/")
+    r = run(["git", "diff", "--name-only", ref, "--", rel])
+    if r.returncode != 0:
+        log.warn("버전 올림", "git diff 실패 — 건너뜀")
+        return
+    changed = [x for x in r.stdout.splitlines() if x.strip()]
+    if not changed:
+        log.ok("버전 올림", f"{rel} 변경 없음")
+        return
+
+    manifest = f"{rel}/.claude-plugin/plugin.json"
+    try:
+        now = json.load(open(os.path.join(ROOT, manifest), encoding="utf-8")).get("version")
+    except Exception as e:
+        log.fail("버전 올림", f"plugin.json 을 읽지 못했다 — {e}")
+        return
+    r2 = run(["git", "show", f"{ref}:{manifest}"])
+    if r2.returncode != 0:
+        log.warn("버전 올림", "갈라진 지점에 plugin.json 이 없어 건너뜀")
+        return
+    try:
+        before = json.loads(r2.stdout).get("version")
+    except Exception as e:
+        log.warn("버전 올림", f"갈라진 지점의 plugin.json 을 읽지 못했다 — {e}")
+        return
+
+    if now == before:
+        log.fail("버전 올림",
+                 f"스킬 파일 {len(changed)}개가 바뀌었는데 version 이 {now} 그대로 — "
+                 f"{manifest} 와 CHANGELOG.md 를 올린다")
+    else:
+        log.ok("버전 올림", f"{before} → {now} · 스킬 파일 {len(changed)}개 변경")
+
+
 # ------------------------------------------------------------------------ main
 
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
     ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
-    ap.add_argument("--only", choices=["decks", "pptx", "dist", "encoding", "plugin", "sync"],
+    ap.add_argument("--only", choices=["decks", "pptx", "dist", "encoding", "plugin", "sync", "version"],
                     action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
     ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
     a = ap.parse_args()
 
-    only = set(a.only or ["decks", "pptx", "dist", "encoding", "plugin", "sync"])
+    only = set(a.only or ["decks", "pptx", "dist", "encoding", "plugin", "sync", "version"])
     log = Log()
 
     if a.shots:
@@ -310,7 +428,7 @@ def main():
     os.makedirs(tmp, exist_ok=True)
     try:
         if "decks" in only:
-            print("── 덱 5종 ──")
+            print("── 덱 6종 ──")
             check_decks(log, tmp, a.shots)
         if "pptx" in only:
             print("\n── PPTX ──")
@@ -327,6 +445,9 @@ def main():
         if "sync" in only:
             print("\n── HTML · PPTX 내용 동기화 ──")
             check_sync(log)
+        if "version" in only:
+            print("\n── 버전 올림 ──")
+            check_version(log)
     finally:
         if not a.keep:
             shutil.rmtree(tmp, ignore_errors=True)

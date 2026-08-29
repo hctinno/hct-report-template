@@ -27,7 +27,8 @@ ASSETS = os.path.join(ROOT, "assets")
 # 용도별 덱. 이름으로 고르거나 --deck 에 파일 경로를 직접 준다.
 DECKS = {
     "catalog":  "deck-template.html",         # 레이아웃 12종 카탈로그
-    "internal": "deck-internal-report.html",  # 사내 보고 (주간·월간)
+    "internal": "deck-internal-report.html",  # 사내 보고 (월간)
+    "weekly":   "deck-weekly-report.html",    # 조직 주간보고
     "sales":    "deck-sales-proposal.html",   # 외부 제안·영업
     "project":  "deck-project-report.html",   # 프로젝트 착수·완료
     "training": "deck-training.html",         # 교육·기술 설명
