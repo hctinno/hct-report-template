@@ -9,7 +9,7 @@ Playwright가 없으면 정적 검사만 수행하고 그 사실을 보고한다
 
 검사 항목 (11)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
-    1. 금지 문체(~습니다 / ~해요 등)를 쓰지 않았는가
+    1. 금지 문체 — 존댓말(~습니다 / ~해요)과 평서형(~한다 / ~없다) 없이 명사형인가
     2. 파이(<path> 호)를 쓰지 않았는가 — 도넛만 허용
     3. 토큰 밖 raw hex를 슬라이드에 직접 쓰지 않았는가
     4. 도넛 stroke-dasharray가 원주 계산과 맞는가
@@ -35,7 +35,13 @@ from palette import contrast, luminance, MIN_DATA_CONTRAST  # noqa: E402
 from ensure_deps import need_browser  # noqa: E402
 
 # 개조식·명사형 위반. 설문 문항 원문은 예외이므로 <!-- 원문 --> 주석이 같은 줄에 있으면 넘어간다.
+#   1) 합니다체·해요체 — 존댓말 종결
 STYLE_BAN = re.compile(r"(합니다|습니다|입니다|됩니다|해요|어요|예요|세요)(?=[\s.,·<!?)]|$)")
+#   2) 평서형 종결(~한다 · ~됐다 · ~없다 …) — 슬라이드 본문은 명사형으로 끝낸다.
+#      한글 음절 + '다' 로 끝나는 말을 잡되, 종결어미가 아닌 조사(마다 · 보다)는 뺀다.
+#      발표자 노트(data-notes)는 대상이 아니다. 태그를 걷어낼 때 함께 사라진다.
+#      '니다' 는 위 존댓말 규칙이 이미 잡으므로 여기서 빼서 두 번 세지 않게 한다.
+STYLE_BAN_PLAIN = re.compile(r"(?!마다|보다|니다)[가-힣]다(?=[\s.,·<!?)\]]|$)")
 STYLE_EXEMPT = re.compile(r"원문|설문 문항|survey-verbatim")
 
 # 토큰으로 관리하는 색 + 알파 표기. 이 밖의 raw hex는 경고 대상.
@@ -75,16 +81,30 @@ class Report:
 
 # ---------------------------------------------------------------- 정적 검사
 
+def _blank(html, pattern):
+    """주석·CSS·JS 를 공백으로 지운다. 줄바꿈은 남겨 행 번호를 보존한다."""
+    return re.sub(pattern, lambda m: re.sub(r"[^\n]", " ", m.group()), html, flags=re.S)
+
+
 def check_style(html, rep):
+    raw_lines = html.splitlines()
+    # 단일 파일 덱은 CSS·JS 가 본문에 인라인돼 있고 그 주석은 한국어 서술형이다.
+    # HTML 주석도 여러 줄이라 줄 단위로는 지워지지 않는다. 먼저 통째로 걷어낸다.
+    html = _blank(html, r"<!--.*?-->")
+    html = _blank(html, r"<style[^>]*>.*?</style>")
+    html = _blank(html, r"<script[^>]*>.*?</script>")
+
     bad = []
-    for n, line in enumerate(html.splitlines(), 1):
-        if STYLE_EXEMPT.search(line):
+    # 예외 표시(<!-- 원문 -->)는 주석 안에 있으므로 원본 줄에서 찾는다.
+    for n, (raw, line) in enumerate(zip(raw_lines, html.splitlines()), 1):
+        if STYLE_EXEMPT.search(raw):
             continue
-        # 태그와 주석을 걷어낸 본문 텍스트만 본다
-        text = re.sub(r"<!--.*?-->", "", line)
-        text = re.sub(r"<[^>]+>", " ", text)
+        # 태그를 걷어낸 본문 텍스트만 본다. data-notes 는 태그 안이라 함께 사라진다.
+        text = re.sub(r"<[^>]+>", " ", line)
         for m in STYLE_BAN.finditer(text):
             bad.append(f"{n}행 '{m.group(1)}' — {text.strip()[:60]}")
+        for m in STYLE_BAN_PLAIN.finditer(text):
+            bad.append(f"{n}행 '{m.group()}' 평서형 — {text.strip()[:60]}")
     if bad:
         rep.f(f"문체 위반 {len(bad)}건 (개조식·명사형 아님)")
         for b in bad[:8]:

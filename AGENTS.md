@@ -19,7 +19,7 @@ This repository is the HCT shared presentation design system, called **Blue Repo
   - `deck-training.html` training and technical explanation
   - `deck-template.html` catalog of all 12 layouts
 - Ask the user which purpose applies before choosing a deck when the request does not make it obvious.
-- Hard rules: use `--br-*` CSS custom properties only and add no raw hex; donut charts only, never pie; Korean body copy in 개조식 (noun-ending) form; slides are exactly 1920x1080; no text below 24px; the brand mark stays in the top-right margin band and body content never intrudes there.
+- Hard rules: use `--br-*` CSS custom properties only and add no raw hex; donut charts only, never pie; Korean slide copy in 개조식 (noun-ending) form — neither polite endings (`~합니다`) nor plain declaratives (`~한다`, `~없다`); speaker notes in `data-notes` are exempt; slides are exactly 1920x1080; no text below 24px; the brand mark stays in the top-right margin band and body content never intrudes there.
 - Write output to `decks-out/`, which is gitignored. Do not scatter result files in the checkout root.
 - Save Korean text as UTF-8 and treat mojibake patterns such as `???`, `濡`, `湲`, `遺`, `媛`, `李` as blocking corruption.
 - Preserve user changes. Inspect `git status` before editing.
