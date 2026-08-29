@@ -29,7 +29,11 @@ This repository is the HCT shared presentation design system, called **Blue Repo
 Python and Node only — no Claude Code dependency. Use `python3` on macOS and Linux.
 
 ```bash
-# Machine-checked rules. Required before reporting a deck complete.
+# Whole-repository check. Required after changing templates, scripts, or docs.
+# CI runs exactly this on every push and pull request.
+python scripts/verify_repo.py
+
+# Machine-checked rules for a single deck. Required before reporting a deck complete.
 python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 
 python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
@@ -38,6 +42,14 @@ node   .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --o
 ```
 
 `check_deck.py` enforces ten rules mechanically: banned sentence endings, pie charts, donut dasharray arithmetic, off-token hex, slide size, minimum font size, 2:1 contrast for data marks, brand-mark presence, mark/body overlap, and logo variant against background luminance. Its report is the completion evidence for deck work — a run with failures is not "done".
+
+`verify_repo.py` builds all five decks, runs `check_deck.py` on each, builds the four PPTX
+files, re-derives `dist/` and compares it against what is committed, scans Korean text for
+mojibake, and validates the plugin manifests. It exits 1 if anything fails. `.github/workflows/verify.yml`
+runs the same single command, so local and CI results cannot diverge.
+
+If you change `assets/`, rebuild `dist/` and commit it: `build_single_file.py` once with no
+arguments, once with `--artifact --brand brand/hct/brand.json`. The dist check fails otherwise.
 
 PPTX content lives separately in `pptx/content.js`. The HTML decks are the source of truth, so change both when content changes. Colors cannot drift because `pptx/tokens.js` parses `assets/blue-report.css`.
 

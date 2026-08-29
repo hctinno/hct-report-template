@@ -1,0 +1,307 @@
+#!/usr/bin/env python3
+"""저장소 전체 점검 — CI 와 로컬이 같은 명령을 쓴다.
+
+    python3 scripts/verify_repo.py             # 전부 점검
+    python3 scripts/verify_repo.py --shots out # 슬라이드별 PNG 도 남긴다
+    python3 scripts/verify_repo.py --only decks
+
+검사 항목
+  decks     덱 5종을 apply_brand.py 로 만들고 check_deck.py 로 판정한다.
+            10항목 중 `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
+            `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
+  pptx      build.js 가 돌고 .pptx 4종이 나오는가.
+  dist      dist/ 의 두 파일이 소스에서 재생성한 것과 같은가.
+            assets/ 를 고치고 dist/ 를 다시 만들지 않으면 여기서 걸린다.
+  encoding  한국어가 UTF-8 로 저장됐고 깨짐 패턴이 없는가.
+  plugin    마켓플레이스·플러그인 매니페스트가 성립하는가.
+            여기가 깨지면 다른 PC 에서 `plugin install` 이 실패한다.
+
+종료 코드는 실패가 하나라도 있으면 1, 아니면 0 이다.
+"""
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import unicodedata
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SKILL = os.path.join(ROOT, ".claude", "skills", "blue-report")
+SCRIPTS = os.path.join(SKILL, "scripts")
+BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
+
+DECKS = ["catalog", "internal", "sales", "project", "training"]
+
+# dist/ 의 두 파일은 빌드 명령이 서로 다르다. 아래가 그 정본이다.
+DIST_BUILDS = [
+    ("blue-report-deck.html", []),
+    ("blue-report-artifact.html", ["--artifact", "--brand", BRAND]),
+]
+
+# 인코딩이 깨졌을 때 나오는 대표 글자. 스크립트 자신이 걸리지 않도록 코드포인트로 적는다.
+MOJIBAKE = ["濡", "湲", "遺", "媛", "李", "???"]
+# 이 패턴을 규칙 문장으로 인용하는 문서. 검사에서 제외한다.
+MOJIBAKE_EXEMPT = {"CLAUDE.md", "AGENTS.md", os.path.join("scripts", "verify_repo.py")}
+SCAN_EXT = {".md", ".html", ".js", ".py", ".json", ".css", ".yml", ".yaml"}
+
+RESULT_RE = re.compile(r"결과: 통과 (\d+) · 주의 (\d+) · 실패 (\d+)")
+
+
+class Log:
+    def __init__(self):
+        self.rows, self.failed = [], False
+
+    def ok(self, name, detail=""):
+        self.rows.append(("통과", name, detail))
+
+    def warn(self, name, detail=""):
+        self.rows.append(("주의", name, detail))
+
+    def fail(self, name, detail=""):
+        self.rows.append(("실패", name, detail))
+        self.failed = True
+
+    @staticmethod
+    def _w(s):
+        """한글은 터미널에서 두 칸을 먹는다. 그 폭으로 센다."""
+        return sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in s)
+
+    def render(self):
+        print("\n" + "=" * 62)
+        print("저장소 점검 결과")
+        print("=" * 62)
+        w = max((self._w(n) for _, n, _ in self.rows), default=0)
+        for mark, name, detail in self.rows:
+            pad = " " * (w - self._w(name))
+            print(f"  {mark}  {name}{pad}  {detail}")
+        n_ok = sum(1 for m, _, _ in self.rows if m == "통과")
+        n_wa = sum(1 for m, _, _ in self.rows if m == "주의")
+        n_fa = sum(1 for m, _, _ in self.rows if m == "실패")
+        print(f"\n통과 {n_ok} · 주의 {n_wa} · 실패 {n_fa}")
+        if self.failed:
+            print("\n실패가 있다. 완료가 아니다.")
+        return 1 if self.failed else 0
+
+
+def run(cmd, cwd=None):
+    return subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True)
+
+
+# ------------------------------------------------------------------- 덱 5종
+
+def check_decks(log, out_dir, shots_dir):
+    for name in DECKS:
+        deck = os.path.join(out_dir, f"{name}.html")
+        r = run([sys.executable, os.path.join(SCRIPTS, "apply_brand.py"),
+                 "--brand", BRAND, "--deck", name, "--single-file", "-o", deck])
+        if r.returncode != 0 or not os.path.exists(deck):
+            log.fail(f"덱 {name}", "apply_brand.py 실패 — " + (r.stderr.strip().splitlines() or [""])[-1])
+            continue
+
+        cmd = [sys.executable, os.path.join(SCRIPTS, "check_deck.py"), deck]
+        if shots_dir:
+            cmd += ["--shots", os.path.join(shots_dir, name)]
+        r = run(cmd)
+        print(r.stdout, end="")
+        if r.stderr.strip():
+            print(r.stderr, end="", file=sys.stderr)
+
+        m = RESULT_RE.search(r.stdout)
+        if not m:
+            log.fail(f"덱 {name}", "check_deck.py 가 결과 줄을 내지 않았다")
+            continue
+        ok, warn, fail = (int(x) for x in m.groups())
+        detail = f"통과 {ok} · 주의 {warn} · 실패 {fail}"
+        if fail or r.returncode != 0:
+            log.fail(f"덱 {name}", detail)
+        elif warn:
+            log.warn(f"덱 {name}", detail)
+        else:
+            log.ok(f"덱 {name}", detail)
+
+
+# ---------------------------------------------------------------------- PPTX
+
+def check_pptx(log, out_dir):
+    if not shutil.which("node"):
+        log.fail("PPTX 생성", "node 가 없다")
+        return
+    r = run(["node", os.path.join(SKILL, "pptx", "build.js"),
+             "--brand", BRAND, "--out", out_dir])
+    made = sorted(f for f in os.listdir(out_dir) if f.endswith(".pptx"))
+    if r.returncode != 0:
+        log.fail("PPTX 생성", (r.stderr.strip().splitlines() or ["build.js 실패"])[-1])
+    elif len(made) != 4:
+        log.fail("PPTX 생성", f"4종이 나와야 하는데 {len(made)}종")
+    else:
+        log.ok("PPTX 생성", f"{len(made)}종 — " + ", ".join(made))
+
+
+# ---------------------------------------------------------------------- dist
+
+def check_dist(log):
+    """dist/ 가 소스에서 재생성한 것과 같은지 본다. 원본은 건드리지 않는다."""
+    dist = os.path.join(SKILL, "dist")
+    backup = {}
+    try:
+        for fname, _ in DIST_BUILDS:
+            p = os.path.join(dist, fname)
+            backup[fname] = open(p, "rb").read() if os.path.exists(p) else None
+
+        for fname, extra in DIST_BUILDS:
+            r = run([sys.executable, os.path.join(SCRIPTS, "build_single_file.py")] + extra)
+            p = os.path.join(dist, fname)
+            if r.returncode != 0 or not os.path.exists(p):
+                log.fail(f"dist/{fname}", "재생성 실패 — " + (r.stderr.strip().splitlines() or [""])[-1])
+                continue
+            if open(p, "rb").read() == backup[fname]:
+                log.ok(f"dist/{fname}", "소스와 일치")
+            else:
+                cmd = "python3 .claude/skills/blue-report/scripts/build_single_file.py " + " ".join(
+                    "brand/hct/brand.json" if x == BRAND else x for x in extra)
+                log.fail(f"dist/{fname}", f"소스와 다르다 — 다시 만들어 커밋한다: {cmd}")
+    finally:
+        for fname, data in backup.items():
+            if data is not None:
+                open(os.path.join(dist, fname), "wb").write(data)
+
+
+# ------------------------------------------------------------------ 인코딩
+
+def check_encoding(log):
+    r = run(["git", "ls-files"])
+    if r.returncode != 0:
+        log.warn("한국어 인코딩", "git ls-files 실패 — 건너뜀")
+        return
+    bad = []
+    for rel in r.stdout.splitlines():
+        if os.path.splitext(rel)[1] not in SCAN_EXT:
+            continue
+        if rel in MOJIBAKE_EXEMPT or rel.replace("/", os.sep) in MOJIBAKE_EXEMPT:
+            continue
+        p = os.path.join(ROOT, rel)
+        try:
+            text = open(p, encoding="utf-8").read()
+        except UnicodeDecodeError:
+            bad.append(f"{rel} (UTF-8 아님)")
+            continue
+        hits = [m for m in MOJIBAKE if m in text]
+        if hits:
+            bad.append(f"{rel} ({' '.join(hits)})")
+    if bad:
+        log.fail("한국어 인코딩", "깨짐 의심 — " + "; ".join(bad[:5]))
+    else:
+        log.ok("한국어 인코딩", "UTF-8 · 깨짐 패턴 없음")
+
+
+# ------------------------------------------------------------------ 배포
+
+def check_plugin(log):
+    """`plugin install` 이 성립하는 최소 조건을 본다."""
+    mp = os.path.join(ROOT, ".claude-plugin", "marketplace.json")
+    try:
+        data = json.load(open(mp, encoding="utf-8"))
+    except Exception as e:
+        log.fail("마켓플레이스 매니페스트", f"{mp} 를 읽지 못했다 — {e}")
+        return
+
+    plugins = data.get("plugins") or []
+    if not data.get("name") or not plugins:
+        log.fail("마켓플레이스 매니페스트", "name 또는 plugins 가 비어 있다")
+        return
+    log.ok("마켓플레이스 매니페스트", f"{data['name']} · 플러그인 {len(plugins)}개")
+
+    for entry in plugins:
+        pname = entry.get("name", "(이름 없음)")
+        src = entry.get("source", "")
+        pdir = os.path.normpath(os.path.join(ROOT, src))
+        if not os.path.isdir(pdir):
+            log.fail(f"플러그인 {pname}", f"source 경로가 없다 — {src}")
+            continue
+
+        manifest = os.path.join(pdir, ".claude-plugin", "plugin.json")
+        if not os.path.exists(manifest):
+            log.fail(f"플러그인 {pname}", "plugin.json 이 없다")
+            continue
+        try:
+            pj = json.load(open(manifest, encoding="utf-8"))
+        except Exception as e:
+            log.fail(f"플러그인 {pname}", f"plugin.json 이 깨졌다 — {e}")
+            continue
+        if pj.get("name") != pname:
+            log.fail(f"플러그인 {pname}",
+                     f"이름이 어긋난다 — marketplace {pname} · plugin.json {pj.get('name')}")
+            continue
+
+        skill = os.path.join(pdir, "SKILL.md")
+        if not os.path.exists(skill):
+            log.fail(f"플러그인 {pname}", "SKILL.md 가 없다")
+            continue
+        head = open(skill, encoding="utf-8").read(2048)
+        if not head.startswith("---") or "\nname:" not in head:
+            log.fail(f"플러그인 {pname}", "SKILL.md 머리말에 name 이 없다")
+            continue
+
+        log.ok(f"플러그인 {pname}", f"v{pj.get('version', '?')} · {src}")
+
+    # 저장소 설정이 가리키는 마켓플레이스 이름이 실제와 같은가
+    st = os.path.join(ROOT, ".claude", "settings.json")
+    if os.path.exists(st):
+        try:
+            known = json.load(open(st, encoding="utf-8")).get("extraKnownMarketplaces", {})
+        except Exception as e:
+            log.fail("settings.json", f"읽지 못했다 — {e}")
+            return
+        if known and data.get("name") not in known:
+            log.fail("settings.json",
+                     f"등록된 이름 {list(known)} 이 marketplace.json 의 {data['name']} 와 다르다")
+        else:
+            log.ok("settings.json", "마켓플레이스 이름 일치")
+
+
+# ------------------------------------------------------------------------ main
+
+def main():
+    ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
+    ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
+    ap.add_argument("--only", choices=["decks", "pptx", "dist", "encoding", "plugin"],
+                    action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
+    ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
+    a = ap.parse_args()
+
+    only = set(a.only or ["decks", "pptx", "dist", "encoding", "plugin"])
+    log = Log()
+
+    if a.shots:
+        os.makedirs(a.shots, exist_ok=True)
+
+    tmp = a.keep or tempfile.mkdtemp(prefix="blue-report-verify-")
+    os.makedirs(tmp, exist_ok=True)
+    try:
+        if "decks" in only:
+            print("── 덱 5종 ──")
+            check_decks(log, tmp, a.shots)
+        if "pptx" in only:
+            print("\n── PPTX ──")
+            check_pptx(log, tmp)
+        if "dist" in only:
+            print("\n── dist 재생성 대조 ──")
+            check_dist(log)
+        if "encoding" in only:
+            print("\n── 한국어 인코딩 ──")
+            check_encoding(log)
+        if "plugin" in only:
+            print("\n── 배포 매니페스트 ──")
+            check_plugin(log)
+    finally:
+        if not a.keep:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    return log.render()
+
+
+if __name__ == "__main__":
+    sys.exit(main())

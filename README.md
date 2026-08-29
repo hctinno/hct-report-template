@@ -99,6 +99,22 @@ python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 
 `--shots <폴더>` 를 붙이면 슬라이드별 PNG 를 남긴다. 겹침은 스크립트가 잡지만 어색한 여백은 잡지 못하므로 눈으로 한 번 본다.
 
+### 템플릿 자체를 고쳤다면
+
+덱 하나가 아니라 템플릿·스크립트·문서를 고쳤을 때는 저장소 전체를 본다.
+
+```bash
+python3 scripts/verify_repo.py            # 전부
+python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 48장도 남긴다
+```
+
+덱 5종을 만들어 `check_deck.py` 로 판정하고, PPTX 4종 생성 · `dist/` 재생성 대조 ·
+한국어 인코딩 · 배포 매니페스트를 함께 본다. 실패가 있으면 종료 코드가 1 이다.
+
+**GitHub Actions 가 push·PR 마다 이 스크립트를 그대로 돌린다**(`.github/workflows/verify.yml`).
+CI 와 로컬이 같은 한 줄을 쓰므로 결과가 갈라지지 않는다. 워크플로를 수동 실행할 때
+`shots` 를 켜면 슬라이드 PNG 를 아티팩트로 내려받을 수 있다.
+
 ---
 
 ## 브랜드
@@ -151,7 +167,9 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   pptx/                                  PowerPoint 생성기
 brand/hct/                               회사 정보와 로고
 docs/CODEX_DECK_PROMPT.md                Codex 등 외부 에이전트용 작업 지시서
+scripts/verify_repo.py                   저장소 전체 점검 — CI 가 이것을 돌린다
 scripts/install_blue_report_skill.py     오프라인 복사 설치기
+.github/workflows/verify.yml             push·PR 자동 점검
 ```
 
 `pptx/tokens.js` 가 `blue-report.css` 의 `--br-*` 를 파싱하므로 HTML 판과 PPTX 판의 색이 갈라질 수 없다.

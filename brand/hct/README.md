@@ -37,6 +37,12 @@ python3 .claude/skills/blue-report/scripts/apply_brand.py \
   인쇄나 큰 확대에는 부족하다. **SVG 또는 고해상도 원본**이 있으면 교체한다.
 - 흰색 녹아웃은 원본에서 파생한 것이다. 사내 브랜드 가이드에 별도 규정된
   반전 로고가 있으면 그것으로 교체한다.
-- 덱의 강조색은 블루 리포트 기본 코발트 `#1140d6`다. 회사 지정색을 쓰려면
-  `.claude/skills/blue-report/assets/blue-report.css`의 `--br-cobalt`를 바꾼다.
-  로고색 `#2f4a9c`는 밝은 지면 대비 7.51 : 1로 강조색 요건을 만족한다.
+
+## 강조색은 교체가 끝났다
+
+`blue-report.css`의 `--br-cobalt`는 이미 HCT 로고색 `#2f4a9c`다. 블루 리포트 원래
+기본값은 `#1140d6`이었고, 이 저장소를 분리하면서 회사 지정색으로 바꿨다.
+밝은 지면 `#f4f6f8` 대비 7.51 : 1로 강조색 요건을 만족하므로 더 손댈 것이 없다.
+
+바꿀 일이 생기면 `.claude/skills/blue-report/assets/blue-report.css`의 `--br-cobalt`
+한 줄만 고친다. 슬라이드에는 hex 를 직접 적지 않으므로 그 한 줄이 전부다.
