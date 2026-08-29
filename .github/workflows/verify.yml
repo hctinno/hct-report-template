@@ -10,9 +10,11 @@
 
 name: 저장소 점검
 
+# push 는 main 만 본다. 작업 브랜치는 PR 쪽에서 보므로,
+# 양쪽을 다 걸면 같은 커밋에 두 번 돈다.
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
     inputs:
@@ -46,7 +48,7 @@ jobs:
       - name: Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       # Chromium 은 150MB 다. 캐시가 맞으면 내려받지 않는다.
       - name: Chromium 캐시
