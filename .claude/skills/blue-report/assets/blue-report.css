@@ -1,0 +1,386 @@
+/* ============================================================================
+   블루 리포트 디자인 시스템 — 토큰 · 파운데이션 · 애니메이션
+   기준 캔버스 1920x1080. 최소 글자 24px.
+   색은 이 파일의 커스텀 속성으로만 쓴다. 슬라이드에 raw hex를 직접 적지 않는다.
+   ========================================================================= */
+
+/* 폰트는 문서 <head>에서 불러온다.
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"> */
+
+:root {
+  /* ---------- 지면 ---------- */
+  --br-page:        #f4f6f8;   /* 밝은 본문 지면 — 배경은 이것 1개 + 다크면 2개까지만 */
+  --br-card:        #ffffff;
+  --br-card-line:   #dbe3ec;
+  --br-card-shadow: 0 10px 28px rgba(11,42,107,.07);
+  --br-hairline:    #c3cedb;   /* 기준선 · 구분선 */
+  --br-chip-line:   #c8d1dc;   /* 알약 칩 테두리 */
+
+  /* ---------- 텍스트 ---------- */
+  --br-text:   #10151c;
+  --br-text-2: #54606e;
+  --br-text-3: #8b98a6;
+
+  /* ---------- 강조 ---------- */
+  --br-cobalt: #2f4a9c;   /* 강조 1 · 주 — HCT 브랜드 블루. 지면 대비 7.51:1 */
+  --br-cyan:   #35b8f0;   /* 강조 2 */
+  --br-navy:   #0b2a6b;   /* 깊은 값 · 키워드 볼드 */
+  --br-coral:  #ff7a59;   /* 경고 · 핵심 단일 수치 */
+
+  /* ---------- 주의 콜아웃 ---------- */
+  --br-warn-line: #f0c469;
+  --br-warn-bg:   #fff7e4;
+  --br-warn-text: #8a5a00;
+
+  /* 지연 · 위험 상태 표시 (코랄 계열). 텍스트 대비 6.22:1 */
+  --br-alert-bg:   #fff1ec;
+  --br-alert-text: #a33418;
+
+  /* ---------- 다크면 (2종까지) ---------- */
+  --br-cover:     #071b45;  /* 표지 · 파트 간지 */
+  --br-dark:      #101827;  /* 핵심 정리 */
+  --br-dark-card: #182238;
+  --br-dark-line: #2b3852;
+
+  /* 다크면 위 텍스트 */
+  --br-on-dark:    #f4f6f8;
+  --br-on-dark-2:  #a9bcd6;
+  --br-on-dark-3:  #6b7c96;
+  --br-on-cover-2: #a6c2e6;
+  --br-on-cover-3: #8aa3c4;
+  --br-accent-on-dark: #6fa8ff;   /* 다크면 위 강조 · 숫자 */
+  --br-amber:      #ffcf6b;       /* 다크면 위 마지막 단계 강조 */
+
+  /* ---------- 데이터 램프 (밝은 지면 전용) ----------
+     값이 클수록 진한 단조 램프. 5색 모두 지면 #f4f6f8 대비 2:1 이상.
+     12.44 / 7.11 / 3.58 / 2.73 / 2.10 : 1 */
+  --br-data-1: #0b2a6b;
+  --br-data-2: #2f4a9c;
+  --br-data-3: #2f7ff0;
+  --br-data-4: #5b9bd5;
+  --br-data-5: #86b0da;
+
+  /* 구간이 6개 이상이면 양 끝을 고정한 보간 램프를 쓴다. scripts/palette.py --steps N 으로 생성.
+     아래는 7단계. 전 단계 지면 대비 2:1 이상, 인접 색 중복 없음. */
+  --br-bar-1: #0b2a6b;  --br-bar-2: #20407e;  --br-bar-3: #345790;  --br-bar-4: #486da2;
+  --br-bar-5: #5d83b5;  --br-bar-6: #729ac8;  --br-bar-7: #86b0da;
+
+  /* ---------- 소프트 램프 (다크면 위 데이터 · 밝은 면의 비데이터 요소) ----------
+     밝은 지면에서는 대비 1.67~1.96:1로 2:1에 미달한다. 밝은 면의 데이터 마크에 쓰지 않는다. */
+  --br-soft-1: #7fb6f5;
+  --br-soft-2: #9dc4f2;
+  --br-soft-3: #a4c4e5;
+
+  /* ---------- 타입 ---------- */
+  --br-font-kr:    'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  --br-font-num:   'Barlow', 'Noto Sans KR', sans-serif;
+  --br-font-label: 'Barlow Condensed', 'Barlow', sans-serif;
+  /* 사내 폰트 배정 자리 — 확정되면 위 세 줄의 첫 패밀리만 교체한다. */
+
+  --br-fs-cover:      108px;  /* 표지 제목 */
+  --br-fs-display:     96px;  /* 마무리 CTA 제목 */
+  --br-fs-part:        84px;  /* 파트 번호 (Barlow Condensed) */
+  --br-fs-h2:          62px;  /* 슬라이드 제목 */
+  --br-fs-h2-sm:       54px;  /* 두 줄 이상 슬라이드 제목 */
+  --br-fs-h3:          38px;  /* 목차 항목 */
+  --br-fs-card-title:  32px;
+  --br-fs-lede:        28px;  /* 제목 아래 요약 문장 */
+  --br-fs-label:       26px;  /* 섹션 라벨 (Barlow Condensed) */
+  --br-fs-body:        25px;
+  --br-fs-foot:        24px;  /* 하한 */
+  --br-fs-stat-hero:  200px;  /* 단일 수치 강조 */
+  --br-fs-stat:        56px;  /* 카드 안 수치 */
+  --br-fs-stat-sm:     32px;  /* 막대 값 컬럼 */
+  --br-sup:          .44em;   /* % 첨자 — 24px 하한의 유일한 예외 */
+
+  --br-ls-tight: -.03em;
+  --br-ls-label:  .14em;
+  --br-ls-mark:   .2em;
+
+  /* ---------- 간격 ---------- */
+  --br-sp-1: 8px;  --br-sp-2: 14px; --br-sp-3: 22px; --br-sp-4: 34px;
+  --br-sp-5: 52px; --br-sp-6: 84px;
+  --br-pad-slide: 84px 96px 60px;
+  --br-pad-cover: 110px 120px 80px;
+  --br-gap-card:  32px;
+
+  /* ---------- 형태 ---------- */
+  --br-r-card: 18px;
+  --br-r-pill: 999px;
+  --br-r-bar:  2px;   /* 좁은 채널의 막대. 넓은 막대만 999px 허용 */
+}
+
+/* ============================================================================
+   1. 슬라이드 골격
+   ========================================================================= */
+
+.br-deck { margin:0; padding:0; background:#111; }
+
+.br-slide {
+  position:relative;
+  box-sizing:border-box;
+  width:1920px; height:1080px;
+  overflow:hidden;
+  font-family:var(--br-font-kr);
+  background:var(--br-page);
+  color:var(--br-text);
+  padding:var(--br-pad-slide);
+  display:flex; flex-direction:column;
+}
+/* 한글이 음절 단위로 잘리지 않게 전역 적용 */
+.br-slide, .br-slide * { word-break:keep-all; overflow-wrap:break-word; }
+
+.br-slide--cover { background:var(--br-cover); color:var(--br-on-dark); padding:var(--br-pad-cover); }
+.br-slide--dark  { background:var(--br-dark);  color:var(--br-on-dark); }
+
+/* 표지·간지의 세로 안내선. 장식색이 아니라 흰색 알파라서 배경 규칙에 걸리지 않는다. */
+.br-rule { position:absolute; top:0; bottom:0; border-left:1px solid rgba(244,246,248,.14); }
+.br-rule--a { right:0;   width:44%; }
+.br-rule--b { right:0;   width:22%; border-left-color:rgba(244,246,248,.08); }
+
+/* ============================================================================
+   2. 타이포 파운데이션
+   ========================================================================= */
+
+.br-eyebrow {           /* 섹션 라벨 */
+  margin:0 0 var(--br-sp-2);
+  font:600 var(--br-fs-label)/1 var(--br-font-label);
+  letter-spacing:var(--br-ls-label);
+  text-transform:uppercase;
+  color:var(--br-navy);
+}
+.br-slide--dark .br-eyebrow, .br-slide--cover .br-eyebrow { color:var(--br-accent-on-dark); }
+
+.br-title  { margin:0; font:900 var(--br-fs-h2)/1.2 var(--br-font-kr); letter-spacing:var(--br-ls-tight); }
+.br-title--sm { font-size:var(--br-fs-h2-sm); line-height:1.3; }
+/* 제목 안에서 weight 300과 900을 대비시킨다: <h2 class="br-title br-title--light">가벼운 앞말 <strong>굵은 핵심</strong></h2> */
+.br-title--light { font-weight:300; }
+.br-title--light strong { font-weight:900; }
+
+.br-lede {
+  margin:var(--br-sp-3) 0 0;
+  font:400 var(--br-fs-lede)/1.6 var(--br-font-kr);
+  color:var(--br-text-2);
+}
+.br-slide--dark .br-lede, .br-slide--cover .br-lede { color:var(--br-on-cover-2); }
+
+.br-body { font:400 var(--br-fs-body)/1.6 var(--br-font-kr); color:var(--br-text-2); margin:0; }
+
+/* 핵심 수치 · 개념 강조 */
+.br-key { font-weight:700; color:var(--br-navy); }
+.br-slide--dark .br-key, .br-slide--cover .br-key { color:var(--br-on-dark); }
+
+/* 숫자는 항상 Barlow 700 */
+.br-num { font-family:var(--br-font-num); font-weight:700; font-variant-numeric:tabular-nums; }
+.br-sup { font-size:var(--br-sup); }   /* % 첨자 */
+
+/* 키워드 — 내용 구조의 서술 분할 */
+.br-split { margin:0 0 18px; font:400 var(--br-fs-body)/1.7 var(--br-font-kr); color:var(--br-text-2); }
+.br-split > strong { font-weight:700; color:var(--br-text); }
+
+/* ============================================================================
+   3. 파운데이션 카드 · 칩 · 콜아웃
+   ========================================================================= */
+
+.br-card {
+  box-sizing:border-box;
+  background:var(--br-card);
+  border:1px solid var(--br-card-line);
+  border-radius:var(--br-r-card);
+  box-shadow:var(--br-card-shadow);
+  padding:30px 34px;
+}
+.br-slide--dark .br-card {
+  background:var(--br-dark-card);
+  border-color:var(--br-dark-line);
+  box-shadow:none;
+}
+/* 단계 강조가 필요한 카드만 상단 굵은 테두리 허용 */
+.br-card--step  { border-top:8px solid var(--br-cobalt); }
+.br-card--final { background:var(--br-navy); color:#fff; border:none; border-top:8px solid var(--br-amber); }
+
+/* 알약 칩 — 한 줄 전용. 두 줄이 되면 .br-chip--rect 로 바꾼다. */
+.br-chip {
+  display:inline-block; box-sizing:border-box;
+  border:1px solid var(--br-chip-line);
+  border-radius:var(--br-r-pill);
+  background:var(--br-card);
+  padding:14px 26px;
+  font:500 var(--br-fs-body)/1 var(--br-font-kr);
+  color:#45505c;
+  box-shadow:none;               /* 칩에는 그림자를 주지 않는다 */
+  white-space:nowrap;
+}
+.br-chip--rect { border-radius:var(--br-r-card); white-space:normal; line-height:1.4; }
+.br-chip--solid { background:var(--br-cobalt); border-color:var(--br-cobalt); color:#fff; font-family:var(--br-font-num); font-weight:600; }
+.br-slide--dark .br-chip, .br-slide--cover .br-chip {
+  background:transparent; border-color:rgba(244,246,248,.5); color:var(--br-on-dark);
+}
+
+/* 주의 콜아웃 */
+.br-callout {
+  border:1px solid var(--br-warn-line);
+  background:var(--br-warn-bg);
+  color:var(--br-warn-text);
+  border-radius:var(--br-r-card);
+  padding:24px 30px;
+  font:500 var(--br-fs-body)/1.6 var(--br-font-kr);
+}
+
+/* 번호 인덱스 (다크 정리면 카드) */
+.br-index {
+  display:block; box-sizing:border-box;
+  border:1px solid var(--br-dark-line);
+  padding:10px 0; text-align:center;
+  font:600 var(--br-fs-foot)/1 var(--br-font-num);
+  color:var(--br-on-dark-2);
+}
+
+/* 푸터 — 콘텐츠와 겹치지 않게 항상 마지막 형제로 둔다 */
+.br-footer {
+  margin-top:var(--br-sp-3);
+  font:400 var(--br-fs-foot)/1 var(--br-font-kr);
+  color:var(--br-text-3);
+  text-align:right;
+  flex-shrink:0;
+}
+.br-footer strong { font-weight:700; color:var(--br-text-2); }
+.br-slide--dark .br-footer { color:var(--br-on-dark-3); }
+.br-slide--dark .br-footer strong { color:var(--br-on-dark-2); }
+
+/* 브랜드 마크 — 모든 슬라이드의 우측 상단 모서리. 표지도 본문도 같은 자리다.
+   상하 여백 띠 안에 들어가므로 본문과 절대 겹치지 않는다.
+     일반 슬라이드  padding-top 84  → 26..66px  (본문 시작 84px, 18px 여유)
+     표지·간지      padding-top 110 → 38..78px  (본문 시작 110px, 32px 여유)
+   data-on 이 배경 밝기를 선언한다. apply_brand.py 가 이 값을 보고 로고 변형을 고른다.
+     data-on="dark"  다크·코발트 배경 → 흰색 녹아웃 로고
+     data-on="light" 밝은 지면       → 원색(파란) 로고 */
+.br-mark {
+  position:absolute;
+  top:26px; right:96px;
+  z-index:5;
+  display:flex; align-items:center;
+  pointer-events:none;          /* 클릭·선택을 가로막지 않는다 */
+}
+.br-slide--cover .br-mark { top:38px; right:120px; }
+
+/* 워드마크 — 로고 확정 전까지 텍스트로 처리한다.
+   apply_brand.py 가 brand.json 의 logo/logoOnLight 로 교체한다. */
+.br-wordmark {
+  font:600 28px/1 var(--br-font-label);
+  letter-spacing:var(--br-ls-mark);
+  color:var(--br-cobalt);                     /* 밝은 지면 기본값 */
+}
+.br-mark[data-on="dark"] .br-wordmark { color:var(--br-on-dark); }
+
+.br-logo { display:block; height:40px; width:auto; }
+
+/* ============================================================================
+   4. 차트 파운데이션
+   ========================================================================= */
+
+/* 도넛 — 원주 기반 stroke-dasharray로만 그린다. <path d="M…A…"> 파이 금지.
+   각 구간: dash = C*pct/100 - C*1.5/360, rotate(누적pct*3.6 - 90) */
+.br-donut { display:block; }
+.br-donut circle { fill:none; stroke-linecap:butt; }
+
+/* 도넛 범례 — 홀 안이 아니라 도넛 밖에 둔다 */
+.br-legend { display:flex; flex-wrap:wrap; gap:26px; justify-content:center; }
+.br-legend-item { text-align:center; }
+.br-legend-name { font:700 var(--br-fs-foot)/1.3 var(--br-font-kr); color:var(--br-text); }
+.br-legend-val  { font:600 var(--br-fs-foot)/1.3 var(--br-font-num); color:var(--br-cobalt); }
+.br-dot { display:inline-block; width:12px; height:12px; border-radius:50%; vertical-align:middle; margin-right:8px; }
+
+/* 세로 막대 — 값은 막대 안이 아니라 막대 위 전용 줄에 */
+.br-col      { display:flex; flex-direction:column; justify-content:flex-end; text-align:center; height:100%; }
+.br-col-val  { font:700 var(--br-fs-stat-sm)/1 var(--br-font-num); margin-bottom:12px; color:var(--br-text); }
+.br-col-val--muted { color:var(--br-text-2); }
+.br-bar-v    { transform-origin:bottom; border-radius:8px 8px 0 0; }   /* 넓은 세로 막대만 8px */
+.br-col-name { text-align:center; font:700 var(--br-fs-foot)/1.35 var(--br-font-kr); }
+
+/* 가로 막대 — 이름 / 채널 / 값을 각각 다른 그리드 컬럼에 둔다 */
+.br-bars-h    { display:grid; grid-template-columns:auto 1fr 140px; align-items:center; gap:20px 24px; }
+.br-bar-track { height:28px; background:#e6ecf3; border-radius:var(--br-r-bar); overflow:hidden; }
+.br-bar-h     { height:100%; transform-origin:left; border-radius:var(--br-r-bar); }
+.br-bar-name  { font:500 var(--br-fs-body)/1.3 var(--br-font-kr); color:var(--br-text); white-space:nowrap; }
+.br-bar-val   { font:700 var(--br-fs-stat-sm)/1 var(--br-font-num); color:var(--br-navy); text-align:right; }
+
+/* 표 — 얼룩무늬를 쓰지 않는다. 얇은 구분선과 머리행 아래선만으로 구분한다 */
+.br-table { width:100%; border-collapse:collapse; font-family:var(--br-font-kr); }
+.br-table th {
+  text-align:left; padding:0 20px 18px;
+  font:700 var(--br-fs-foot)/1.3 var(--br-font-kr);
+  color:var(--br-navy); border-bottom:2px solid var(--br-navy);
+}
+.br-table td {
+  padding:20px; font:400 var(--br-fs-body)/1.4 var(--br-font-kr);
+  color:var(--br-text-2); border-bottom:1px solid var(--br-card-line);
+}
+.br-table tr:last-child td { border-bottom:none; }
+.br-table td:first-child { font-weight:700; color:var(--br-text); }
+.br-table .num, .br-table th.num {
+  font-family:var(--br-font-num); font-weight:700; color:var(--br-text);
+  text-align:right; font-variant-numeric:tabular-nums;
+}
+.br-table th.num { color:var(--br-navy); }
+
+/* 상태 칩 — 그림자 없는 알약. 색만이 아니라 글자로도 상태를 말한다 */
+.br-status {
+  display:inline-block; border-radius:var(--br-r-pill); padding:8px 18px;
+  font:600 var(--br-fs-foot)/1 var(--br-font-kr); white-space:nowrap;
+}
+.br-status--ok    { background:var(--br-card);     border:1px solid var(--br-chip-line); color:var(--br-text-2); }
+.br-status--warn  { background:var(--br-warn-bg);  border:1px solid var(--br-warn-line); color:var(--br-warn-text); }
+.br-status--late  { background:var(--br-alert-bg); border:1px solid var(--br-coral);     color:var(--br-alert-text); }
+
+/* 일정 타임라인 — 이름 컬럼과 기간 격자를 분리해 막대가 이름을 덮지 않게 한다 */
+.br-tl        { display:flex; flex-direction:column; gap:16px; }
+.br-tl-row    { display:grid; grid-template-columns:300px 1fr; align-items:center; gap:28px; }
+.br-tl-name   { font:700 var(--br-fs-body)/1.3 var(--br-font-kr); color:var(--br-text); }
+.br-tl-track  { display:grid; align-items:center; position:relative; min-height:44px; }
+.br-tl-head   { font:600 var(--br-fs-foot)/1 var(--br-font-label); letter-spacing:.1em;
+                color:var(--br-text-3); text-align:center; text-transform:uppercase; }
+.br-tl-bar    { height:38px; border-radius:var(--br-r-bar); transform-origin:left;
+                display:flex; align-items:center; padding:0 16px;
+                font:600 var(--br-fs-foot)/1 var(--br-font-kr); color:#fff; white-space:nowrap; }
+.br-tl-line   { position:absolute; top:0; bottom:0; border-left:1px solid var(--br-card-line); }
+/* 마일스톤 — 기간 막대와 겹치지 않게 트랙 아래 별도 줄에 둔다 */
+.br-tl-mile   { display:flex; align-items:center; gap:10px;
+                font:600 var(--br-fs-foot)/1 var(--br-font-kr); color:var(--br-navy); }
+.br-tl-dot    { width:14px; height:14px; border-radius:50%; background:var(--br-coral); flex:none; }
+
+/* 기준선 */
+.br-baseline { position:absolute; left:0; right:0; border-top:1px solid var(--br-hairline); }
+.br-baseline > span { position:absolute; right:0; top:-38px; font:500 var(--br-fs-foot)/1 var(--br-font-kr); color:var(--br-text-3); }
+
+/* ============================================================================
+   5. 진입 애니메이션
+   슬라이드가 활성화되면 [data-deck-active]가 붙고 제목 → 본문 → 차트 순으로 등장한다.
+   딜레이 .d1~.d12 = 80ms 단위. 마지막 딜레이가 1s를 넘지 않게 한다.
+   ========================================================================= */
+
+@keyframes br-fu   { from { opacity:0; transform:translateY(22px) } }
+@keyframes br-fd   { from { opacity:0; transform:translateY(-16px) } }
+@keyframes br-fi   { from { opacity:0 } }
+@keyframes br-gx   { from { transform:scaleX(0) } }
+@keyframes br-gy   { from { transform:scaleY(0) } }
+@keyframes br-pop  { from { opacity:0; transform:scale(.8) } }
+@keyframes br-dash { from { stroke-dasharray:0 4000 } }
+
+@media (prefers-reduced-motion:no-preference) {
+  [data-deck-active] .a   { animation:br-fu  .62s cubic-bezier(.2,.75,.2,1) both }
+  [data-deck-active] .ad  { animation:br-fd  .62s cubic-bezier(.2,.75,.2,1) both }
+  [data-deck-active] .f   { animation:br-fi  .8s  ease both }
+  [data-deck-active] .bx  { animation:br-gx  .85s cubic-bezier(.2,.85,.2,1) both }
+  [data-deck-active] .by  { animation:br-gy  .85s cubic-bezier(.2,.85,.2,1) both }
+  [data-deck-active] .p   { animation:br-pop .55s cubic-bezier(.2,.85,.2,1) both }
+  [data-deck-active] .dsh { animation:br-dash 1.1s ease both }
+
+  .d1{animation-delay:.08s!important}  .d2{animation-delay:.16s!important}
+  .d3{animation-delay:.24s!important}  .d4{animation-delay:.32s!important}
+  .d5{animation-delay:.40s!important}  .d6{animation-delay:.48s!important}
+  .d7{animation-delay:.56s!important}  .d8{animation-delay:.64s!important}
+  .d9{animation-delay:.72s!important}  .d10{animation-delay:.80s!important}
+  .d11{animation-delay:.88s!important} .d12{animation-delay:.96s!important}
+}

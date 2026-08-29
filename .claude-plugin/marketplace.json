@@ -1,0 +1,14 @@
+{
+  "name": "hct-tools",
+  "description": "주식회사 에이치시티 사내 도구 마켓플레이스. 발표 슬라이드 디자인 시스템을 배포한다.",
+  "owner": {
+    "name": "주식회사 에이치시티"
+  },
+  "plugins": [
+    {
+      "name": "blue-report",
+      "source": "./.claude/skills/blue-report",
+      "description": "블루 리포트 발표 슬라이드 디자인 시스템. 용도별 덱 4종과 HTML·PDF·PPTX 출력."
+    }
+  ]
+}

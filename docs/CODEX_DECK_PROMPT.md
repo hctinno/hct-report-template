@@ -1,0 +1,190 @@
+# Codex 발표 덱 작업 지시서
+
+이 문서는 사람이 읽는 설명서가 아니라 **에이전트에게 그대로 건네는 작업 지시**다.
+Codex·Gemini 등 Claude Code 가 아닌 에이전트는 `.claude/skills/` 를 인식하지 못하므로
+이 파일이 진입점 역할을 한다.
+
+---
+
+## 사람이 칠 한 줄
+
+저장소 안에서 에이전트를 띄운 뒤 이렇게 친다. **경로는 저장소 루트 기준 상대 경로이므로
+어느 PC 어느 폴더에 클론했든 그대로 통한다.**
+
+```
+docs/CODEX_DECK_PROMPT.md 를 읽고 그대로 수행해라. 용도는 사내 보고, 주제는 8월 월간 업무 보고.
+```
+
+용도와 주제를 빼고 파일만 지목해도 된다. 그 경우 에이전트가 먼저 물어본다.
+
+| 넘길 값 | 고르는 것 |
+|---|---|
+| 용도 | 사내 보고 · 외부 제안 · 프로젝트 보고 · 교육 |
+| 주제 | 덱 제목과 내용 |
+| 형식 | HTML(기본) · PDF · PPTX. 여러 개 가능 |
+
+저장소가 아직 없는 PC라면 먼저 받는다. 폴더 이름과 위치는 아무래도 좋다.
+
+```bash
+git clone https://github.com/dytc880915-commits/hct-report-template.git
+cd hct-report-template
+```
+
+---
+
+## 여기서부터가 에이전트에게 주는 지시다
+
+### 0. 준비와 사전 확인
+
+**모든 경로는 저장소 루트 기준 상대 경로다.** 절대 경로를 쓰지 않는다. 저장소가 어느
+드라이브 어느 폴더에 있든 상관없어야 한다. 먼저 저장소 루트로 이동해 `git pull` 로
+최신 `main` 을 받는다.
+
+명령 예시는 `python` 으로 적었다. macOS·Linux 에서는 `python3` 으로 바꿔 쓴다.
+경로 구분자는 `/` 로 통일했다. Windows 에서도 그대로 동작한다.
+
+아래 5개가 실재하는지 먼저 확인한다. **하나라도 없으면 작업을 멈추고 그 사실을 보고한다.**
+없는 파일을 짐작으로 대체하지 않는다.
+
+```
+.claude/skills/blue-report/README.md
+.claude/skills/blue-report/references/rules.md
+.claude/skills/blue-report/assets/deck-template.html
+.claude/skills/blue-report/scripts/check_deck.py
+brand/hct/brand.json
+```
+
+### 1. 규격 읽기
+
+`.claude/skills/blue-report/README.md` 를 **전부** 읽는다. 이것이 규격서다.
+색값, 타입 스케일, 간격, 차트 계산법, 문체 규칙이 전부 여기 있다.
+
+`.claude/skills/blue-report/references/rules.md` 는 같은 내용의 압축본이다. 함께 읽는다.
+
+규격을 읽지 않고 시작하지 않는다. 이 시스템은 "파란색을 쓴다" 수준의 지침이 아니라
+값과 계산식이 정해진 체계다.
+
+### 2. 덱 고르기 — 새로 만들지 말고 골라서 내용만 바꾼다
+
+`.claude/skills/blue-report/assets/` 에 완성된 덱이 5종 있다. 용도에 맞는 것을 복사해
+**내용만** 교체한다. 레이아웃과 스타일을 새로 설계하지 않는다.
+
+| 파일 | 용도 | 장수 |
+|---|---|---|
+| `deck-internal-report.html` | 사내 보고 (주간·월간) | 9 |
+| `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
+| `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
+| `deck-training.html` | 교육·기술 설명 | 8 |
+| `deck-template.html` | 레이아웃 12종 카탈로그 | 12 |
+
+같은 레이아웃을 쓰되 배치 순서가 용도에 맞게 다르다. 사내 보고는 다크 요약이 3번째에
+있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤
+정리한다). 그러므로 용도가 다르면 파일도 달라야 한다.
+
+**용도를 지시받지 못했으면 임의로 고르지 말고 사람에게 먼저 묻는다.**
+
+복사할 때 다음 3개를 같은 폴더에 함께 둔다. 없으면 스타일이 전혀 적용되지 않는다.
+
+```
+assets/blue-report.css
+assets/deck-viewer.css
+assets/deck-viewer.js
+```
+
+한 파일로 만들려면 4절의 `--single-file` 을 쓴다. 그 경우 위 3개를 옮기지 않아도 된다.
+
+### 3. 어겨선 안 되는 것
+
+- **색은 `--br-*` CSS 변수만 쓴다.** 새 hex 값을 슬라이드에 직접 적지 않는다.
+- **파이 차트 금지.** 도넛만 쓴다. `<path d="M…A…">` 로 부채꼴을 그리지 않는다.
+  도넛 SVG 는 `scripts/donut.py` 로 생성한다. 각도를 손으로 계산하지 않는다.
+- **문체는 개조식**(명사형 종결). `~합니다`, `~됩니다`, `~입니다` 를 쓰지 않는다.
+- **슬라이드는 정확히 1920x1080.** 넘치면 행 높이를 줄인다. 축소하지 않는다.
+- **글자는 24px 이상.** `%` 첨자(`.br-sup`)만 예외다.
+- **데이터 마크는 배경 대비 2:1 이상.** 밝은 지면에 `--br-soft-*` 를 쓰지 않는다.
+- **로고는 모든 슬라이드 우측 상단** `.br-mark` 자리에 들어간다.
+  그 자리(상단 여백 띠)에 본문 콘텐츠를 붙이지 않는다.
+- **예시 수치·부서명·문구는 자리표시자가 아니라 사용법 견본이다.** 실제 내용으로 바꾼다.
+  바꾸지 않고 남기면 남의 회사 숫자가 그대로 발표된다.
+
+### 4. 브랜드 적용과 출력
+
+저장소 루트에서 실행한다. **산출물은 `decks-out/` 에 넣는다.** 이 폴더는 `.gitignore`
+처리돼 있어 저장소를 더럽히지 않는다. 저장소 루트에 결과 파일을 흩어 놓지 않는다.
+
+```bash
+# HTML — 회사명·로고·저작권을 넣어 한 파일로 만든다
+python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
+
+# --deck 은 이름(catalog · internal · sales · project · training) 또는 HTML 파일 경로
+# 내용을 직접 편집한 덱이면 파일 경로를 준다:
+#   --deck decks-out/my-deck.html
+
+# PDF — 발표용. --notes 를 주면 발표자 노트를 마지막 장에 붙인다
+python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
+
+# PowerPoint — 내용은 pptx/content.js 에 있다
+node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
+```
+
+PPTX 는 HTML 덱과 내용을 따로 들고 있다. **HTML 쪽이 기준이므로 내용을 바꿀 때는
+`assets/deck-*.html` 과 `pptx/content.js` 두 곳을 함께 고친다.** 색은 두 판이
+`assets/blue-report.css` 의 토큰을 같이 읽으므로 갈라지지 않는다.
+
+필요한 것(Pillow · Chromium · node_modules)은 스크립트가 스스로 받는다. 미리 설치하지
+않아도 된다. 설치를 막으려면 환경변수 `BLUE_REPORT_NO_INSTALL=1` 을 준다. 그 경우
+필요한 명령만 출력하고 멈춘다.
+
+### 5. 완료 조건
+
+```bash
+python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
+```
+
+이 스크립트가 10항목을 기계로 판정한다.
+
+문체 · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 ·
+최소 글자 크기 · 데이터 마크 대비 · 브랜드 마크 존재 · 마크와 본문 겹침 ·
+배경 밝기와 로고 변형 일치.
+
+**실패가 0 이 아니면 완료가 아니다.** 실패가 남은 채로 "완료"라고 쓰지 않는다.
+
+`주의`는 허용된다. 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
+
+레이아웃 검수까지 하려면 `--shots 폴더명` 을 붙여 슬라이드별 PNG 를 남기고 눈으로 본다.
+겹침은 스크립트가 잡지만 어색한 여백은 잡지 못한다.
+
+### 6. 보고 형식
+
+보고는 **한국어로** 쓴다. 다음을 반드시 포함한다.
+
+- 실행한 명령 (그대로)
+- `check_deck.py` 결과의 통과 / 주의 / 실패 수
+- 산출물 파일 경로
+- 바꾸지 못했거나 확신이 없는 내용
+
+검사를 돌리지 않았으면 그 사실을 쓴다. 돌린 것처럼 쓰지 않는다.
+
+---
+
+## 참고 — 이 저장소 밖에서 쓸 때
+
+다른 프로젝트 폴더에서 작업한다면 스킬 폴더를 통째로 복사한다. `--target` 을 생략하면
+사용자 스킬 폴더(`~/.claude/skills/blue-report`)에 설치되어 그 PC 의 모든 프로젝트에서 쓸 수 있다.
+
+```bash
+python scripts/install_blue_report_skill.py                      # 사용자 스킬 폴더
+python scripts/install_blue_report_skill.py --target <프로젝트경로>   # 특정 프로젝트
+```
+
+Claude Code 라면 저장소를 클론하지 않고 플러그인으로 받을 수도 있다. PC 마다 한 번만
+실행하면 된다.
+
+```bash
+claude plugin marketplace add dytc880915-commits/hct-report-template
+claude plugin install blue-report@hct-tools
+```
+
+파일도 줄 수 없는 환경(웹 UI 등)이라면 `.claude/skills/blue-report/README.md` 내용을
+통째로 붙여넣고 "이 규격을 따라 1920x1080 HTML 슬라이드를 만들어라"라고 지시한다.
+다만 이 경우 완성된 덱 템플릿과 검증 스크립트가 없어 품질이 떨어진다.
