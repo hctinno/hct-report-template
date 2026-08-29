@@ -416,10 +416,14 @@
          font:400 15px/1.6 system-ui,sans-serif;border-top:1px solid #2b3852;z-index:8}
   #notes b{display:block;color:#8fa4bd;font:600 11px/1 system-ui,sans-serif;
            letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
-  /* ?all=1 — 전 슬라이드 세로 나열. 스크린샷·PDF 내보내기·검수용 */
+  /* 전 슬라이드 세로 나열. ?all=1 은 스크린샷·PDF 내보내기·검수용이라 HUD 를 감추고,
+     버튼으로 켠 경우(.all-mode--live)는 되돌아갈 수 있게 HUD 를 남긴다. */
   body.all-mode #stage{position:static;display:block;overflow:visible}
   body.all-mode .br-frame{display:block;margin:0 auto 24px}
   body.all-mode #hud,body.all-mode #notes{display:none}
+  body.all-mode--live{overflow:auto}
+  body.all-mode--live #hud{display:flex}
+  body.all-mode--live .br-frame{margin-bottom:24px}
 
 /* 인쇄 · PDF — 슬라이드 1장이 1페이지. 1920x1080px = 20in x 11.25in (96dpi) */
 @media print {
@@ -1097,7 +1101,20 @@
   document.getElementById('prev').onclick = function () { show(i - 1); };
   document.getElementById('next').onclick = function () { show(i + 1); };
   document.getElementById('notes-btn').onclick = toggleNotes;
-  document.getElementById('all').onclick = function () { location.search = '?all=1'; };
+  // 전체 보기는 제자리에서 켜고 끈다. URL 을 바꾸면 새로고침이 되고, 되돌아갈 길도 없다.
+  // Artifact 처럼 주소를 못 바꾸는 곳에서도 이 방식이면 동작한다.
+  var allBtn = document.getElementById('all');
+  allBtn.onclick = function () {
+    var on = !document.body.classList.contains('all-mode--live');
+    document.body.classList.toggle('all-mode', on);
+    document.body.classList.toggle('all-mode--live', on);
+    frames.forEach(function (f) {
+      if (on) { f.setAttribute('data-deck-active', ''); f.style.transform = 'none'; }
+      else { f.removeAttribute('data-deck-active'); f.style.transform = ''; }
+    });
+    allBtn.textContent = on ? '한 장씩' : '전체 보기';
+    if (on) { window.scrollTo(0, 0); } else { scale(); show(i); }
+  };
 
   scale();
   show(0);

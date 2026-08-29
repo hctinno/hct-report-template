@@ -7,16 +7,25 @@ CSS를 인라인해 첨부 파일 없이 어디서나 열리는 한 장짜리 �
     python3 build_single_file.py                       # dist/blue-report-deck.html
     python3 build_single_file.py --artifact            # dist/blue-report-artifact.html
     python3 build_single_file.py --artifact --brand ../../../brand/hct/brand.json
+    python3 build_single_file.py --artifact --deck ax -o /tmp/ax-artifact.html
+
+--deck 은 apply_brand.py 와 같은 이름을 받는다. 생략하면 카탈로그다.
 """
 import argparse
 import os
 import re
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-DECK = os.path.join(ROOT, "assets", "deck-template.html")
 ASSETS = os.path.join(ROOT, "assets")
 DIST = os.path.join(ROOT, "dist")
+
+# 용도별 덱. apply_brand.py 와 같은 이름을 쓴다. 한곳에서만 고치도록 거기서 읽어 온다.
+sys.path.insert(0, HERE)
+from apply_brand import DECKS  # noqa: E402
+
+DECK = os.path.join(ASSETS, DECKS["catalog"])
 
 # 덱이 링크하는 로컬 자원. 단일 파일로 만들 때 전부 본문에 박는다.
 LOCAL_CSS = ("blue-report.css", "deck-viewer.css")
@@ -41,8 +50,12 @@ def inline_assets(html, assets_dir=None):
     return html
 
 
-def build(artifact=False, brand_path=None):
-    html = open(DECK, encoding="utf-8").read()
+def build(artifact=False, brand_path=None, deck="catalog", out_path=None):
+    deck_path = os.path.join(ASSETS, DECKS[deck]) if deck in DECKS else deck
+    if not os.path.exists(deck_path):
+        raise SystemExit(f"덱을 찾지 못했다: {deck}\n"
+                         f"이름으로 고르려면: {' · '.join(DECKS)}")
+    html = open(deck_path, encoding="utf-8").read()
     if brand_path:
         # 순환 import를 피하려고 여기서 늦게 불러온다 (apply_brand 도 이 모듈을 쓴다).
         from apply_brand import load_brand, logo_data_uri, apply
@@ -56,7 +69,7 @@ def build(artifact=False, brand_path=None):
     assert "data-deck-title" in html, "뷰어 JS 인라인 실패"
 
     if not artifact:
-        out = os.path.join(DIST, "blue-report-deck.html")
+        out = out_path or os.path.join(DIST, "blue-report-deck.html")
     else:
         # Artifact는 <!doctype>/<head>/<body>를 발행 시점에 씌운다. 본문만 남긴다.
         head = re.search(r"<head>(.*?)</head>", html, re.S).group(1)
@@ -69,9 +82,9 @@ def build(artifact=False, brand_path=None):
         # body에 걸려 있던 .br-deck 배경을 body 규칙으로 옮긴다
         keep.append("<style>\nbody { background:#111; margin:0; }\n</style>")
         html = "\n".join(keep) + "\n" + body
-        out = os.path.join(DIST, "blue-report-artifact.html")
+        out = out_path or os.path.join(DIST, "blue-report-artifact.html")
 
-    os.makedirs(DIST, exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(out)) or ".", exist_ok=True)
     open(out, "w", encoding="utf-8").write(html)
     print(f"생성: {out}  ({len(html):,}자)")
     return out
@@ -81,5 +94,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--artifact", action="store_true", help="Artifact 발행용 (껍데기 태그 제거)")
     ap.add_argument("--brand", help="brand.json 경로. 주면 회사 정보·로고까지 넣어 만든다")
+    ap.add_argument("--deck", default="catalog",
+                    help="용도별 덱 이름(" + " · ".join(DECKS) + ") 또는 HTML 파일 경로")
+    ap.add_argument("-o", "--out", help="출력 경로. 생략하면 dist/ 에 넣는다")
     a = ap.parse_args()
-    build(a.artifact, a.brand)
+    build(a.artifact, a.brand, a.deck, a.out)

@@ -119,7 +119,7 @@ assets/deck-viewer.js
 # HTML — 회사명·로고·저작권을 넣어 한 파일로 만든다
 python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
 
-# --deck 은 이름(catalog · internal · weekly · sales · project · training) 또는 HTML 파일 경로
+# --deck 은 이름(catalog · internal · weekly · ax · sales · project · training) 또는 HTML 파일 경로
 # 내용을 직접 편집한 덱이면 파일 경로를 준다:
 #   --deck decks-out/my-deck.html
 

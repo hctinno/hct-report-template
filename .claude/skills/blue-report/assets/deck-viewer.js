@@ -65,7 +65,20 @@
   document.getElementById('prev').onclick = function () { show(i - 1); };
   document.getElementById('next').onclick = function () { show(i + 1); };
   document.getElementById('notes-btn').onclick = toggleNotes;
-  document.getElementById('all').onclick = function () { location.search = '?all=1'; };
+  // 전체 보기는 제자리에서 켜고 끈다. URL 을 바꾸면 새로고침이 되고, 되돌아갈 길도 없다.
+  // Artifact 처럼 주소를 못 바꾸는 곳에서도 이 방식이면 동작한다.
+  var allBtn = document.getElementById('all');
+  allBtn.onclick = function () {
+    var on = !document.body.classList.contains('all-mode--live');
+    document.body.classList.toggle('all-mode', on);
+    document.body.classList.toggle('all-mode--live', on);
+    frames.forEach(function (f) {
+      if (on) { f.setAttribute('data-deck-active', ''); f.style.transform = 'none'; }
+      else { f.removeAttribute('data-deck-active'); f.style.transform = ''; }
+    });
+    allBtn.textContent = on ? '한 장씩' : '전체 보기';
+    if (on) { window.scrollTo(0, 0); } else { scale(); show(i); }
+  };
 
   scale();
   show(0);

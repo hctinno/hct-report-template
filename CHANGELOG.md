@@ -14,6 +14,27 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.3.0 — 2026-08-29
+
+### 추가
+
+- `build_single_file.py` 에 `--deck` 과 `-o` 를 붙였다. 그전에는 대상이
+  `deck-template.html` 로 박혀 있어 **카탈로그 외의 덱은 Artifact 로 발행할 수 없었다.**
+  덱 목록은 `apply_brand.py` 에서 읽어 오므로 두 곳으로 갈라지지 않는다.
+
+  ```bash
+  python3 scripts/build_single_file.py --artifact --deck ax --brand brand.json -o out.html
+  ```
+
+### 고침
+
+- **`전체 보기` 버튼이 URL 을 바꿔 새로고침했다.** 주소를 바꿀 수 없는 환경
+  (Artifact 등)에서는 동작하지 않고, 브라우저에서도 한 번 누르면 HUD 가 사라져
+  되돌아갈 길이 없었다. 제자리 토글로 바꾸고 버튼 이름이 `한 장씩` 으로 바뀌게 했다.
+  내보내기용 `?all=1` 경로는 그대로 두어 PDF·스크린샷 파이프라인에 영향이 없다.
+
+---
+
 ## 1.2.0 — 2026-08-29
 
 ### 추가

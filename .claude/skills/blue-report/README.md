@@ -89,7 +89,7 @@ python3 scripts/check_deck.py ./deck.html --shots ./out/
 
 ```bash
 python3 scripts/apply_brand.py --brand ./brand.json --deck internal --single-file -o ./보고서.html
-# --deck: catalog · internal · sales · project · training, 또는 HTML 파일 경로
+# --deck: catalog · internal · weekly · ax · sales · project · training, 또는 HTML 파일 경로
 ```
 
 ### PowerPoint(.pptx)로 만들기
