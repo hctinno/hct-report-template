@@ -16,114 +16,112 @@
 
 <!-- 01 한 장 보고 ───────────────────────────────────────────────────────
      역할: 보고 본문 전체. 상위 관리자의 판단이 이 장에서 종료
-     조판: 문서형. 카드·라운드를 쓰지 않고 라벨 열 + 괘선으로만 구획한다
-           (한국 임원 보고서 양식). 색은 --br-* 토큰 그대로다
-     설계: 관리자의 네 질문에 행이 1:1로 대응
-       ① 언제 성과가 나오나 ② 될 것 같나 ③ 사람은 괜찮나 ④ 내가 뭘 해야 하나
-     교체: 주차 · 판정 한 줄 · 지표 3행 · 단계 4개 · 리스크 2건 · 결정 2건
+     조판: 문서형. 카드·라운드를 쓰지 않고 괘선으로만 구획한다
+     구성: 지표 4 → 업무 카테고리별 이번 주 · 다음 주 → 결정 요청
+       업무별로 이번 주와 다음 주를 나란히 두는 것이 주간보고의 본체다.
+       리스크는 따로 두지 않고 해당 업무 행의 상태 칩으로 말한다.
+     교체: 주차 · 판정 한 줄 · 지표 4개 · 업무 5행 · 결정 2건
      뒤 4장은 부록. 질문이 나온 항목만 펼침
      ══════════════════════════════════════════════════════════════════ -->
-<div class="br-frame" data-label="한 장 보고" data-notes="이 한 장으로 보고를 끝낸다. 종합 판정 한 줄을 읽고 곧바로 결정 2건으로 내려간다. 가운데 지표와 단계는 질문이 나올 때만 짚는다.">
-  <section class="br-slide" style="padding:76px 96px 44px">
+<div class="br-frame" data-label="한 장 보고" data-notes="이 한 장으로 보고를 끝낸다. 지표 줄에서 첫 가동 시점을 말하고, 업무 표에서는 지연·주의 두 행만 짚는다. 나머지는 읽지 않고 결정 요청으로 내려간다.">
+  <section class="br-slide" style="padding:72px 96px 40px">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
 
     <div class="ad" style="display:flex;justify-content:space-between;align-items:baseline">
       <p class="br-eyebrow" style="margin:0">AX추진팀 주간보고 · 발족 3주 차</p>
       <span class="br-num" style="font-weight:500;font-size:var(--br-fs-foot);line-height:1;color:var(--br-text-3)">2026.08.24 ~ 08.28</span>
     </div>
-    <h2 class="a br-title br-title--light" style="margin-top:12px">첫 파일럿 <strong>1주 지연 위험</strong>, 원인은 결정 2건</h2>
+    <h2 class="a br-title br-title--light" style="margin-top:10px">첫 파일럿 <strong>1주 지연 위험</strong>, 원인은 결정 2건</h2>
 
-    <!-- 라벨 열 + 내용 열. 세로 괘선은 내용 열의 border-left 가 만든다. -->
-    <div class="a d2" style="display:grid;grid-template-columns:190px 1fr;align-content:space-between;
-                             flex:1;min-height:0;margin-top:22px;border-top:2px solid var(--br-navy)">
-
-      <div style="padding:16px 0;font:500 var(--br-fs-label)/1.3 var(--br-font-kr);color:var(--br-navy);border-bottom:1px solid var(--br-card-line)">종합 판정</div>
-      <div style="padding:16px 0 16px 34px;border-left:1px solid var(--br-hairline);border-bottom:1px solid var(--br-card-line)">
-        <p class="br-split" style="font:400 28px/1.5 var(--br-font-kr);color:var(--br-text);margin:0">
-          첫 파일럿 가동이 <span class="br-key">10월 2주</span>로 1주 밀림 — 원인은 사내 결정 2건 대기<br>
-          9월 1주에 두 건 모두 결정되면 <span class="br-key">10월 1주 복귀 가능</span>
-        </p>
+    <!-- 지표 4 — 한 줄 띠. 세로 괘선으로만 나눈다 -->
+    <div class="a d2" style="display:grid;grid-template-columns:repeat(4,1fr);margin-top:20px;
+                             border-top:2px solid var(--br-navy);border-bottom:1px solid var(--br-card-line)">
+      <div style="padding:16px 26px 16px 0">
+        <div style="font:500 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-2)">첫 파일럿 가동</div>
+        <div style="font:700 34px/1 var(--br-font-kr);color:var(--br-coral);margin-top:10px;letter-spacing:var(--br-ls-tight)">10월 2주</div>
+        <div style="font:400 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-3);margin-top:8px">계획 10월 1주 · 1주 지연</div>
       </div>
-
-      <div style="padding:14px 0;font:500 var(--br-fs-label)/1.3 var(--br-font-kr);color:var(--br-text-2);border-bottom:1px solid var(--br-card-line)">첫 파일럿 가동</div>
-      <div style="padding:14px 0 14px 34px;border-left:1px solid var(--br-hairline);border-bottom:1px solid var(--br-card-line);display:flex;align-items:baseline;gap:26px">
-        <span style="font:700 40px/1 var(--br-font-kr);color:var(--br-coral);letter-spacing:var(--br-ls-tight)">10월 2주</span>
-        <span style="font:400 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-text-2)">계획 10월 1주 · 1주 지연</span>
+      <div style="padding:16px 26px;border-left:1px solid var(--br-hairline)">
+        <div style="font:500 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-2)">발굴 과제</div>
+        <div class="br-num" style="font-size:34px;line-height:1;color:var(--br-navy);margin-top:10px">34<span class="br-sup">건</span></div>
+        <div style="font:400 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-3);margin-top:8px">목표 20건 · 170% 달성</div>
       </div>
-
-      <div style="padding:14px 0;font:500 var(--br-fs-label)/1.3 var(--br-font-kr);color:var(--br-text-2);border-bottom:1px solid var(--br-card-line)">발굴 과제</div>
-      <div style="padding:14px 0 14px 34px;border-left:1px solid var(--br-hairline);border-bottom:1px solid var(--br-card-line);display:flex;align-items:baseline;gap:26px">
-        <span class="br-num" style="font-size:40px;line-height:1;color:var(--br-navy)">34<span class="br-sup">건</span></span>
-        <span style="font:400 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-text-2)">목표 20건 · 170% 달성</span>
+      <div style="padding:16px 26px;border-left:1px solid var(--br-hairline)">
+        <div style="font:500 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-2)">인력 · 예산</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px">
+          <span class="br-num" style="font-size:34px;line-height:1;color:var(--br-cobalt)">5</span>
+          <span style="font:500 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-cobalt)">/ 8명</span>
+        </div>
+        <div style="font:400 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-3);margin-top:8px">예산 집행 12% · 1명 미충원</div>
       </div>
-
-      <div style="padding:14px 0;font:500 var(--br-fs-label)/1.3 var(--br-font-kr);color:var(--br-text-2);border-bottom:1px solid var(--br-card-line)">인력 충원</div>
-      <div style="padding:14px 0 14px 34px;border-left:1px solid var(--br-hairline);border-bottom:1px solid var(--br-card-line);display:flex;align-items:baseline;gap:26px">
-        <span style="display:flex;align-items:baseline;gap:6px"><span class="br-num" style="font-size:40px;line-height:1;color:var(--br-cobalt)">5</span><span style="font:500 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-cobalt)">/ 8명</span></span>
-        <span style="font:400 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-text-2)">데이터분석 1명 미충원 · 예산 집행 12%</span>
+      <div style="padding:16px 0 16px 26px;border-left:1px solid var(--br-hairline)">
+        <div style="font:500 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-2)">결정 요청</div>
+        <div class="br-num" style="font-size:34px;line-height:1;color:var(--br-coral);margin-top:10px">2<span class="br-sup">건</span></div>
+        <div style="font:400 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-3);margin-top:8px">기한 9월 2일 · 9월 4일</div>
       </div>
+    </div>
 
-      <div style="padding:14px 0;font:500 var(--br-fs-label)/1.3 var(--br-font-kr);color:var(--br-text-2);border-bottom:1px solid var(--br-card-line)">단계별 관문</div>
-      <div style="padding:14px 0 14px 34px;border-left:1px solid var(--br-hairline);border-bottom:1px solid var(--br-card-line);display:grid;grid-template-columns:repeat(4,1fr);gap:26px">
-        <div>
-          <div style="font:500 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-text)">1 현황 진단</div>
-          <div style="display:flex;align-items:baseline;gap:14px;margin-top:10px">
-            <span class="br-num" style="font-size:34px;line-height:1;color:var(--br-data-1)">92<span class="br-sup">%</span></span>
-            <span class="br-num" style="font-weight:500;font-size:var(--br-fs-foot);line-height:1;color:var(--br-text-3)">09.02</span>
-          </div>
-        </div>
-        <div>
-          <div style="font:500 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-text)">2 과제 발굴</div>
-          <div style="display:flex;align-items:baseline;gap:14px;margin-top:10px">
-            <span class="br-num" style="font-size:34px;line-height:1;color:var(--br-data-2)">76<span class="br-sup">%</span></span>
-            <span class="br-num" style="font-weight:500;font-size:var(--br-fs-foot);line-height:1;color:var(--br-text-3)">09.04</span>
-          </div>
-        </div>
-        <div>
-          <div style="font:500 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-text)">3 파일럿</div>
-          <div style="display:flex;align-items:baseline;gap:14px;margin-top:10px">
-            <span class="br-num" style="font-size:34px;line-height:1;color:var(--br-coral)">35<span class="br-sup">%</span></span>
-            <span class="br-num" style="font-weight:500;font-size:var(--br-fs-foot);line-height:1;color:var(--br-text-3)">10.12</span>
-          </div>
-        </div>
-        <div>
-          <div style="font:500 var(--br-fs-body)/1 var(--br-font-kr);color:var(--br-text-3)">4 전사 확산</div>
-          <div style="display:flex;align-items:baseline;gap:14px;margin-top:10px">
-            <span class="br-num" style="font-size:34px;line-height:1;color:var(--br-text-3)">0<span class="br-sup">%</span></span>
-            <span class="br-num" style="font-weight:500;font-size:var(--br-fs-foot);line-height:1;color:var(--br-text-3)">12.07</span>
-          </div>
-        </div>
-      </div>
+    <!-- 업무 카테고리별 이번 주 · 다음 주 — 이 표가 보고의 본체다 -->
+    <div class="a d4" style="flex:1;min-height:0;margin-top:18px">
+      <table class="br-table">
+        <thead><tr>
+          <th style="width:17%;padding-bottom:12px">업무</th>
+          <th style="width:35%;padding-bottom:12px">이번 주 진행</th>
+          <th style="width:33%;padding-bottom:12px">다음 주 계획</th>
+          <th style="width:15%;padding-bottom:12px">상태</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td style="padding:14px 20px">현황 진단</td>
+            <td style="padding:14px 20px">부서 인터뷰 12건 완료 · 초안 92%</td>
+            <td style="padding:14px 20px">09.02 진단 보고서 확정</td>
+            <td style="padding:14px 20px"><span class="br-status br-status--ok">정상</span></td>
+          </tr>
+          <tr>
+            <td style="padding:14px 20px">과제 발굴</td>
+            <td style="padding:14px 20px">후보 34건 수집 — 목표 20건 초과</td>
+            <td style="padding:14px 20px">09.04 우선순위 20건 선별</td>
+            <td style="padding:14px 20px"><span class="br-status br-status--ok">정상</span></td>
+          </tr>
+          <tr>
+            <td style="padding:14px 20px">파일럿 준비</td>
+            <td style="padding:14px 20px">대상 부서 2곳 협의 · 데이터 권한 16일째 대기</td>
+            <td style="padding:14px 20px">부서 확정 · 권한 확보 (결정 01·02)</td>
+            <td style="padding:14px 20px"><span class="br-status br-status--late">지연</span></td>
+          </tr>
+          <tr>
+            <td style="padding:14px 20px">도구 검토</td>
+            <td style="padding:14px 20px">후보 3종 1차 조사 완료</td>
+            <td style="padding:14px 20px">3종 기능·비용 비교표 작성</td>
+            <td style="padding:14px 20px"><span class="br-status br-status--ok">정상</span></td>
+          </tr>
+          <tr>
+            <td style="padding:14px 20px">조직 셋업</td>
+            <td style="padding:14px 20px">엔지니어 2차 면접 완료 · 예산 12% 집행</td>
+            <td style="padding:14px 20px">데이터분석 공고 재게시</td>
+            <td style="padding:14px 20px"><span class="br-status br-status--warn">주의</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <div style="padding:14px 0;font:500 var(--br-fs-label)/1.3 var(--br-font-kr);color:var(--br-text-2);border-bottom:1px solid var(--br-card-line)">리스크와 영향</div>
-      <div style="padding:14px 0 14px 34px;border-left:1px solid var(--br-hairline);border-bottom:1px solid var(--br-card-line)">
-        <div style="display:flex;align-items:baseline;gap:20px">
-          <span class="br-status br-status--late">지연</span>
-          <span style="font:700 var(--br-fs-body)/1.4 var(--br-font-kr);color:var(--br-navy)">데이터 접근 권한 미승인</span>
-          <span style="font:400 var(--br-fs-body)/1.4 var(--br-font-kr);color:var(--br-text-2)">파일럿 착수 2주 지연 · 신청 16일 경과</span>
-        </div>
-        <div style="display:flex;align-items:baseline;gap:20px;margin-top:14px">
-          <span class="br-status br-status--warn">주의</span>
-          <span style="font:700 var(--br-fs-body)/1.4 var(--br-font-kr);color:var(--br-navy)">데이터분석 인력 미충원</span>
-          <span style="font:400 var(--br-fs-body)/1.4 var(--br-font-kr);color:var(--br-text-2)">도구 검토 3주 순연 · 9월 중순 합류 예상</span>
-        </div>
-      </div>
-
+    <!-- 결정 요청 — 미결 시 결과를 함께 적어 즉석에서 판단하게 한다 -->
+    <div class="a d6" style="display:grid;grid-template-columns:190px 1fr;margin-top:14px;border-top:2px solid var(--br-navy)">
       <div style="padding:16px 0;font:700 var(--br-fs-label)/1.3 var(--br-font-kr);color:var(--br-navy)">결정 요청</div>
-      <div style="padding:16px 0 0 34px;border-left:1px solid var(--br-hairline)">
+      <div style="padding:16px 0 16px 34px;border-left:1px solid var(--br-hairline)">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:30px">
           <span style="font:500 28px/1.4 var(--br-font-kr);color:var(--br-text)"><strong style="font-weight:700;color:var(--br-navy)">01</strong>  사내 데이터 접근 권한 승인</span>
           <span class="br-num" style="font-size:var(--br-fs-body);line-height:1;color:var(--br-coral);white-space:nowrap">9월 2일</span>
         </div>
-        <div style="font:400 var(--br-fs-foot)/1.4 var(--br-font-kr);color:var(--br-alert-text);margin-top:8px">미승인 시 파일럿 착수 2주 지연 · 4분기 목표 미달</div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:30px;margin-top:18px">
+        <div style="font:400 var(--br-fs-foot)/1.4 var(--br-font-kr);color:var(--br-alert-text);margin-top:6px">미승인 시 파일럿 착수 2주 지연 · 4분기 목표 미달</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:30px;margin-top:14px">
           <span style="font:500 28px/1.4 var(--br-font-kr);color:var(--br-text)"><strong style="font-weight:700;color:var(--br-navy)">02</strong>  파일럿 대상 부서 확정 (2개 후보 중 1)</span>
           <span class="br-num" style="font-size:var(--br-fs-body);line-height:1;color:var(--br-coral);white-space:nowrap">9월 4일</span>
         </div>
-        <div style="font:400 var(--br-fs-foot)/1.4 var(--br-font-kr);color:var(--br-alert-text);margin-top:8px">미확정 시 10월 가동 일정 전면 재수립</div>
+        <div style="font:400 var(--br-fs-foot)/1.4 var(--br-font-kr);color:var(--br-alert-text);margin-top:6px">미확정 시 10월 가동 일정 전면 재수립</div>
       </div>
     </div>
-    <div class="br-footer" style="margin-top:12px"></div>
+    <div class="br-footer" style="margin-top:10px"></div>
   </section>
 </div>
 
