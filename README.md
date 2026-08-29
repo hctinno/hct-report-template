@@ -55,7 +55,7 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 |---|---|---|
 | `deck-internal-report.html` | 사내 보고 (월간) | 9 |
 | `deck-weekly-report.html` | 조직 주간보고 | 7 |
-| `deck-ax-weekly.html` | AX 조직 1장 보고 + 부록 | 6 |
+| `deck-ax-weekly.html` | AX 조직 1장 보고 + 부록 | 5 |
 | `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |

@@ -36,7 +36,7 @@ description: "\"블루 리포트\" 스타일로 보고서·발표 덱·문서를
 |---|---|---|---|
 | 사내 보고 (월간) | `internal` | `deck-internal-report.html` | 9 |
 | 조직 주간보고 | `weekly` | `deck-weekly-report.html` | 7 |
-| AX 조직 1장 보고 + 부록 | `ax` | `deck-ax-weekly.html` | 6 |
+| AX 조직 1장 보고 + 부록 | `ax` | `deck-ax-weekly.html` | 5 |
 | 외부 제안·영업 | `sales` | `deck-sales-proposal.html` | 10 |
 | 프로젝트 착수·완료 | `project` | `deck-project-report.html` | 9 |
 | 교육·기술 설명 | `training` | `deck-training.html` | 8 |
