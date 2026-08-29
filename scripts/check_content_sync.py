@@ -37,6 +37,8 @@ CONTENT_JS = os.path.join(SKILL, "pptx", "content.js")
 DECKS = {
     "internal": "deck-internal-report.html",
     "weekly": "deck-weekly-report.html",
+    # AX 덱은 본문 1장 + 부록 구조라 HTML 과 PPTX 의 슬라이드 구성이 다르다.
+    # HTML 1장(대시보드)을 PPTX 는 표 1장으로 옮긴다. 그래서 이 대조에서 뺀다.
     "sales": "deck-sales-proposal.html",
     "project": "deck-project-report.html",
     "training": "deck-training.html",

@@ -55,6 +55,7 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 |---|---|---|
 | `deck-internal-report.html` | 사내 보고 (월간) | 9 |
 | `deck-weekly-report.html` | 조직 주간보고 | 7 |
+| `deck-ax-weekly.html` | AX 조직 1장 보고 + 부록 | 6 |
 | `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |
@@ -92,9 +93,9 @@ node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out
 python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 ```
 
-10항목을 기계로 판정한다.
+11항목을 기계로 판정한다.
 
-문체(금지 어미) · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 1920x1080 · 최소 글자 24px · 데이터 마크 대비 2:1 · 브랜드 마크 존재 · 마크와 본문 겹침 · 배경 밝기와 로고 변형 일치.
+문체(금지 어미) · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 1920x1080 · 최소 글자 24px · 데이터 마크 대비 2:1 · **본문 영역 겹침** · 브랜드 마크 존재 · 마크와 본문 겹침 · 배경 밝기와 로고 변형 일치.
 
 **실패가 0 이 아니면 완료가 아니다.** `주의`는 허용된다(도넛을 쓰지 않은 덱에서 나오는 정상 결과).
 
@@ -160,7 +161,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   references/rules.md                    압축 규칙
   assets/blue-report.css                 토큰 68개 — 단일 소스
   assets/deck-*.html                     완성 덱 5종 + 레이아웃 카탈로그
-  scripts/check_deck.py                  10항목 자동 점검
+  scripts/check_deck.py                  11항목 자동 점검
   scripts/apply_brand.py                 브랜드 일괄 적용
   scripts/to_pdf.py                      PDF 내보내기
   scripts/make_logo_variants.py          로고 두 벌 생성

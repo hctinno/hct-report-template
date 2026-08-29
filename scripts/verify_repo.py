@@ -7,7 +7,7 @@
 
 검사 항목
   decks     덱 6종을 apply_brand.py 로 만들고 check_deck.py 로 판정한다.
-            10항목 중 `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
+            11항목 중 `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
   pptx      build.js 가 돌고 .pptx 4종이 나오는가.
   dist      dist/ 의 두 파일이 소스에서 재생성한 것과 같은가.
@@ -39,7 +39,7 @@ SKILL = os.path.join(ROOT, ".claude", "skills", "blue-report")
 SCRIPTS = os.path.join(SKILL, "scripts")
 BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
 
-DECKS = ["catalog", "internal", "weekly", "sales", "project", "training"]
+DECKS = ["catalog", "internal", "weekly", "ax", "sales", "project", "training"]
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
 EXPECTED_PPTX = len(DECKS) - 1

@@ -13,6 +13,7 @@ This repository is the HCT shared presentation design system, called **Blue Repo
 - Start from a finished deck in `.claude/skills/blue-report/assets/`, replacing content only. Do not invent a new visual style.
   - `deck-internal-report.html` internal monthly reporting
   - `deck-weekly-report.html` organisation-wide weekly reporting (no agenda slide; weekday timeline)
+  - `deck-ax-weekly.html` one-page report for senior management, with appendix slides behind it
   - `deck-sales-proposal.html` external proposal and sales
   - `deck-project-report.html` project kickoff and completion
   - `deck-training.html` training and technical explanation
@@ -42,7 +43,7 @@ python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 node   .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
 ```
 
-`check_deck.py` enforces ten rules mechanically: banned sentence endings, pie charts, donut dasharray arithmetic, off-token hex, slide size, minimum font size, 2:1 contrast for data marks, brand-mark presence, mark/body overlap, and logo variant against background luminance. Its report is the completion evidence for deck work — a run with failures is not "done".
+`check_deck.py` enforces eleven rules mechanically: banned sentence endings, pie charts, donut dasharray arithmetic, off-token hex, slide size, minimum font size, 2:1 contrast for data marks, body-region overlap between stacked siblings, brand-mark presence, mark/body overlap, and logo variant against background luminance. Its report is the completion evidence for deck work — a run with failures is not "done".
 
 `verify_repo.py` builds all five decks, runs `check_deck.py` on each, builds the four PPTX
 files, re-derives `dist/` and compares it against what is committed, scans Korean text for

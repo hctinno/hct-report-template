@@ -74,6 +74,7 @@ brand/hct/brand.json
 |---|---|---|
 | `deck-internal-report.html` | 사내 보고 (월간) | 9 |
 | `deck-weekly-report.html` | 조직 주간보고 | 7 |
+| `deck-ax-weekly.html` | AX 조직 1장 보고 + 부록 | 6 |
 | `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |
@@ -152,7 +153,7 @@ python scripts/check_content_sync.py
 python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 ```
 
-이 스크립트가 10항목을 기계로 판정한다.
+이 스크립트가 11항목을 기계로 판정한다.
 
 문체 · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 ·
 최소 글자 크기 · 데이터 마크 대비 · 브랜드 마크 존재 · 마크와 본문 겹침 ·

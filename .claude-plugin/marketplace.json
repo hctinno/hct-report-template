@@ -8,7 +8,7 @@
     {
       "name": "blue-report",
       "source": "./.claude/skills/blue-report",
-      "description": "블루 리포트 발표 슬라이드 디자인 시스템. 용도별 덱 5종과 레이아웃 카탈로그. HTML·PDF·PPTX 출력."
+      "description": "블루 리포트 발표 슬라이드 디자인 시스템. 용도별 덱 6종과 레이아웃 카탈로그. HTML·PDF·PPTX 출력."
     }
   ]
 }
