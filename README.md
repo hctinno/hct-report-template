@@ -168,11 +168,14 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
 brand/hct/                               회사 정보와 로고
 docs/CODEX_DECK_PROMPT.md                Codex 등 외부 에이전트용 작업 지시서
 scripts/verify_repo.py                   저장소 전체 점검 — CI 가 이것을 돌린다
+scripts/check_content_sync.py            HTML 덱과 PPTX 내용 갈라짐 검사
 scripts/install_blue_report_skill.py     오프라인 복사 설치기
 .github/workflows/verify.yml             push·PR 자동 점검
 ```
 
 `pptx/tokens.js` 가 `blue-report.css` 의 `--br-*` 를 파싱하므로 HTML 판과 PPTX 판의 색이 갈라질 수 없다.
+
+내용은 그렇게 할 수 없어 `assets/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다. HTML 이 기준이다. 두 곳을 합치지 않는 대신 `scripts/check_content_sync.py` 가 갈라짐을 잡고, CI 가 이것을 돌린다.
 
 ---
 

@@ -53,6 +53,8 @@ arguments, once with `--artifact --brand brand/hct/brand.json`. The dist check f
 
 PPTX content lives separately in `pptx/content.js`. The HTML decks are the source of truth, so change both when content changes. Colors cannot drift because `pptx/tokens.js` parses `assets/blue-report.css`.
 
+The two content sources are deliberately not merged: hand-editing the HTML decks is how this system is used, and generating the HTML from data would remove that. Drift is caught mechanically instead — `scripts/check_content_sync.py` compares slide counts, deck titles, all 36 speaker notes, bar names and values, donut legends, and table headers and rows across both sources, and names the deck, slide, and field that diverged. `verify_repo.py` and CI run it, so changing only one side does not pass.
+
 ## Reporting
 
 Write reports in Korean. Include the commands you ran, the pass/warn/fail counts from `check_deck.py`, and the output paths. If you did not run the check, say so — do not write "완료" without it.

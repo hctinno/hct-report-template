@@ -105,7 +105,30 @@ node pptx/build.js --brand brand.json --deck internal    # 한 종만
 | 발표자 노트 | `N` 키로 표시 | 슬라이드 노트 창 |
 
 Noto Sans KR 과 Barlow 를 사내 PC 에 배포했다면 `pptx/tokens.js` 의 `F` 두 줄만 바꾼다.
-덱 내용은 `pptx/content.js` 에 따로 있다. HTML 덱이 기준이므로 내용을 고칠 때는 두 곳을 함께 고친다.
+
+#### 내용이 두 곳에 있다 — 합치지 않고 갈라짐을 검사한다
+
+덱 내용은 `assets/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다.
+**HTML 이 기준이므로 내용을 고칠 때는 두 곳을 함께 고친다.**
+
+합치지 않기로 했다. HTML 덱을 손으로 고치는 것이 이 시스템의 사용법이고
+(`deck-*.html` 을 복사해 내용만 바꾼다), HTML 을 데이터에서 만들어 내는 생성물로
+바꾸면 그 사용법이 사라진다. 색이 갈라지지 않는 것은 `tokens.js` 가 CSS 를 읽기
+때문이지만, 내용은 그렇게 한쪽이 다른 쪽을 읽을 수 없다.
+
+대신 갈라짐을 사람 눈이 아니라 스크립트가 잡는다.
+
+```bash
+python3 ../../../scripts/check_content_sync.py            # 저장소 루트 기준
+python3 scripts/check_content_sync.py --deck internal
+```
+
+슬라이드 수 · 문서명 · 발표자 노트 36개 · 세로 막대 이름과 값 · 도넛 범례 · 표 머리글과
+행을 두 곳에서 뽑아 견준다. 어긋나면 어느 덱 몇 장 어느 항목인지까지 찍는다.
+`verify_repo.py` 와 CI 가 이것을 함께 돌리므로 한쪽만 고친 채로는 통과하지 못한다.
+
+단위(`%` · `h`)와 표의 `colspan` 은 형식 차이라 대조에서 제외한다. 단위는 PPTX 생성기가
+붙이고, HTML 은 지면에 직접 찍기 때문이다.
 
 ### PDF로 내보내기
 

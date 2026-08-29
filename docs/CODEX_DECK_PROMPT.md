@@ -131,6 +131,15 @@ PPTX 는 HTML 덱과 내용을 따로 들고 있다. **HTML 쪽이 기준이므�
 `assets/deck-*.html` 과 `pptx/content.js` 두 곳을 함께 고친다.** 색은 두 판이
 `assets/blue-report.css` 의 토큰을 같이 읽으므로 갈라지지 않는다.
 
+한쪽만 고쳤는지는 스크립트가 잡는다. 템플릿 자체를 고쳤다면 돌린다.
+
+```bash
+python scripts/check_content_sync.py
+```
+
+슬라이드 수 · 문서명 · 발표자 노트 · 막대 · 도넛 · 표를 두 곳에서 뽑아 견주고,
+어긋나면 어느 덱 몇 장 어느 항목인지 찍는다.
+
 필요한 것(Pillow · Chromium · node_modules)은 스크립트가 스스로 받는다. 미리 설치하지
 않아도 된다. 설치를 막으려면 환경변수 `BLUE_REPORT_NO_INSTALL=1` 을 준다. 그 경우
 필요한 명령만 출력하고 멈춘다.
@@ -148,6 +157,13 @@ python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 배경 밝기와 로고 변형 일치.
 
 **실패가 0 이 아니면 완료가 아니다.** 실패가 남은 채로 "완료"라고 쓰지 않는다.
+
+덱 하나가 아니라 템플릿·스크립트·문서를 고쳤다면 저장소 전체를 본다. GitHub Actions 가
+push·PR 마다 이 한 줄을 그대로 돌린다.
+
+```bash
+python scripts/verify_repo.py
+```
 
 `주의`는 허용된다. 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
 

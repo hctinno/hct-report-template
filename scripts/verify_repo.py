@@ -15,6 +15,8 @@
   encoding  한국어가 UTF-8 로 저장됐고 깨짐 패턴이 없는가.
   plugin    마켓플레이스·플러그인 매니페스트가 성립하는가.
             여기가 깨지면 다른 PC 에서 `plugin install` 이 실패한다.
+  sync      HTML 덱과 pptx/content.js 의 내용이 갈라지지 않았는가.
+            같은 내용이 두 곳에 있어 한쪽만 고치기 쉽다.
 
 종료 코드는 실패가 하나라도 있으면 1, 아니면 0 이다.
 """
@@ -197,6 +199,32 @@ def check_encoding(log):
         log.ok("한국어 인코딩", "UTF-8 · 깨짐 패턴 없음")
 
 
+# ------------------------------------------------------- HTML · PPTX 내용 동기화
+
+def check_sync(log):
+    """같은 내용이 assets/deck-*.html 과 pptx/content.js 두 곳에 있다.
+
+    합치지 않기로 했다. HTML 을 손으로 고치는 것이 이 시스템의 사용법이고,
+    HTML 을 생성물로 만들면 그 사용법이 사라진다. 대신 갈라짐을 기계가 잡는다.
+    자세한 내용은 scripts/check_content_sync.py 머리말에 있다."""
+    script = os.path.join(ROOT, "scripts", "check_content_sync.py")
+    r = run([sys.executable, script])
+    print(r.stdout, end="")
+    if r.stderr.strip():
+        print(r.stderr, end="", file=sys.stderr)
+    first = (r.stdout.strip().splitlines() or [""])[0]
+    detail = first.split("  ", 2)[-1].strip() if first else ""
+    # 하위 스크립트가 자기 이름을 앞에 붙여 나온다. 표에서 두 번 찍지 않게 뗀다.
+    for prefix in ("내용 동기화 — ", "내용 동기화 "):
+        if detail.startswith(prefix):
+            detail = detail[len(prefix):]
+            break
+    if r.returncode == 0:
+        log.ok("내용 동기화", detail or "HTML 과 PPTX 일치")
+    else:
+        log.fail("내용 동기화", detail or "HTML 덱과 pptx/content.js 가 갈라졌다")
+
+
 # ------------------------------------------------------------------ 배포
 
 def check_plugin(log):
@@ -267,12 +295,12 @@ def check_plugin(log):
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
     ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
-    ap.add_argument("--only", choices=["decks", "pptx", "dist", "encoding", "plugin"],
+    ap.add_argument("--only", choices=["decks", "pptx", "dist", "encoding", "plugin", "sync"],
                     action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
     ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
     a = ap.parse_args()
 
-    only = set(a.only or ["decks", "pptx", "dist", "encoding", "plugin"])
+    only = set(a.only or ["decks", "pptx", "dist", "encoding", "plugin", "sync"])
     log = Log()
 
     if a.shots:
@@ -296,6 +324,9 @@ def main():
         if "plugin" in only:
             print("\n── 배포 매니페스트 ──")
             check_plugin(log)
+        if "sync" in only:
+            print("\n── HTML · PPTX 내용 동기화 ──")
+            check_sync(log)
     finally:
         if not a.keep:
             shutil.rmtree(tmp, ignore_errors=True)
