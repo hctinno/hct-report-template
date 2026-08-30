@@ -21,7 +21,7 @@
 - 예시 수치·부서명·문구는 자리표시자가 아니라 사용법 견본이다. 실제 내용으로 바꾼다.
 - 완료라고 말하기 전에 `check_deck.py` 를 돌리고 결과를 제시한다. 실패가 0 이 아니면 완료가 아니다.
 - 템플릿·스크립트·문서를 고쳤으면 `python3 scripts/verify_repo.py` 를 돌린다. CI 가 push·PR 마다 같은 것을 돌리므로 여기서 통과하지 않으면 CI 도 빨간불이다.
-- `assets/` 를 고쳤으면 `dist/` 를 다시 만들어 함께 커밋한다. `build_single_file.py` 는 인자 없이 한 번, `--artifact --brand brand/hct/brand.json` 으로 한 번이다.
+- `assets/` 를 고쳤으면 `dist/` 를 다시 만들어 함께 커밋한다. `build_single_file.py` 를 세 번 돌린다 — 인자 없이 한 번, `--artifact --brand brand/hct/brand.json` 으로 한 번, 거기에 `--deck minutes` 를 더해 한 번(A4 문서)이다.
 - 자동 점검이 못 잡는 여백과 균형은 `--shots` 로 남긴 PNG 를 눈으로 확인한다.
 
 ## 어길 수 없는 규칙

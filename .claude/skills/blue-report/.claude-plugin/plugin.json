@@ -1,7 +1,7 @@
 {
   "name": "blue-report",
   "description": "블루 리포트 디자인 시스템 — 사내 공용 발표 슬라이드와 A4 문서. 덱 6종, 문서 1종, 레이아웃 12종, HTML·PDF·PPTX 출력, 자동 점검.",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "author": {
     "name": "주식회사 에이치시티"
   },

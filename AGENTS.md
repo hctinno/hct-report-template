@@ -50,8 +50,10 @@ files, re-derives `dist/` and compares it against what is committed, scans Korea
 mojibake, and validates the plugin manifests. It exits 1 if anything fails. `.github/workflows/verify.yml`
 runs the same single command, so local and CI results cannot diverge.
 
-If you change `assets/`, rebuild `dist/` and commit it: `build_single_file.py` once with no
-arguments, once with `--artifact --brand brand/hct/brand.json`. The dist check fails otherwise.
+If you change `assets/`, rebuild `dist/` and commit it: `build_single_file.py` three times —
+once with no arguments, once with `--artifact --brand brand/hct/brand.json`, and once with
+`--artifact --brand brand/hct/brand.json --deck minutes` for the A4 document. The dist check
+fails otherwise.
 
 PPTX content lives separately in `pptx/content.js`. The HTML decks are the source of truth, so change both when content changes. Colors cannot drift because `pptx/tokens.js` parses `assets/blue-report.css`.
 

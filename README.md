@@ -107,14 +107,21 @@ python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
 ```
 
-`--deck` 은 이름(`catalog` · `internal` · `weekly` · `ax` · `sales` · `project` · `training`) 또는 HTML 파일 경로를 받는다.
+`--deck` 은 덱 이름(`catalog` · `internal` · `weekly` · `ax` · `sales` · `project` · `training`), A4 문서 이름(`minutes`), 또는 HTML 파일 경로를 받는다.
 
 덱을 웹페이지로 올려 링크로 공유하려면 Artifact 발행용 단일 파일을 만든다. `<html>` 껍데기를 뺀 판이다.
 
 ```bash
 python .claude/skills/blue-report/scripts/build_single_file.py \
        --artifact --deck ax --brand brand/hct/brand.json -o decks-out/ax-artifact.html
+
+python .claude/skills/blue-report/scripts/build_single_file.py \
+       --artifact --deck minutes --brand brand/hct/brand.json -o decks-out/회의록.html
 ```
+
+**`--artifact` 없이 만든 파일을 Artifact 로 올리지 않는다.** 그쪽은 `<!doctype>` ·
+`<head>` · `<body>` 가 붙은 온전한 문서라, 발행 시점에 껍데기가 한 겹 더 씌워져 겹친다.
+브라우저가 관대해 보이기는 하지만 파서가 안쪽 태그를 버린다.
 
 필요한 것(Pillow · Chromium · node_modules)은 스크립트가 스스로 받는다. 미리 설치하지 않아도 된다. 막으려면 `BLUE_REPORT_NO_INSTALL=1` 을 준다.
 

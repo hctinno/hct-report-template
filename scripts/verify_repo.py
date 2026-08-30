@@ -52,6 +52,8 @@ DOCS = ["doc-minutes.html"]
 DIST_BUILDS = [
     ("blue-report-deck.html", []),
     ("blue-report-artifact.html", ["--artifact", "--brand", BRAND]),
+    # A4 문서도 Artifact 발행 경로를 탄다. 덱과 뷰어·CSS 가 달라 따로 굳혀 둔다.
+    ("blue-report-doc-artifact.html", ["--artifact", "--brand", BRAND, "--deck", "minutes"]),
 ]
 
 # 인코딩이 깨졌을 때 나오는 대표 글자. 스크립트 자신이 걸리지 않도록 코드포인트로 적는다.

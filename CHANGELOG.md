@@ -14,6 +14,38 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.12.0 — 2026-08-30
+
+### 수정 — A4 문서의 Artifact 발행 경로
+
+`build_single_file.py` 가 덱만 알고 있었다. 자원 목록이 `deck-viewer.css` ·
+`deck-viewer.js` 로 박혀 있어 A4 문서를 넣으면 `doc-viewer` 를 인라인하지 못했고,
+`--artifact` 의 바탕색도 덱의 `#111` 이 박혀 있었다. 그래서 문서는 이 경로를 못 타고
+온전한 HTML 문서째로 발행됐다 — Artifact 는 `<!doctype>`·`<head>`·`<body>` 를 발행
+시점에 씌우므로 껍데기 안에 껍데기가 겹쳤다. 브라우저가 관대해 보이기는 했으나
+파서가 안쪽 태그를 버리는 상태였다.
+
+- **자원 목록을 없앴다.** 이름을 박는 대신 `<link rel="stylesheet" href="*.css">` ·
+  `<script src="*.js"></script>` 를 정규식으로 찾아 `assets/` 에 있으면 인라인한다.
+  종류가 늘어도 이 스크립트를 고칠 일이 없다. 원격 폰트는 `.css` 로 끝나지 않아
+  걸리지 않는다.
+- **바탕색을 박지 않는다.** 방금 인라인한 뷰어 CSS 의 `html,body{background:…}` 에서
+  읽어 옮긴다. 덱은 `#111`, 문서는 `#8a8f96` 이 저절로 따라온다.
+- 뷰어 JS 인라인 확인도 종류에 맞춘다 — 덱은 `data-deck-title`, 문서는 `data-doc-title`.
+
+`apply_brand.py` 에 **`DOCS` 표**와 `resolve()` 를 넣었다. 이제 `--deck minutes` 로
+문서를 이름으로 고른다. 두 스크립트가 같은 `resolve()` 를 쓰므로 덱·문서 목록은
+여전히 한곳에서만 고친다.
+
+`verify_repo.py` 의 `dist` 검사에 **`blue-report-doc-artifact.html`** 을 더했다.
+문서 발행 경로가 검사에 없어서 이 결함이 여기까지 왔다. 이제 CI 가 매번 다시 만들어
+커밋본과 대조한다.
+
+덱 두 벌(`blue-report-deck.html` · `blue-report-artifact.html`)의 출력은 바이트까지
+같다. 덱 경로의 동작은 바뀌지 않았다.
+
+---
+
 ## 1.11.0 — 2026-08-30
 
 ### 변경 — A4 문서에 회사 로고·명칭, 회의록 서명란 제거

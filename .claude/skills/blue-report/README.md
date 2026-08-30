@@ -225,6 +225,19 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | `.bd-doctitle` | `doc-viewer.js` | `data-doc-title` |
 | `.bd-pageno` | `doc-viewer.js` | `n / 총쪽` |
 
+**Artifact 로 올릴 때는 `--artifact` 판을 쓴다.**
+
+```bash
+python3 scripts/build_single_file.py --artifact --deck minutes \
+        --brand ../../../brand/hct/brand.json -o ./회의록.html
+```
+
+`--deck` 은 덱 이름과 A4 문서 이름(`minutes`)을 함께 받는다. `--artifact` 를 빼면
+`<!doctype>`·`<head>`·`<body>` 가 붙은 온전한 문서가 나오는데, Artifact 는 발행
+시점에 그 껍데기를 스스로 씌우므로 한 겹이 겹친다. 브라우저가 관대해 보이기는
+하지만 파서가 안쪽 태그를 버린다. 지면 바깥 바탕색은 뷰어 CSS 에서 읽어 오므로
+덱(`#111`)과 문서(`#8a8f96`)가 저절로 갈린다.
+
 **서명란은 결재 문서에만 넣는다.** `.bd-sign` 이 있지만 회의록에는 쓰지 않는다.
 사규·품의처럼 결재선이 필요한 문서의 마지막 쪽에만 붙인다.
 

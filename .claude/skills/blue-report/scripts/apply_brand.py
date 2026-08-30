@@ -35,6 +35,11 @@ DECKS = {
     "training": "deck-training.html",         # 교육·기술 설명
 }
 
+# A4 문서. 덱과 달리 가로 슬라이드가 아니라 794x1123 세로 지면이다.
+DOCS = {
+    "minutes": "doc-minutes.html",           # 회의록
+}
+
 LOGO_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
               ".svg": "image/svg+xml", ".webp": "image/webp"}
 LOGO_WARN_BYTES = 400 * 1024
@@ -43,6 +48,18 @@ HANGUL = re.compile(r"[가-힣]")
 
 # 슬라이드 우측 상단 마크. 그룹1=배경 밝기, 그룹2=자리표시자 주석(다시 찾기 쉽게 남긴다).
 MARK = re.compile(r'<div class="br-mark" data-on="(dark|light)">(<!--.*?-->)?.*?</div>', re.S)
+
+
+def resolve(name):
+    """덱·문서 이름 또는 파일 경로를 실제 경로로 바꾼다.
+
+    이름 두 벌을 한곳에서 푼다. 다른 스크립트도 이것을 불러 쓰므로
+    새 덱이나 문서가 생겨도 고칠 곳은 위 표 두 개뿐이다."""
+    if name in DECKS:
+        return os.path.join(ASSETS, DECKS[name])
+    if name in DOCS:
+        return os.path.join(ASSETS, DOCS[name])
+    return os.path.abspath(name)
 
 
 def load_brand(path):
@@ -180,7 +197,8 @@ def main():
                     help="CSS까지 인라인해 파일 하나로 만든다")
     ap.add_argument("--title", help="이 덱의 문서명 (푸터에 들어간다). brand.json의 docTitle보다 우선한다")
     ap.add_argument("--deck", default="catalog",
-                    help="용도별 덱 이름(" + " · ".join(DECKS) + ") 또는 HTML 파일 경로. A4 문서(assets/doc-*.html)도 경로로 준다")
+                    help="덱 이름(" + " · ".join(DECKS) + ") · A4 문서 이름("
+                         + " · ".join(DOCS) + ") · 또는 HTML 파일 경로")
     a = ap.parse_args()
 
     brand = load_brand(a.brand)
@@ -197,11 +215,11 @@ def main():
         print("주의: logo(다크면용 흰색 녹아웃)가 없다. 표지·다크 슬라이드는 "
               "워드마크 텍스트로 둔다.", file=sys.stderr)
 
-    deck_path = (os.path.join(ASSETS, DECKS[a.deck]) if a.deck in DECKS
-                 else os.path.abspath(a.deck))
+    deck_path = resolve(a.deck)
     if not os.path.isfile(deck_path):
-        sys.exit(f"오류: 덱을 찾지 못했다 — {deck_path}\n"
-                 f"이름으로 고르려면: {' · '.join(DECKS)}")
+        sys.exit(f"오류: 덱·문서를 찾지 못했다 — {deck_path}\n"
+                 f"덱 이름: {' · '.join(DECKS)}\n"
+                 f"문서 이름: {' · '.join(DOCS)}")
     is_doc = os.path.basename(deck_path).startswith("doc-")
     print(f"{'문서' if is_doc else '덱'}: {os.path.basename(deck_path)}")
 
