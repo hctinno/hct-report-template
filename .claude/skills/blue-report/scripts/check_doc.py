@@ -4,19 +4,20 @@
     python3 check_doc.py 회의록.html
     python3 check_doc.py 회의록.html --shots out/
 
-검사 항목 (8)
+검사 항목 (9)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 문체 — 존댓말·평서형 종결 없이 명사형인가 (check_deck.py 규칙 재사용)
     2. 색 — 토큰 밖 raw hex 를 문서에 직접 쓰지 않았는가
     3. 쪽마다 머리말·꼬리말이 있는가
     4. 쪽번호를 손으로 적지 않았는가 (뷰어가 채운다)
+    5. 쪽마다 브랜드 마크(.br-mark)가 있고 꼬리말에 회사명 자리가 있는가
   렌더 — 실제 브라우저 레이아웃. Playwright 가 필요하다.
-    5. 지면이 정확히 794x1123 인가 (A4 210x297mm @96dpi)
-    6. 본문이 머리말·꼬리말을 침범하지 않는가
+    6. 지면이 정확히 794x1123 인가 (A4 210x297mm @96dpi)
+    7. 본문이 머리말·꼬리말을 침범하지 않는가
        .bd-page 가 overflow:hidden 이라 scrollHeight 로는 잡히지 않는다.
        자손까지 포함한 실제 차지 범위로 형제 간 겹침을 본다.
-    7. 10.5pt(14px) 미만 본문이 없는가 — 표 보조·각주(.bd-fs-small)는 예외
-    8. 본문 글자가 지면 대비 4.5:1 이상인가 (인쇄물 기준)
+    8. 10.5pt(14px) 미만 본문이 없는가 — 표 보조·각주(.bd-fs-small)는 예외
+    9. 본문 글자가 지면 대비 4.5:1 이상인가 (인쇄물 기준)
 
 종료 코드는 실패가 하나라도 있으면 1, 아니면 0 이다. 주의는 0 을 유지한다.
 """
@@ -87,6 +88,16 @@ def check_frame(html, rep):
         rep.f(f"머리말·꼬리말 누락 {len(miss)}쪽 — " + ", ".join(miss[:6]))
     else:
         rep.o(f"머리말·꼬리말 — {len(pages)}쪽 모두 있다")
+
+    # 브랜드 마크 — 슬라이드와 같은 .br-mark 자리표시자를 쪽 머리말에 둔다.
+    no_mark = [f"{i+1}쪽" for i, p in enumerate(pages) if "br-mark" not in p]
+    no_co = [f"{i+1}쪽" for i, p in enumerate(pages) if "bd-company" not in p]
+    if no_mark:
+        rep.f(f"브랜드 마크 없는 쪽 {len(no_mark)} — " + ", ".join(no_mark[:6]))
+    elif no_co:
+        rep.f(f"꼬리말에 회사명 자리 없는 쪽 {len(no_co)} — " + ", ".join(no_co[:6]))
+    else:
+        rep.o(f"브랜드 — {len(pages)}쪽 모두 마크와 회사명 자리가 있다")
 
     hand = []
     for i, p in enumerate(pages):

@@ -63,6 +63,17 @@
   font:400 var(--bd-fs-small)/1 var(--br-font-kr); color:var(--br-text-3);
 }
 .bd-foot .bd-pageno { font-family:var(--br-font-num); font-weight:600; }
+.bd-head .bd-docno  { font-family:var(--br-font-num); font-weight:600; }
+.bd-company { font-weight:600; color:var(--br-text-2); }
+
+/* 브랜드 마크는 슬라이드와 같은 `.br-mark` 자리표시자를 쓴다.
+   apply_brand.py 가 슬라이드와 똑같이 처리하므로 브랜드 소스가 하나로 유지된다.
+   다만 슬라이드에서는 우측 상단 절대 위치이므로 문서에서는 흐름 안으로 되돌린다.
+   로고 높이도 40px(슬라이드)에서 머리말에 맞게 줄인다. 인라인 style 을 이겨야
+   해서 !important 를 쓴다. */
+.bd-head .br-mark { position:static; top:auto; right:auto; }
+.bd-head .br-logo { height:20px !important; }
+.bd-head .br-wordmark { font-size:11pt !important; color:var(--br-navy); }
 
 /* ── 표제부 — 문서 첫 쪽의 제목 블록 ───────────────────────────────────── */
 .bd-title {

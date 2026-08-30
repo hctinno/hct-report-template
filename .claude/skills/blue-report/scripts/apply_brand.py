@@ -124,7 +124,8 @@ def apply(html, brand, uris):
     html, n_mark = MARK.subn(one_mark, html)
     n += n_mark
     if not n_mark:
-        sys.exit("오류: br-mark 자리를 하나도 찾지 못했다. 템플릿이 수정된 것 같다.")
+        sys.exit("오류: br-mark 자리를 하나도 찾지 못했다. 템플릿이 수정된 것 같다.\n"
+                 "        슬라이드는 슬라이드마다, A4 문서는 쪽 머리말마다 하나씩 있어야 한다.")
 
     contact = brand["email"] or brand["website"]
     if contact:
@@ -151,8 +152,14 @@ def apply(html, brand, uris):
         f'© {brand["copyrightYear"]} {brand["company"]} · All rights reserved')
 
     # 푸터의 문서명. 쪽번호는 뷰어가 자동으로 매기므로 여기서 건드리지 않는다.
+    # 슬라이드는 data-deck-title, A4 문서는 data-doc-title 을 쓴다.
     if brand.get("docTitle"):
         sub(r'data-deck-title="[^"]*"', f'data-deck-title="{brand["docTitle"]}"', 1)
+        sub(r'data-doc-title="[^"]*"', f'data-doc-title="{brand["docTitle"]}"', 1)
+
+    # A4 문서 꼬리말의 회사명. 슬라이드에는 없는 자리다.
+    sub(r'<span class="bd-company">COMPANY NAME</span>',
+        f'<span class="bd-company">{brand["company"]}</span>')
 
     # 자리표시자 주석은 일부러 남긴다. 나중에 로고를 바꿀 때 위치를 다시 찾기 쉽다.
     # 남은 자리표시자를 셀 때는 그 주석을 빼고 본문만 본다.
@@ -169,7 +176,7 @@ def main():
                     help="CSS까지 인라인해 파일 하나로 만든다")
     ap.add_argument("--title", help="이 덱의 문서명 (푸터에 들어간다). brand.json의 docTitle보다 우선한다")
     ap.add_argument("--deck", default="catalog",
-                    help="용도별 덱 이름(" + " · ".join(DECKS) + ") 또는 HTML 파일 경로")
+                    help="용도별 덱 이름(" + " · ".join(DECKS) + ") 또는 HTML 파일 경로. A4 문서(assets/doc-*.html)도 경로로 준다")
     a = ap.parse_args()
 
     brand = load_brand(a.brand)

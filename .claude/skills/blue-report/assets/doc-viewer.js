@@ -1,5 +1,10 @@
-// 문서 뷰어 — 쪽번호·문서명 자동 채움, 축척 맞춤, 인쇄.
-// 문서 4종이 이 파일 하나를 공유한다. 단일 파일로 만들 때는 인라인된다.
+// 문서 뷰어 — 쪽번호·문서명·문서번호 자동 채움, 축척 맞춤, 인쇄.
+// 문서 여러 종이 이 파일 하나를 공유한다. 단일 파일로 만들 때는 인라인된다.
+//
+// 채우는 자리는 셋뿐이다. 나머지 머리말·꼬리말 내용은 HTML 에 그대로 둔다.
+//   .bd-pageno    n / m
+//   .bd-doctitle  .bd-doc 의 data-doc-title
+//   .bd-docno     .bd-doc 의 data-doc-no
 
 (function () {
   var doc   = document.querySelector('.bd-doc');
@@ -7,19 +12,15 @@
   if (!doc || !pages.length) return;
 
   var title = doc.dataset.docTitle || '';
+  var docno = doc.dataset.docNo || '';
   var total = pages.length;
 
-  // 쪽번호와 문서명은 여기서 채운다. 쪽을 넣거나 빼도 번호가 어긋나지 않는다.
   pages.forEach(function (pg, n) {
-    var head = pg.querySelector('.bd-head');
-    if (head && !head.children.length) {
-      head.innerHTML = '<span>' + title + '</span><span>' + (doc.dataset.docNo || '') + '</span>';
-    }
-    var foot = pg.querySelector('.bd-foot');
-    if (!foot) return;
-    if (!foot.children.length) foot.innerHTML = '<span>' + title + '</span><span class="bd-pageno"></span>';
-    var no = foot.querySelector('.bd-pageno');
-    if (no) no.textContent = (n + 1) + ' / ' + total;
+    pg.querySelectorAll('.bd-doctitle').forEach(function (el) { el.textContent = title; });
+    pg.querySelectorAll('.bd-docno').forEach(function (el) { el.textContent = docno; });
+    pg.querySelectorAll('.bd-pageno').forEach(function (el) {
+      el.textContent = (n + 1) + ' / ' + total;
+    });
   });
 
   // 창이 좁으면 지면을 줄여 가로 스크롤이 생기지 않게 한다. 인쇄에는 영향이 없다.

@@ -42,7 +42,7 @@ blue-report/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
    ├─ check_deck.py            덱 자동 점검 11항목 + 슬라이드별 PNG
-   ├─ check_doc.py             A4 문서 점검 8항목 + 쪽별 PNG
+   ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
    ├─ apply_brand.py           회사 정보·로고를 덱에 일괄 적용
    ├─ to_pdf.py                덱 HTML → 발표용 PDF (슬라이드 1장 = 1페이지)
@@ -180,7 +180,8 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | 본문 대비 | 데이터 마크 2:1 | 본문 4.5:1 (인쇄물) |
 | 애니메이션 | 있음 (끌 수 있음) | 없음 |
 | 머리말·꼬리말 | 꼬리말만 | 쪽마다 둘 다 |
-| 검사기 | `check_deck.py` 11항목 | `check_doc.py` 8항목 |
+| 브랜드 | 우측 상단 마크 | 머리말 로고 + 꼬리말 회사명 |
+| 검사기 | `check_deck.py` 11항목 | `check_doc.py` 9항목 |
 
 파일 구성도 덱과 같은 방식으로 나뉜다.
 
@@ -194,8 +195,41 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 쪽을 넣거나 빼도 번호가 어긋나지 않으며, 손으로 적으면 `check_doc.py` 가 실패시킨다.
 문서명은 `.bd-doc` 의 `data-doc-title`, 문서번호는 `data-doc-no` 한 곳에서 읽는다.
 
+**회사 로고와 명칭은 쪽마다 들어간다.** 슬라이드는 우측 상단 마크 하나지만, 문서는
+한 장씩 떼어 돌려 보고 인쇄해 철하므로 어느 쪽을 집어도 어디서 나온 문서인지
+보여야 한다. 머리말에 로고, 꼬리말에 회사명이다.
+
+```html
+<div class="bd-head">
+  <div class="br-mark" data-on="light"><span class="br-wordmark">COMPANY NAME</span></div>
+  <span class="bd-docno"></span>
+</div>
+...
+<div class="bd-foot">
+  <span><span class="bd-company">COMPANY NAME</span> · <span class="bd-doctitle"></span></span>
+  <span class="bd-pageno"></span>
+</div>
+```
+
+덱과 같은 `.br-mark` 자리표시자다. `apply_brand.py` 가 `brand.json` 의 `logo`(다크용)·
+`logoOnLight`(밝은 지면용)로 바꾸고, `.bd-company` 에 회사명을 넣는다. 문서 지면은
+밝으므로 `data-on="light"` 다. `.bd-head` 안에서는 마크가 `position:static` 이 되어
+문서번호와 같은 줄에 놓인다(슬라이드는 우측 상단 절대 배치다). 빠뜨리면
+`check_doc.py` 5번 항목이 실패시킨다.
+
+| 자리 | 채우는 주체 | 무엇 |
+|---|---|---|
+| `.br-mark` | `apply_brand.py` | 로고 이미지 · 워드마크 |
+| `.bd-company` | `apply_brand.py` | 회사명 |
+| `.bd-docno` | `doc-viewer.js` | `data-doc-no` |
+| `.bd-doctitle` | `doc-viewer.js` | `data-doc-title` |
+| `.bd-pageno` | `doc-viewer.js` | `n / 총쪽` |
+
+**서명란은 결재 문서에만 넣는다.** `.bd-sign` 이 있지만 회의록에는 쓰지 않는다.
+사규·품의처럼 결재선이 필요한 문서의 마지막 쪽에만 붙인다.
+
 **한 쪽을 넘치면 쪽을 나눈다.** `.bd-page` 가 `overflow:hidden` 이라 넘친 내용은
-잘려 보이지 않고 꼬리말과 겹친다. `check_doc.py` 6번 항목이 이것을 잡는다.
+잘려 보이지 않고 꼬리말과 겹친다. `check_doc.py` 7번 항목이 이것을 잡는다.
 
 ---
 

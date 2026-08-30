@@ -20,7 +20,7 @@
      액션아이템에 담당과 기한이 없으면 회의록이 아니다. 빈칸으로 두지 않는다.
      ══════════════════════════════════════════════════════════════════ -->
 <section class="bd-page">
-  <div class="bd-head"></div>
+  <div class="bd-head"><div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div><span class="bd-docno"></span></div>
   <div class="bd-body">
 
     <h1 class="bd-title">AX 파일럿 대상 부서 선정 회의</h1>
@@ -57,15 +57,16 @@
 
   </div>
 
-  <div class="bd-foot"></div>
+  <div class="bd-foot"><span><span class="bd-company">COMPANY NAME</span> · <span class="bd-doctitle"></span></span><span class="bd-pageno"></span></div>
 </section>
 
 <!-- 2쪽 ─────────────────────────────────────────────────────────────────
-     교체: 결정사항 · 액션아이템 · 다음 회의 · 서명란
+     교체: 결정사항 · 액션아이템 · 다음 회의
      액션아이템은 회의록의 목적이다. 담당과 기한이 빈 줄을 남기지 않는다.
+     결재가 필요한 문서라면 .bd-sign 서명란을 마지막 쪽에 넣는다.
      ══════════════════════════════════════════════════════════════════ -->
 <section class="bd-page">
-  <div class="bd-head"></div>
+  <div class="bd-head"><div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div><span class="bd-docno"></span></div>
   <div class="bd-body">
 
     <h2 class="bd-h1">2. 결정사항</h2>
@@ -100,12 +101,7 @@
 
   </div>
 
-  <div class="bd-sign">
-    <div><div class="bd-sign-k">작성</div><div class="bd-sign-v"></div></div>
-    <div><div class="bd-sign-k">검토</div><div class="bd-sign-v"></div></div>
-    <div><div class="bd-sign-k">승인</div><div class="bd-sign-v"></div></div>
-  </div>
-  <div class="bd-foot"></div>
+  <div class="bd-foot"><span><span class="bd-company">COMPANY NAME</span> · <span class="bd-doctitle"></span></span><span class="bd-pageno"></span></div>
 </section>
 
 </div><!-- /.bd-doc -->

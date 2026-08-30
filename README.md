@@ -65,6 +65,32 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 
 ---
 
+## A4 문서
+
+회의록 · 사규 · 매뉴얼 · 공지는 발표 슬라이드가 아니라 A4 세로 문서다.
+지면 794×1123px(210×297mm @96dpi)이고 인쇄하면 그대로 A4 한 장이다.
+
+| 파일 | 용도 | 쪽 |
+|---|---|---|
+| `doc-minutes.html` | 회의록 | 2 |
+
+색·타입·간격 토큰은 슬라이드와 같다. `blue-doc.css` 는 토큰을 선언하지 않고
+`blue-report.css` 를 전제하므로 두 파일을 함께 불러야 한다. 그래서 슬라이드와
+문서의 색이 갈라질 수 없다.
+
+머리말에 로고, 꼬리말에 회사명이 쪽마다 들어간다. 한 장씩 떼어 돌려 보고 인쇄해
+철하는 물건이라 어느 쪽을 집어도 출처가 보여야 하기 때문이다. 쪽번호 · 문서명 ·
+문서번호는 뷰어가 채우므로 손으로 적지 않는다.
+
+```bash
+python .claude/skills/blue-report/scripts/check_doc.py decks-out/회의록.html
+```
+
+9항목을 기계로 판정한다. 슬라이드와 기준이 다른 곳은 글자 하한(10.5pt = 14px)과
+본문 대비(인쇄물이라 4.5:1)다.
+
+---
+
 ## 만들기
 
 저장소 루트에서 실행한다. 산출물은 `decks-out/` 에 넣는다(gitignore 처리돼 있다).
@@ -117,7 +143,8 @@ python3 scripts/verify_repo.py            # 전부
 python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 55장도 남긴다
 ```
 
-덱 6종을 만들어 `check_deck.py` 로 판정하고, PPTX 5종 생성과 무결성 · `dist/` 재생성 대조 ·
+덱 7종을 만들어 `check_deck.py` 로, A4 문서를 `check_doc.py` 로 판정하고, PPTX 6종 생성과
+무결성 · `dist/` 재생성 대조 ·
 한국어 인코딩 · 배포 매니페스트 · 내용 동기화 · 버전 올림을 함께 본다.
 실패가 있으면 종료 코드가 1 이다.
 
@@ -166,9 +193,12 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   SKILL.md                               스킬 트리거 정의
   README.md                              자기완결 사양서
   references/rules.md                    압축 규칙
-  assets/blue-report.css                 토큰 68개 — 단일 소스
-  assets/deck-*.html                     완성 덱 5종 + 레이아웃 카탈로그
-  scripts/check_deck.py                  11항목 자동 점검
+  assets/blue-report.css                 토큰 77개 — 단일 소스
+  assets/deck-*.html                     완성 덱 6종 + 레이아웃 카탈로그
+  assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다
+  assets/doc-*.html · doc-viewer.*       A4 문서와 그 뷰어
+  scripts/check_deck.py                  슬라이드 11항목 자동 점검
+  scripts/check_doc.py                   A4 문서 9항목 자동 점검
   scripts/apply_brand.py                 브랜드 일괄 적용
   scripts/to_pdf.py                      PDF 내보내기
   scripts/make_logo_variants.py          로고 두 벌 생성
