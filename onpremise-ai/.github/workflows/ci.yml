@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 테스트
+        run: scripts/run_tests.sh
+
+      - name: 서드파티 의존성 없음 확인
+        run: |
+          python3 - <<'PY'
+          import pathlib, re, sys
+
+          allowed = {"onprem_ai", "tests"}
+          stdlib = set(sys.stdlib_module_names)
+          bad = []
+          for path in pathlib.Path("src").rglob("*.py"):
+              for line in path.read_text(encoding="utf-8").splitlines():
+                  m = re.match(r"\s*(?:from|import)\s+([A-Za-z_][\w.]*)", line)
+                  if not m:
+                      continue
+                  root = m.group(1).split(".")[0]
+                  if root and root not in stdlib and root not in allowed:
+                      bad.append(f"{path}: {line.strip()}")
+          if bad:
+              print("서드파티 import 발견:")
+              print("\n".join(bad))
+              sys.exit(1)
+          print("표준 라이브러리만 사용 확인")
+          PY
+
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: compose 문법 검증
+        run: docker compose -f deploy/docker-compose.yml config --quiet
+
+      - name: 격리 설정 유지 확인
+        run: |
+          grep -q "internal: true" deploy/docker-compose.yml \
+            || { echo "internal: true 가 사라졌다. 격리가 깨진다."; exit 1; }
+          echo "격리 설정 확인"

@@ -1,0 +1,5 @@
+{"question": "추론 컨테이너의 망 분리 원칙은?", "expect_docs": ["isolation-policy.md"]}
+{"question": "하이브리드 검색에서 순위 결합 방식은?", "expect_docs": ["rag-design.md"]}
+{"question": "청킹 기본 길이와 겹침 값은?", "expect_docs": ["rag-design.md"]}
+{"question": "근거로 답할 수 없을 때 출력하는 문구는?", "expect_docs": ["harness-rules.md"]}
+{"question": "모델 가중치 반입 시 검증 방법은?", "expect_docs": ["isolation-policy.md"]}

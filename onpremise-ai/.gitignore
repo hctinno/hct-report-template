@@ -1,0 +1,30 @@
+# 산출물
+var/
+decks-out/
+
+# 코퍼스 실데이터. 샘플만 커밋한다.
+data/corpus/private/
+
+# 모델 가중치
+*.gguf
+*.safetensors
+*.bin
+deploy/models/*.gguf
+
+# 설정
+.env
+
+# 파이썬
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# 편집기·OS
+.vscode/
+.idea/
+.DS_Store

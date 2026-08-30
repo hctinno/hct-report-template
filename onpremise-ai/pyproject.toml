@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "onprem-ai"
+version = "0.1.0"
+description = "폐쇄망 격리 환경에서 동작하는 로컬 LLM/RAG 스택"
+readme = "README.md"
+requires-python = ">=3.11"
+# 런타임 의존성을 두지 않는다. 폐쇄망 반입 시 pip 인덱스가 없다.
+dependencies = []
+
+[project.scripts]
+onprem-ai = "onprem_ai.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
