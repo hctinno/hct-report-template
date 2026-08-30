@@ -65,10 +65,9 @@ def build(artifact=False, brand_path=None, deck="catalog", out_path=None):
     html = open(deck_path, encoding="utf-8").read()
     if brand_path:
         # 순환 import를 피하려고 여기서 늦게 불러온다 (apply_brand 도 이 모듈을 쓴다).
-        from apply_brand import load_brand, logo_data_uri, apply
+        from apply_brand import load_brand, logo_uris, apply
         brand = load_brand(brand_path)
-        uris = {"dark":  logo_data_uri(brand, brand_path, "logo"),
-                "light": logo_data_uri(brand, brand_path, "logoOnLight")}
+        uris = logo_uris(brand, brand_path)   # 키 목록은 apply_brand 가 한 곳에서 정한다
         html, n, left = apply(html, brand, uris)
         print(f"브랜드 적용 {n}건" + (f" · 남은 자리표시자 {len(left)}건" if left else ""))
     html = inline_assets(html)

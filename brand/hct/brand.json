@@ -8,6 +8,9 @@
   "copyrightYear": "2026",
   "logo": "hct-logo-white.png",
   "logoOnLight": "hct-logo-color.png",
+  "_watermark설명": "배경 워터마크용. 국문 병기를 뗀 심볼만. make_logo_variants.py 가 만든다.",
+  "watermark": "hct-logo-symbol-white.png",
+  "watermarkOnLight": "hct-logo-symbol-color.png",
   "logoHeight": 40,
   "docTitle": "HCT 사내 보고서"
 }

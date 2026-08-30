@@ -25,14 +25,25 @@ const CW = 1920 - PAD.side * 2;     // 본문 폭 1728px
 const txt = (slide, text, o) =>
   slide.addText(text, Object.assign({ isTextBox: true, margin: 0 }, o));
 
-/** 카드 — 흰 배경 + 얇은 테두리 + 은은한 그림자. 다크면에서는 색만 바뀐다. */
+/** 카드 — 흰 배경 + 얇은 테두리 + 은은한 그림자.
+ *
+ * 다크면에서는 판을 그리지 않는다. 짙은 지면 위에 짙은 판을 얹으면 경계가
+ * 대비 1.12:1 로 뭉개진다. HTML 의 .br-slide--dark .br-card 와 같은 처리로,
+ * 상단 괘선 2px 만 긋는다. 두 판이 갈라지면 안 되므로 여기도 같이 바꾼다. */
 function card(slide, { x, y, w, h, dark = false, fill, line, topBar }) {
+  if (dark && !fill) {
+    slide.addShape('rect', {
+      x: X(x), y: X(y), w: X(w), h: X(2),
+      fill: { color: line || C.accentOnDark }, line: { type: 'none' },
+    });
+    return;
+  }
   slide.addShape('roundRect', {
     x: X(x), y: X(y), w: X(w), h: X(h), rectRadius: 0.125,
-    fill: { color: fill || (dark ? C.darkCard : C.card) },
-    line: { color: line || (dark ? C.darkLine : C.cardLine), width: 0.75 },
-    ...(dark ? {} : { shadow: { type: 'outer', color: '0B2A6B', opacity: 0.07,
-                                blur: 14, offset: 5, angle: 90 } }),
+    fill: { color: fill || C.card },
+    line: { color: line || C.cardLine, width: 0.75 },
+    shadow: { type: 'outer', color: '0B2A6B', opacity: 0.07,
+              blur: 14, offset: 5, angle: 90 },
   });
   if (topBar) {
     // 단계 강조 카드에만 허용하는 상단 굵은 선 (HTML 의 .br-card--step)
@@ -41,6 +52,23 @@ function card(slide, { x, y, w, h, dark = false, fill, line, topBar }) {
       fill: { color: topBar }, line: { type: 'none' },
     });
   }
+}
+
+/** 배경 워터마크 — 다크면 가운데에 회사 마크를 아주 옅게 깐다.
+ *
+ * HTML 의 .br-watermark 와 같은 크기(720px)·같은 불투명도(5%)다. 슬라이드에
+ * 가장 먼저 그려야 본문 뒤에 깔린다 — pptxgenjs 는 z-index 가 없고 추가 순서가
+ * 곧 쌓임 순서다. */
+function watermark(slide, brand, dark = true) {
+  const src = dark ? brand.watermarkPath : brand.watermarkPathOnLight;
+  if (!src) return;
+  const w = X(720);
+  const ratio = (dark ? brand.watermarkRatio : brand.watermarkRatioOnLight)
+    || brand.logoRatio || 3.07;
+  const h = w / ratio;
+  // 밝은 지면은 잉크가 진해 더 옅게 깐다. HTML 의 3% / 5% 와 같다.
+  slide.addImage({ path: src, x: (SLIDE_W - w) / 2, y: (SLIDE_H - h) / 2, w, h,
+    transparency: dark ? 95 : 97 });
 }
 
 /** 알약 칩 — 그림자 없음. HTML 의 .br-chip */
@@ -151,4 +179,4 @@ function mark(slide, brand) {
   });
 }
 
-module.exports = { X, SLIDE_W, SLIDE_H, PAD, COVER_PAD, CW, txt, card, chip, header, lede, footer, mark };
+module.exports = { X, SLIDE_W, SLIDE_H, PAD, COVER_PAD, CW, txt, card, chip, header, lede, footer, mark, watermark };

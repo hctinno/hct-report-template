@@ -53,6 +53,8 @@ HANGUL = re.compile(r"[가-힣]")
 
 # 슬라이드 우측 상단 마크. 그룹1=배경 밝기, 그룹2=자리표시자 주석(다시 찾기 쉽게 남긴다).
 MARK = re.compile(r'<div class="br-mark" data-on="(dark|light)">(<!--.*?-->)?.*?</div>', re.S)
+# 다크면 가운데 배경 워터마크. 마크와 자리표시자 구조가 같지만 크기·색 처리가 달라 따로 잡는다.
+WATERMARK = re.compile(r'<div class="br-watermark" data-on="(dark|light)">(<!--.*?-->)?.*?</div>', re.S)
 
 
 def resolve(name):
@@ -78,6 +80,8 @@ def load_brand(path):
     b.setdefault("website", "")
     b.setdefault("phone", "")
     b.setdefault("logoOnLight", "")
+    b.setdefault("watermark", "")          # 다크면 배경 워터마크. 비우면 logo 를 키워 쓴다
+    b.setdefault("watermarkOnLight", "")   # 밝은 지면 배경 워터마크. 비우면 logoOnLight
     b.setdefault("logoHeight", 40)
     return b
 
@@ -102,6 +106,20 @@ def logo_data_uri(brand, brand_path, key="logo"):
         data = base64.b64encode(f.read()).decode("ascii")
     print(f"로고[{key}]: {path} ({mime}, {size/1024:.1f}KB) → data URI")
     return f"data:{mime};base64,{data}"
+
+
+def logo_uris(brand, brand_path):
+    """브랜드가 쓰는 이미지 네 벌을 한 번에 data URI 로 만든다.
+
+    이 딕셔너리를 두 곳에서 따로 만들다 사고가 났다. build_single_file.py 가
+    watermark 키를 빠뜨려, 아티팩트에서만 워터마크가 전체 로고로 되돌아갔다.
+    호출부가 늘어도 키가 갈라지지 않게 여기 한 곳에서만 만든다."""
+    return {
+        "dark":  logo_data_uri(brand, brand_path, "logo"),
+        "light": logo_data_uri(brand, brand_path, "logoOnLight"),
+        "watermark":        logo_data_uri(brand, brand_path, "watermark"),
+        "watermarkOnLight": logo_data_uri(brand, brand_path, "watermarkOnLight"),
+    }
 
 
 def wordmark_html(brand, font_size):
@@ -142,6 +160,21 @@ def apply(html, brand, uris, title_override=None):
         u = uris["dark"] if on == "dark" else uris["light"]
         inner = logo_html(u, h) if u else wordmark_html(brand, 28)
         return f'<div class="br-mark" data-on="{on}">{m.group(2)}{inner}</div>'
+
+    def one_watermark(m):
+        # 마크와 같이 배경 밝기에 따라 잉크를 고른다. 다크면은 흰색 녹아웃,
+        # 밝은 지면은 원색이다. brand.json 에 심볼만 잘라 낸 판을 주면 그것을 먼저
+        # 쓰고, 없으면 마크용 로고를 그대로 키워 쓴다.
+        on = m.group(1)
+        if on == "dark":
+            u = uris.get("watermark") or uris["dark"]
+        else:
+            u = uris.get("watermarkOnLight") or uris["light"]
+        inner = f'<img src="{u}" alt="">' if u else wordmark_html(brand, 128)
+        return f'<div class="br-watermark" data-on="{on}">{m.group(2) or ""}{inner}</div>'
+
+    html, n_wm = WATERMARK.subn(one_watermark, html)
+    n += n_wm
 
     html, n_mark = MARK.subn(one_mark, html)
     n += n_mark
@@ -210,8 +243,7 @@ def main():
     if a.title:
         brand["docTitle"] = a.title
     # 다크면용(흰색 녹아웃)과 밝은면용(원색) 두 벌을 읽는다.
-    uris = {"dark":  logo_data_uri(brand, a.brand, "logo"),
-            "light": logo_data_uri(brand, a.brand, "logoOnLight")}
+    uris = logo_uris(brand, a.brand)
     if uris["dark"] and not uris["light"]:
         print("주의: logoOnLight 가 없다. 흰색 로고를 밝은 지면에 얹으면 보이지 않으므로 "
               "밝은 슬라이드는 워드마크 텍스트로 둔다. brand.json 에 원색 로고 경로를 넣어라.",

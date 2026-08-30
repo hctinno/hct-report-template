@@ -47,7 +47,7 @@ blue-report/
 └─ scripts/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
-   ├─ check_deck.py            덱 자동 점검 11항목 + 슬라이드별 PNG
+   ├─ check_deck.py            덱 자동 점검 12항목 + 슬라이드별 PNG
    ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
    ├─ apply_brand.py           회사 정보·로고를 덱에 일괄 적용
@@ -197,7 +197,7 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | 애니메이션 | 있음 (끌 수 있음) | 없음 |
 | 머리말·꼬리말 | 꼬리말만 | 쪽마다 둘 다 |
 | 브랜드 | 우측 상단 마크 | 머리말 로고 + 꼬리말 회사명 |
-| 검사기 | `check_deck.py` 11항목 | `check_doc.py` 9항목 |
+| 검사기 | `check_deck.py` 12항목 | `check_doc.py` 9항목 |
 
 파일 구성도 덱과 같은 방식으로 나뉜다.
 
@@ -466,6 +466,76 @@ python3 scripts/install_blue_report_skill.py             # ~/.claude/skills/blue
 | 기준선 · 구분선 | `#c3cedb` | `--br-hairline` |
 | 알약 칩 테두리 | `#c8d1dc` | `--br-chip-line` |
 
+**다크면 가운데에 회사 마크를 아주 옅게 깐다.** `.br-watermark` 다. 720px · 불투명도
+5% 로 본문 뒤(`z-index:-1`)에 깔린다. 단색 한 장으로 지면이 죽는 것을 막는 장치이고,
+새 색을 들이지 않는다 — 같은 흰색의 투명도만 쓴다.
+
+```html
+<section class="br-slide br-slide--dark">
+  <div class="br-mark" data-on="dark">…</div>
+  <div class="br-watermark" data-on="dark"><span class="br-wordmark">COMPANY NAME</span></div>
+```
+
+**워터마크에는 심볼만 쓴다.** 전체 로고를 720px 로 키우면 국문 병기까지 함께 커져
+본문 괘선과 겹치고, 읽히지도 않으면서 자리만 차지한다. 우측 상단 마크는 40px 로 작게
+들어가 전체 로고가 그대로 읽히므로 거기서는 자르지 않는다.
+
+심볼 판은 손으로 자르지 않는다. `make_logo_variants.py` 가 만든다.
+
+```bash
+python3 scripts/make_logo_variants.py 로고.png --out-dir brand/hct --name hct-logo
+#   심볼 분리: 58행에서 자름 (국문은 66행부터) → (264, 58)
+#   워터마크용 : brand/hct/hct-logo-symbol-white.png
+```
+
+로고는 대개 `[심볼] / 빈 띠 / [국문 병기]` 구조다. 스크립트가 아래쪽 절반에서 가장 넓은
+빈 가로 띠를 찾아 그 위에서 자른다. 띠를 못 찾으면 심볼만 있는 로고로 보고 넘어가며,
+그때는 `watermark` 를 비워 두면 `logo` 가 그대로 쓰인다.
+
+나온 파일을 `brand.json` 의 `watermark` 에 넣는다.
+
+```json
+"logo":             "hct-logo-white.png",
+"logoOnLight":      "hct-logo-color.png",
+"watermark":        "hct-logo-symbol-white.png",
+"watermarkOnLight": "hct-logo-symbol-color.png"
+```
+
+**비율은 마크와 따로 잡는다.** 심볼은 국문이 빠져 마크보다 납작하다(4.55 대 3.07).
+PPTX 생성기가 `logoRatio` 하나로 둘을 그리면 한쪽이 찌그러지므로 `watermarkRatio` 를
+따로 둔다.
+
+**표지 한 장만 뺀다.** 그 밖의 모든 지면에 깔린다. 표지는 본문이 왼쪽에 몰려 있어
+가운데 마크와 제목이 겹치고, 우측 상단 마크와 안내선으로 이미 브랜드가 선다.
+마무리 장은 표지와 같은 `--br-cover` 조판이지만 표지가 아니므로 깔린다.
+
+**지면 밝기에 따라 잉크와 농도가 다르다.** 마크와 같은 규칙이다.
+
+| 지면 | `data-on` | 자산 | 불투명도 |
+|---|---|---|---|
+| 다크 · 표지 조판 | `dark` | `watermark` (흰색 녹아웃) | 5% |
+| 밝은 지면 | `light` | `watermarkOnLight` (원색) | 3% |
+
+밝은 지면을 3% 로 낮추는 이유 — 진한 잉크는 같은 값이면 훨씬 세게 보이고 본문 대비를
+갉아먹는다. 3% 에서 본문 대비 변화는 16.5:1 → 15.6:1 로 무시할 수준이다.
+
+**`.br-slide` 에 `isolation:isolate` 가 필요하다.** 이것이 없으면 `z-index:-1` 이
+슬라이드 배경보다 뒤로 내려가 아예 보이지 않는다. `position:relative` 만으로는 쌓임
+맥락이 생기지 않는다.
+
+불투명도가 5% 라 원본 해상도를 넘겨 키워도 흐림이 드러나지 않는다. HCT 로고 원본은
+264×86 이고 720px 로 2.7배 확대되지만 눈에 띄지 않는다. `check_deck.py` 의 겹침 검사는
+`.br-watermark` 를 배경 장치로 보고 건너뛴다.
+
+**카드는 밝은 지면에서만 판이다.** 다크면(`--br-cover` · `--br-dark`)에서는 `.br-card`
+마크업을 그대로 써도 판이 그려지지 않는다 — 바탕과 테두리를 걷어내고 상단 괘선
+2px(`--br-accent-on-dark`)으로만 구획한다. `blue-report.css` 가 알아서 처리하므로
+슬라이드에서 따로 할 일은 없다.
+
+짙은 지면 위에 짙은 판을 얹으면 경계가 뭉개진다. 예전에 쓰던 `#182238` 카드는
+지면 `#101827` 과 대비가 **1.12:1**, 테두리 `#2b3852` 도 **1.52:1** 이었다.
+사람 눈에는 초점이 안 맞는 얼룩으로 보인다. 그래서 다크면 카드 바탕 토큰을 없앴다.
+
 ### 텍스트
 
 | 역할 | 값 | CSS 토큰 |
@@ -505,8 +575,7 @@ python3 scripts/install_blue_report_skill.py             # ~/.claude/skills/blue
 |---|---|---|
 | 표지 · 파트 간지 | `#071b45` | `--br-cover` |
 | 핵심 정리 | `#101827` | `--br-dark` |
-| 다크면 카드 | `#182238` | `--br-dark-card` |
-| 다크면 카드 테두리 | `#2b3852` | `--br-dark-line` |
+| 다크면 구분선 | `#2b3852` | `--br-dark-line` |
 | 다크면 본문 | `#f4f6f8` | `--br-on-dark` |
 | 다크면 보조 | `#a9bcd6` | `--br-on-dark-2` |
 | 다크면 약함 | `#6b7c96` | `--br-on-dark-3` |
@@ -717,7 +786,7 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
    → 마크는 상단 여백 띠 안에만 둔다. 우측 상단에 콘텐츠를 붙이지 않는다.
 
 `python3 scripts/check_deck.py deck.html --shots out/`이 위 1·4·5·6·7·8과 문체를 자동
-검사하고 슬라이드별 PNG를 남긴다. 판정은 11항목이다.
+검사하고 슬라이드별 PNG를 남긴다. 판정은 12항목이다.
 
 | # | 항목 | 실패하면 |
 |---|---|---|
