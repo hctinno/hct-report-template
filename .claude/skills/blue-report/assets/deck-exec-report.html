@@ -132,19 +132,22 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px;flex:1;min-height:0;margin-top:34px">
       <div class="br-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
         <div style="font:700 30px/1 var(--br-font-kr)">절감 항목별 구성비</div>
-  <svg class="br-donut" viewBox="0 0 196 196" style="width:360px;height:360px" role="img" aria-label="비율 분포">
+  <div class="br-donut-wrap">
+          <svg class="br-donut" viewBox="0 0 196 196" style="width:360px;height:360px" role="img" aria-label="비율 분포">
     <g transform="translate(98,98)">
-      <circle class="dsh d5" r="78" stroke="var(--br-data-1)" stroke-width="36" stroke-dasharray="223.4 490.1" transform="rotate(-90.00)"></circle>
-      <circle class="dsh d6" r="78" stroke="var(--br-data-2)" stroke-width="36" stroke-dasharray="130.3 490.1" transform="rotate(75.60)"></circle>
-      <circle class="dsh d7" r="78" stroke="var(--br-data-3)" stroke-width="36" stroke-dasharray="86.2 490.1" transform="rotate(172.80)"></circle>
-      <circle class="dsh d8" r="78" stroke="var(--br-data-4)" stroke-width="36" stroke-dasharray="42.1 490.1" transform="rotate(237.60)"></circle>
+      <circle class="dsh d5" r="78" stroke="var(--mark)" stroke-width="36" stroke-dasharray="223.4 490.1" transform="rotate(-90.00)"></circle>
+      <circle class="dsh d6" r="78" stroke="var(--mark-mid)" stroke-width="36" stroke-dasharray="130.3 490.1" transform="rotate(75.60)"></circle>
+      <circle class="dsh d7" r="78" stroke="var(--mark-mute)" stroke-width="36" stroke-dasharray="86.2 490.1" transform="rotate(172.80)"></circle>
+      <circle class="dsh d8" r="78" stroke="var(--mark-mute)" stroke-width="36" stroke-dasharray="42.1 490.1" transform="rotate(237.60)"></circle>
     </g>
   </svg>
+          <div class="br-donut-center"><span class="br-donut-num">46<span class="br-sup">%</span></span><span class="br-donut-cap">인건비 절감</span></div>
+        </div>
   <div class="br-legend">
-    <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--br-data-1)"></span>인건비 절감</div><div class="br-legend-val">46<span class="br-sup">%</span></div></div>
-    <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--br-data-2)"></span>외주비 절감</div><div class="br-legend-val">27<span class="br-sup">%</span></div></div>
-    <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--br-data-3)"></span>재작업 감소</div><div class="br-legend-val">18<span class="br-sup">%</span></div></div>
-    <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--br-data-4)"></span>기타</div><div class="br-legend-val">9<span class="br-sup">%</span></div></div>
+    <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--mark)"></span>인건비 절감</div><div class="br-legend-val">46<span class="br-sup">%</span></div></div>
+    <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--mark-mid)"></span>외주비 절감</div><div class="br-legend-val">27<span class="br-sup">%</span></div></div>
+    <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--mark-mute)"></span>재작업 감소</div><div class="br-legend-val">18<span class="br-sup">%</span></div></div>
+    <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--mark-mute)"></span>기타</div><div class="br-legend-val">9<span class="br-sup">%</span></div></div>
   </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:26px;min-height:0">
