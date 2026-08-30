@@ -20,10 +20,24 @@
       : '<strong>' + page + '</strong>';
   });
 
+  // 지면 전체가 언제나 화면 안에 들어오게 맞춘다.
+  //   - 가로·세로 중 더 빡빡한 쪽에 맞춘다(contain). 16:9 가 아닌 화면에서는 위아래나
+  //     좌우에 여백이 남는다. 잘라 내지 않는다.
+  //   - HUD 띠 높이를 빼 둔다. 안 빼면 16:9 정확히 맞는 화면에서 지면 아래 47px 가
+  //     HUD 뒤로 들어가 꼬리말(문서명·쪽번호)이 가려진다.
+  //   - translate(-50%,-50%) 로 되돌려 어느 창 크기에서든 가운데에 앉힌다.
   function scale() {
+    var hud = document.getElementById('hud');
+    var chrome = (hud && hud.offsetHeight ? hud.offsetHeight : 0)
+               + (showNotes ? window.innerHeight * .34 : 0);
+    // 무대를 HUD·노트 띠 위까지로 줄인다. 배율만 줄이고 무대를 그대로 두면 지면이
+    // 화면 한가운데에 앉아 아래쪽이 띠 뒤로 들어간다.
+    stage.style.bottom = chrome + 'px';
     var s = Math.min(window.innerWidth / 1920,
-                     (window.innerHeight - (showNotes ? window.innerHeight * .34 : 0)) / 1080);
-    frames.forEach(function (f) { f.style.transform = 'scale(' + s + ')'; });
+                     Math.max(window.innerHeight - chrome, 100) / 1080);
+    frames.forEach(function (f) {
+      f.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+    });
   }
 
   function show(n) {

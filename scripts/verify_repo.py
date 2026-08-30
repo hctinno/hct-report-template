@@ -38,6 +38,7 @@ import zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILL = os.path.join(ROOT, ".claude", "skills", "blue-report")
 SCRIPTS = os.path.join(SKILL, "scripts")
+ASSETS = os.path.join(SKILL, "assets")
 BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
 
 DECKS = ["catalog", "internal", "weekly", "ax", "exec", "allhands",
@@ -320,6 +321,81 @@ def check_palette(log):
         log.fail("계열색", bad[0].replace("실패 — ", "") if bad else "인접쌍이 갈리지 않는다")
 
 
+# ------------------------------------------------------------------ 뷰어 축척
+
+# 실제로 쓰이는 화면들. 16:9 정배수만 보면 이 검사가 하는 일이 없다 —
+# 결함은 1920x1080 보다 작은 창에서만 났다.
+VIEWPORTS = [
+    ("FHD 16:9", 1920, 1080), ("노트북 16:9", 1366, 768), ("QHD 16:9", 2560, 1440),
+    ("16:10", 1920, 1200), ("맥북 16:10", 1440, 900), ("울트라와이드 21:9", 3440, 1440),
+    ("빔프로젝터 4:3", 1024, 768), ("5:4", 1280, 1024),
+]
+
+FIT_PROBE = """() => {
+  const f = document.querySelector('.br-frame.is-active');
+  if (!f) return { err: '활성 슬라이드가 없다' };
+  const b = f.getBoundingClientRect();
+  const hud = document.getElementById('hud');
+  const h = hud ? hud.getBoundingClientRect() : null;
+  const foot = f.querySelector('.br-footer');
+  const fb = foot ? foot.getBoundingClientRect() : null;
+  return {
+    l: b.left, t: b.top, r: b.right, b: b.bottom, w: b.width, h: b.height,
+    vw: innerWidth, vh: innerHeight,
+    hudTop: h ? h.top : Infinity,
+    footBottom: fb ? fb.bottom : null,
+  };
+}"""
+
+
+def check_viewer(log):
+    """창 크기가 달라져도 지면 전체가 화면 안에 들어오는가.
+
+    덱 뷰어는 1920x1080 지면을 창에 맞춰 줄여 보여 준다. 그런데 브라우저는 컨테이너
+    보다 큰 항목을 가운데가 아니라 시작 모서리에 붙이므로, 가운데 기준으로 줄이면
+    지면이 오른쪽·아래로 밀린다. 1366x768 노트북에서 오른쪽 277px 가 화면 밖으로
+    나가 있었고 16항목 검사는 전부 통과했다 — 검사기가 1920x1080 에서만 그렸기
+    때문이다. 그래서 여러 해상도로 직접 띄워 본다.
+
+    HUD 띠도 함께 본다. 지면이 띠 뒤로 들어가면 꼬리말(문서명·쪽번호)이 가려진다."""
+    sys.path.insert(0, SCRIPTS)
+    from ensure_deps import need_browser
+    chrome = need_browser()
+    from playwright.sync_api import sync_playwright
+
+    deck = os.path.join(ASSETS, "deck-internal-report.html")
+    url = "file://" + os.path.abspath(deck)
+    bad = []
+    with sync_playwright() as pw:
+        br = pw.chromium.launch(executable_path=chrome)
+        for name, w, h in VIEWPORTS:
+            pg = br.new_page(viewport={"width": w, "height": h}, reduced_motion="reduce")
+            pg.goto(url)
+            pg.wait_for_timeout(700)
+            pg.keyboard.press("ArrowRight")      # 꼬리말이 있는 장으로 넘긴다
+            pg.keyboard.press("ArrowRight")
+            pg.wait_for_timeout(400)
+            r = pg.evaluate(FIT_PROBE)
+            pg.close()
+            if r.get("err"):
+                bad.append(f"{name} {w}x{h} — {r['err']}")
+                continue
+            if (r["l"] < -1 or r["t"] < -1 or r["r"] > r["vw"] + 1 or r["b"] > r["vh"] + 1):
+                bad.append(f"{name} {w}x{h} — 지면이 화면 밖으로 나간다 "
+                           f"({r['l']:.0f},{r['t']:.0f}~{r['r']:.0f},{r['b']:.0f})")
+            elif r["footBottom"] and r["footBottom"] > r["hudTop"] + 1:
+                bad.append(f"{name} {w}x{h} — 꼬리말이 HUD 띠에 "
+                           f"{r['footBottom'] - r['hudTop']:.0f}px 가린다")
+        br.close()
+
+    if bad:
+        log.fail("뷰어 축척", f"{len(bad)}개 해상도에서 지면이 다 보이지 않는다")
+        for t in bad:
+            print(f"    · {t}")
+    else:
+        log.ok("뷰어 축척", f"해상도 {len(VIEWPORTS)}종 모두 지면 전체가 화면 안에 들어온다")
+
+
 # ------------------------------------------------------- HTML · PPTX 내용 동기화
 
 def check_sync(log):
@@ -471,12 +547,12 @@ def check_version(log):
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
     ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
-    ap.add_argument("--only", choices=["decks", "docs", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
+    ap.add_argument("--only", choices=["decks", "docs", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
                     action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
     ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
     a = ap.parse_args()
 
-    only = set(a.only or ["decks", "docs", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
+    only = set(a.only or ["decks", "docs", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
     log = Log()
 
     if a.shots:
@@ -494,6 +570,9 @@ def main():
         if "docs" in only:
             print("\n── A4 문서 ──")
             check_docs(log)
+        if "viewer" in only:
+            print("\n── 뷰어 축척 ──")
+            check_viewer(log)
         if "pptx" in only:
             print("\n── PPTX ──")
             check_pptx(log, tmp)
