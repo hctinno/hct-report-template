@@ -66,12 +66,15 @@ brand/hct/brand.json
 
 ### 2. 덱 고르기 — 새로 만들지 말고 골라서 내용만 바꾼다
 
-`.claude/skills/blue-report/assets/` 에 완성된 덱이 5종 있다. 용도에 맞는 것을 복사해
+`.claude/skills/blue-report/assets/` 에 완성된 덱이 5종과 레이아웃 카탈로그 1종 있다.
+용도에 맞는 것을 복사해
 **내용만** 교체한다. 레이아웃과 스타일을 새로 설계하지 않는다.
 
 | 파일 | 용도 | 장수 |
 |---|---|---|
-| `deck-internal-report.html` | 사내 보고 (주간·월간) | 9 |
+| `deck-internal-report.html` | 사내 보고 (월간) | 9 |
+| `deck-weekly-report.html` | 조직 주간보고 | 7 |
+| `deck-ax-weekly.html` | AX 조직 1장 보고 + 부록 | 5 |
 | `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |
@@ -116,7 +119,7 @@ assets/deck-viewer.js
 # HTML — 회사명·로고·저작권을 넣어 한 파일로 만든다
 python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
 
-# --deck 은 이름(catalog · internal · sales · project · training) 또는 HTML 파일 경로
+# --deck 은 이름(catalog · internal · weekly · ax · sales · project · training) 또는 HTML 파일 경로
 # 내용을 직접 편집한 덱이면 파일 경로를 준다:
 #   --deck decks-out/my-deck.html
 
@@ -131,6 +134,15 @@ PPTX 는 HTML 덱과 내용을 따로 들고 있다. **HTML 쪽이 기준이므�
 `assets/deck-*.html` 과 `pptx/content.js` 두 곳을 함께 고친다.** 색은 두 판이
 `assets/blue-report.css` 의 토큰을 같이 읽으므로 갈라지지 않는다.
 
+한쪽만 고쳤는지는 스크립트가 잡는다. 템플릿 자체를 고쳤다면 돌린다.
+
+```bash
+python scripts/check_content_sync.py
+```
+
+슬라이드 수 · 문서명 · 발표자 노트 · 막대 · 도넛 · 표를 두 곳에서 뽑아 견주고,
+어긋나면 어느 덱 몇 장 어느 항목인지 찍는다.
+
 필요한 것(Pillow · Chromium · node_modules)은 스크립트가 스스로 받는다. 미리 설치하지
 않아도 된다. 설치를 막으려면 환경변수 `BLUE_REPORT_NO_INSTALL=1` 을 준다. 그 경우
 필요한 명령만 출력하고 멈춘다.
@@ -141,13 +153,20 @@ PPTX 는 HTML 덱과 내용을 따로 들고 있다. **HTML 쪽이 기준이므�
 python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 ```
 
-이 스크립트가 10항목을 기계로 판정한다.
+이 스크립트가 11항목을 기계로 판정한다.
 
 문체 · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 ·
 최소 글자 크기 · 데이터 마크 대비 · 브랜드 마크 존재 · 마크와 본문 겹침 ·
 배경 밝기와 로고 변형 일치.
 
 **실패가 0 이 아니면 완료가 아니다.** 실패가 남은 채로 "완료"라고 쓰지 않는다.
+
+덱 하나가 아니라 템플릿·스크립트·문서를 고쳤다면 저장소 전체를 본다. GitHub Actions 가
+push·PR 마다 이 한 줄을 그대로 돌린다.
+
+```bash
+python scripts/verify_repo.py
+```
 
 `주의`는 허용된다. 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
 

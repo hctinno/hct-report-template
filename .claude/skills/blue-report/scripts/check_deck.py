@@ -7,14 +7,22 @@ Playwright가 없으면 정적 검사만 수행하고 그 사실을 보고한다
     python3 check_deck.py ../assets/deck-template.html
     python3 check_deck.py deck.html --shots out/     # 슬라이드별 PNG도 저장
 
-검사 항목
-  1. 슬라이드 렌더 크기가 정확히 1920x1080인가 (넘침 없음)
-  2. 24px 미만 텍스트가 없는가 (% 첨자 .br-sup 만 예외)
-  3. 금지 문체(~습니다 / ~해요 등)를 쓰지 않았는가
-  4. 파이(<path> 호)를 쓰지 않았는가 — 도넛만 허용
-  5. 도넛 stroke-dasharray가 원주 계산과 맞는가
-  6. 데이터 마크가 슬라이드 배경 대비 2:1 이상인가
-  7. 토큰 밖 raw hex를 슬라이드에 직접 쓰지 않았는가
+검사 항목 (11)
+  정적 — HTML 원문만 본다. Playwright 없이도 돈다.
+    1. 금지 문체 — 존댓말(~습니다 / ~해요)과 평서형(~한다 / ~없다) 없이 명사형인가
+    2. 파이(<path> 호)를 쓰지 않았는가 — 도넛만 허용
+    3. 토큰 밖 raw hex를 슬라이드에 직접 쓰지 않았는가
+    4. 도넛 stroke-dasharray가 원주 계산과 맞는가
+  렌더 — 실제 브라우저 레이아웃. Playwright가 필요하다.
+    5. 슬라이드 렌더 크기가 정확히 1920x1080인가 (넘침 없음)
+    6. 24px 미만 텍스트가 없는가 (% 첨자 .br-sup 만 예외)
+    7. 데이터 마크가 슬라이드 배경 대비 2:1 이상인가
+    8. 본문 영역이 위아래로 서로 겹치지 않는가
+    9. 브랜드 마크가 모든 슬라이드 우측 상단에 있는가
+   10. 브랜드 마크가 본문과 겹치지 않는가
+   11. 로고 변형이 배경 밝기와 맞는가 (어두운 면 흰색 · 밝은 면 원색)
+
+종료 코드는 실패가 하나라도 있으면 1, 아니면 0이다. 주의는 0을 유지한다.
 """
 import argparse
 import math
@@ -27,7 +35,13 @@ from palette import contrast, luminance, MIN_DATA_CONTRAST  # noqa: E402
 from ensure_deps import need_browser  # noqa: E402
 
 # 개조식·명사형 위반. 설문 문항 원문은 예외이므로 <!-- 원문 --> 주석이 같은 줄에 있으면 넘어간다.
+#   1) 합니다체·해요체 — 존댓말 종결
 STYLE_BAN = re.compile(r"(합니다|습니다|입니다|됩니다|해요|어요|예요|세요)(?=[\s.,·<!?)]|$)")
+#   2) 평서형 종결(~한다 · ~됐다 · ~없다 …) — 슬라이드 본문은 명사형으로 끝낸다.
+#      한글 음절 + '다' 로 끝나는 말을 잡되, 종결어미가 아닌 조사(마다 · 보다)는 뺀다.
+#      발표자 노트(data-notes)는 대상이 아니다. 태그를 걷어낼 때 함께 사라진다.
+#      '니다' 는 위 존댓말 규칙이 이미 잡으므로 여기서 빼서 두 번 세지 않게 한다.
+STYLE_BAN_PLAIN = re.compile(r"(?!마다|보다|니다)[가-힣]다(?=[\s.,·<!?)\]]|$)")
 STYLE_EXEMPT = re.compile(r"원문|설문 문항|survey-verbatim")
 
 # 토큰으로 관리하는 색 + 알파 표기. 이 밖의 raw hex는 경고 대상.
@@ -67,16 +81,30 @@ class Report:
 
 # ---------------------------------------------------------------- 정적 검사
 
+def _blank(html, pattern):
+    """주석·CSS·JS 를 공백으로 지운다. 줄바꿈은 남겨 행 번호를 보존한다."""
+    return re.sub(pattern, lambda m: re.sub(r"[^\n]", " ", m.group()), html, flags=re.S)
+
+
 def check_style(html, rep):
+    raw_lines = html.splitlines()
+    # 단일 파일 덱은 CSS·JS 가 본문에 인라인돼 있고 그 주석은 한국어 서술형이다.
+    # HTML 주석도 여러 줄이라 줄 단위로는 지워지지 않는다. 먼저 통째로 걷어낸다.
+    html = _blank(html, r"<!--.*?-->")
+    html = _blank(html, r"<style[^>]*>.*?</style>")
+    html = _blank(html, r"<script[^>]*>.*?</script>")
+
     bad = []
-    for n, line in enumerate(html.splitlines(), 1):
-        if STYLE_EXEMPT.search(line):
+    # 예외 표시(<!-- 원문 -->)는 주석 안에 있으므로 원본 줄에서 찾는다.
+    for n, (raw, line) in enumerate(zip(raw_lines, html.splitlines()), 1):
+        if STYLE_EXEMPT.search(raw):
             continue
-        # 태그와 주석을 걷어낸 본문 텍스트만 본다
-        text = re.sub(r"<!--.*?-->", "", line)
-        text = re.sub(r"<[^>]+>", " ", text)
+        # 태그를 걷어낸 본문 텍스트만 본다. data-notes 는 태그 안이라 함께 사라진다.
+        text = re.sub(r"<[^>]+>", " ", line)
         for m in STYLE_BAN.finditer(text):
             bad.append(f"{n}행 '{m.group(1)}' — {text.strip()[:60]}")
+        for m in STYLE_BAN_PLAIN.finditer(text):
+            bad.append(f"{n}행 '{m.group()}' 평서형 — {text.strip()[:60]}")
     if bad:
         rep.f(f"문체 위반 {len(bad)}건 (개조식·명사형 아님)")
         for b in bad[:8]:
@@ -139,7 +167,11 @@ def check_render(path, rep, shots=None):
     url = "file://" + os.path.abspath(path)
     with sync_playwright() as p:
         br = p.chromium.launch(executable_path=chrome)
-        pg = br.new_page(viewport={"width": 1920, "height": 1080})
+        # reduced_motion 으로 연다. 등장 애니메이션이 fill:both 라 재생 전에는
+        # 막대가 scaleY(0) 로 접혀 있고, 스크롤로 슬라이드가 활성화되는 순간부터
+        # 재생된다. 그대로 찍으면 아직 안 뜬 막대가 PNG 에서 통째로 사라져
+        # "눈으로 확인한다" 단계가 거짓말을 한다. 애니메이션을 끄면 최종 상태다.
+        pg = br.new_page(viewport={"width": 1920, "height": 1080}, reduced_motion="reduce")
         pg.goto(url + "?all=1")
         pg.wait_for_timeout(1800)          # 폰트 로드 대기
 
@@ -191,6 +223,43 @@ def check_render(path, rep, shots=None):
                        h: Math.round(mr.height), hit: hit.slice(0, 3),
                        inside: mr.top >= sr.top && mr.right <= sr.right };
             }
+            // 슬라이드 직계 형제끼리 세로로 겹치는가.
+            // 컨테이너가 min-height:0 으로 줄어도 안의 카드는 내용 높이만큼 삐져나온다.
+            // 그래서 박스가 아니라 자손까지 포함한 실제 차지 범위로 잰다.
+            const bands = [];
+            [...sec.children].forEach(el => {
+              if (el.classList.contains('br-mark') || el.classList.contains('br-rule')) return;
+              const cs = getComputedStyle(el);
+              if (cs.display === 'none' || cs.visibility === 'hidden' || cs.position === 'absolute') return;
+              let r = el.getBoundingClientRect();
+              let top = r.top, bottom = r.bottom, left = r.left, right = r.right;
+              el.querySelectorAll('*').forEach(d => {
+                const dcs = getComputedStyle(d);
+                if (dcs.display === 'none' || dcs.visibility === 'hidden' || dcs.position === 'absolute') return;
+                const dr = d.getBoundingClientRect();
+                if (dr.height === 0 && dr.width === 0) return;
+                if (dr.top < top) top = dr.top;
+                if (dr.bottom > bottom) bottom = dr.bottom;
+                if (dr.left < left) left = dr.left;
+                if (dr.right > right) right = dr.right;
+              });
+              bands.push({ cls: (el.className || el.tagName).toString().slice(0, 30),
+                           txt: (el.innerText || '').trim().split(String.fromCharCode(10))[0].slice(0, 24),
+                           top: Math.round(top), bottom: Math.round(bottom),
+                           left: Math.round(left), right: Math.round(right) });
+            });
+            const collide = [];
+            for (let a = 0; a < bands.length - 1; a++) {
+              for (let b = a + 1; b < bands.length; b++) {
+                const over = Math.round(Math.min(bands[a].bottom, bands[b].bottom)
+                                      - Math.max(bands[a].top, bands[b].top));
+                // 가로로도 겹쳐야 진짜 겹침이다. 2열 그리드처럼 좌우로 나란한 형제는 넘어간다.
+                const ox = Math.round(Math.min(bands[a].right, bands[b].right)
+                                    - Math.max(bands[a].left, bands[b].left));
+                if (over > 2 && ox > 2) collide.push({ a: bands[a], b: bands[b], over });
+              }
+            }
+
             const marks = [];
             sec.querySelectorAll('.br-bar-v,.br-bar-h,.br-dot,circle').forEach(el => {
               const cs = getComputedStyle(el);
@@ -201,13 +270,13 @@ def check_render(path, rep, shots=None):
               i, label: fr.dataset.label,
               h: sec.scrollHeight, w: sec.scrollWidth,
               ch: sec.clientHeight, cw: sec.clientWidth,
-              bg, small, mark, marks: [...new Set(marks)]
+              bg, small, mark, collide, marks: [...new Set(marks)]
             });
           });
           return out;
         }""")
 
-        overflow, small_all, contrast_bad = [], [], []
+        overflow, small_all, contrast_bad, collide_all = [], [], [], []
         mark_missing, mark_overlap, mark_variant, mark_pos = [], [], [], []
         for s in data:
             m = s.get("mark")
@@ -229,6 +298,13 @@ def check_render(path, rep, shots=None):
                         mark_variant.append(
                             f"{here}: 배경 {bgh}(광도 {luminance(bgh):.3f})는 "
                             f"data-on=\"{want}\" 여야 하는데 \"{m['on'] or '없음'}\" 이다")
+            for c in s.get("collide", []):
+                collide_all.append(
+                    f"{s['i']+1}. {s['label']}: {c['a']['cls']}"
+                    + (f"(“{c['a']['txt']}”)" if c['a']['txt'] else "")
+                    + f" 와 {c['b']['cls']}"
+                    + (f"(“{c['b']['txt']}”)" if c['b']['txt'] else "")
+                    + f" 가 세로로 {c['over']}px 겹침")
             if s["h"] != 1080 or s["w"] != 1920:
                 overflow.append(f"{s['i']+1}. {s['label']}: {s['w']}x{s['h']} (기대 1920x1080)")
             for t in s["small"]:
@@ -248,6 +324,14 @@ def check_render(path, rep, shots=None):
                 print(f"        {o}")
         else:
             rep.o(f"슬라이드 크기 — {len(data)}장 모두 정확히 1920x1080")
+
+        if collide_all:
+            rep.f(f"본문 영역이 서로 겹침 {len(collide_all)}건")
+            for c in collide_all[:10]:
+                print(f"        {c}")
+            print("        → 여백을 줄이거나 내용을 덜어 아래 영역을 밀어내지 않게 한다")
+        else:
+            rep.o("본문 영역 — 위아래가 서로 겹치지 않는다")
 
         if small_all:
             rep.f(f"24px 미만 텍스트 {len(small_all)}건")

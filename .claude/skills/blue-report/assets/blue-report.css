@@ -61,6 +61,14 @@
   --br-data-4: #5b9bd5;
   --br-data-5: #86b0da;
 
+  /* 다크면 위 데이터 램프. 밝은면 램프를 뒤집은 것이 아니라 따로 고른 값이다.
+     donut.py --dark 가 이것을 읽는다. 지면(--br-dark) 대비 2:1 이상. */
+  --br-data-dark-1: #dbe9ff;
+  --br-data-dark-2: #a9c8ff;
+  --br-data-dark-3: #6fa8ff;
+  --br-data-dark-4: #3d84ea;
+  --br-data-dark-5: #2a5fc0;
+
   /* 구간이 6개 이상이면 양 끝을 고정한 보간 램프를 쓴다. scripts/palette.py --steps N 으로 생성.
      아래는 7단계. 전 단계 지면 대비 2:1 이상, 인접 색 중복 없음. */
   --br-bar-1: #0b2a6b;  --br-bar-2: #20407e;  --br-bar-3: #345790;  --br-bar-4: #486da2;
@@ -384,3 +392,15 @@
   .d9{animation-delay:.72s!important}  .d10{animation-delay:.80s!important}
   .d11{animation-delay:.88s!important} .d12{animation-delay:.96s!important}
 }
+
+/* 등장 효과를 끄는 덱. #stage 에 data-no-anim 을 주면 전부 꺼진다.
+   주간보고처럼 정적으로 읽고 인쇄하는 문서에 쓴다. 발표용 덱은 켠 채로 둔다.
+   미디어 쿼리 밖이라 prefers-reduced-motion 과 무관하게 항상 이긴다. */
+[data-no-anim] [data-deck-active] .a,
+[data-no-anim] [data-deck-active] .ad,
+[data-no-anim] [data-deck-active] .f,
+[data-no-anim] [data-deck-active] .bx,
+[data-no-anim] [data-deck-active] .by,
+[data-no-anim] [data-deck-active] .p,
+[data-no-anim] [data-deck-active] .dsh { animation:none!important }
+

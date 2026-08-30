@@ -65,6 +65,14 @@
   --br-data-4: #5b9bd5;
   --br-data-5: #86b0da;
 
+  /* 다크면 위 데이터 램프. 밝은면 램프를 뒤집은 것이 아니라 따로 고른 값이다.
+     donut.py --dark 가 이것을 읽는다. 지면(--br-dark) 대비 2:1 이상. */
+  --br-data-dark-1: #dbe9ff;
+  --br-data-dark-2: #a9c8ff;
+  --br-data-dark-3: #6fa8ff;
+  --br-data-dark-4: #3d84ea;
+  --br-data-dark-5: #2a5fc0;
+
   /* 구간이 6개 이상이면 양 끝을 고정한 보간 램프를 쓴다. scripts/palette.py --steps N 으로 생성.
      아래는 7단계. 전 단계 지면 대비 2:1 이상, 인접 색 중복 없음. */
   --br-bar-1: #0b2a6b;  --br-bar-2: #20407e;  --br-bar-3: #345790;  --br-bar-4: #486da2;
@@ -389,6 +397,18 @@
   .d11{animation-delay:.88s!important} .d12{animation-delay:.96s!important}
 }
 
+/* 등장 효과를 끄는 덱. #stage 에 data-no-anim 을 주면 전부 꺼진다.
+   주간보고처럼 정적으로 읽고 인쇄하는 문서에 쓴다. 발표용 덱은 켠 채로 둔다.
+   미디어 쿼리 밖이라 prefers-reduced-motion 과 무관하게 항상 이긴다. */
+[data-no-anim] [data-deck-active] .a,
+[data-no-anim] [data-deck-active] .ad,
+[data-no-anim] [data-deck-active] .f,
+[data-no-anim] [data-deck-active] .bx,
+[data-no-anim] [data-deck-active] .by,
+[data-no-anim] [data-deck-active] .p,
+[data-no-anim] [data-deck-active] .dsh { animation:none!important }
+
+
 </style>
 <style>
 /* 덱 뷰어 전용 스타일 — 디자인 시스템이 아니라 브라우저에서 넘겨 보기 위한 껍데기.
@@ -409,10 +429,14 @@
          font:400 15px/1.6 system-ui,sans-serif;border-top:1px solid #2b3852;z-index:8}
   #notes b{display:block;color:#8fa4bd;font:600 11px/1 system-ui,sans-serif;
            letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
-  /* ?all=1 — 전 슬라이드 세로 나열. 스크린샷·PDF 내보내기·검수용 */
+  /* 전 슬라이드 세로 나열. ?all=1 은 스크린샷·PDF 내보내기·검수용이라 HUD 를 감추고,
+     버튼으로 켠 경우(.all-mode--live)는 되돌아갈 수 있게 HUD 를 남긴다. */
   body.all-mode #stage{position:static;display:block;overflow:visible}
   body.all-mode .br-frame{display:block;margin:0 auto 24px}
   body.all-mode #hud,body.all-mode #notes{display:none}
+  body.all-mode--live{overflow:auto}
+  body.all-mode--live #hud{display:flex}
+  body.all-mode--live .br-frame{margin-bottom:24px}
 
 /* 인쇄 · PDF — 슬라이드 1장이 1페이지. 1920x1080px = 20in x 11.25in (96dpi) */
 @media print {
@@ -536,7 +560,7 @@ body { background:#111; margin:0; }
       <h2 class="a" style="font:700 var(--br-fs-part)/1 var(--br-font-label);color:var(--br-accent-on-dark);margin:0;letter-spacing:.01em">Part 01</h2>
     </div>
     <div style="display:flex;flex-direction:column;min-height:0">
-      <h3 class="a d2" style="font:900 74px/1.24 var(--br-font-kr);margin:0;letter-spacing:var(--br-ls-tight)">도입은 끝났고,<br>정착은 시작도 안 됐다</h3>
+      <h3 class="a d2" style="font:900 74px/1.24 var(--br-font-kr);margin:0;letter-spacing:var(--br-ls-tight)">도입은 끝났고,<br>정착은 시작 전</h3>
       <p class="a d4 br-lede" style="margin-top:38px">전사 일상 사용률 58.4% — 도구 보급 완료<br>부서 · 직급별 활용 격차는 오히려 확대</p>
       <div style="margin-top:auto;display:flex;flex-direction:column">
         <div class="a d6" style="display:flex;justify-content:space-between;align-items:baseline;padding:26px 0;border-bottom:1px solid rgba(244,246,248,.22)">
@@ -1084,7 +1108,20 @@ body { background:#111; margin:0; }
   document.getElementById('prev').onclick = function () { show(i - 1); };
   document.getElementById('next').onclick = function () { show(i + 1); };
   document.getElementById('notes-btn').onclick = toggleNotes;
-  document.getElementById('all').onclick = function () { location.search = '?all=1'; };
+  // 전체 보기는 제자리에서 켜고 끈다. URL 을 바꾸면 새로고침이 되고, 되돌아갈 길도 없다.
+  // Artifact 처럼 주소를 못 바꾸는 곳에서도 이 방식이면 동작한다.
+  var allBtn = document.getElementById('all');
+  allBtn.onclick = function () {
+    var on = !document.body.classList.contains('all-mode--live');
+    document.body.classList.toggle('all-mode', on);
+    document.body.classList.toggle('all-mode--live', on);
+    frames.forEach(function (f) {
+      if (on) { f.setAttribute('data-deck-active', ''); f.style.transform = 'none'; }
+      else { f.removeAttribute('data-deck-active'); f.style.transform = ''; }
+    });
+    allBtn.textContent = on ? '한 장씩' : '전체 보기';
+    if (on) { window.scrollTo(0, 0); } else { scale(); show(i); }
+  };
 
   scale();
   show(0);

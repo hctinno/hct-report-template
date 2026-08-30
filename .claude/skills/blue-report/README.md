@@ -16,13 +16,25 @@ blue-report/
 ├─ README.md                   이 문서 — 다른 AI 도구에 붙여넣는 자기완결 사양서
 ├─ assets/
 │  ├─ blue-report.css          토큰(색·타입·간격) + 파운데이션 + 애니메이션
+│  ├─ blue-doc.css             A4 문서 파운데이션 (토큰은 blue-report.css 를 씀)
+│  ├─ doc-viewer.css           문서 뷰어 껍데기
+│  ├─ doc-viewer.js            쪽번호 자동 · 축척 · 인쇄
+│  ├─ doc-minutes.html         회의록 2쪽
 │  ├─ deck-viewer.css          뷰어 껍데기 (디자인 시스템 아님)
 │  ├─ deck-viewer.js           넘김 · 축척 · 쪽번호 자동 · 발표자 노트
 │  ├─ deck-template.html       레이아웃 12종 카탈로그
-│  ├─ deck-internal-report.html   사내 보고 (주간·월간) 9장
+│  ├─ deck-internal-report.html   사내 보고 (월간) 9장
+│  ├─ deck-weekly-report.html     조직 주간보고 7장
+│  ├─ deck-ax-weekly.html         AX 조직 1장 보고 + 부록 5장
+│  ├─ deck-exec-report.html       경영진 보고 (결론 먼저) 6장
+│  ├─ deck-allhands.html          전직원 보고 (타운홀) 8장
 │  ├─ deck-sales-proposal.html    외부 제안·영업 10장
 │  ├─ deck-project-report.html    프로젝트 착수·완료 9장
 │  ├─ deck-training.html          교육·기술 설명 8장
+│  ├─ doc-minutes.html           회의록 A4 2쪽
+│  ├─ doc-policy.html            사규·규정 A4 3쪽
+│  ├─ doc-manual.html            매뉴얼·가이드 A4 3쪽
+│  ├─ doc-notice.html            공지 A4 1쪽
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
 ├─ references/
 │  └─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
@@ -30,12 +42,13 @@ blue-report/
 │  ├─ tokens.js                blue-report.css 의 토큰을 읽어 온다 (색 값 중복 없음)
 │  ├─ layouts.js               카드 · 칩 · 머리말 · 꼬리말 등 원자 helper
 │  ├─ slides.js                슬라이드 종류별 생성기 11종
-│  ├─ content.js               용도별 덱 4종의 내용
+│  ├─ content.js               용도별 덱 8종의 내용
 │  └─ build.js                 실행 진입점
 └─ scripts/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
-   ├─ check_deck.py            덱 자동 점검 7항목 + 슬라이드별 PNG
+   ├─ check_deck.py            덱 자동 점검 11항목 + 슬라이드별 PNG
+   ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
    ├─ apply_brand.py           회사 정보·로고를 덱에 일괄 적용
    ├─ to_pdf.py                덱 HTML → 발표용 PDF (슬라이드 1장 = 1페이지)
@@ -52,13 +65,44 @@ blue-report/
 
 | 용도 | 파일 | 장수 | 구성 |
 |---|---|---|---|
-| 사내 보고 (주간·월간) | `deck-internal-report.html` | 9 | 표지 · 목차 · **요약(다크)** · 지표 표 · 막대 · 비교 2열 · 최대 이슈 · 타임라인 · 결정 요청 |
+| 사내 보고 (월간) | `deck-internal-report.html` | 9 | 표지 · 목차 · **요약(다크)** · 지표 표 · 막대 · 비교 2열 · 최대 이슈 · 타임라인 · 결정 요청 |
+| 조직 주간보고 | `deck-weekly-report.html` | 7 | 표지 · **요약(다크)** · 조직별 표 · 막대 · 지난주 대비 2열 · 요일 타임라인 · 지원 요청 |
+| AX 조직 1장 보고 | `deck-ax-weekly.html` | 5 | **한 장 보고(문서형)** · 단계 표 · 자원 표 · 병목 · 요일 타임라인 |
+| 경영진 보고 | `deck-exec-report.html` | 6 | 표지 · **결론(다크)** · 부문 막대 · 도넛 · 최대 위험 · 결정 요청 |
+| 전직원 보고 (타운홀) | `deck-allhands.html` | 8 | 표지 · 오늘 이야기할 것 · **한 문장(다크)** · 전후 막대 · 오해 풀기 · 부서별 타임라인 · 할 일 2건 · 질문 |
 | 외부 제안·영업 | `deck-sales-proposal.html` | 10 | 표지 · 목차 · 문제 · 도넛 · 3단계 · 효과 · 사례 표 · 일정 · 요약(다크) · CTA |
 | 프로젝트 착수·완료 | `deck-project-report.html` | 9 | 표지 · 목차 · 범위 2열 · 타임라인 · 산출물 표 · 달성 막대 · 미달 · 판정(다크) · 승인 요청 |
 | 교육·기술 설명 | `deck-training.html` | 8 | 표지 · 학습 목표 · 3단계 절차 · 방식 비교 · 도넛 · 체크리스트 표 · 요약(다크) · 다음 학습 |
 
 용도가 요청에 드러나면 그대로 고르고, 드러나지 않을 때만 추천을 붙여 묻는 것이 기본 동작이다.
 판단 기준은 `SKILL.md` 2절에 있다.
+
+**AX 덱은 1장이 보고서 전부다** — 뒤 4장은 부록이며 질문이 나온 항목만 편다. 간지를 두지 않아 부록이 바로 이어진다.
+
+한 장의 뼈대는 **업무 카테고리 × 이번 주·다음 주** 표다. 주간보고의 본체가 그 대조이기 때문이다.
+그 위에 지표 4개를 한 줄 띠로 얹는데, 신생조직 보고를 받는 관리자의 질문에 1:1로 대응한다 —
+①언제 성과가 나오나(첫 성과 시점) ②될 것 같나(파이프라인) ③사람·돈(인력·예산) ④내가 뭘(결정 요청).
+**리스크는 따로 두지 않는다** — 해당 업무 행의 상태 칩이 말한다.
+조판은 **문서형**이다. 카드·라운드를 쓰지 않고 왼쪽 라벨 열과 괘선으로만 구획한다.
+다른 덱은 카드 조판을 쓰므로 이 덱만 다르다 — 한 장에 밀도를 높이면서도 대시보드처럼
+보이지 않게 하려는 의도다. 색과 타입은 `--br-*` 토큰 그대로다.
+
+**경영진 보고에는 목차를 두지 않는다.** 6장이 상한이고, 6장짜리 보고에 목차를 넣으면
+목차가 전체의 6분의 1이 된다. 결론이 두 번째 장이고 마지막 장은 반드시 결정 요청이다.
+**나쁜 소식을 한 장 넣는다** — 없으면 신뢰를 잃는다. 애니메이션은 끈다(`data-no-anim`).
+
+**전직원 보고에는 오해 풀기 장이 있다.** 실제로 들어온 걱정을 그대로 적고 얼버무리지
+않는다. 이 장을 빼면 복도에서 소문으로 돈다. 한 장에 담는 항목 수를 경영진 보고보다
+적게 잡는다 — 뒷줄에서도 읽혀야 한다. 발표 자리이므로 애니메이션은 켠 채로 둔다.
+
+**진척률만 적지 않는다.** 진척률은 팀이 스스로 매긴 노력의 양이라 받는 사람이 판단 기준으로
+쓸 수 없다. 관문 날짜를 함께 적고, 결정 요청에는 미결 시 결과를 붙인다.
+한 장 안에 판정 제목 · 지표 4 · 과제 진척 · 이슈 · 결정 요청이 모두 들어간다.
+상위 관리자가 앞 장만 보고 판단을 끝내는 자리에 쓴다. 밀도가 높아 내용을 늘리면
+겹침 검사(7번)가 실패하므로, 늘리는 대신 부록으로 내린다.
+
+**주간보고에는 목차가 없다** — 매주 반복하는 보고라 목차가 시간만 쓴다. 타임라인도 주차가
+아니라 요일(월~금) 단위다. 월간 보고와 헷갈리면 주기로 가른다. 매주면 `weekly`, 매달이면 `internal`.
 
 **사내 보고는 요약을 앞에 둔다** — 경영진이 앞부분만 보고 넘어가는 경우가 많다.
 **외부 제안은 요약을 뒤에 둔다** — 문제부터 설득한 뒤 정리하는 순서가 맞는다.
@@ -77,7 +121,7 @@ python3 scripts/check_deck.py ./deck.html --shots ./out/
 
 ```bash
 python3 scripts/apply_brand.py --brand ./brand.json --deck internal --single-file -o ./보고서.html
-# --deck: catalog · internal · sales · project · training, 또는 HTML 파일 경로
+# --deck: catalog · internal · weekly · ax · sales · project · training, 또는 HTML 파일 경로
 ```
 
 ### PowerPoint(.pptx)로 만들기
@@ -105,7 +149,137 @@ node pptx/build.js --brand brand.json --deck internal    # 한 종만
 | 발표자 노트 | `N` 키로 표시 | 슬라이드 노트 창 |
 
 Noto Sans KR 과 Barlow 를 사내 PC 에 배포했다면 `pptx/tokens.js` 의 `F` 두 줄만 바꾼다.
-덱 내용은 `pptx/content.js` 에 따로 있다. HTML 덱이 기준이므로 내용을 고칠 때는 두 곳을 함께 고친다.
+
+#### 내용이 두 곳에 있다 — 합치지 않고 갈라짐을 검사한다
+
+덱 내용은 `assets/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다.
+**HTML 이 기준이므로 내용을 고칠 때는 두 곳을 함께 고친다.**
+
+합치지 않기로 했다. HTML 덱을 손으로 고치는 것이 이 시스템의 사용법이고
+(`deck-*.html` 을 복사해 내용만 바꾼다), HTML 을 데이터에서 만들어 내는 생성물로
+바꾸면 그 사용법이 사라진다. 색이 갈라지지 않는 것은 `tokens.js` 가 CSS 를 읽기
+때문이지만, 내용은 그렇게 한쪽이 다른 쪽을 읽을 수 없다.
+
+대신 갈라짐을 사람 눈이 아니라 스크립트가 잡는다.
+
+```bash
+python3 ../../../scripts/check_content_sync.py            # 저장소 루트 기준
+python3 scripts/check_content_sync.py --deck internal
+```
+
+슬라이드 수 · 문서명 · 발표자 노트 36개 · 세로 막대 이름과 값 · 도넛 범례 · 표 머리글과
+행을 두 곳에서 뽑아 견준다. 어긋나면 어느 덱 몇 장 어느 항목인지까지 찍는다.
+`verify_repo.py` 와 CI 가 이것을 함께 돌리므로 한쪽만 고친 채로는 통과하지 못한다.
+
+단위(`%` · `h`)와 표의 `colspan` 은 형식 차이라 대조에서 제외한다. 단위는 PPTX 생성기가
+붙이고, HTML 은 지면에 직접 찍기 때문이다.
+
+### A4 문서판 — 슬라이드가 아닌 문서
+
+회의록 · 사규 · 매뉴얼 · 공지는 발표 슬라이드가 아니라 **A4 세로 문서**다.
+지면 794×1123px(210×297mm @96dpi)이고 인쇄하면 그대로 A4 한 장이다.
+
+```bash
+cp assets/doc-minutes.html ./회의록.html
+cp assets/blue-report.css assets/blue-doc.css assets/doc-viewer.css assets/doc-viewer.js ./
+python3 scripts/check_doc.py ./회의록.html --shots out/
+```
+
+**색·타입·간격 토큰은 슬라이드와 같은 것을 쓴다.** `blue-doc.css` 는 토큰을
+선언하지 않고 `blue-report.css` 를 전제한다. 두 파일을 함께 불러야 한다.
+그래서 슬라이드와 문서의 색이 갈라질 수 없다.
+
+| 항목 | 슬라이드 | A4 문서 |
+|---|---|---|
+| 지면 | 1920×1080 가로 | 794×1123 세로 |
+| 글자 하한 | 24px (멀리서 봄) | 10.5pt = 14px (손에 듦) |
+| 본문 대비 | 데이터 마크 2:1 | 본문 4.5:1 (인쇄물) |
+| 애니메이션 | 있음 (끌 수 있음) | 없음 |
+| 머리말·꼬리말 | 꼬리말만 | 쪽마다 둘 다 |
+| 브랜드 | 우측 상단 마크 | 머리말 로고 + 꼬리말 회사명 |
+| 검사기 | `check_deck.py` 11항목 | `check_doc.py` 9항목 |
+
+파일 구성도 덱과 같은 방식으로 나뉜다.
+
+| 파일 | 역할 |
+|---|---|
+| `blue-doc.css` | 문서 파운데이션. raw hex 0, `--br-*` 토큰만 참조 |
+| `doc-viewer.css` · `doc-viewer.js` | 껍데기 — 회색 바탕 · 조작 막대 · 인쇄 · 쪽번호 자동 |
+| `doc-minutes.html` | 회의록 2쪽 |
+| `doc-policy.html` | 사규·규정 3쪽 — 조·항·호 · 부칙 · 개정 이력 · 결재란 |
+| `doc-manual.html` | 매뉴얼·가이드 3쪽 — 목차 · 절차 단계 · 화면 캡처 자리 |
+| `doc-notice.html` | 공지 1쪽 — 게시판용. 한 쪽을 넘기지 않는다 |
+
+**쪽번호와 문서명은 뷰어가 채운다.** `.bd-foot` 을 비워 두고 숫자를 적지 않는다.
+쪽을 넣거나 빼도 번호가 어긋나지 않으며, 손으로 적으면 `check_doc.py` 가 실패시킨다.
+문서명은 `.bd-doc` 의 `data-doc-title`, 문서번호는 `data-doc-no` 한 곳에서 읽는다.
+
+**회사 로고와 명칭은 쪽마다 들어간다.** 슬라이드는 우측 상단 마크 하나지만, 문서는
+한 장씩 떼어 돌려 보고 인쇄해 철하므로 어느 쪽을 집어도 어디서 나온 문서인지
+보여야 한다. 머리말에 로고, 꼬리말에 회사명이다.
+
+```html
+<div class="bd-head">
+  <div class="br-mark" data-on="light"><span class="br-wordmark">COMPANY NAME</span></div>
+  <span class="bd-docno"></span>
+</div>
+...
+<div class="bd-foot">
+  <span><span class="bd-company">COMPANY NAME</span> · <span class="bd-doctitle"></span></span>
+  <span class="bd-pageno"></span>
+</div>
+```
+
+덱과 같은 `.br-mark` 자리표시자다. `apply_brand.py` 가 `brand.json` 의 `logo`(다크용)·
+`logoOnLight`(밝은 지면용)로 바꾸고, `.bd-company` 에 회사명을 넣는다. 문서 지면은
+밝으므로 `data-on="light"` 다. `.bd-head` 안에서는 마크가 `position:static` 이 되어
+문서번호와 같은 줄에 놓인다(슬라이드는 우측 상단 절대 배치다). 빠뜨리면
+`check_doc.py` 5번 항목이 실패시킨다.
+
+| 자리 | 채우는 주체 | 무엇 |
+|---|---|---|
+| `.br-mark` | `apply_brand.py` | 로고 이미지 · 워드마크 |
+| `.bd-company` | `apply_brand.py` | 회사명 |
+| `.bd-docno` | `doc-viewer.js` | `data-doc-no` |
+| `.bd-doctitle` | `doc-viewer.js` | `data-doc-title` |
+| `.bd-pageno` | `doc-viewer.js` | `n / 총쪽` |
+
+**Artifact 로 올릴 때는 `--artifact` 판을 쓴다.**
+
+```bash
+python3 scripts/build_single_file.py --artifact --deck minutes \
+        --brand ../../../brand/hct/brand.json -o ./회의록.html
+```
+
+`--deck` 은 덱 이름과 A4 문서 이름(`minutes`)을 함께 받는다. `--artifact` 를 빼면
+`<!doctype>`·`<head>`·`<body>` 가 붙은 온전한 문서가 나오는데, Artifact 는 발행
+시점에 그 껍데기를 스스로 씌우므로 한 겹이 겹친다. 브라우저가 관대해 보이기는
+하지만 파서가 안쪽 태그를 버린다. 지면 바깥 바탕색은 뷰어 CSS 에서 읽어 오므로
+덱(`#111`)과 문서(`#8a8f96`)가 저절로 갈린다.
+
+**서명란은 결재 문서에만 넣는다.** `.bd-sign` 이 있지만 회의록에는 쓰지 않는다.
+사규·품의처럼 결재선이 필요한 문서의 마지막 쪽에만 붙인다(`doc-policy.html` 참조).
+`.bd-body` **안이 아니라** `.bd-page` 직계로 둔다 — `.bd-page` 가 세로 flex 이고
+`.bd-body` 가 `flex:1` 이라 그것만으로 지면 바닥에 붙는다. 안에 두면 본문 흐름을 따라
+중간에 뜬다.
+
+**문서 전용 조판 도구.**
+
+| 클래스 | 쓰는 곳 |
+|---|---|
+| `.bd-toc` (`.bd-toc--sub`) | 목차. 쪽번호는 편집자가 아는 값이라 손으로 적는다 |
+| `.bd-steps` · `.bd-step` | 절차 단계. 번호는 자동이라 단계를 끼워 넣어도 다시 매겨진다 |
+| `.bd-figure` · `.bd-figure-box` | 화면 캡처 자리. 실제 `<img>` 로 갈아 끼운다 |
+| `.bd-callout--danger` · `--info` | 경고 · 참고. 기본은 주의(노랑) |
+| `.bd-list--legal` | 조·항·호 괄호 번호 |
+
+**조 번호는 손으로 적는다.** 절차 단계와 반대다. 사규는 개정 때 조를 끼워 넣으면
+번호가 법적으로 달라지므로 자동 번호를 쓰면 안 된다.
+
+**한 쪽을 넘치면 쪽을 나눈다.** `.bd-page` 가 `overflow:hidden` 이라 넘친 내용은
+잘려 보이지 않고 꼬리말과 겹친다. `check_doc.py` 7번 항목이 이것을 잡는다.
+
+---
 
 ### PDF로 내보내기
 
@@ -456,8 +630,12 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 
 ## 5. 문체 (엄수)
 
-- **개조식 · 명사형.** `~합니다 / ~습니다 / ~입니다 / ~됩니다 / ~해요 / ~어요` 금지.
-  예외는 설문 문항과 응답 선택지 원문뿐.
+- **개조식 · 명사형.** 슬라이드 본문은 명사로 끝낸다.
+  - 존댓말 종결 금지 — `~합니다 / ~습니다 / ~입니다 / ~됩니다 / ~해요 / ~어요`
+  - **평서형 종결도 금지** — `~한다 / ~된다 / ~없다 / ~았다·었다` 등 `다` 로 끝나는 서술
+  - 예: `진단으로 푼다` → `진단으로 해결`, `시작도 안 됐다` → `시작 전`
+  예외는 설문 문항과 응답 선택지 원문뿐이며, 그 줄에 `<!-- 원문 -->` 주석을 남긴다.
+  **발표자 노트(`data-notes`)는 대상이 아니다** — 노트는 `~한다` 형으로 적는다.
 - 긴 서술은 `키워드 — 내용`으로 쪼갠다.
 - 핵심 수치·개념은 `<strong style="font-weight:700;color:#0b2a6b">`로 강조한다 (`.br-key`).
 - **한 슬라이드 = 한 주장.** 문장 수를 줄이고 한눈에 스캔되게 한다.
@@ -481,6 +659,16 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 딜레이 `.d1` ~ `.d12` = **80ms 단위**. 마지막 딜레이가 1초를 넘지 않게 한다.
 넘으면 요소가 너무 많은 것이므로 슬라이드를 쪼갠다.
 `prefers-reduced-motion: reduce`에서는 전부 꺼지므로, 애니메이션에 의존해 정보를 전달하지 않는다.
+
+**덱 단위로 끌 수 있다.** `#stage` 에 `data-no-anim` 을 주면 등장 효과가 전부 꺼진다.
+
+```html
+<div id="stage" data-no-anim data-deck-title="…">
+```
+
+주간보고처럼 화면에 띄워 놓고 읽거나 인쇄해서 돌리는 문서는 꺼 두는 편이 낫다.
+넘길 때마다 요소가 하나씩 나타나면 표를 훑는 속도가 느려진다.
+`weekly` 와 `ax` 덱은 이미 꺼져 있고, 발표용 덱(`internal` · `sales` · `project` · `training` · `catalog`)은 켜져 있다.
 
 ```css
 @keyframes br-fu   { from { opacity:0; transform:translateY(22px) } }
@@ -528,22 +716,56 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 8. 우측 상단 `.br-mark`가 있고, 본문과 겹치지 않으며, 배경 밝기와 변형이 맞는가
    → 마크는 상단 여백 띠 안에만 둔다. 우측 상단에 콘텐츠를 붙이지 않는다.
 
-`python3 scripts/check_deck.py deck.html --shots out/`이 1·4·5·6·7·8과 문체를 자동 검사하고
-슬라이드별 PNG를 남긴다. **실패가 0이어도 PNG를 눈으로 확인한다.** 어색한 여백은
-스크립트가 잡지 못한다.
+`python3 scripts/check_deck.py deck.html --shots out/`이 위 1·4·5·6·7·8과 문체를 자동
+검사하고 슬라이드별 PNG를 남긴다. 판정은 11항목이다.
+
+| # | 항목 | 실패하면 |
+|---|---|---|
+| 1 | 문체 — 존댓말·평서형 종결 없음 | `~합니다` · `~한다` 로 끝나는 말을 명사형으로 고친다 |
+| 2 | 파이 없음 — 도넛만 사용 | 손으로 적은 `<path d="M…A…">` 를 `donut.py` 산출물로 바꾼다 |
+| 3 | 색 — 토큰 밖 raw hex 없음 | 슬라이드의 hex 를 `--br-*` 변수로 바꾼다 |
+| 4 | 슬라이드 크기 1920x1080 | `flex:1` 컨테이너에 `min-height:0` 을 주고 행 높이를 줄인다 |
+| 5 | 글자 크기 24px 미만 없음 | `%` 첨자(`.br-sup`) 외에는 24px 이상으로 올린다 |
+| 6 | 데이터 마크 대비 2:1 이상 | 밝은 지면에서 `--br-soft-*` 를 빼고 데이터 램프를 쓴다 |
+| 7 | 본문 영역이 위아래로 겹치지 않는다 | 여백을 줄이거나 내용을 덜어 아래 영역을 밀어내지 않게 한다 |
+| 8 | 브랜드 마크가 우측 상단에 있다 | `.br-mark` 를 빠뜨린 슬라이드에 넣는다 |
+| 9 | 브랜드 마크가 본문과 겹치지 않는다 | `logoHeight` 를 줄이거나 본문을 여백 띠 밖으로 뺀다 |
+| 10 | 로고 변형이 배경 밝기와 맞는다 | `data-on` 값과 `logo` · `logoOnLight` 짝을 맞춘다 |
+| 11 | 도넛 dasharray 검산 | `donut.py` 로 다시 생성한다. 손계산하지 않는다 |
+
+11번은 도넛을 쓰지 않은 덱에서 `주의`로 나온다. **`주의`는 허용되고 `실패`만 완료를 막는다.**
+
+**실패가 0이어도 PNG를 눈으로 확인한다.** 어색한 여백은 스크립트가 잡지 못한다.
 
 ---
 
-## 9. 브랜드 자리 (미확정)
+## 9. 브랜드 자리
 
-로고와 사내 폰트는 아직 없다. 확정되면 교체 지점은 두 곳뿐이다.
+교체 지점은 두 곳뿐이다. 하나는 끝났고 하나는 남아 있다.
 
-- **브랜드 마크** — 모든 슬라이드 우측 상단의 `.br-mark`. 표지도 본문도 같은 자리다.
-  `data-on="dark"`는 딥네이비·다크 배경, `data-on="light"`는 밝은 지면을 뜻하며
-  `apply_brand.py`가 이 값을 보고 로고 변형을 고른다. 로고가 없는 동안에는 안에
-  `.br-wordmark`의 `COMPANY NAME` 텍스트가 들어간다.
-- **폰트** — `blue-report.css`의 `--br-font-kr`, `--br-font-num`, `--br-font-label`의
-  첫 패밀리만 교체한다. 나머지는 폴백으로 남긴다.
+### 브랜드 마크 — 적용 완료
 
-연락처(`contact@company.co.kr`, `02-0000-0000`)와 저작권 표기는 표지·마무리 슬라이드의
-자리표시자이므로 실제 값으로 바꾼다.
+모든 슬라이드 우측 상단의 `.br-mark`. 표지도 본문도 같은 자리다.
+`data-on="dark"`는 딥네이비·다크 배경, `data-on="light"`는 밝은 지면을 뜻하며
+`apply_brand.py`가 이 값을 보고 로고 변형을 고른다.
+
+이 저장소에는 HCT 로고 두 벌이 `brand/hct/`에 들어와 있고 `brand.json`이 가리킨다.
+로고를 지정하지 않은 브랜드에서는 `.br-wordmark`의 회사명 텍스트가 대신 들어간다.
+
+**남은 것** — 원본 로고의 마크 영역이 264×86px 이다. 화면 발표에는 충분하지만 인쇄에는
+모자란다. SVG 나 고해상도 원본이 생기면 교체하고 `make_logo_variants.py`로 두 벌을
+다시 뽑는다.
+
+### 사내 폰트 — 미확정
+
+`blue-report.css`의 `--br-font-kr`, `--br-font-num`, `--br-font-label`의 첫 패밀리만
+교체한다. 나머지는 폴백으로 남긴다. 현재는 Google Fonts 의 Noto Sans KR · Barlow ·
+Barlow Condensed 를 쓴다.
+
+PPTX 판은 PC 설치 폰트를 쓰므로 별도다. 사내 폰트를 PC 에 배포했다면 `pptx/tokens.js`의
+`F` 두 줄도 함께 바꾼다.
+
+### 연락처
+
+`brand.json`의 `email` · `website` · `phone`에 적는다. 빈 문자열로 두면 해당 줄과 행이
+통째로 사라진다. 사내 배포용 덱은 대개 이쪽이 맞고, `brand/hct/brand.json`도 그렇게 돼 있다.

@@ -1,0 +1,786 @@
+<title>회의록 템플릿</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
+<style>
+/* ============================================================================
+   블루 리포트 디자인 시스템 — 토큰 · 파운데이션 · 애니메이션
+   기준 캔버스 1920x1080. 최소 글자 24px.
+   색은 이 파일의 커스텀 속성으로만 쓴다. 슬라이드에 raw hex를 직접 적지 않는다.
+   ========================================================================= */
+
+/* 폰트는 문서 <head>에서 불러온다.
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"> */
+
+:root {
+  /* ---------- 지면 ---------- */
+  --br-page:        #f4f6f8;   /* 밝은 본문 지면 — 배경은 이것 1개 + 다크면 2개까지만 */
+  --br-card:        #ffffff;
+  --br-card-line:   #dbe3ec;
+  --br-card-shadow: 0 10px 28px rgba(11,42,107,.07);
+  --br-hairline:    #c3cedb;   /* 기준선 · 구분선 */
+  --br-chip-line:   #c8d1dc;   /* 알약 칩 테두리 */
+
+  /* ---------- 텍스트 ---------- */
+  --br-text:   #10151c;
+  --br-text-2: #54606e;
+  --br-text-3: #8b98a6;
+
+  /* ---------- 강조 ---------- */
+  --br-cobalt: #2f4a9c;   /* 강조 1 · 주 — HCT 브랜드 블루. 지면 대비 7.51:1 */
+  --br-cyan:   #35b8f0;   /* 강조 2 */
+  --br-navy:   #0b2a6b;   /* 깊은 값 · 키워드 볼드 */
+  --br-coral:  #ff7a59;   /* 경고 · 핵심 단일 수치 */
+
+  /* ---------- 주의 콜아웃 ---------- */
+  --br-warn-line: #f0c469;
+  --br-warn-bg:   #fff7e4;
+  --br-warn-text: #8a5a00;
+
+  /* 지연 · 위험 상태 표시 (코랄 계열). 텍스트 대비 6.22:1 */
+  --br-alert-bg:   #fff1ec;
+  --br-alert-text: #a33418;
+
+  /* ---------- 다크면 (2종까지) ---------- */
+  --br-cover:     #071b45;  /* 표지 · 파트 간지 */
+  --br-dark:      #101827;  /* 핵심 정리 */
+  --br-dark-card: #182238;
+  --br-dark-line: #2b3852;
+
+  /* 다크면 위 텍스트 */
+  --br-on-dark:    #f4f6f8;
+  --br-on-dark-2:  #a9bcd6;
+  --br-on-dark-3:  #6b7c96;
+  --br-on-cover-2: #a6c2e6;
+  --br-on-cover-3: #8aa3c4;
+  --br-accent-on-dark: #6fa8ff;   /* 다크면 위 강조 · 숫자 */
+  --br-amber:      #ffcf6b;       /* 다크면 위 마지막 단계 강조 */
+
+  /* ---------- 데이터 램프 (밝은 지면 전용) ----------
+     값이 클수록 진한 단조 램프. 5색 모두 지면 #f4f6f8 대비 2:1 이상.
+     12.44 / 7.11 / 3.58 / 2.73 / 2.10 : 1 */
+  --br-data-1: #0b2a6b;
+  --br-data-2: #2f4a9c;
+  --br-data-3: #2f7ff0;
+  --br-data-4: #5b9bd5;
+  --br-data-5: #86b0da;
+
+  /* 다크면 위 데이터 램프. 밝은면 램프를 뒤집은 것이 아니라 따로 고른 값이다.
+     donut.py --dark 가 이것을 읽는다. 지면(--br-dark) 대비 2:1 이상. */
+  --br-data-dark-1: #dbe9ff;
+  --br-data-dark-2: #a9c8ff;
+  --br-data-dark-3: #6fa8ff;
+  --br-data-dark-4: #3d84ea;
+  --br-data-dark-5: #2a5fc0;
+
+  /* 구간이 6개 이상이면 양 끝을 고정한 보간 램프를 쓴다. scripts/palette.py --steps N 으로 생성.
+     아래는 7단계. 전 단계 지면 대비 2:1 이상, 인접 색 중복 없음. */
+  --br-bar-1: #0b2a6b;  --br-bar-2: #20407e;  --br-bar-3: #345790;  --br-bar-4: #486da2;
+  --br-bar-5: #5d83b5;  --br-bar-6: #729ac8;  --br-bar-7: #86b0da;
+
+  /* ---------- 소프트 램프 (다크면 위 데이터 · 밝은 면의 비데이터 요소) ----------
+     밝은 지면에서는 대비 1.67~1.96:1로 2:1에 미달한다. 밝은 면의 데이터 마크에 쓰지 않는다. */
+  --br-soft-1: #7fb6f5;
+  --br-soft-2: #9dc4f2;
+  --br-soft-3: #a4c4e5;
+
+  /* ---------- 타입 ---------- */
+  --br-font-kr:    'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  --br-font-num:   'Barlow', 'Noto Sans KR', sans-serif;
+  --br-font-label: 'Barlow Condensed', 'Barlow', sans-serif;
+  /* 사내 폰트 배정 자리 — 확정되면 위 세 줄의 첫 패밀리만 교체한다. */
+
+  --br-fs-cover:      108px;  /* 표지 제목 */
+  --br-fs-display:     96px;  /* 마무리 CTA 제목 */
+  --br-fs-part:        84px;  /* 파트 번호 (Barlow Condensed) */
+  --br-fs-h2:          62px;  /* 슬라이드 제목 */
+  --br-fs-h2-sm:       54px;  /* 두 줄 이상 슬라이드 제목 */
+  --br-fs-h3:          38px;  /* 목차 항목 */
+  --br-fs-card-title:  32px;
+  --br-fs-lede:        28px;  /* 제목 아래 요약 문장 */
+  --br-fs-label:       26px;  /* 섹션 라벨 (Barlow Condensed) */
+  --br-fs-body:        25px;
+  --br-fs-foot:        24px;  /* 하한 */
+  --br-fs-stat-hero:  200px;  /* 단일 수치 강조 */
+  --br-fs-stat:        56px;  /* 카드 안 수치 */
+  --br-fs-stat-sm:     32px;  /* 막대 값 컬럼 */
+  --br-sup:          .44em;   /* % 첨자 — 24px 하한의 유일한 예외 */
+
+  --br-ls-tight: -.03em;
+  --br-ls-label:  .14em;
+  --br-ls-mark:   .2em;
+
+  /* ---------- 간격 ---------- */
+  --br-sp-1: 8px;  --br-sp-2: 14px; --br-sp-3: 22px; --br-sp-4: 34px;
+  --br-sp-5: 52px; --br-sp-6: 84px;
+  --br-pad-slide: 84px 96px 60px;
+  --br-pad-cover: 110px 120px 80px;
+  --br-gap-card:  32px;
+
+  /* ---------- 형태 ---------- */
+  --br-r-card: 18px;
+  --br-r-pill: 999px;
+  --br-r-bar:  2px;   /* 좁은 채널의 막대. 넓은 막대만 999px 허용 */
+}
+
+/* ============================================================================
+   1. 슬라이드 골격
+   ========================================================================= */
+
+.br-deck { margin:0; padding:0; background:#111; }
+
+.br-slide {
+  position:relative;
+  box-sizing:border-box;
+  width:1920px; height:1080px;
+  overflow:hidden;
+  font-family:var(--br-font-kr);
+  background:var(--br-page);
+  color:var(--br-text);
+  padding:var(--br-pad-slide);
+  display:flex; flex-direction:column;
+}
+/* 한글이 음절 단위로 잘리지 않게 전역 적용 */
+.br-slide, .br-slide * { word-break:keep-all; overflow-wrap:break-word; }
+
+.br-slide--cover { background:var(--br-cover); color:var(--br-on-dark); padding:var(--br-pad-cover); }
+.br-slide--dark  { background:var(--br-dark);  color:var(--br-on-dark); }
+
+/* 표지·간지의 세로 안내선. 장식색이 아니라 흰색 알파라서 배경 규칙에 걸리지 않는다. */
+.br-rule { position:absolute; top:0; bottom:0; border-left:1px solid rgba(244,246,248,.14); }
+.br-rule--a { right:0;   width:44%; }
+.br-rule--b { right:0;   width:22%; border-left-color:rgba(244,246,248,.08); }
+
+/* ============================================================================
+   2. 타이포 파운데이션
+   ========================================================================= */
+
+.br-eyebrow {           /* 섹션 라벨 */
+  margin:0 0 var(--br-sp-2);
+  font:600 var(--br-fs-label)/1 var(--br-font-label);
+  letter-spacing:var(--br-ls-label);
+  text-transform:uppercase;
+  color:var(--br-navy);
+}
+.br-slide--dark .br-eyebrow, .br-slide--cover .br-eyebrow { color:var(--br-accent-on-dark); }
+
+.br-title  { margin:0; font:900 var(--br-fs-h2)/1.2 var(--br-font-kr); letter-spacing:var(--br-ls-tight); }
+.br-title--sm { font-size:var(--br-fs-h2-sm); line-height:1.3; }
+/* 제목 안에서 weight 300과 900을 대비시킨다: <h2 class="br-title br-title--light">가벼운 앞말 <strong>굵은 핵심</strong></h2> */
+.br-title--light { font-weight:300; }
+.br-title--light strong { font-weight:900; }
+
+.br-lede {
+  margin:var(--br-sp-3) 0 0;
+  font:400 var(--br-fs-lede)/1.6 var(--br-font-kr);
+  color:var(--br-text-2);
+}
+.br-slide--dark .br-lede, .br-slide--cover .br-lede { color:var(--br-on-cover-2); }
+
+.br-body { font:400 var(--br-fs-body)/1.6 var(--br-font-kr); color:var(--br-text-2); margin:0; }
+
+/* 핵심 수치 · 개념 강조 */
+.br-key { font-weight:700; color:var(--br-navy); }
+.br-slide--dark .br-key, .br-slide--cover .br-key { color:var(--br-on-dark); }
+
+/* 숫자는 항상 Barlow 700 */
+.br-num { font-family:var(--br-font-num); font-weight:700; font-variant-numeric:tabular-nums; }
+.br-sup { font-size:var(--br-sup); }   /* % 첨자 */
+
+/* 키워드 — 내용 구조의 서술 분할 */
+.br-split { margin:0 0 18px; font:400 var(--br-fs-body)/1.7 var(--br-font-kr); color:var(--br-text-2); }
+.br-split > strong { font-weight:700; color:var(--br-text); }
+
+/* ============================================================================
+   3. 파운데이션 카드 · 칩 · 콜아웃
+   ========================================================================= */
+
+.br-card {
+  box-sizing:border-box;
+  background:var(--br-card);
+  border:1px solid var(--br-card-line);
+  border-radius:var(--br-r-card);
+  box-shadow:var(--br-card-shadow);
+  padding:30px 34px;
+}
+.br-slide--dark .br-card {
+  background:var(--br-dark-card);
+  border-color:var(--br-dark-line);
+  box-shadow:none;
+}
+/* 단계 강조가 필요한 카드만 상단 굵은 테두리 허용 */
+.br-card--step  { border-top:8px solid var(--br-cobalt); }
+.br-card--final { background:var(--br-navy); color:#fff; border:none; border-top:8px solid var(--br-amber); }
+
+/* 알약 칩 — 한 줄 전용. 두 줄이 되면 .br-chip--rect 로 바꾼다. */
+.br-chip {
+  display:inline-block; box-sizing:border-box;
+  border:1px solid var(--br-chip-line);
+  border-radius:var(--br-r-pill);
+  background:var(--br-card);
+  padding:14px 26px;
+  font:500 var(--br-fs-body)/1 var(--br-font-kr);
+  color:#45505c;
+  box-shadow:none;               /* 칩에는 그림자를 주지 않는다 */
+  white-space:nowrap;
+}
+.br-chip--rect { border-radius:var(--br-r-card); white-space:normal; line-height:1.4; }
+.br-chip--solid { background:var(--br-cobalt); border-color:var(--br-cobalt); color:#fff; font-family:var(--br-font-num); font-weight:600; }
+.br-slide--dark .br-chip, .br-slide--cover .br-chip {
+  background:transparent; border-color:rgba(244,246,248,.5); color:var(--br-on-dark);
+}
+
+/* 주의 콜아웃 */
+.br-callout {
+  border:1px solid var(--br-warn-line);
+  background:var(--br-warn-bg);
+  color:var(--br-warn-text);
+  border-radius:var(--br-r-card);
+  padding:24px 30px;
+  font:500 var(--br-fs-body)/1.6 var(--br-font-kr);
+}
+
+/* 번호 인덱스 (다크 정리면 카드) */
+.br-index {
+  display:block; box-sizing:border-box;
+  border:1px solid var(--br-dark-line);
+  padding:10px 0; text-align:center;
+  font:600 var(--br-fs-foot)/1 var(--br-font-num);
+  color:var(--br-on-dark-2);
+}
+
+/* 푸터 — 콘텐츠와 겹치지 않게 항상 마지막 형제로 둔다 */
+.br-footer {
+  margin-top:var(--br-sp-3);
+  font:400 var(--br-fs-foot)/1 var(--br-font-kr);
+  color:var(--br-text-3);
+  text-align:right;
+  flex-shrink:0;
+}
+.br-footer strong { font-weight:700; color:var(--br-text-2); }
+.br-slide--dark .br-footer { color:var(--br-on-dark-3); }
+.br-slide--dark .br-footer strong { color:var(--br-on-dark-2); }
+
+/* 브랜드 마크 — 모든 슬라이드의 우측 상단 모서리. 표지도 본문도 같은 자리다.
+   상하 여백 띠 안에 들어가므로 본문과 절대 겹치지 않는다.
+     일반 슬라이드  padding-top 84  → 26..66px  (본문 시작 84px, 18px 여유)
+     표지·간지      padding-top 110 → 38..78px  (본문 시작 110px, 32px 여유)
+   data-on 이 배경 밝기를 선언한다. apply_brand.py 가 이 값을 보고 로고 변형을 고른다.
+     data-on="dark"  다크·코발트 배경 → 흰색 녹아웃 로고
+     data-on="light" 밝은 지면       → 원색(파란) 로고 */
+.br-mark {
+  position:absolute;
+  top:26px; right:96px;
+  z-index:5;
+  display:flex; align-items:center;
+  pointer-events:none;          /* 클릭·선택을 가로막지 않는다 */
+}
+.br-slide--cover .br-mark { top:38px; right:120px; }
+
+/* 워드마크 — 로고 확정 전까지 텍스트로 처리한다.
+   apply_brand.py 가 brand.json 의 logo/logoOnLight 로 교체한다. */
+.br-wordmark {
+  font:600 28px/1 var(--br-font-label);
+  letter-spacing:var(--br-ls-mark);
+  color:var(--br-cobalt);                     /* 밝은 지면 기본값 */
+}
+.br-mark[data-on="dark"] .br-wordmark { color:var(--br-on-dark); }
+
+.br-logo { display:block; height:40px; width:auto; }
+
+/* ============================================================================
+   4. 차트 파운데이션
+   ========================================================================= */
+
+/* 도넛 — 원주 기반 stroke-dasharray로만 그린다. <path d="M…A…"> 파이 금지.
+   각 구간: dash = C*pct/100 - C*1.5/360, rotate(누적pct*3.6 - 90) */
+.br-donut { display:block; }
+.br-donut circle { fill:none; stroke-linecap:butt; }
+
+/* 도넛 범례 — 홀 안이 아니라 도넛 밖에 둔다 */
+.br-legend { display:flex; flex-wrap:wrap; gap:26px; justify-content:center; }
+.br-legend-item { text-align:center; }
+.br-legend-name { font:700 var(--br-fs-foot)/1.3 var(--br-font-kr); color:var(--br-text); }
+.br-legend-val  { font:600 var(--br-fs-foot)/1.3 var(--br-font-num); color:var(--br-cobalt); }
+.br-dot { display:inline-block; width:12px; height:12px; border-radius:50%; vertical-align:middle; margin-right:8px; }
+
+/* 세로 막대 — 값은 막대 안이 아니라 막대 위 전용 줄에 */
+.br-col      { display:flex; flex-direction:column; justify-content:flex-end; text-align:center; height:100%; }
+.br-col-val  { font:700 var(--br-fs-stat-sm)/1 var(--br-font-num); margin-bottom:12px; color:var(--br-text); }
+.br-col-val--muted { color:var(--br-text-2); }
+.br-bar-v    { transform-origin:bottom; border-radius:8px 8px 0 0; }   /* 넓은 세로 막대만 8px */
+.br-col-name { text-align:center; font:700 var(--br-fs-foot)/1.35 var(--br-font-kr); }
+
+/* 가로 막대 — 이름 / 채널 / 값을 각각 다른 그리드 컬럼에 둔다 */
+.br-bars-h    { display:grid; grid-template-columns:auto 1fr 140px; align-items:center; gap:20px 24px; }
+.br-bar-track { height:28px; background:#e6ecf3; border-radius:var(--br-r-bar); overflow:hidden; }
+.br-bar-h     { height:100%; transform-origin:left; border-radius:var(--br-r-bar); }
+.br-bar-name  { font:500 var(--br-fs-body)/1.3 var(--br-font-kr); color:var(--br-text); white-space:nowrap; }
+.br-bar-val   { font:700 var(--br-fs-stat-sm)/1 var(--br-font-num); color:var(--br-navy); text-align:right; }
+
+/* 표 — 얼룩무늬를 쓰지 않는다. 얇은 구분선과 머리행 아래선만으로 구분한다 */
+.br-table { width:100%; border-collapse:collapse; font-family:var(--br-font-kr); }
+.br-table th {
+  text-align:left; padding:0 20px 18px;
+  font:700 var(--br-fs-foot)/1.3 var(--br-font-kr);
+  color:var(--br-navy); border-bottom:2px solid var(--br-navy);
+}
+.br-table td {
+  padding:20px; font:400 var(--br-fs-body)/1.4 var(--br-font-kr);
+  color:var(--br-text-2); border-bottom:1px solid var(--br-card-line);
+}
+.br-table tr:last-child td { border-bottom:none; }
+.br-table td:first-child { font-weight:700; color:var(--br-text); }
+.br-table .num, .br-table th.num {
+  font-family:var(--br-font-num); font-weight:700; color:var(--br-text);
+  text-align:right; font-variant-numeric:tabular-nums;
+}
+.br-table th.num { color:var(--br-navy); }
+
+/* 상태 칩 — 그림자 없는 알약. 색만이 아니라 글자로도 상태를 말한다 */
+.br-status {
+  display:inline-block; border-radius:var(--br-r-pill); padding:8px 18px;
+  font:600 var(--br-fs-foot)/1 var(--br-font-kr); white-space:nowrap;
+}
+.br-status--ok    { background:var(--br-card);     border:1px solid var(--br-chip-line); color:var(--br-text-2); }
+.br-status--warn  { background:var(--br-warn-bg);  border:1px solid var(--br-warn-line); color:var(--br-warn-text); }
+.br-status--late  { background:var(--br-alert-bg); border:1px solid var(--br-coral);     color:var(--br-alert-text); }
+
+/* 일정 타임라인 — 이름 컬럼과 기간 격자를 분리해 막대가 이름을 덮지 않게 한다 */
+.br-tl        { display:flex; flex-direction:column; gap:16px; }
+.br-tl-row    { display:grid; grid-template-columns:300px 1fr; align-items:center; gap:28px; }
+.br-tl-name   { font:700 var(--br-fs-body)/1.3 var(--br-font-kr); color:var(--br-text); }
+.br-tl-track  { display:grid; align-items:center; position:relative; min-height:44px; }
+.br-tl-head   { font:600 var(--br-fs-foot)/1 var(--br-font-label); letter-spacing:.1em;
+                color:var(--br-text-3); text-align:center; text-transform:uppercase; }
+.br-tl-bar    { height:38px; border-radius:var(--br-r-bar); transform-origin:left;
+                display:flex; align-items:center; padding:0 16px;
+                font:600 var(--br-fs-foot)/1 var(--br-font-kr); color:#fff; white-space:nowrap; }
+.br-tl-line   { position:absolute; top:0; bottom:0; border-left:1px solid var(--br-card-line); }
+/* 마일스톤 — 기간 막대와 겹치지 않게 트랙 아래 별도 줄에 둔다 */
+.br-tl-mile   { display:flex; align-items:center; gap:10px;
+                font:600 var(--br-fs-foot)/1 var(--br-font-kr); color:var(--br-navy); }
+.br-tl-dot    { width:14px; height:14px; border-radius:50%; background:var(--br-coral); flex:none; }
+
+/* 기준선 */
+.br-baseline { position:absolute; left:0; right:0; border-top:1px solid var(--br-hairline); }
+.br-baseline > span { position:absolute; right:0; top:-38px; font:500 var(--br-fs-foot)/1 var(--br-font-kr); color:var(--br-text-3); }
+
+/* ============================================================================
+   5. 진입 애니메이션
+   슬라이드가 활성화되면 [data-deck-active]가 붙고 제목 → 본문 → 차트 순으로 등장한다.
+   딜레이 .d1~.d12 = 80ms 단위. 마지막 딜레이가 1s를 넘지 않게 한다.
+   ========================================================================= */
+
+@keyframes br-fu   { from { opacity:0; transform:translateY(22px) } }
+@keyframes br-fd   { from { opacity:0; transform:translateY(-16px) } }
+@keyframes br-fi   { from { opacity:0 } }
+@keyframes br-gx   { from { transform:scaleX(0) } }
+@keyframes br-gy   { from { transform:scaleY(0) } }
+@keyframes br-pop  { from { opacity:0; transform:scale(.8) } }
+@keyframes br-dash { from { stroke-dasharray:0 4000 } }
+
+@media (prefers-reduced-motion:no-preference) {
+  [data-deck-active] .a   { animation:br-fu  .62s cubic-bezier(.2,.75,.2,1) both }
+  [data-deck-active] .ad  { animation:br-fd  .62s cubic-bezier(.2,.75,.2,1) both }
+  [data-deck-active] .f   { animation:br-fi  .8s  ease both }
+  [data-deck-active] .bx  { animation:br-gx  .85s cubic-bezier(.2,.85,.2,1) both }
+  [data-deck-active] .by  { animation:br-gy  .85s cubic-bezier(.2,.85,.2,1) both }
+  [data-deck-active] .p   { animation:br-pop .55s cubic-bezier(.2,.85,.2,1) both }
+  [data-deck-active] .dsh { animation:br-dash 1.1s ease both }
+
+  .d1{animation-delay:.08s!important}  .d2{animation-delay:.16s!important}
+  .d3{animation-delay:.24s!important}  .d4{animation-delay:.32s!important}
+  .d5{animation-delay:.40s!important}  .d6{animation-delay:.48s!important}
+  .d7{animation-delay:.56s!important}  .d8{animation-delay:.64s!important}
+  .d9{animation-delay:.72s!important}  .d10{animation-delay:.80s!important}
+  .d11{animation-delay:.88s!important} .d12{animation-delay:.96s!important}
+}
+
+/* 등장 효과를 끄는 덱. #stage 에 data-no-anim 을 주면 전부 꺼진다.
+   주간보고처럼 정적으로 읽고 인쇄하는 문서에 쓴다. 발표용 덱은 켠 채로 둔다.
+   미디어 쿼리 밖이라 prefers-reduced-motion 과 무관하게 항상 이긴다. */
+[data-no-anim] [data-deck-active] .a,
+[data-no-anim] [data-deck-active] .ad,
+[data-no-anim] [data-deck-active] .f,
+[data-no-anim] [data-deck-active] .bx,
+[data-no-anim] [data-deck-active] .by,
+[data-no-anim] [data-deck-active] .p,
+[data-no-anim] [data-deck-active] .dsh { animation:none!important }
+
+
+</style>
+<style>
+/* ============================================================================
+   블루 리포트 문서판 — A4 세로 문서용 파운데이션
+   기준 지면 794x1123px (210x297mm @96dpi). 인쇄하면 그대로 A4 한 장이다.
+
+   색·타입·간격 토큰은 blue-report.css 를 그대로 쓴다. 이 파일은 토큰을
+   선언하지 않는다. 두 파일을 함께 불러야 한다.
+
+     <link rel="stylesheet" href="blue-report.css">
+     <link rel="stylesheet" href="blue-doc.css">
+
+   슬라이드와 다른 점
+     - 지면이 A4 세로다. 여러 쪽이고 쪽마다 머리말·꼬리말이 반복된다
+     - 글자 하한이 다르다. 슬라이드는 24px(멀리서 봄), 문서는 10.5pt(손에 듦)
+     - 등장 애니메이션이 없다. 읽고 인쇄하는 물건이다
+
+   지면 밖(회색 바탕·조작 막대)과 인쇄 규칙은 doc-viewer.css 에 있다.
+   덱의 blue-report.css / deck-viewer.css 와 같은 구분이다.
+   ========================================================================= */
+
+/* ── 문서 타입 척도 ────────────────────────────────────────────────────────
+   pt 로 적는다. 인쇄가 기준이기 때문이다. 1pt = 1.333px @96dpi */
+:root {
+  --bd-fs-title:   24pt;   /* 문서 제목 */
+  --bd-fs-h1:      15pt;   /* 장 제목 */
+  --bd-fs-h2:      12pt;   /* 절 제목 */
+  --bd-fs-body:  10.5pt;   /* 본문 — 하한 */
+  --bd-fs-small:   9pt;    /* 표 안 보조 · 각주 · 쪽번호 (본문 아님) */
+
+  --bd-page-w:  794px;
+  --bd-page-h: 1123px;
+  --bd-pad:    64px 72px;  /* 지면 여백 — 좌우 19mm */
+  --bd-lh:     1.65;       /* 한글 본문 행간 */
+}
+
+/* ── 지면 ───────────────────────────────────────────────────────────────── */
+.bd-page {
+  position:relative; box-sizing:border-box;
+  width:var(--bd-page-w); height:var(--bd-page-h);
+  margin:0 auto 20px; padding:var(--bd-pad);
+  background:var(--br-card);
+  color:var(--br-text);
+  font:400 var(--bd-fs-body)/var(--bd-lh) var(--br-font-kr);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+.bd-page, .bd-page * { word-break:keep-all; overflow-wrap:break-word; }
+
+/* 본문 영역. 머리말과 꼬리말 사이를 채운다. */
+.bd-body { flex:1; min-height:0; }
+
+/* ── 머리말 · 꼬리말 ──────────────────────────────────────────────────────
+   쪽번호와 문서명은 뷰어가 채운다. 손으로 숫자를 적지 않는다. */
+.bd-head {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding-bottom:10px; margin-bottom:26px;
+  border-bottom:1px solid var(--br-hairline);
+  font:500 var(--bd-fs-small)/1 var(--br-font-kr); color:var(--br-text-3);
+}
+.bd-foot {
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding-top:10px; margin-top:22px;
+  border-top:1px solid var(--br-hairline);
+  font:400 var(--bd-fs-small)/1 var(--br-font-kr); color:var(--br-text-3);
+}
+.bd-foot .bd-pageno { font-family:var(--br-font-num); font-weight:600; }
+.bd-head .bd-docno  { font-family:var(--br-font-num); font-weight:600; }
+.bd-company { font-weight:600; color:var(--br-text-2); }
+
+/* 브랜드 마크는 슬라이드와 같은 `.br-mark` 자리표시자를 쓴다.
+   apply_brand.py 가 슬라이드와 똑같이 처리하므로 브랜드 소스가 하나로 유지된다.
+   다만 슬라이드에서는 우측 상단 절대 위치이므로 문서에서는 흐름 안으로 되돌린다.
+   로고 높이도 40px(슬라이드)에서 머리말에 맞게 줄인다. 인라인 style 을 이겨야
+   해서 !important 를 쓴다. */
+.bd-head .br-mark { position:static; top:auto; right:auto; }
+.bd-head .br-logo { height:20px !important; }
+.bd-head .br-wordmark { font-size:11pt !important; color:var(--br-navy); }
+
+/* ── 표제부 — 문서 첫 쪽의 제목 블록 ───────────────────────────────────── */
+.bd-title {
+  font:900 var(--bd-fs-title)/1.3 var(--br-font-kr);
+  letter-spacing:var(--br-ls-tight); margin:0 0 14px;
+}
+.bd-subtitle { font:400 12pt/1.5 var(--br-font-kr); color:var(--br-text-2); margin:0 0 22px; }
+
+/* 문서 정보 표 — 작성자·일자·문서번호 등. 라벨 열 + 값 열. */
+.bd-meta { display:grid; grid-template-columns:96px 1fr 96px 1fr; border-top:2px solid var(--br-navy); }
+.bd-meta > div { padding:9px 12px; border-bottom:1px solid var(--br-card-line); font-size:var(--bd-fs-body); }
+.bd-meta .bd-meta-k { font-weight:700; color:var(--br-navy); background:var(--br-page); }
+
+/* ── 제목 위계 ───────────────────────────────────────────────────────────
+   장 제목에 좌측 굵은 표시를 둔다. 장식이 아니라 위계 표시다. */
+.bd-h1 {
+  font:700 var(--bd-fs-h1)/1.4 var(--br-font-kr); color:var(--br-navy);
+  margin:24px 0 12px; padding-left:12px; border-left:4px solid var(--br-cobalt);
+}
+.bd-h1:first-child { margin-top:0; }
+.bd-h2 { font:700 var(--bd-fs-h2)/1.5 var(--br-font-kr); color:var(--br-text); margin:18px 0 8px; }
+.bd-p  { margin:0 0 10px; }
+.bd-p:last-child { margin-bottom:0; }
+
+/* ── 목록 ────────────────────────────────────────────────────────────────
+   조·항·호 번호를 쓰는 사규는 .bd-list--legal 로 괄호 번호를 매긴다. */
+.bd-list { margin:0 0 12px; padding-left:20px; }
+.bd-list li { margin-bottom:6px; }
+.bd-list li:last-child { margin-bottom:0; }
+.bd-list--legal { list-style:none; padding-left:0; counter-reset:bd-legal; }
+.bd-list--legal > li { counter-increment:bd-legal; padding-left:34px; text-indent:-34px; }
+.bd-list--legal > li::before {
+  content:"(" counter(bd-legal) ") "; display:inline-block; width:34px; text-indent:0;
+  font-family:var(--br-font-num); font-weight:600; color:var(--br-navy);
+}
+
+/* ── 표 ──────────────────────────────────────────────────────────────────
+   슬라이드 표와 같은 처리(2px 딥네이비 머리글 + 헤어라인)를 문서 크기로 옮긴다. */
+.bd-table { width:100%; border-collapse:collapse; font-size:var(--bd-fs-body); margin:0 0 12px; }
+.bd-table th {
+  text-align:left; padding:8px 10px; background:var(--br-page);
+  font-weight:700; color:var(--br-navy);
+  border-top:2px solid var(--br-navy); border-bottom:1px solid var(--br-navy);
+}
+.bd-table td { padding:8px 10px; border-bottom:1px solid var(--br-card-line); vertical-align:top; }
+.bd-table .num { font-family:var(--br-font-num); font-weight:600; text-align:right;
+                 font-variant-numeric:tabular-nums; }
+.bd-table--grid th, .bd-table--grid td { border:1px solid var(--br-card-line); }
+.bd-table--grid th { border-color:var(--br-navy); }
+
+/* ── 강조와 상태 ─────────────────────────────────────────────────────────── */
+.bd-key  { font-weight:700; color:var(--br-navy); }
+.bd-chip {
+  display:inline-block; border-radius:var(--br-r-pill); padding:2px 10px;
+  font:600 var(--bd-fs-small)/1.5 var(--br-font-kr); white-space:nowrap;
+  border:1px solid var(--br-chip-line); color:var(--br-text-2); background:var(--br-card);
+}
+.bd-chip--warn { background:var(--br-warn-bg);  border-color:var(--br-warn-line);  color:var(--br-warn-text); }
+.bd-chip--late { background:var(--br-alert-bg); border-color:var(--br-coral);      color:var(--br-alert-text); }
+
+/* ── 목차 ────────────────────────────────────────────────────────────────
+   장 제목과 쪽번호 사이를 점선으로 잇는다. 쪽번호는 손으로 적는다 —
+   꼬리말 쪽번호와 달리 목차는 문서를 짠 사람이 아는 값이다. */
+.bd-toc { list-style:none; margin:0 0 12px; padding:0; }
+.bd-toc li { display:flex; align-items:baseline; gap:10px; margin-bottom:9px; }
+.bd-toc li:last-child { margin-bottom:0; }
+.bd-toc .bd-toc-t { font-weight:700; color:var(--br-navy); }
+.bd-toc .bd-toc-d { flex:1; border-bottom:1px dotted var(--br-chip-line); }
+.bd-toc .bd-toc-p { font-family:var(--br-font-num); font-weight:600; color:var(--br-navy); }
+.bd-toc li.bd-toc--sub { padding-left:20px; }
+.bd-toc li.bd-toc--sub .bd-toc-t { font-weight:400; color:var(--br-text-2); }
+
+/* ── 절차 단계 ───────────────────────────────────────────────────────────
+   매뉴얼의 본체다. 번호를 손으로 적지 않는다 — 단계를 끼워 넣어도 다시 매겨진다. */
+.bd-steps { counter-reset:bd-step; margin:0 0 12px; }
+.bd-step { position:relative; padding-left:40px; margin-bottom:14px; counter-increment:bd-step; }
+.bd-step:last-child { margin-bottom:0; }
+.bd-step::before {
+  content:counter(bd-step); position:absolute; left:0; top:0;
+  width:26px; height:26px; border-radius:var(--br-r-pill);
+  background:var(--br-navy); color:var(--br-on-dark);
+  font:700 10pt/26px var(--br-font-num); text-align:center;
+}
+.bd-step .bd-step-t { display:block; font-weight:700; color:var(--br-navy); margin-bottom:4px; }
+
+/* ── 화면 캡처·도해 자리 ─────────────────────────────────────────────────
+   .bd-figure-box 를 실제 <img> 로 갈아 끼운다. 자리를 비워 두지 않는다. */
+.bd-figure { border:1px solid var(--br-card-line); border-radius:var(--br-r-card);
+             background:var(--br-page); margin:0 0 12px; overflow:hidden; }
+.bd-figure .bd-figure-box {
+  height:150px; display:flex; align-items:center; justify-content:center;
+  color:var(--br-text-2); font-size:var(--bd-fs-body);
+}
+.bd-figure img { display:block; width:100%; }
+.bd-figure figcaption {
+  padding:8px 12px; border-top:1px solid var(--br-card-line);
+  font-size:var(--bd-fs-body); color:var(--br-text-2);
+}
+
+/* 주의 상자 — 매뉴얼의 경고, 사규의 단서 조항에 쓴다. */
+.bd-callout {
+  border:1px solid var(--br-warn-line); background:var(--br-warn-bg); color:var(--br-warn-text);
+  border-radius:var(--br-r-card); padding:12px 16px; margin:0 0 12px;
+}
+
+.bd-callout--danger { border-color:var(--br-coral); background:var(--br-alert-bg); color:var(--br-alert-text); }
+.bd-callout--info   { border-color:var(--br-cobalt); background:var(--br-page); color:var(--br-navy); }
+.bd-callout .bd-callout-k { display:block; font-weight:700; margin-bottom:4px; }
+
+/* 서명란 — 결재·확인이 필요한 문서에 쓴다.
+   .bd-body 안이 아니라 .bd-page 직계로 둔다. .bd-page 가 세로 flex 이고
+   .bd-body 가 flex:1 이므로 그것만으로 지면 바닥에 붙는다. 안에 두면
+   본문 흐름을 따라 중간에 떠 버린다. */
+.bd-sign { display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:16px; margin-top:20px; }
+.bd-sign > div { border:1px solid var(--br-card-line); }
+.bd-sign .bd-sign-k {
+  padding:7px 10px; background:var(--br-page); border-bottom:1px solid var(--br-card-line);
+  font:600 var(--bd-fs-small)/1 var(--br-font-kr); color:var(--br-navy); text-align:center;
+}
+.bd-sign .bd-sign-v { height:56px; }
+
+</style>
+<style>
+/* 문서 뷰어 전용 스타일 — 디자인 시스템이 아니라 브라우저에서 읽기 위한 껍데기.
+   문서 자체의 디자인은 blue-doc.css 에만 있다. */
+
+  html,body{margin:0;padding:0;background:#8a8f96}
+  .bd-doc{padding:24px 0 80px}
+  .bd-page{box-shadow:0 2px 14px rgba(0,0,0,.28)}
+
+  #bd-hud{position:fixed;left:0;right:0;bottom:0;display:flex;gap:18px;justify-content:center;
+          align-items:center;padding:10px;background:rgba(0,0,0,.62);color:#cfd8e3;
+          font:500 13px/1 'Barlow',sans-serif;letter-spacing:.08em;z-index:9}
+  #bd-hud button{background:none;border:1px solid #48566b;color:#cfd8e3;border-radius:4px;
+                 padding:6px 12px;font:inherit;cursor:pointer}
+  #bd-hud button:hover{border-color:#8fa4bd;color:#fff}
+
+/* 인쇄 — 지면 1장이 A4 1페이지 */
+@media print {
+  @page { size:A4 portrait; margin:0; }
+  html,body{background:#fff}
+  .bd-doc{padding:0}
+  .bd-page{margin:0;box-shadow:none;page-break-after:always}
+  .bd-page:last-child{page-break-after:auto}
+  #bd-hud{display:none!important}
+}
+
+</style>
+<style>
+body { background:#8a8f96; margin:0; }
+</style>
+
+<div class="bd-doc" data-doc-title="AX 파일럿 대상 부서 선정 회의" data-doc-no="AX-MIN-2026-014">
+
+<!-- 1쪽 ─────────────────────────────────────────────────────────────────
+     교체: 표제 · 문서 정보 6칸 · 안건별 논의 · 결정사항 · 액션아이템
+     액션아이템에 담당과 기한이 없으면 회의록이 아니다. 빈칸으로 두지 않는다.
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="bd-page">
+  <div class="bd-head"><div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><img class="br-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAABWCAYAAAAzBQjMAAAn7klEQVR4nO2df3Bc1ZXnv+e+7n5P3ZJaLbvlH1IsWQb/0GBsSSYmdgonMHEska3sulu2BS6SmkwSAztLJlO1g9mdbNVkBzIzFTJkFyMSJzOhAAOWqJpK8K/sEkwN9rBYsgkgMOAfMpYtW1g/LKnVr9979+wf3U9uyZKsH+/pB/SnSmV39+3T791333nnnHvuPUCGDBkyZMiQIcN4ockKWF21u1jAfJIYC5w4oHQYlE1k/a5x/wN/5bTs8VJeXTdXsNzJrHyDwL1Oyp5J5zka5dV1cwlyPkkqBMl5YHETgQsliXmpJtnEyJnWg8wwKZJj0fy7xv0PPgMAnskKVNhYfjmGuwOqMvmjG8IHl+KoLPQccVzwBGD2BAxB2/vjZoEihKOyk+epvO2o0Emyump3sQK9ECw2MVGFRZ7yXt1a2BFjAAy/1+4DguYlKGLSz5oMM4DUWBx4PWkF4YFeETO8yM/2TlbUdeRlKbDgO+a44AmgsLH8kw5ZUBRSHZVrScaqIj8YiSZHBY+D8uq6ucyegMLGcgDrmegOk2jNlV4RiBkSfq9AQJXwqwr8LjwIMswckveceth+PWkFYZD29Xy/808P3ZAonqNeOLHvz1scFz4x1lvSeaG6IZHr5SYpRJvz0kcnZSVsICk3MMzVhvAta+2MB/L9HijCQn62F/lTfVAZpo2YbqE05Pmwaf+1e25SCmJ11e7iBPMG1XnjAe29BhYH6YDzkicGQ2wNZzvrWgBA3JDI9fFrx/c98KnjwkegctNTXyfwFsnWl02hLu3oMxBQBTyQcNpCyjB7+Oh8PypLfY+kvzcpBaEgseZsJ6Mo5JvckQ3BkgwAYMI+RwVPkNVVu4ubWmNLVxX5HZVrnycA1+MsySCrVW2QtuvsgJVAUAVccQ8zzC46eg1UlGqHJeFw+vuTUhDEqM5RhSsBqsKQ1sfQTzoueAJ4WL87L8t539u0GPnZ3guMhGvnubpqd7GH9bsT5P0fZ65YBeFsM2MlZBiEbkiEsn19xPFHmvY9OMiSnZSCkFC+HFDdiT/k+KxjEr4ex4VPAElKdY7KN244Tvp0C36PPM7kfPzBthjA5kOXYqIioFoonpNRDBkGE9Mt+FUFHo4/0Lj/wess2QkriIrqXbdYUJZ64PyNk/LLG0/sn/4A5eqq3cUWoTyguhChBEDMTU3773c0/lBZ9eQ6Zjyis+9u3ZDIz550LHrMpLlNMC3nx8Z04lHcnc61JE9Zn1mS0d5roijkg4cT0cb9DzYM127CI4eYK3RTwqM432FBvweAMSPyHxQ2lpvkXej0eVqSEVAVgIyPnZRbWbXrp1cTyg8BQPXC1WlJe0DbSkERBEsy/KoCBvX5FPS59uPTADGbABa6IdvuQ9UrLrghfygeabblh4x6ndTnG/c/MOKDeBIKgjZYkqF6nY3s64ZMdhLzRUcFT5z1thnmJKbF8Cv8IRM5kv9QUb3rFkilobFVX7qqyNmgcTq2UujTLYSyfX1+mK3w8Edejr9hQm1iL7cyuO34vh1TNiszVVRWPbnucp94w42g7sXuBEry6PHGfTMrm3ZCCmJ11e5iZnO1G+aWJRkKm8clKR86LnycJBOIUOGGbEsy4OGPmvY98O5kZVVWPXmfQeo/dsYSBU7PtKSjGxLtvQaKg54PAwH+HVg/YpHv2ExwBacEFpt6dIn8bGfFDrhlTIeclTx5JqQgFOiFhqIVeTB7/PKJINhaapJargiXzhNy0rMXazf90844qY8mEpZr05WWZFzsTqAopF5YHMTfmaS8cmL/9z8fSmEQdHfYhXiOaTEKQ1qfhNHouPBJMqGzJcbq/rhZ4LR7MeCykDVT1iXcpBvSlfhDiknFWSqrdv30Qh/9MKBKx109G9u9KgmKH0uYPz924MFpV9zTQXl13dyznVbFgqDz7ltqNuu1pv0zzy2boDqkyo6YO/PpQog+i6d//UV5dd1cknJDn+7OkzlL9fRZrEz4PCurdv20sdX8oVsuhW5I9OkWwgF6BUg83Hhg8q7QbEaw3HClz0JRyHm3OmZICJ4ZSYFDGbeCsOMPbq2/yPVaJxsP7Jh285XZE2CYqwOq809mO8+jaf/EzrNy01N/e7kPrioH1SsQUKwfN+7f8SNXfmSWQYzqL+Q5/6CwJKMopIJZP+G4cAcY9+hXoBfqUCrcMGk7YiZA8jXHBU8AQYmcyzGucGMatyNmgphfn8h3K6uevM8U3r9JTgU7j25I+LxKn4f1bzUeuD+jHFIYwrfJjS0NdEPCI80mC2qr48IdYNyjjBirUwErxw/mSp+FkqB3RkRyheQ7enRG0J+8iMC12EHcGBy0jKW99g+jOLXUe3aegCUBkBz3QrTKqifXGaTtShiWKzGH5LExvKx/a6TEmc8jlVVPrtMlL3Sjz+OGRNDLJ2bqTNC4FYQkZYvf63y2lyUZy+dpkELOiEguQ/lOUUiBUMRlP8wu0EBeRm/Qy5eY0JVsSH2AgAd6vwk1a0AAcSD5D/IkcWrHJc4mRk5uSIEkjHsat8/0vmFJ05XkJ3umoiQoNjXuf+Cg4z8wi/GwsaHP8jqeRWlJTiUFJmbEmB+OcSmI1VW7i02iNQHVcvxAkn45H26aIQk2BOtXKvgRZm6V5OshMvucSP6xN2c5se/PxyWrsmrXT091GK6sp7Akoztm4qag8cibB36QUQ5DMEhbn55C7iRCEZdZ4oQrwh1gXApCYWP5J10y4IZ70d5rIjckJuSXu8GxAw/uckNuSsmMUzk8uc4k3w+LQu4M0u6YiXl+/vWbB37wmCs/MItJZqjSzW4kBZoWIwDjvBTTnxQ4EuN1qta7cRCWZCjJI3nDDfmzmfLqurnE9J2YbrmyUCimWwj7xYdS4GeOC/8MQIxlllCWuhGstiSDIE/M5LT0cVkQDLE13+98oMa0GEUh9YLF+MBx4WOkvLpurv1/Zk8ASM5kEHNu8l1K7do9EFvIZoj5AwJSMYdkTOIaHuj9FrzdTEjthE19YOoFyZ5kc7oqOenC2N9JHzBCcqUhfH+muhT3Ub0CAoknju178HOd5zAiTKtiCefX4lwTz4dv3Gr6GLOCSC17XurGQO3TLWQr5gFLCFdW/9l+/8ANzyIHJOd52Cg0yTeXGHmSMY8YC0zhmQ8CGBSMG56AJRlxQw6aqbjG9bMX17cbOnee3BU6PzVN6VcVsKDLxB5TkVYviC+u2bTrVLIltTLRHW4sFgOuxX0sUl5yXPhnALfX4qheMWiD2JnImBWEAn3D5V7hWr6/gsTHx/b9YFKmVmqTlKVgkUOQSxhiPoELJWOeYHMBs5JtCE9hwrQCfToAqLB3bda8SRMyfd2FRyF4FIJfVRAcEqQaydwfbpPXoQGu9O/qhoQluSBuSPToEl391lIAGwDgC3leBFQBvwvJWkAq7pOPXw/dRShDEoKcb5L6FdXr/FocezVv0wxf0zIOF4NWaS7NvQf9HpjE4wrU2HUbPGxssOC7SZJYAkkLDEXLAyMgpQx0x0zYdRuA5I3pQTJL0N78Y6y7Nk/G/0//riUZHb2GrQyQl6WgeI6KXC83FQToNWLlFBNdYsJJIfkvL8WsP3Mr52F+rheN+7/3jOPCPyMQc0VrVzzg1vqLQIB/57hghxmTgkiZWpVuRXKT+yJgxJWNq6t2FytsLPdArzBIW2+S9yt9uhmIGwKaNwtxQ8JOiU5fYTqatTPVhV7SNlW5MM/PB+b50cj5yglJyofHR5jyvLX6V1vdmFIGgPOdCSzJp8ddEf4ZgZg2+F0qCtSjSxQEMOOT0cakIARbSw2hrfAozptalmQIxfq3Y6l9EQbKuzGWAVgHFl/RmSuuxICY4YXfywj6k1aA7ZfPhmIuKX//FQa+fezAjbe4r6jedUvT+b7ALQuzbtR0QnT1WwDPjKzVmUpCqK4o6FTNF0iYM3Z602ZMCoIYqxMJq8CNqZ6k+WyhctNTXwewnhkVplBv69fNgrghU2Xd+DNRxEWwte/Y/rH5+yRpS16W4srTy67mJWHO2Ay+6cZW0G4siEst7z48E5d3D2WMMQiqdGvZsyIICVK/AcbWzt5EIKkQrM9UmTc7Yi0FjTkRjIkq3NicBLg2e8GZcpoj4pWJ/5CX5V69EC/HZ0XG6g1H4Oqq3cUS5hI70OcG0pIFwGe7gItQxOWmV8a2p0J5dd1cSLrZrU1gOmImcn3U2DSF1bxmGwayvj0/1x3rLT/bC5PljJ7etLnhCFSgF/YkaINbgxVIWhFTHTTUDYmYbqGj10BMt66binSS7pgJn6WPOWLN7AmYiifPrS3Q/V5xXUJXhmusrtpdnIBwJXtypi/vHsoN73pirO6ImbO6vLu9jNlWCB29BnxepS/Xy03hAL2S65U/dvP3e3QJBo05GUmBXghGwLVt5AwJD/R+V4R/BlCQWKMb0pUxHzckQPK1mbq8eyhjcHKp0u+ie+Em9rZpPbpEjioQ9osPg17+NyY+DI5/bJHaSmT2SXgDF7v0v3FjEZolGTmqgBQ0joAgLSBwILlGxfm+93sFBi1NzzCUdW4JDvo9IE6ccku+04yqIMqr6+Ym4HVtLt5JbBdBN+TAhi6hbF+f3yNfKwjgJSZuukU7eOmZl19uH/rdNZue3GK5s3E1dEMiHKDxLWNn6oWLOjlmSIAo4N4vzF7snB83ZKcU/gXmmbu8eyijKgjB1tLjrQlXpnqcwJI8oBBC2b4+Anfn+Ph4vld/wxC+3zbt+86goOBIFWokKVvC2e7ckR0xE/leY9wRawb1KQKu3MT5fg8YvMwN2bMdO+fHjfTq1OzRRzOh5stYGd3FYLFpzgx7ztibm8QMicKQ1pfjs47levE6WH+bCSeb9o9/9+UEKxv8LhQhtjckNRnjiliz4FYQ+iyLA264GKpXwCK6e3XV7uLZ4gtPITdJSxa4FXMjyFk1e3SDGATdne/S5qjjwbYUOmImwtlehAP0imDsY46fsKC2njgw8UGeLKdmujLFaloMFVaTReOLWDNEW6oOpCsogtByRceSfFoDIKMgBkGrdEO6mIPDM6Xmy5gY8e4vr66be1WniulKVrJrQLb3GvB7BQr81JQfNOoNQb91olydjYeNDYDzwUkgtYzdzyfS93oYC8f37fi0oqruo5hBC93q//m5Xpgkfg7M/PUAU8Xqqt3FYPMrblkPyaLGliO1WKeKERWEYLmhvZdRPIUKwrYUACBL81z2k/H+TUHjoE7Zzze6ZAobpK13o/aFvUqVKXF4IjsGeTl+sL3Xu8Gt/le9Ai1X9IVrNj35gFvb6802FDaW6/BUeFzoct2QCCiyabYVIBrNf1iX49I+BOmkWwoLgj7k+Piwl+MHTek93Lj/wUmVprsR9n6DbskXirgMiY8n8t2E0H6pCOtRt6Y6AaAo5ENCiH+o3PTUqcYD98+K1F838UCvuBxzJ6O3vddAIChecVywywyrAcqr6+YyRKUbhUJs7MSli90JqF5xoSSPHldhbmJC9M0DP3jMbeUAJPcbNIWn0L2MOeP9iWbMHd+349PiPOWV5J4W7qAIQr9uBhji56nFcp9rDNK+7saeJ0Cy5stEaqFMN8NaEG4u77ZLyFsSWBJSmnLz8ITFONy4/4EpD5Z5OLH0akJxLWNRsDzVNIkAKsF6VPN67nbTivCrCnp0a2mW6mtYs+nJ//p5dTfKq+vmJqSyQXVpOVBeloKpeOg5zbB3hr2826kfsa2FVM3HCyV59HjpHFrZeGBHZeP+B5+Zjqm28uq6uQZp6+MupNTaqzeZJleQtXH/g0fyvf2PdMdMV9eK+FUFUsrAsQvWkxVVda9VVj3pWibhTEWw3HCxO+GK7JhuoTRfmRWLs4YyrAXBREvsQT5ZOnoN5Gd7U7GF/oM6Zz8/HdbCUAhyPli52Y0AJeBclfKE0H4ZDuDrPQm5wc0ZJUUQVhX50d5rbNC8njcqqupeIVgvMVGTZF/PZz1fghjVfq9wxVLriJkIejErNwa+TkGsrtpdzDAnlWqansy0OEi/Zk7ss+A79uaBH8yYQUaSCnWIpW5FrJ2qUn58345PK6p3/ecsTf2/sbhZ4Pa0c362F5ZktPeZd8cM3F2Yr172sPH+mk27TjGhy8OJTy14u109iFFQYASHvmeS78PG/Q9Maro2oajfcGNJgSWTO5gzmSccFz4FXKcgFOiFBmlrJppqer5TBwAsDtKvpaCfWRBtM7QwyPrumDsJUqkqYY5FrJv2PfBuRfWuuzpi/E7ckK7vm6EIGtjBS09YBf2SCuIGbUgG8LJu+JQdT8xk/K7T4CH7UbuONQv5wXEKGURF9a5b2nsSBW70a/JhwbNmefdQhnMxbursTQTG2ln2NKUlGX5VQUkePW7B9/NjM9wkZaI73NoEp6vLAM/xOWpSppTESpL0m8u9RkXQ75mSJfi2m5luudzoph7PrNBk3FhLMr6Q54VJ3kkpYyH5Ds3rjmUWNyRyfTxrlncP5ToFQUwbxvrlVE0H+FXlgocTLzCsf26cwFqIqWZ11e7imCk3qC4oCEsyvjBPRdO++x3vh6Z9D7y7umr35oJA4r+YRD90q6DOjZgpe4N0x0yEA/RK0yRvPklKtVPHNJRU9e5ZlV6dziAFUV5dNzdB3jH5Yh29BoJ+DwIe83Gw2TCbpnAUNpa3XZWuVMq2B+0njktOknoS/VXlpqcO5XjFz1s69aXhbK8jAeXZhCUZAVUBwfznychJpldbrhTntWftwBNLlpsJDBpVBDn/j5/0FYw22GK6hbfPxxAO0GGfMFY27n/gr2aTcgAAAm9xK0u0R5fwctz1IsSNB+4/KEnZeFPQeET1Crx9PjaQpv55oDtmwu+RhyWJSU0fKmwsdytZzpIMhc2PZmv8ARhiQYy0k296nCHXy02VC72PNO7fMWtTc92qd2BXqzIE/dZx4cOQsiYeK6+u++WahcoWQ4j/1tFrLLSzAW1FP1NcAqewN34laTzWtP/+SQXAPdArLvdizDG38aAIAsFqnK3xB2CIgjCQ9e1w9uAGdpwhx4sPyWP+XeP+B2d1qbaK6l23tI8jCDse7Ii1hGhzXPgopGaJdgHYlUxy4ghDVJpCrOiP2/VFknP8qleMa5ZhpmFPoRf48ePJrh8pr66bazDWuxGstiTbwdpZZV0PZUBBlFfXzW3pNJfadQjtlZVZqqfPKxOPs+CXGj8DJeKF5DsAciUz0Y5YH5/GDUFS7t6R8uq6uV4ZX+rzYnXQS5WSeIkpPCv0hFXQp1+znmzFMZyJbSsRN7M4x4IiaEAxAEBBgB9v3P/AjyYrlyDnW+QrV4R05RyFIi5bcvLJctPJgIIQkiuv9FkoCiUvxvnOBJaElCZw/C8aD8yuGMNoSFKqP+lKoEd3x18vCGBGRKxTVsWnSD3BVlftLvawnuP1YFnAwwGAVjHEMoCzLVJuZlBQShlI39MzNoNiGvl+Dwr81ASynnDKiiXmirdbYwvzspyfCerqt1C50HfeiWS56STdxVg/J6Aglnq6LAmJHzce2DFpLT3TIOb/VVnomVTkezQmGzRzizQ/eFgrsLy6bq4gT8CnWjk5KkDMuQMfssiZimMcDRZWq4RoO75vbKULxySTqKmy0BNNvegFcfag/9/oPft9AIPaAUA+ZTPJEQtSzxYG7MrKTXWNZ7utiuI85RWQfNjJXZsyZMgwOxmwIBiUfVPQeCRByi+n04fOkCHDDOTzuMQ3Q4YMGTJkyJAhQ4YMGTJkyJAhQ4YMGTJkyDCDmbaE/Hsjka9Koi0gDg3bgKlz0Oth2jEoBFDDC3v3/mKk39m2JbqTmFeBqRPEITD9/Z76+uPDta2NRssBPMWEUgAg8Ktei/9iuIrgdnsmHIz3x8IAoGX5D/ksuX2k9ttqopfTTqjNZ1l3Ddf23kjkq5YQA/U6PFIeeLah4dwIx/AUEyK2TEXKh55raPjDsJ0xDPdt3hyWRFn2a8HcP/SYhumXX4HppfT3QPjZCy/VPzacfEOIIsGcx0TzibmNgFOjnE85EwbWWBD41T17G7aNdPzbaqIHP2lp2ejxeBDKDyFL81eMdH231dR8j8BPMNCTkv7fRxo747wG5Uz0G4Dn28ecPm62RyKLGFgy0jkMJb1/7olGayXhibQPh+1nt5i2wptMNL8/Htsx3Gd6XEfL2dMDr0P5cxEuCA/bLi8vdPq6Dwb/UO1bR4+s9GkqLn58BtWRyNMjNRXMeX16/9qWM2eh6/24tXxNmSQ5cPPct3nzwEE88/LL7YI5ry/eH245cxYAsKysrNwQoghA+9C2AHCyuXngvdxgMHz4yNFhFYkkeuz13x9c689OJud98fZ19wAYdnAyofTY0SPhnGAeAIRXrCibP2p/pKiNRstBvCUB+s7F1tZwQtchFAVfKC55Z9uW6B6SOJB+o/XHY2n9UlmhMB/q6O5a23bxInS9H6tWVy4aTr4B+sHbxxu1rk+vDHz2xS9/GdtqoocE41+er6/fM/TY7PPp6e7CbbevK0n/bHskMvA7FtEcBi2I9fVB0zTocR1+zb98eyQy8GPpCo8gF7919KiWE8zTAGDZn5TNGal/LEEvvv77g2F/djY+Pn8B90SjI14DwZx3/kLryqvd3QPjBrDSZOEfPmh+f6umaQCAeDwOXe8f9ncvfnwGm2oiPwGwEwCkQMnrhw6Fi5fchJZTH2PDn25cNOwXXWLaFIRHyv+TpfkrhvtM8/s3BTtDj/pUFaZpYtGi4jcB3D+0XZbmh8J8ZRgRAxBzLDxvPnxqcnMYSdQ1WvusLH/cHwho9mvB3A8kB6ZB9BIT+Yk5tq0m2m2BFuhxHbnB5D6q8f5YOEvzP7WtJtptMIJM5CfI5vs2b/6LZ15+uV3TNAhFgf20GwkmdBcvuWngmIl51NWhOcE85AaDMM2xFdm5JxqtZcKv3z7epKlqFpaVlR0icBODKg7u3bux5E/KVi4rK/vLeyORrenWiD8QgKZpIHAnAKiaOvAeiLvsdttqar4H8BMfNL+v9XR3Yc2X1r8D4H8L5h4mvvWto0cf9mnqxnDB/I21NZFvDrUQ7PMZ7rjN9KcpgO7OjrDdNhaLIS8U+rVJ1AMABORYwL8CGJBvy07o+g16idqKl9wU9qkqfJp6w2vg9/sBAAldG7GNfe1LShe/yBCvDtfm1vI1APNbA28wXZlXWASfqiJv7pxB/TwVTJuCSGn1kUzxn8Tj8YEbBIRVYGAk03E0mMhv/z8R1yGY80Zr398fG/EKp8zptq6uzrVtFy9C0zTE43EAgK7342p3NzRNW9vd3YlV5ZVxgHvAFJOErHQ5Y72Rx4vH47nhQK6NRstj8djzLWfOQlWzsLxsxYt79tYP3EDbamr+eLL5vZUnm5vD8xcseBUpNzQryx+XljXy6E+Tf/b0qacBQNM0LC9bF9+zd++taU32bNsSvXrsyJFHTdPE28ebttZGo5176uuvewAMD7UBScXPRH5VU8OxWGzgUwZ6iHEaSF57Ap8Zm9zJoWoqYrHYwHgYBFOnpmnweJK3GzH96576vddZTjORaVMQI7GtJnrwZHPzRn8gANM0IS0LZ0+f1opLSw/WRqNfH4+S2B6JLLLANwsluVrPp6mQAhsBjNlHt0n5hAX3RiJfVTX1VfsptKys7JBH8nctojlM9JuW06dWhvLnAgCIMa7jHQkmGpPbAACWEE9sq4leJEaQCd3EeHjQMRD/9YcfvI9wwXy0X27D0Kc3MX9L07Qmn6qi5exp1NZEXmDQq/H+Pk0oCqR1w412norH48gNBtF6rgWlJYuv2+/RZ8rdt31p3Y/Onj6thfLnoqurc8f2SOSxkXx8m5Q7MnBj3bd5c5g0/28v6W1rhaIgXBCGInnreGIw04EkmvbFb2NlRiiI7ZHIIkm0XhKe+OPxxrCqZiFcEEZWVtZPGPSdk83N4T8ebwwXl5Q21dZEfqJIPHWjwQQAFtHOcy0tmsfjgWmaCOXPxYXWCw9vj0TG9P3hjtMU9GLLmbPQNA3FpUve8Uj53ZSsc7XR6LdKSkuPnD19WvuguVlbVlb2EwDjqnm5PRJZZALl9uuErkMKlIz1+/H+vpVZWf6bQcNHoBmiTFWTBk1SkQ1+wCrMV/JCIVy9ehXhgvlI+c5bfaoKj8eDxI0UBGGV7Wv7NBUEnBquGQOvx+PxjbnBIGKxGPKDeUswgo8/EoYQRSCsApLWU2dHJ/wL/WNWpqPR3dmx0n6wAIAk2oIJPFiGg8BPbKuJ/s+RPheMh4aLzUwH07LTaW00Wn5PNFq7rabme7XR6FOmoGMnTjQ+//rvD4WLS0qxrKzskF/z37Nnb8NOj+Q1y1eU1a0qr4y3nD2Nw7///cOWoJO1NZEXtm2J7rwnGq29NxL56tDf2LYlurOrq3MHkLzJwgVhSMvC1e5umEL8LhWZHxcMLIn3x8L+QAAAQJDN6YrGK+V5Bn0EJM1rAOXpQbWxIInWX2xtDQ+4V8kf/sv0oOdoaFmB7yuSl9l/Qy0YgnzFDpB1dnyKocfHwJK2ixfh8XjQfrkNy1eU1RUvKX0klB8am2vEeDvdzB4lel9uKxK/33/D2NBwELC8q7NTs2/kq93dYOJvjlfOUO6JRmu7OjsHXIJgMISRAurj5VofUtvIfzOHadsKWRLt/OPxY0+/faJxR3dnZ3jV6so379i48ZG8vFCFz5LbbQ36bEPDuT319fcrkpeVr6q4c8PXvvZif39M+6D5/a3Hjhx5tPVC6/PpJvh9mzeHt9VED1483/po28WLaP5/b6FkcWldQM26s6S0NN7T3YWTze+tBOFIMpg2dgg4lfLFASSfxuk3riFEEYFvBpKRamKctoOcYyFpSeEJO4B2tbsbPlXFyebmsCHE345FhiLlR882NJyz/65rwPTS0uUrcLW7G6qaBVPQL9M/tgS9qGkarnZ3o7ikFHvq6+8niQPp5z0agnnnpdbzSOg6gsEQLEEvDm2TUJT/dLK5OexTVbSea0EwFDo0XlcsNT27076RE7oOfyCAC60Xtg73wBgr9jUAkg8W+xq0nDmL2mj0qYnKtcnNzQWDHvJZ1l0j/c0U6wGYJhcjNRhu3R6JLHq2oeFc88c3jiPZZjySZt42IHkxBXP/M/X17fZ88TvNzWFd70cqOt++YkXZgLl23+bNi267fd3fnj1zescHzc2arvc/XfWndz0dDIUOvbC3fsAViPX1DUxDpecIPNvQcO6eaPTP8kKh59suXsTJ5vdWLisre3Z7JJKKQeDgyeZmDQCKF5cAwP0j5UQMZXskssgSdPJkc7OmaRr8fj8WLiys++D95h3+QABv/fuRHbU1ka49ext2jiTDNM0bxiv21Ncfr41GK5aVlR1MuW4b/+M3qlnLCrzT3dmx8o/HGwf6ziN5jf290YK36TzX0PCHbTU137/Yev7pq93dONncHN5WE70sGA8Rc5sU+P7bx49tDQZDuNrdjdtuX/fmnrS+HyuGEL892fzeStuaKy4tbT/Z3BzWNA3nL154tTYaHTEfYiSSLqT43cnm98KapqGktDQO8L9eaL2wVdM0nD1z+obXYFjScnhisRhCeaGesY6L6WbKFcT2SGSRRTQHSM4U10ajI85F3wgLgEWE2mi0iIEPQPjZ8hVl3wRwXDC/9Nze+kE+Y+qi3L89EnnMVOheYl7FoBAxHgaSU6Balv/QsrI/WQAAxPzGUAvg+fr6PbXR6AfBUP5v4v19K082N2/UNK0lHo+novZlcQZe90j+7rP19aP61HZfsMCmT863Ptp+uQ3BYAglpaVxIbn6ufr6P9TWRLq6OrsejvX14a2jRx/eVlNztyLlQ5Koa6IB0NT3ClLTkREA5QS+ORgKtd8aqjwuGP/y/N7rn2JjDFLihb17f1Ebjb61sHDhXwP0zQutreH2y23PA4CqZmHp8hXI0vxvEvDEeJ6W923eHLaIbrEEvfjW0SPh8Lz5yM3NRTA/9IjPlLuXlZW913L6dPhqdzcANG2rqfn+SAlO6fGF2mi0nAU2XenofLTl7OnB16Ch4Q+1NZEz/f39D7ecOTtwDQTzY4L5jTHFspg64/H4wDQnA3fcG4m0JT9KJo8Nbp5U8lKgBIxa2xWbDqZcQVhEO8+da9mRm5s7YhtVu76gjR4fed46FothQWHROz7TuuuZl18eyDIb0W9n7veZvDv14lpbKc9Lou/a7w2XVQhcs4DuiUZrixeXPH/pYlsqaFnaLkaIot+3eXP41PlkOR3bt2VgCRM9cezIGyvnLSzEreWV7QT+lSJ5IIi6Z2/DznsjkUN5obzvd3V2bT129I2VOcG8V5eXrXgRafP7EyGVRfgLO5typPOdCKk+2lYbjZYXLixcvqCwKAcABHMPMbc9V18/roDfPdForQE8dPbM6bXtl9pw8/IVCIZCyWSrl5JKZnsksqZkcelOEL791tEjWvvltqdXlVfGa2si/zTsU5/pip0F+fqhgyuLl9w06jVYVlb2cLw/tvHY0TdWAnj+ttvX1d23efOPbqQyBfNLy8vKvn329GktYVk4e+b0DgAjxjRs5bWouDjO4J50ZTbVTLmCIOD1RcWLukZrw6CKltOnNwJJX35ZWVl7VlbWr0ZqnxfKAw8Jx9dGo08ZhG9fS6ud0LG+aic5pZ72yUGWSlZhRh5w7YISkCMFNtbWRDZeOxnKY0JpIjUzYc+oAIDC/K5k/taades2KRb/O0keNgU5pXD+UBuN/v2aL62/TTD3CMmOFedx09xNKYpJT/UK5jcsgVuLS5f4S0oXvyIkDimWfDf92FN9d39tNPqLNevWbQLjKwB3ColDQ+VJywKI5+zZW3+8Nhr91h0bN97wGty3efO7pPmLvnj7uuWSKEeR8sAzL7/cfm8kMuqxP9fQ8IftkciyxYtL14/1fBn4QJF8xRRiU6yv7+nhEsemgilXEEPnsocjFWTaOJBJmMzHH5/fNwEIyDl7+rQGAN3dnYNSrRlYcqC+fsecooWDvpNKcQYAvH28UUvE9Yft176UJRQumI+FCwvfzM3NHZTUk5YsNqYbyKmbbaKMxb1wi9RNuzP1Nypp/TSmNQtj7dfxXq900mJo42JbTc14v+IoMyIPYihMND/drEouyhofqcy8MWbnJamNRstLSkuPnGtp0excATsGkXoKFI/3OJ5taDiHVBC26k/vYreyKKeCscYgMnx2mJEKYrpILb4aMSI0keSqdLo6OzGd/mSGDOPl81USehy4GTm2g5QZPjvYQfTpnHFwgxmrIC5daEXruRa0nJrayul6XMelC634oLEJAM9Pz4OYLO2X2nDmw5NoPdeCSxedSZgjRvDse81JmRfcKyKtx3Wc+fAkWk59PODydXZ04tKF1uQ1Yspz4ncEc96l1vNoPdeCs+81Y2C/CYc4nuqr9kttg4sDTZKuzs608cqOpHsDAIjn2Mfc/PEZx/p5rMzIR5lgfmPt2i/dab+WjK6p+F2F+d38YN6da9d+CVib/N3JuhXpfPH2dfekz3kfbWxyQuz91ZFInv2CmIdd+zAZvFKezw/m3fnVu74GINkvBFwpWrDwzqIFyaCthDPXSGF+96t3fS157dcmf8wxmF66NxIZmNEgOfw6kfGiML9bWrL4ztKSxck3JDs2M+Sx+Ll7I5F/B4C1a925vhkyZMiQIUOGDM7y/wH+WhcQp+5EegAAAABJRU5ErkJggg==" alt="회사 로고" style="height:40px;width:auto"></div><span class="bd-docno"></span></div>
+  <div class="bd-body">
+
+    <h1 class="bd-title">AX 파일럿 대상 부서 선정 회의</h1>
+    <p class="bd-subtitle">후보 2개 부서 중 1곳 확정 · 데이터 접근 권한 처리 방안 합의</p>
+
+    <div class="bd-meta">
+      <div class="bd-meta-k">일시</div><div>2026.08.28(금) 14:00 ~ 15:10</div>
+      <div class="bd-meta-k">장소</div><div>본사 3층 회의실 A</div>
+      <div class="bd-meta-k">주관</div><div>AX추진팀</div>
+      <div class="bd-meta-k">작성자</div><div>기획 A</div>
+      <div class="bd-meta-k">참석</div><div>AX추진팀 4명 · 기술본부 2명 · 품질팀 2명</div>
+      <div class="bd-meta-k">불참</div><div>정보보안팀 (서면 의견 제출)</div>
+    </div>
+
+    <h2 class="bd-h1">1. 안건별 논의</h2>
+
+    <h3 class="bd-h2">1.1 파일럿 대상 부서 선정</h3>
+    <ul class="bd-list">
+      <li>기술본부 — 전기·전자 시험 데이터가 정형화돼 있어 착수 부담 적음. 다만 9월 인증 심사와 일정 충돌</li>
+      <li>품질팀 — 성적서 검토 업무가 반복적이라 효과 측정 용이. 담당자 2명 중 1명이 10월 육아휴직 예정</li>
+      <li>양측 모두 참여 의사 있음. <span class="bd-key">일정 리스크가 선정 기준</span>이라는 데 합의</li>
+    </ul>
+
+    <h3 class="bd-h2">1.2 사내 데이터 접근 권한</h3>
+    <ul class="bd-list">
+      <li>8월 12일 신청 후 <span class="bd-key">16일째 회신 없음</span> — 파일럿 후보 과제 3건이 대기 중</li>
+      <li>정보보안팀 서면 의견 — 심의위원회 상정이 필요하며 팀 단위 요청으로는 처리 불가</li>
+      <li>경영진 요청으로 9월 1주 심의에 상정하는 방안으로 정리</li>
+    </ul>
+
+    <div class="bd-callout">
+      9월 2일까지 권한 미승인 시 파일럿 가동이 10월 4주로 재이월 — 연내 확산 계획 수립 불가
+    </div>
+
+  </div>
+
+  <div class="bd-foot"><span><span class="bd-company">주식회사 에이치시티</span> · <span class="bd-doctitle"></span></span><span class="bd-pageno"></span></div>
+</section>
+
+<!-- 2쪽 ─────────────────────────────────────────────────────────────────
+     교체: 결정사항 · 액션아이템 · 다음 회의
+     액션아이템은 회의록의 목적이다. 담당과 기한이 빈 줄을 남기지 않는다.
+     결재가 필요한 문서라면 .bd-sign 서명란을 마지막 쪽에 넣는다.
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="bd-page">
+  <div class="bd-head"><div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><img class="br-logo" src="data:image/png;base64,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" alt="회사 로고" style="height:40px;width:auto"></div><span class="bd-docno"></span></div>
+  <div class="bd-body">
+
+    <h2 class="bd-h1">2. 결정사항</h2>
+    <table class="bd-table">
+      <thead><tr>
+        <th style="width:8%">번호</th><th style="width:52%">내용</th>
+        <th style="width:22%">근거</th><th style="width:18%">확정 여부</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>파일럿 대상은 기술본부·품질팀 중 9월 4일까지 확정</td><td>일정 리스크 비교 필요</td><td><span class="bd-chip bd-chip--warn">보류</span></td></tr>
+        <tr><td class="num">2</td><td>데이터 접근 권한을 9월 1주 정보보안 심의에 상정</td><td>정보보안팀 서면 의견</td><td><span class="bd-chip">확정</span></td></tr>
+        <tr><td class="num">3</td><td>파일럿 효과 측정 지표는 처리 시간·재작업률 2종으로 한정</td><td>측정 부담 최소화</td><td><span class="bd-chip">확정</span></td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="bd-h1">3. 액션아이템</h2>
+    <table class="bd-table bd-table--grid">
+      <thead><tr>
+        <th style="width:44%">할 일</th><th style="width:16%">담당</th>
+        <th style="width:16%">기한</th><th style="width:24%">상태</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>양 부서 9~10월 일정 확인서 취합</td><td>기획 A</td><td class="num">09.02</td><td><span class="bd-chip">진행</span></td></tr>
+        <tr><td>정보보안 심의 상정 요청서 제출</td><td>팀장</td><td class="num">09.01</td><td><span class="bd-chip bd-chip--late">지연 위험</span></td></tr>
+        <tr><td>효과 측정 지표 산식 정의서 작성</td><td>기획 B</td><td class="num">09.08</td><td><span class="bd-chip">대기</span></td></tr>
+        <tr><td>파일럿 대상 부서 최종 확정 보고</td><td>팀장</td><td class="num">09.04</td><td><span class="bd-chip">대기</span></td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="bd-h1">4. 다음 회의</h2>
+    <p class="bd-p">2026.09.04(금) 14:00 · 본사 3층 회의실 A · 안건 — 파일럿 대상 부서 확정, 착수 일정 확정</p>
+
+  </div>
+
+  <div class="bd-foot"><span><span class="bd-company">주식회사 에이치시티</span> · <span class="bd-doctitle"></span></span><span class="bd-pageno"></span></div>
+</section>
+
+</div><!-- /.bd-doc -->
+
+<div id="bd-hud">
+  <span id="bd-pos"></span>
+  <span>A4 · 인쇄하면 그대로</span>
+  <button id="bd-print">인쇄 · PDF</button>
+</div>
+
+<script>
+// 문서 뷰어 — 쪽번호·문서명·문서번호 자동 채움, 축척 맞춤, 인쇄.
+// 문서 여러 종이 이 파일 하나를 공유한다. 단일 파일로 만들 때는 인라인된다.
+//
+// 채우는 자리는 셋뿐이다. 나머지 머리말·꼬리말 내용은 HTML 에 그대로 둔다.
+//   .bd-pageno    n / m
+//   .bd-doctitle  .bd-doc 의 data-doc-title
+//   .bd-docno     .bd-doc 의 data-doc-no
+
+(function () {
+  var doc   = document.querySelector('.bd-doc');
+  var pages = Array.prototype.slice.call(document.querySelectorAll('.bd-page'));
+  if (!doc || !pages.length) return;
+
+  var title = doc.dataset.docTitle || '';
+  var docno = doc.dataset.docNo || '';
+  var total = pages.length;
+
+  pages.forEach(function (pg, n) {
+    pg.querySelectorAll('.bd-doctitle').forEach(function (el) { el.textContent = title; });
+    pg.querySelectorAll('.bd-docno').forEach(function (el) { el.textContent = docno; });
+    pg.querySelectorAll('.bd-pageno').forEach(function (el) {
+      el.textContent = (n + 1) + ' / ' + total;
+    });
+  });
+
+  // 창이 좁으면 지면을 줄여 가로 스크롤이 생기지 않게 한다. 인쇄에는 영향이 없다.
+  function fit() {
+    var w = parseFloat(getComputedStyle(document.documentElement)
+                       .getPropertyValue('--bd-page-w')) || 794;
+    var s = Math.min(1, (window.innerWidth - 48) / w);
+    doc.style.transform = s < 1 ? 'scale(' + s + ')' : '';
+    doc.style.transformOrigin = 'top center';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  var hud = document.getElementById('bd-hud');
+  if (!hud) return;
+  var pos = hud.querySelector('#bd-pos');
+  if (pos) pos.textContent = total + '쪽';
+  var pr = hud.querySelector('#bd-print');
+  if (pr) pr.onclick = function () { window.print(); };
+})();
+
+</script>

@@ -27,10 +27,22 @@ ASSETS = os.path.join(ROOT, "assets")
 # 용도별 덱. 이름으로 고르거나 --deck 에 파일 경로를 직접 준다.
 DECKS = {
     "catalog":  "deck-template.html",         # 레이아웃 12종 카탈로그
-    "internal": "deck-internal-report.html",  # 사내 보고 (주간·월간)
+    "internal": "deck-internal-report.html",  # 사내 보고 (월간)
+    "weekly":   "deck-weekly-report.html",    # 조직 주간보고
+    "ax":       "deck-ax-weekly.html",        # AX 조직 주간보고 (1장 + 부록)
     "sales":    "deck-sales-proposal.html",   # 외부 제안·영업
     "project":  "deck-project-report.html",   # 프로젝트 착수·완료
     "training": "deck-training.html",         # 교육·기술 설명
+    "exec":     "deck-exec-report.html",      # 경영진 보고 (결론 먼저 · 6장)
+    "allhands": "deck-allhands.html",         # 전직원 보고 (타운홀)
+}
+
+# A4 문서. 덱과 달리 가로 슬라이드가 아니라 794x1123 세로 지면이다.
+DOCS = {
+    "minutes": "doc-minutes.html",           # 회의록
+    "policy":  "doc-policy.html",            # 사규·규정 (조·항·호 · 개정 이력 · 결재란)
+    "manual":  "doc-manual.html",            # 매뉴얼·가이드 (목차 · 절차 단계 · 캡처)
+    "notice":  "doc-notice.html",            # 공지 (1쪽 완결)
 }
 
 LOGO_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
@@ -41,6 +53,18 @@ HANGUL = re.compile(r"[가-힣]")
 
 # 슬라이드 우측 상단 마크. 그룹1=배경 밝기, 그룹2=자리표시자 주석(다시 찾기 쉽게 남긴다).
 MARK = re.compile(r'<div class="br-mark" data-on="(dark|light)">(<!--.*?-->)?.*?</div>', re.S)
+
+
+def resolve(name):
+    """덱·문서 이름 또는 파일 경로를 실제 경로로 바꾼다.
+
+    이름 두 벌을 한곳에서 푼다. 다른 스크립트도 이것을 불러 쓰므로
+    새 덱이나 문서가 생겨도 고칠 곳은 위 표 두 개뿐이다."""
+    if name in DECKS:
+        return os.path.join(ASSETS, DECKS[name])
+    if name in DOCS:
+        return os.path.join(ASSETS, DOCS[name])
+    return os.path.abspath(name)
 
 
 def load_brand(path):
@@ -99,7 +123,7 @@ def logo_html(uri, height):
             f'style="height:{height}px;width:auto">')
 
 
-def apply(html, brand, uris):
+def apply(html, brand, uris, title_override=None):
     """자리표시자를 실제 값으로 바꾼다. 바꾼 건수를 함께 돌려준다."""
     n = 0
 
@@ -122,7 +146,8 @@ def apply(html, brand, uris):
     html, n_mark = MARK.subn(one_mark, html)
     n += n_mark
     if not n_mark:
-        sys.exit("오류: br-mark 자리를 하나도 찾지 못했다. 템플릿이 수정된 것 같다.")
+        sys.exit("오류: br-mark 자리를 하나도 찾지 못했다. 템플릿이 수정된 것 같다.\n"
+                 "        슬라이드는 슬라이드마다, A4 문서는 쪽 머리말마다 하나씩 있어야 한다.")
 
     contact = brand["email"] or brand["website"]
     if contact:
@@ -148,9 +173,19 @@ def apply(html, brand, uris):
     sub(re.escape("© 2026 COMPANY NAME · All rights reserved"),
         f'© {brand["copyrightYear"]} {brand["company"]} · All rights reserved')
 
-    # 푸터의 문서명. 쪽번호는 뷰어가 자동으로 매기므로 여기서 건드리지 않는다.
+    # 슬라이드 푸터의 문서명. 쪽번호는 뷰어가 자동으로 매기므로 여기서 건드리지 않는다.
     if brand.get("docTitle"):
         sub(r'data-deck-title="[^"]*"', f'data-deck-title="{brand["docTitle"]}"', 1)
+
+    # A4 문서의 data-doc-title 은 브랜드가 아니라 그 문서 자체의 제목이다
+    # (회의록이면 회의 이름). brand.json 의 docTitle 로 덮으면 문서가 이름을 잃는다.
+    # --title 로 명시했을 때만 바꾼다.
+    if title_override:
+        sub(r'data-doc-title="[^"]*"', f'data-doc-title="{title_override}"', 1)
+
+    # A4 문서 꼬리말의 회사명. 슬라이드에는 없는 자리다.
+    sub(r'<span class="bd-company">COMPANY NAME</span>',
+        f'<span class="bd-company">{brand["company"]}</span>')
 
     # 자리표시자 주석은 일부러 남긴다. 나중에 로고를 바꿀 때 위치를 다시 찾기 쉽다.
     # 남은 자리표시자를 셀 때는 그 주석을 빼고 본문만 본다.
@@ -167,7 +202,8 @@ def main():
                     help="CSS까지 인라인해 파일 하나로 만든다")
     ap.add_argument("--title", help="이 덱의 문서명 (푸터에 들어간다). brand.json의 docTitle보다 우선한다")
     ap.add_argument("--deck", default="catalog",
-                    help="용도별 덱 이름(" + " · ".join(DECKS) + ") 또는 HTML 파일 경로")
+                    help="덱 이름(" + " · ".join(DECKS) + ") · A4 문서 이름("
+                         + " · ".join(DOCS) + ") · 또는 HTML 파일 경로")
     a = ap.parse_args()
 
     brand = load_brand(a.brand)
@@ -184,15 +220,16 @@ def main():
         print("주의: logo(다크면용 흰색 녹아웃)가 없다. 표지·다크 슬라이드는 "
               "워드마크 텍스트로 둔다.", file=sys.stderr)
 
-    deck_path = (os.path.join(ASSETS, DECKS[a.deck]) if a.deck in DECKS
-                 else os.path.abspath(a.deck))
+    deck_path = resolve(a.deck)
     if not os.path.isfile(deck_path):
-        sys.exit(f"오류: 덱을 찾지 못했다 — {deck_path}\n"
-                 f"이름으로 고르려면: {' · '.join(DECKS)}")
-    print(f"덱: {os.path.basename(deck_path)}")
+        sys.exit(f"오류: 덱·문서를 찾지 못했다 — {deck_path}\n"
+                 f"덱 이름: {' · '.join(DECKS)}\n"
+                 f"문서 이름: {' · '.join(DOCS)}")
+    is_doc = os.path.basename(deck_path).startswith("doc-")
+    print(f"{'문서' if is_doc else '덱'}: {os.path.basename(deck_path)}")
 
     html = open(deck_path, encoding="utf-8").read()
-    html, n, left = apply(html, brand, uris)
+    html, n, left = apply(html, brand, uris, a.title)
 
     if a.single_file:
         from build_single_file import inline_assets
@@ -207,7 +244,8 @@ def main():
     print(f"  회사명   {brand['company']}")
     print(f"  마크     다크면 {'로고' if uris['dark'] else '워드마크 ' + brand['wordmark']}"
           f" · 밝은면 {'로고' if uris['light'] else '워드마크 ' + brand['wordmark']}"
-          f" (높이 {brand['logoHeight']}px, 우측 상단)")
+          + (" (쪽 머리말 · 높이 20px 로 blue-doc.css 가 맞춘다)" if is_doc
+             else f" (높이 {brand['logoHeight']}px, 우측 상단)"))
     if brand["email"]:
         print(f"  연락처   {brand['email']}")
     elif brand["website"]:
@@ -216,7 +254,11 @@ def main():
         print("  연락처   없음 — 연락처 줄 삭제")
     print(f"  전화     {brand['phone'] or '없음 — PHONE 행 삭제'}")
     print(f"  저작권   © {brand['copyrightYear']} {brand['company']}")
-    print(f"  문서명   {brand.get('docTitle') or '(미지정 — 템플릿 기본값 유지)'}")
+    if is_doc:
+        # A4 문서의 제목은 문서 자체의 내용이다. --title 로 덮었을 때만 알린다.
+        print(f"  문서명   {a.title}" if a.title else "  문서명   문서에 적힌 것 유지 (브랜드가 건드리지 않는다)")
+    else:
+        print(f"  문서명   {brand.get('docTitle') or '(미지정 — 템플릿 기본값 유지)'}")
     print(f"\n생성: {out}")
     if left:
         print(f"\n주의: 본문에 남은 자리표시자 {len(left)}건 — {', '.join(sorted(set(left)))}")
