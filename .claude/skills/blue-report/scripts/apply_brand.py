@@ -33,11 +33,16 @@ DECKS = {
     "sales":    "deck-sales-proposal.html",   # 외부 제안·영업
     "project":  "deck-project-report.html",   # 프로젝트 착수·완료
     "training": "deck-training.html",         # 교육·기술 설명
+    "exec":     "deck-exec-report.html",      # 경영진 보고 (결론 먼저 · 6장)
+    "allhands": "deck-allhands.html",         # 전직원 보고 (타운홀)
 }
 
 # A4 문서. 덱과 달리 가로 슬라이드가 아니라 794x1123 세로 지면이다.
 DOCS = {
     "minutes": "doc-minutes.html",           # 회의록
+    "policy":  "doc-policy.html",            # 사규·규정 (조·항·호 · 개정 이력 · 결재란)
+    "manual":  "doc-manual.html",            # 매뉴얼·가이드 (목차 · 절차 단계 · 캡처)
+    "notice":  "doc-notice.html",            # 공지 (1쪽 완결)
 }
 
 LOGO_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",

@@ -4,7 +4,7 @@
 #
 #     python3 scripts/verify_repo.py
 #
-# 덱 6종을 check_deck.py 11항목, A4 문서를 check_doc.py 8항목으로 판정하고,
+# 덱 8종을 check_deck.py 11항목, A4 문서 4종을 check_doc.py 9항목으로 판정하고,
 # dist/ 재생성 대조, 한국어 인코딩, 배포 매니페스트를 함께 본다.
 # `실패` 가 하나라도 있으면 이 워크플로가 빨간불이 된다. `주의` 는 통과다.
 
@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   verify:
-    name: 덱 6종 · A4 문서 · PPTX · dist · 인코딩 · 배포 · 버전
+    name: 덱 8종 · A4 문서 4종 · PPTX · dist · 인코딩 · 배포 · 버전
     runs-on: ubuntu-latest
     timeout-minutes: 30
 

@@ -65,6 +65,14 @@
   --br-data-4: #5b9bd5;
   --br-data-5: #86b0da;
 
+  /* 다크면 위 데이터 램프. 밝은면 램프를 뒤집은 것이 아니라 따로 고른 값이다.
+     donut.py --dark 가 이것을 읽는다. 지면(--br-dark) 대비 2:1 이상. */
+  --br-data-dark-1: #dbe9ff;
+  --br-data-dark-2: #a9c8ff;
+  --br-data-dark-3: #6fa8ff;
+  --br-data-dark-4: #3d84ea;
+  --br-data-dark-5: #2a5fc0;
+
   /* 구간이 6개 이상이면 양 끝을 고정한 보간 램프를 쓴다. scripts/palette.py --steps N 으로 생성.
      아래는 7단계. 전 단계 지면 대비 2:1 이상, 인접 색 중복 없음. */
   --br-bar-1: #0b2a6b;  --br-bar-2: #20407e;  --br-bar-3: #345790;  --br-bar-4: #486da2;
@@ -539,14 +547,60 @@
 .bd-chip--warn { background:var(--br-warn-bg);  border-color:var(--br-warn-line);  color:var(--br-warn-text); }
 .bd-chip--late { background:var(--br-alert-bg); border-color:var(--br-coral);      color:var(--br-alert-text); }
 
+/* ── 목차 ────────────────────────────────────────────────────────────────
+   장 제목과 쪽번호 사이를 점선으로 잇는다. 쪽번호는 손으로 적는다 —
+   꼬리말 쪽번호와 달리 목차는 문서를 짠 사람이 아는 값이다. */
+.bd-toc { list-style:none; margin:0 0 12px; padding:0; }
+.bd-toc li { display:flex; align-items:baseline; gap:10px; margin-bottom:9px; }
+.bd-toc li:last-child { margin-bottom:0; }
+.bd-toc .bd-toc-t { font-weight:700; color:var(--br-navy); }
+.bd-toc .bd-toc-d { flex:1; border-bottom:1px dotted var(--br-chip-line); }
+.bd-toc .bd-toc-p { font-family:var(--br-font-num); font-weight:600; color:var(--br-navy); }
+.bd-toc li.bd-toc--sub { padding-left:20px; }
+.bd-toc li.bd-toc--sub .bd-toc-t { font-weight:400; color:var(--br-text-2); }
+
+/* ── 절차 단계 ───────────────────────────────────────────────────────────
+   매뉴얼의 본체다. 번호를 손으로 적지 않는다 — 단계를 끼워 넣어도 다시 매겨진다. */
+.bd-steps { counter-reset:bd-step; margin:0 0 12px; }
+.bd-step { position:relative; padding-left:40px; margin-bottom:14px; counter-increment:bd-step; }
+.bd-step:last-child { margin-bottom:0; }
+.bd-step::before {
+  content:counter(bd-step); position:absolute; left:0; top:0;
+  width:26px; height:26px; border-radius:var(--br-r-pill);
+  background:var(--br-navy); color:var(--br-on-dark);
+  font:700 10pt/26px var(--br-font-num); text-align:center;
+}
+.bd-step .bd-step-t { display:block; font-weight:700; color:var(--br-navy); margin-bottom:4px; }
+
+/* ── 화면 캡처·도해 자리 ─────────────────────────────────────────────────
+   .bd-figure-box 를 실제 <img> 로 갈아 끼운다. 자리를 비워 두지 않는다. */
+.bd-figure { border:1px solid var(--br-card-line); border-radius:var(--br-r-card);
+             background:var(--br-page); margin:0 0 12px; overflow:hidden; }
+.bd-figure .bd-figure-box {
+  height:150px; display:flex; align-items:center; justify-content:center;
+  color:var(--br-text-2); font-size:var(--bd-fs-body);
+}
+.bd-figure img { display:block; width:100%; }
+.bd-figure figcaption {
+  padding:8px 12px; border-top:1px solid var(--br-card-line);
+  font-size:var(--bd-fs-body); color:var(--br-text-2);
+}
+
 /* 주의 상자 — 매뉴얼의 경고, 사규의 단서 조항에 쓴다. */
 .bd-callout {
   border:1px solid var(--br-warn-line); background:var(--br-warn-bg); color:var(--br-warn-text);
   border-radius:var(--br-r-card); padding:12px 16px; margin:0 0 12px;
 }
 
-/* 서명란 — 결재·확인이 필요한 문서에 쓴다. */
-.bd-sign { display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:16px; margin-top:auto; }
+.bd-callout--danger { border-color:var(--br-coral); background:var(--br-alert-bg); color:var(--br-alert-text); }
+.bd-callout--info   { border-color:var(--br-cobalt); background:var(--br-page); color:var(--br-navy); }
+.bd-callout .bd-callout-k { display:block; font-weight:700; margin-bottom:4px; }
+
+/* 서명란 — 결재·확인이 필요한 문서에 쓴다.
+   .bd-body 안이 아니라 .bd-page 직계로 둔다. .bd-page 가 세로 flex 이고
+   .bd-body 가 flex:1 이므로 그것만으로 지면 바닥에 붙는다. 안에 두면
+   본문 흐름을 따라 중간에 떠 버린다. */
+.bd-sign { display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:16px; margin-top:20px; }
 .bd-sign > div { border:1px solid var(--br-card-line); }
 .bd-sign .bd-sign-k {
   padding:7px 10px; background:var(--br-page); border-bottom:1px solid var(--br-card-line);

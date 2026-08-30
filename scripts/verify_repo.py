@@ -40,13 +40,14 @@ SKILL = os.path.join(ROOT, ".claude", "skills", "blue-report")
 SCRIPTS = os.path.join(SKILL, "scripts")
 BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
 
-DECKS = ["catalog", "internal", "weekly", "ax", "sales", "project", "training"]
+DECKS = ["catalog", "internal", "weekly", "ax", "exec", "allhands",
+         "sales", "project", "training"]
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
 EXPECTED_PPTX = len(DECKS) - 1
 
 # A4 문서. 슬라이드가 아니라 지면이 794x1123 이고 검사기가 다르다.
-DOCS = ["doc-minutes.html"]
+DOCS = ["doc-minutes.html", "doc-policy.html", "doc-manual.html", "doc-notice.html"]
 
 # dist/ 의 두 파일은 빌드 명령이 서로 다르다. 아래가 그 정본이다.
 DIST_BUILDS = [

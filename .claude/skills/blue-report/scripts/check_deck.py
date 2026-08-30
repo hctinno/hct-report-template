@@ -167,7 +167,11 @@ def check_render(path, rep, shots=None):
     url = "file://" + os.path.abspath(path)
     with sync_playwright() as p:
         br = p.chromium.launch(executable_path=chrome)
-        pg = br.new_page(viewport={"width": 1920, "height": 1080})
+        # reduced_motion 으로 연다. 등장 애니메이션이 fill:both 라 재생 전에는
+        # 막대가 scaleY(0) 로 접혀 있고, 스크롤로 슬라이드가 활성화되는 순간부터
+        # 재생된다. 그대로 찍으면 아직 안 뜬 막대가 PNG 에서 통째로 사라져
+        # "눈으로 확인한다" 단계가 거짓말을 한다. 애니메이션을 끄면 최종 상태다.
+        pg = br.new_page(viewport={"width": 1920, "height": 1080}, reduced_motion="reduce")
         pg.goto(url + "?all=1")
         pg.wait_for_timeout(1800)          # 폰트 로드 대기
 

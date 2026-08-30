@@ -39,6 +39,8 @@ DECKS = {
     "weekly": "deck-weekly-report.html",
     # AX 덱은 본문 1장 + 부록 구조라 HTML 과 PPTX 의 슬라이드 구성이 다르다.
     # HTML 1장(대시보드)을 PPTX 는 표 1장으로 옮긴다. 그래서 이 대조에서 뺀다.
+    "exec": "deck-exec-report.html",
+    "allhands": "deck-allhands.html",
     "sales": "deck-sales-proposal.html",
     "project": "deck-project-report.html",
     "training": "deck-training.html",
@@ -114,9 +116,17 @@ def html_facts(frame):
     m = re.search(r'data-notes="([^"]*)"', frame)
     f["notes"] = norm(htmllib.unescape(m.group(1))) if m else ""
 
-    # 세로 막대 — 값 열과 이름 열이 따로 있다
-    vals = [text(x) for x in re.findall(r'<div class="br-col-val[^"]*">(.*?)</div>', frame, re.S)]
-    names = [text(x) for x in re.findall(r'<div class="[^"]*br-col-name[^"]*">(.*?)</div>', frame, re.S)]
+    # 막대 — 세로(.br-col-*)와 가로(.br-bar-name/.br-bar-val) 두 배치를 모두 읽는다.
+    # class 뒤에 style 같은 속성이 붙어도 걸리게 한다. 예전 정규식은 class 속성이
+    # 태그의 마지막일 때만 맞아서 막대를 통째로 놓쳤고, 그래서 "HTML 없음" 이 떴다.
+    def cls(name):
+        return re.findall(rf'<div\b[^>]*\bclass="[^"]*\b{name}\b[^"]*"[^>]*>(.*?)</div>', frame, re.S)
+
+    vals = [text(x) for x in cls("br-col-val")]
+    names = [text(x) for x in cls("br-col-name")]
+    if not (vals and names):
+        names = [text(x) for x in cls("br-bar-name")]
+        vals = [text(x) for x in cls("br-bar-val")]
     if vals and names:
         f["bar"] = {"names": names, "values": vals}
 
@@ -182,6 +192,13 @@ def read_content_js():
 def js_facts(slide):
     f = {"notes": norm(slide.get("notes", ""))}
 
+    if slide.get("type") == "compare":
+        # 좌우 두 카드에 가로 막대가 하나씩. HTML 도 좌 → 우 순서로 적혀 있다.
+        # 예전에는 HTML 쪽 가로 막대를 못 읽어 이 슬라이드가 통째로 대조 밖이었다.
+        bars = list(slide.get("left", {}).get("bars", [])) + list(slide.get("right", {}).get("bars", []))
+        if bars:
+            f["bar"] = {"names": [norm(b.get("name", "")) for b in bars],
+                        "values": [norm(str(b.get("val", ""))) for b in bars]}
     if slide.get("type") == "bar":
         f["bar"] = {"names": [norm(x) for x in slide.get("categories", [])],
                     "values": [norm(v) for v in slide.get("values", [])]}
@@ -218,6 +235,11 @@ def compare_deck(key, hd, cd, problems):
 
         if h["notes"] != c["notes"]:
             problems.append(f"{at} 발표자 노트\n      HTML: {h['notes'][:80]}\n      PPTX: {c['notes'][:80]}")
+
+        # 형식 한계로 배치가 다른 슬라이드는 마크만 뺀다. 문서명·장수·노트는 계속 본다.
+        # 덱을 통째로 빼는 것(ax)보다 잃는 범위가 작다.
+        if c_raw.get("syncSkip"):
+            continue
 
         for kind, label in (("bar", "막대"), ("donut", "도넛")):
             if kind in h and kind in c:

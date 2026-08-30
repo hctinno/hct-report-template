@@ -15,13 +15,31 @@
 """
 import argparse
 import math
+import os
+import re
 import sys
 
-# 밝은 지면(#f4f6f8) 위 데이터 램프. 값이 클수록 진한 단조 램프.
-# 5색 모두 지면 대비 2:1 이상이다.
-RAMP_LIGHT = ["#0b2a6b", "#1140d6", "#2f7ff0", "#5b9bd5", "#86b0da"]
-# 다크면(#101827) 위 램프.
-RAMP_DARK = ["#dbe9ff", "#a9c8ff", "#6fa8ff", "#3d84ea", "#2a5fc0"]
+# 램프를 여기 적어 두지 않는다. blue-report.css 의 --br-data-* 를 읽는다.
+# 예전에는 hex 를 박아 두었고, CSS 의 --br-data-2 가 #1140d6 에서 #2f4a9c 로
+# 바뀌었을 때 이 파일만 옛 값에 남아 갈라졌다. pptx/tokens.js 가 CSS 를 파싱하는
+# 것과 같은 이유로 여기서도 CSS 를 읽는다.
+CSS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                   "assets", "blue-report.css")
+
+
+def _ramp(prefix):
+    """--br-<prefix>-1..N 을 번호 순서대로 읽는다. 값이 아니라 var() 이름을 돌려준다.
+
+    슬라이드에 hex 를 직접 적으면 check_deck.py 가 실패시킨다. 생성 결과를 그대로
+    붙여 넣을 수 있어야 하므로 처음부터 토큰 이름으로 낸다."""
+    try:
+        css = open(CSS, encoding="utf-8").read()
+    except OSError:
+        raise SystemExit(f"오류: 토큰 파일을 읽지 못했다 — {CSS}")
+    found = re.findall(rf"--br-{prefix}-(\d+)\s*:", css)
+    if not found:
+        raise SystemExit(f"오류: blue-report.css 에 --br-{prefix}-* 가 없다.")
+    return [f"var(--br-{prefix}-{n})" for n in sorted(set(found), key=int)]
 
 
 def build(values, labels=None, r=78, width=36, gap=1.5, dark=False, delay_start=5):
@@ -33,7 +51,7 @@ def build(values, labels=None, r=78, width=36, gap=1.5, dark=False, delay_start=
         print(f"# 경고: 값의 합이 {total:.1f}%다. 100%가 아니면 비율이 왜곡된다.",
               file=sys.stderr)
 
-    ramp = RAMP_DARK if dark else RAMP_LIGHT
+    ramp = _ramp("data-dark") if dark else _ramp("data")
     if len(values) > len(ramp):
         raise SystemExit(f"오류: 구간 {len(values)}개는 램프 {len(ramp)}색을 넘는다. "
                          "구간을 묶거나 막대 차트로 바꾼다.")
@@ -85,7 +103,8 @@ def build(values, labels=None, r=78, width=36, gap=1.5, dark=False, delay_start=
            + "\n".join(lines) + "\n    </g>\n  </svg>")
     leg = '  <div class="br-legend">\n' + "\n".join(legend) + "\n  </div>"
 
-    print(f"# C = 2*pi*{r} = {C:.1f} · 간격 {gap}도 = {gap_len:.1f}")
+    print(f"# C = 2*pi*{r} = {C:.1f} · 간격 {gap}도 = {gap_len:.1f}"
+          f" · 램프 {'--br-data-dark-*' if dark else '--br-data-*'} ({len(ramp)}색)")
     print(svg)
     print(leg)
     return svg, leg
