@@ -80,7 +80,7 @@ function pngSize(file) {
 
 const BUILDERS = {
   cover: S.cover, agenda: S.agenda, darkSummary: S.darkSummary, table: S.tableSlide,
-  bar: S.barSlide, donut: S.donutSlide, compare: S.compareSlide,
+  bar: S.barSlide, donut: S.donutSlide, compare: S.compareSlide, progress: S.progressSlide,
   roadmap: S.roadmapSlide, timeline: S.timelineSlide, bigStat: S.bigStatSlide,
   closing: S.closingSlide,
 };

@@ -123,7 +123,7 @@
 
 <!-- 04 과제별 진척 (표) ─────────────────────────────────────────────── -->
 <div class="br-frame" data-label="과제별 진척" data-notes="표를 처음부터 읽지 않는다. 지연 2건만 짚고, 나머지는 질문받을 때 답한다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-2)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">02. 과제별 진척</p>
@@ -153,7 +153,7 @@
 
 <!-- 05 팀별 적용 현황 (막대) ────────────────────────────────────────── -->
 <div class="br-frame" data-label="팀별 적용 현황" data-notes="상위 3개 팀과 하위 2개 팀만 말한다. 하위 팀은 모두 교육 미이수 — 다음 장 요청과 연결된다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-4)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">03. 지표 추이</p>
@@ -161,19 +161,19 @@
     <p class="a d2 br-lede">전 팀 평균 <span class="br-key">24.9건</span> 초과 — 기술본부, 품질팀, 영업본부<br>하위 3개 팀은 모두 8월 교육 미이수</p>
     <div style="position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:26px;align-items:end;flex:1;min-height:0;margin-top:34px">
       <div class="br-baseline" style="bottom:278px"><span>전 팀 평균 24.9건</span></div>
-      <div class="br-col"><div class="br-col-val">42</div><div class="by d2 br-bar-v" style="height:470px;background:var(--br-bar-1)"></div></div>
-      <div class="br-col"><div class="br-col-val">35</div><div class="by d3 br-bar-v" style="height:392px;background:var(--br-bar-2)"></div></div>
-      <div class="br-col"><div class="br-col-val">28</div><div class="by d4 br-bar-v" style="height:313px;background:var(--br-bar-3)"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">24</div><div class="by d5 br-bar-v" style="height:269px;background:var(--br-bar-4)"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">19</div><div class="by d6 br-bar-v" style="height:213px;background:var(--br-bar-5)"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">15</div><div class="by d7 br-bar-v" style="height:168px;background:var(--br-bar-6)"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">11</div><div class="by d8 br-bar-v" style="height:123px;background:var(--br-bar-7)"></div></div>
+      <div class="br-col"><div class="br-col-val">42</div><div class="by d2 br-bar-v" style="height:470px;"></div></div>
+      <div class="br-col"><div class="br-col-val">35</div><div class="by d3 br-bar-v" style="height:392px;"></div></div>
+      <div class="br-col"><div class="br-col-val">28</div><div class="by d4 br-bar-v" style="height:313px;"></div></div>
+      <div class="br-col"><div class="br-col-val br-col-val--muted">24</div><div class="by d5 br-bar-v br-bar-v--mute" style="height:269px;"></div></div>
+      <div class="br-col"><div class="br-col-val br-col-val--muted">19</div><div class="by d6 br-bar-v br-bar-v--mute" style="height:213px;"></div></div>
+      <div class="br-col"><div class="br-col-val br-col-val--muted">15</div><div class="by d7 br-bar-v br-bar-v--mute" style="height:168px;"></div></div>
+      <div class="br-col"><div class="br-col-val br-col-val--muted">11</div><div class="by d8 br-bar-v br-bar-v--mute" style="height:123px;"></div></div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:26px;margin-top:22px">
       <div class="f d9 br-col-name">기술본부</div><div class="f d9 br-col-name">품질팀</div>
-      <div class="f d9 br-col-name">영업본부</div><div class="f d10 br-col-name">경영지원</div>
-      <div class="f d10 br-col-name">생산관리</div><div class="f d10 br-col-name">고객지원</div>
-      <div class="f d11 br-col-name">물류팀</div>
+      <div class="f d9 br-col-name">영업본부</div><div class="f d10 br-col-name br-col-name--mute">경영지원</div>
+      <div class="f d10 br-col-name br-col-name--mute">생산관리</div><div class="f d10 br-col-name br-col-name--mute">고객지원</div>
+      <div class="f d11 br-col-name br-col-name--mute">물류팀</div>
     </div>
     <div class="br-footer"></div>
   </section>
@@ -181,38 +181,48 @@
 
 <!-- 06 계획 대비 실적 (비교 2열) ────────────────────────────────────── -->
 <div class="br-frame" data-label="계획 대비 실적" data-notes="네 지표를 하나씩 읽지 말고 격차가 가장 큰 데이터 연결부터 말한다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-4)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">03. 지표 추이</p>
     <h2 class="a br-title br-title--light">계획 대비 실적, <strong>데이터 연결이 병목</strong></h2>
     <p class="a d2 br-lede">4개 지표 중 3개는 90% 이상 — 데이터 연결만 <span class="br-key">36%</span></p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px;flex:1;min-height:0;margin-top:34px">
-      <div class="a d3 br-card" style="display:flex;flex-direction:column">
-        <div class="br-chip" style="align-self:flex-start">8월 계획</div>
-        <div class="br-num" style="font-size:72px;line-height:1;color:var(--br-text-2);margin:24px 0 4px">390</div>
-        <div class="br-body" style="margin-bottom:34px">4개 지표 합계</div>
-        <div style="font:700 26px/1 var(--br-font-kr);color:var(--br-text-2);margin-top:auto;padding-bottom:20px;border-bottom:1px solid var(--br-card-line)">지표별 상세</div>
-        <div class="br-bars-h" style="margin-top:30px;gap:30px 24px">
-          <div class="br-bar-name">적용 업무 수</div><div class="br-bar-track"><div class="bx d5 br-bar-h" style="width:100%;background:var(--br-data-4)"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">180</div>
-          <div class="br-bar-name">교육 이수</div><div class="br-bar-track"><div class="bx d6 br-bar-h" style="width:100%;background:var(--br-data-4)"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">100</div>
-          <div class="br-bar-name">산출물 등록</div><div class="br-bar-track"><div class="bx d7 br-bar-h" style="width:100%;background:var(--br-data-4)"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">60</div>
-          <div class="br-bar-name">데이터 연결</div><div class="br-bar-track"><div class="bx d8 br-bar-h" style="width:100%;background:var(--br-data-4)"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">50</div>
-        </div>
+    <!-- 계획과 실적을 카드 둘로 갈라 두면 같은 지표를 좌우로 오가며 비교해야 한다.
+         한 트랙에 겹친다 — 트랙 전체가 계획, 채워진 부분이 실적이다.
+         네 행이 같은 단위(건)라 하나의 척도로 견줄 수 있다. 색은 값의 크기가 아니라
+         "무엇이 병목인가"로 정한다 — 제목이 데이터 연결을 지목하므로 그 행만 경고색. -->
+    <div class="a d3" style="display:flex;gap:var(--br-sp-6);align-items:flex-end;margin-top:30px">
+      <div>
+        <div style="font:600 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-2);margin-bottom:12px">8월 계획</div>
+        <div class="br-num" style="font-size:64px;line-height:1;color:var(--br-text-3)">390<span class="br-sup">건</span></div>
       </div>
-      <div class="a d4 br-card" style="display:flex;flex-direction:column">
-        <div class="br-chip br-chip--solid" style="align-self:flex-start">8월 실적</div>
-        <div class="br-num" style="font-size:72px;line-height:1;color:var(--br-cobalt);margin:24px 0 4px">332</div>
-        <div class="br-body" style="margin-bottom:34px">달성률 <span class="br-key">85.1%</span></div>
-        <div style="font:700 26px/1 var(--br-font-kr);color:var(--br-text-2);margin-top:auto;padding-bottom:20px;border-bottom:1px solid var(--br-card-line)">지표별 상세</div>
-        <div class="br-bars-h" style="margin-top:30px;gap:30px 24px">
-          <div class="br-bar-name">적용 업무 수</div><div class="br-bar-track"><div class="bx d5 br-bar-h" style="width:96.7%;background:var(--br-data-2)"></div></div><div class="br-bar-val">174</div>
-          <div class="br-bar-name">교육 이수</div><div class="br-bar-track"><div class="bx d6 br-bar-h" style="width:94%;background:var(--br-data-2)"></div></div><div class="br-bar-val">94</div>
-          <div class="br-bar-name">산출물 등록</div><div class="br-bar-track"><div class="bx d7 br-bar-h" style="width:76.7%;background:var(--br-data-2)"></div></div><div class="br-bar-val">46</div>
-          <div class="br-bar-name">데이터 연결</div><div class="br-bar-track"><div class="bx d8 br-bar-h" style="width:36%;background:var(--br-data-2)"></div></div><div class="br-bar-val">18</div>
-        </div>
+      <div>
+        <div style="font:600 var(--br-fs-foot)/1 var(--br-font-kr);color:var(--br-text-2);margin-bottom:12px">8월 실적</div>
+        <div class="br-num" style="font-size:64px;line-height:1;color:var(--br-cobalt)">332<span class="br-sup">건</span></div>
+      </div>
+      <div style="padding-bottom:8px">
+        <div class="br-body">달성률 <span class="br-key">85.1%</span> — 트랙 전체가 계획, 채워진 부분이 실적</div>
       </div>
     </div>
+
+    <div class="br-bars-h" data-bar-scale="row" style="margin-top:52px;gap:38px 30px;grid-template-columns:auto 1fr 190px">
+      <div class="br-bar-name">적용 업무 수</div>
+      <div class="br-bar-track"><div class="bx d5 br-bar-h" style="width:96.7%"></div></div>
+      <div><div class="br-bar-val">174<span class="br-bar-of">/ 180</span></div><div class="br-bar-sub">달성 96.7%</div></div>
+
+      <div class="br-bar-name">교육 이수</div>
+      <div class="br-bar-track"><div class="bx d6 br-bar-h" style="width:94%"></div></div>
+      <div><div class="br-bar-val">94<span class="br-bar-of">/ 100</span></div><div class="br-bar-sub">달성 94.0%</div></div>
+
+      <div class="br-bar-name">산출물 등록</div>
+      <div class="br-bar-track"><div class="bx d7 br-bar-h" style="width:76.7%"></div></div>
+      <div><div class="br-bar-val">46<span class="br-bar-of">/ 60</span></div><div class="br-bar-sub">달성 76.7%</div></div>
+
+      <div class="br-bar-name">데이터 연결</div>
+      <div class="br-bar-track"><div class="bx d8 br-bar-h" style="width:36%;background:var(--br-alert-text)"></div></div>
+      <div><div class="br-bar-val" style="color:var(--br-alert-text)">18<span class="br-bar-of">/ 50</span></div><div class="br-bar-sub br-bar-sub--alert">달성 36.0%</div></div>
+    </div>
+
     <div class="br-footer"></div>
   </section>
 </div>
@@ -245,7 +255,7 @@
 
 <!-- 08 다음 달 일정 (타임라인) ──────────────────────────────────────── -->
 <div class="br-frame" data-label="다음 달 일정" data-notes="9월 일정. 교육과 데이터 연결이 병행이라는 점, 3주 차 대안 전환 분기점을 짚는다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-3)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">04. 다음 달 계획</p>

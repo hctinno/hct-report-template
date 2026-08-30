@@ -274,16 +274,58 @@ def check_render(path, rep, shots=None):
             }
 
             const marks = [];
+            const blank = [];
             sec.querySelectorAll('.br-bar-v,.br-bar-h,.br-dot,circle').forEach(el => {
               const cs = getComputedStyle(el);
               const c = el.tagName === 'circle' ? cs.stroke : cs.backgroundColor;
-              if (c && c !== 'none' && c !== 'rgba(0, 0, 0, 0)') marks.push(c);
+              // 색이 안 잡히면 건너뛰는 것이 아니라 잡아낸다. 예전에는 걸러 내기만 해서
+              // 조각이 통째로 안 그려져도 대비 검사를 그냥 통과했다. var() 하나가
+              // 풀리지 않으면 값 하나가 지면에서 조용히 사라진다.
+              if (!c || c === 'none' || c === 'rgba(0, 0, 0, 0)') {
+                const r = el.getBoundingClientRect();
+                blank.push({ tag: el.tagName.toLowerCase(),
+                             cls: (el.className.baseVal ?? el.className ?? '').toString().slice(0,30) });
+                return;
+              }
+              marks.push(c);
+            });
+
+            // 막대 길이가 값에 비례하는가. 도넛은 원주로 검산하면서 막대는 아무도
+            // 안 봤다. 경영진 보고에서 142%가 제일 짧고 116%가 화면을 다 차지하는
+            // 상태로 12항목을 전부 통과해 나갔다.
+            const num = t => { const m = (t||'').replace(/,/g,'').match(/-?\d+(\.\d+)?/);
+                               return m ? parseFloat(m[0]) : null; };
+            // 단위는 .br-sup 에 들어간다(% · 분 · 배 · 건). 한 그룹에 단위가 섞이면
+            // 공통 척도가 성립하지 않는다 — 184분과 3.8배를 같은 자로 잴 수 없다.
+            // 그때는 행마다 자기 척도를 쓰는 것이 옳으므로 검산 대상에서 뺀다.
+            const unit = el => (el?.querySelector('.br-sup')?.textContent || '').trim();
+            const bars = [];
+            // 세로 — .br-col 안의 값과 막대 높이
+            const cols = [...sec.querySelectorAll('.br-col')].map(c => {
+              const ve = c.querySelector('.br-col-val');
+              const v = num(ve?.textContent);
+              const b = c.querySelector('.br-bar-v');
+              return (v !== null && b)
+                ? { v, u: unit(ve), len: b.getBoundingClientRect().height } : null;
+            }).filter(Boolean);
+            if (cols.length > 1) bars.push({ kind: '세로', items: cols });
+            // 가로 — .br-bars-h 그리드의 값과 채움 폭.
+            // data-bar-scale="row" 를 준 그룹은 행마다 척도가 다르다고 선언한 것이다.
+            sec.querySelectorAll('.br-bars-h').forEach(g => {
+              if (g.dataset.barScale === 'row') return;
+              const ves   = [...g.querySelectorAll('.br-bar-val')];
+              const vals  = ves.map(e => num(e.textContent));
+              const fills = [...g.querySelectorAll('.br-bar-h')].map(e => e.getBoundingClientRect().width);
+              if (vals.length === fills.length && vals.length > 1 && vals.every(v => v !== null))
+                bars.push({ kind: '가로',
+                            items: vals.map((v,i) => ({ v, u: unit(ves[i]), len: fills[i] })) });
             });
             out.push({
               i, label: fr.dataset.label,
               h: sec.scrollHeight, w: sec.scrollWidth,
               ch: sec.clientHeight, cw: sec.clientWidth,
-              bg, small, mark, collide, wm, marks: [...new Set(marks)]
+              bg, small, mark, collide, wm, blank, bars,
+              marks: [...new Set(marks)]
             });
           });
           return out;
@@ -359,6 +401,50 @@ def check_render(path, rep, shots=None):
                 print(f"        {c}")
         else:
             rep.o("데이터 마크 — 전부 배경 대비 2:1 이상")
+
+        # 색이 안 잡힌 마크. var() 하나가 풀리지 않으면 값 하나가 조용히 사라진다.
+        blank_bad = []
+        for s_ in data:
+            for b in s_.get("blank", []):
+                blank_bad.append(f"{s_['i']+1}장 {s_['label']} — {b['tag']}.{b['cls']} 색이 잡히지 않는다")
+        if blank_bad:
+            rep.f(f"안 그려지는 데이터 마크 {len(blank_bad)}건")
+            for t in blank_bad[:10]:
+                print(f"        {t}")
+        else:
+            rep.o("데이터 마크 — 전부 색이 잡힌다")
+
+        # 막대 길이가 값에 비례하는가. 최댓값을 1로 놓고 견준다.
+        # 최소 폭·둥근 끝 때문에 짧은 막대가 조금 길게 잡히므로 3%p 를 허용한다.
+        prop_bad = []
+        mixed = 0
+        for s_ in data:
+            for g in s_.get("bars", []):
+                items = [it for it in g["items"] if it["v"] is not None]
+                if len(items) < 2:
+                    continue
+                # 단위가 섞인 그룹은 공통 척도가 없다. 184분과 3.8배를 같은 자로
+                # 재면 안 된다. 행마다 자기 척도를 쓰는 것이 옳은 조판이다.
+                if len({it.get("u", "") for it in items}) > 1:
+                    mixed += 1
+                    continue
+                vmax = max(abs(it["v"]) for it in items)
+                lmax = max(it["len"] for it in items)
+                if vmax == 0 or lmax == 0:
+                    continue
+                for it in items:
+                    want, got = abs(it["v"]) / vmax, it["len"] / lmax
+                    if abs(want - got) > 0.03:
+                        prop_bad.append(
+                            f"{s_['i']+1}장 {s_['label']} — {g['kind']} 막대 값 {it['v']}"
+                            f"(최댓값의 {want*100:.0f}%)인데 길이는 {got*100:.0f}%")
+        if prop_bad:
+            rep.f(f"막대 길이가 값과 어긋남 {len(prop_bad)}건")
+            for t in prop_bad[:10]:
+                print(f"        {t}")
+        else:
+            note = f" (단위가 섞인 {mixed}개 그룹은 행별 척도라 제외)" if mixed else ""
+            rep.o(f"막대 검산 — 길이가 값에 비례한다{note}")
 
         if mark_missing:
             rep.f(f"브랜드 마크 없는 슬라이드 {len(mark_missing)}장")

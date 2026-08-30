@@ -132,6 +132,26 @@
   --br-cat-dark-5: #1f9ec4;
   --br-cat-dark-6: #df6862;
 
+  /* ---------- 데이터 마크의 주인공과 맥락 ----------
+     참고본에서 가장 크게 갈린 지점이다. 7개 부서를 파랑 농담 7단계로 칠하면
+     "누가 평균을 넘었나"를 색이 말해 주지 않는다. 값의 크기는 막대 길이가 이미
+     말하고 있으므로, 색은 그 위에 "무엇을 보라"를 얹어야 한다.
+
+     주인공은 --br-mark, 나머지는 --br-mark-mute 로 물린다. 몇 개를 주인공으로
+     둘지는 문장이 정한다 — 제목이 "상위 3개"라면 셋만 색을 준다.
+
+     회색도 데이터 마크이므로 2:1 규칙을 지킨다. 밝은면 2.16 · 다크면 2.37:1.
+
+     구간이 셋이면 주인공 · 중간 · 맥락 세 단계를 쓴다. --br-soft-* 를 중간으로
+     쓰면 안 된다 — 밝은면에서 1.67~1.96:1 이라 2:1 에 미달한다. 그렇게 짰다가
+     검사에 걸렸다. 중간 단계는 3.77:1 로 따로 잡았다. */
+  --br-mark:      var(--br-cat-1);
+  --br-mark-mid:  #5b7fb5;
+  --br-mark-mute: #9aabc0;
+  --br-mark-dark:      var(--br-cat-dark-1);
+  --br-mark-mid-dark:  #4a6a9e;
+  --br-mark-mute-dark: #44566f;
+
   /* ---------- 소프트 램프 (다크면 위 데이터 · 밝은 면의 비데이터 요소) ----------
      밝은 지면에서는 대비 1.67~1.96:1로 2:1에 미달한다. 밝은 면의 데이터 마크에 쓰지 않는다. */
   --br-soft-1: #7fb6f5;
@@ -414,26 +434,73 @@
 .br-donut { display:block; }
 .br-donut circle { fill:none; stroke-linecap:butt; }
 
-/* 도넛 범례 — 홀 안이 아니라 도넛 밖에 둔다 */
-.br-legend { display:flex; flex-wrap:wrap; gap:26px; justify-content:center; }
-.br-legend-item { text-align:center; }
-.br-legend-name { font:700 var(--br-fs-foot)/1.3 var(--br-font-kr); color:var(--br-text); }
-.br-legend-val  { font:600 var(--br-fs-foot)/1.3 var(--br-font-num); color:var(--br-cobalt); }
+/* 도넛 홀 — 여기에 결론 수치를 넣는다.
+   예전에는 "좁은 홀에 텍스트를 넣지 않는다"고 적어 두고 비워 뒀는데, 홀 지름이
+   도넛 지름의 63%라 좁지 않다. 비워 두면 지면 한가운데가 그냥 구멍이고,
+   읽는 사람은 어느 조각이 결론인지 범례에서 다시 찾아야 한다. */
+.br-donut-wrap   { position:relative; display:inline-grid; place-items:center; }
+.br-donut-center { position:absolute; text-align:center; pointer-events:none; }
+.br-donut-num    { font:700 var(--br-fs-stat)/1 var(--br-font-num); color:var(--mark);
+                   letter-spacing:var(--br-ls-tight); display:block; }
+.br-donut-cap    { font:600 var(--br-fs-foot)/1.3 var(--br-font-kr); color:var(--br-text-2);
+                   display:block; margin-top:8px; }
+.br-slide--dark .br-donut-cap { color:var(--br-on-dark-2); }
+
+/* 도넛 범례 — 홀에 결론이 들어갔으므로 범례는 구간 목록 노릇만 한다.
+   가운데 정렬 대신 왼쪽으로 세워 이름과 값이 열을 이루게 한다. */
+.br-legend { display:flex; flex-wrap:wrap; gap:14px 30px; justify-content:center; }
+.br-legend-item { display:flex; align-items:baseline; gap:10px; }
+.br-legend-name { font:600 var(--br-fs-foot)/1.3 var(--br-font-kr); color:var(--br-text-2); }
+.br-legend-val  { font:700 var(--br-fs-foot)/1.3 var(--br-font-num); color:var(--br-text); }
+.br-slide--dark .br-legend-name { color:var(--br-on-dark-2); }
+.br-slide--dark .br-legend-val  { color:var(--br-on-dark); }
 .br-dot { display:inline-block; width:12px; height:12px; border-radius:50%; vertical-align:middle; margin-right:8px; }
+
+/* ── 마크 색을 한곳에서 정한다 ────────────────────────────────────────────
+   마크업이 background 를 직접 적지 않는다. 클래스로 "주인공인가 맥락인가"만
+   말하면 색은 여기가 고른다. 다크면 전환도 여기서 한 번에 끝난다. */
+.br-slide { --mark:var(--br-mark); --mark-mid:var(--br-mark-mid); --mark-mute:var(--br-mark-mute); }
+.br-slide--dark, .br-slide--cover { --mark:var(--br-mark-dark); --mark-mid:var(--br-mark-mid-dark); --mark-mute:var(--br-mark-mute-dark); }
+/* 장별 강조색은 마크에 닿지 않는다. 눈썹말과 파트 번호만 바뀐다.
+   장마다 데이터 색이 바뀌면 같은 부서가 2장에서 파랑, 5장에서 주황이 되어
+   색이 뜻을 잃는다. 바뀌는 것은 "지금 어느 장인가"를 말하는 자리뿐이다. */
 
 /* 세로 막대 — 값은 막대 안이 아니라 막대 위 전용 줄에 */
 .br-col      { display:flex; flex-direction:column; justify-content:flex-end; text-align:center; height:100%; }
-.br-col-val  { font:700 var(--br-fs-stat-sm)/1 var(--br-font-num); margin-bottom:12px; color:var(--br-text); }
-.br-col-val--muted { color:var(--br-text-2); }
-.br-bar-v    { transform-origin:bottom; border-radius:8px 8px 0 0; }   /* 넓은 세로 막대만 8px */
-.br-col-name { text-align:center; font:700 var(--br-fs-foot)/1.35 var(--br-font-kr); }
+.br-col-val  { font:700 var(--br-fs-stat-sm)/1 var(--br-font-num); margin-bottom:12px; color:var(--mark); }
+.br-col-val--muted { color:var(--br-text-3); }
+/* 막대 폭에 상한을 둔다. 열 너비를 꽉 채우면 지면이 색으로 덮여 무거워지고,
+   막대끼리 붙어 보여 각각이 하나의 값이라는 것이 흐려진다. */
+.br-bar-v    { width:min(100%,124px); margin-inline:auto;
+               transform-origin:bottom; border-radius:6px 6px 0 0; background:var(--mark); }
+.br-bar-v--mute { background:var(--mark-mute); }
+.br-col-name { text-align:center; font:700 var(--br-fs-foot)/1.35 var(--br-font-kr); color:var(--br-text); }
+/* 맥락 열의 이름은 물린다. 이름은 막대와 다른 그리드에 있어 형제 선택으로는
+   닿지 않으므로 클래스를 직접 붙인다. 색이 말하는 것을 굵기가 한 번 더 말한다. */
+.br-col-name--mute { font-weight:500; color:var(--br-text-3); }
+.br-slide--dark .br-col-name { color:var(--br-on-dark); }
+.br-slide--dark .br-col-name--mute { color:var(--br-on-dark-3); }
 
-/* 가로 막대 — 이름 / 채널 / 값을 각각 다른 그리드 컬럼에 둔다 */
-.br-bars-h    { display:grid; grid-template-columns:auto 1fr 140px; align-items:center; gap:20px 24px; }
-.br-bar-track { height:28px; background:#e6ecf3; border-radius:var(--br-r-bar); overflow:hidden; }
-.br-bar-h     { height:100%; transform-origin:left; border-radius:var(--br-r-bar); }
+/* 가로 막대 — 이름 / 채널 / 값을 각각 다른 그리드 컬럼에 둔다.
+   채널(트랙)을 항상 깔아 둔다. 트랙이 없으면 "얼마나 남았나"가 보이지 않는다. */
+.br-bars-h    { display:grid; grid-template-columns:auto 1fr 140px; align-items:center; gap:22px 26px; }
+.br-bar-track { height:26px; background:#e3e9f0; border-radius:var(--br-r-pill); overflow:hidden; }
+.br-slide--dark .br-bar-track, .br-slide--cover .br-bar-track { background:#1c2740; }
+.br-bar-h     { height:100%; transform-origin:left; border-radius:var(--br-r-pill); background:var(--mark); }
+.br-bar-h--mute { background:var(--mark-mute); }
 .br-bar-name  { font:500 var(--br-fs-body)/1.3 var(--br-font-kr); color:var(--br-text); white-space:nowrap; }
-.br-bar-val   { font:700 var(--br-fs-stat-sm)/1 var(--br-font-num); color:var(--br-navy); text-align:right; }
+.br-slide--dark .br-bar-name, .br-slide--cover .br-bar-name { color:var(--br-on-dark-2); }
+.br-bar-val   { font:700 var(--br-fs-stat-sm)/1 var(--br-font-num); color:var(--mark); text-align:right; }
+.br-bar-val--muted { color:var(--br-text-3); }
+/* 값 아래에 붙는 부가 수치(달성률 · 목표 대비). 값과 같은 칸에 세로로 쌓는다.
+   계획과 실적을 카드 둘로 갈라 놓으면 좌우를 오가며 비교해야 한다. 한 트랙 위에
+   겹쳐 놓고 — 트랙이 계획, 채움이 실적 — 이 줄이 달성률을 말한다. */
+.br-bar-sub   { font:600 var(--br-fs-foot)/1 var(--br-font-num); color:var(--br-text-3);
+                text-align:right; margin-top:7px; }
+/* 분모(계획값). .br-sup 을 쓰면 안 된다 — 그건 단위 자리이고, 내용 대조 검사가
+   "174/ 180" 을 값 하나로 읽는다. 분모는 값이 아니라 견주는 대상이다. */
+.br-bar-of    { font-size:var(--br-fs-foot); font-weight:600; color:var(--br-text-3); margin-left:5px; }
+.br-bar-sub--alert { color:var(--br-alert-text); }
 
 /* 표 — 얼룩무늬를 쓰지 않는다. 얇은 구분선과 머리행 아래선만으로 구분한다 */
 .br-table { width:100%; border-collapse:collapse; font-family:var(--br-font-kr); }
@@ -492,8 +559,16 @@
 .br-tl-dot    { width:14px; height:14px; border-radius:50%; background:var(--br-coral); flex:none; }
 
 /* 기준선 */
-.br-baseline { position:absolute; left:0; right:0; border-top:1px solid var(--br-hairline); }
-.br-baseline > span { position:absolute; right:0; top:-38px; font:500 var(--br-fs-foot)/1 var(--br-font-kr); color:var(--br-text-3); }
+/* 기준선 — 평균·목표선. 파선으로 그어 데이터 마크가 아님을 형태로 말한다.
+   실선 한 줄이면 막대 테두리처럼 읽혀 눈에 걸리지 않는다. */
+.br-baseline { position:absolute; left:0; right:0; border-top:2px dashed var(--br-text-3); }
+.br-baseline > span {
+  position:absolute; right:0; top:-34px; padding:4px 12px;
+  background:var(--br-page); border-radius:var(--br-r-pill);
+  font:600 var(--br-fs-foot)/1 var(--br-font-kr); color:var(--br-text-2);
+}
+.br-slide--dark .br-baseline { border-top-color:var(--br-on-dark-3); }
+.br-slide--dark .br-baseline > span { background:var(--br-dark); color:var(--br-on-dark-2); }
 
 /* ============================================================================
    5. 진입 애니메이션
