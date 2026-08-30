@@ -476,9 +476,33 @@ python3 scripts/install_blue_report_skill.py             # ~/.claude/skills/blue
   <div class="br-watermark" data-on="dark"><span class="br-wordmark">COMPANY NAME</span></div>
 ```
 
-`apply_brand.py` 가 `brand.json` 의 `watermark`(없으면 `logo`)로 바꾼다. **심볼만 잘라 낸
-판을 쓰고 싶으면 `watermark` 에 그 파일을 준다** — 전체 로고를 키우면 국문 병기가 함께
-커져 본문 괘선과 겹칠 수 있다.
+**워터마크에는 심볼만 쓴다.** 전체 로고를 720px 로 키우면 국문 병기까지 함께 커져
+본문 괘선과 겹치고, 읽히지도 않으면서 자리만 차지한다. 우측 상단 마크는 40px 로 작게
+들어가 전체 로고가 그대로 읽히므로 거기서는 자르지 않는다.
+
+심볼 판은 손으로 자르지 않는다. `make_logo_variants.py` 가 만든다.
+
+```bash
+python3 scripts/make_logo_variants.py 로고.png --out-dir brand/hct --name hct-logo
+#   심볼 분리: 58행에서 자름 (국문은 66행부터) → (264, 58)
+#   워터마크용 : brand/hct/hct-logo-symbol-white.png
+```
+
+로고는 대개 `[심볼] / 빈 띠 / [국문 병기]` 구조다. 스크립트가 아래쪽 절반에서 가장 넓은
+빈 가로 띠를 찾아 그 위에서 자른다. 띠를 못 찾으면 심볼만 있는 로고로 보고 넘어가며,
+그때는 `watermark` 를 비워 두면 `logo` 가 그대로 쓰인다.
+
+나온 파일을 `brand.json` 의 `watermark` 에 넣는다.
+
+```json
+"logo":        "hct-logo-white.png",
+"logoOnLight": "hct-logo-color.png",
+"watermark":   "hct-logo-symbol-white.png"
+```
+
+**비율은 마크와 따로 잡는다.** 심볼은 국문이 빠져 마크보다 납작하다(4.55 대 3.07).
+PPTX 생성기가 `logoRatio` 하나로 둘을 그리면 한쪽이 찌그러지므로 `watermarkRatio` 를
+따로 둔다.
 
 세 가지를 지킨다.
 

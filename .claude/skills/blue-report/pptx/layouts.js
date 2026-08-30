@@ -63,7 +63,7 @@ function watermark(slide, brand) {
   const src = brand.watermarkPath;
   if (!src) return;
   const w = X(720);
-  const h = w / (brand.logoRatio || 3.07);
+  const h = w / (brand.watermarkRatio || brand.logoRatio || 3.07);
   slide.addImage({ path: src, x: (SLIDE_W - w) / 2, y: (SLIDE_H - h) / 2, w, h, transparency: 95 });
 }
 
