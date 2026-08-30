@@ -39,10 +39,17 @@ from ensure_deps import need_browser  # noqa: E402
 #   1) 합니다체·해요체 — 존댓말 종결
 STYLE_BAN = re.compile(r"(합니다|습니다|입니다|됩니다|해요|어요|예요|세요)(?=[\s.,·<!?)]|$)")
 #   2) 평서형 종결(~한다 · ~됐다 · ~없다 …) — 슬라이드 본문은 명사형으로 끝낸다.
-#      한글 음절 + '다' 로 끝나는 말을 잡되, 종결어미가 아닌 조사(마다 · 보다)는 뺀다.
+#      '다' 로 끝나는 한글 낱말을 통째로 잡는다. 앞 두 글자만 보면 '가져다' 의 '져다'
+#      처럼 낱말 중간이 걸려 오탐이 난다. 낱말 전체를 잡아야 아래 예외와 맞출 수 있고,
+#      실패 메시지도 '져다' 가 아니라 '가져다' 로 나와 어디를 고칠지 보인다.
 #      발표자 노트(data-notes)는 대상이 아니다. 태그를 걷어낼 때 함께 사라진다.
-#      '니다' 는 위 존댓말 규칙이 이미 잡으므로 여기서 빼서 두 번 세지 않게 한다.
-STYLE_BAN_PLAIN = re.compile(r"(?!마다|보다|니다)[가-힣]다(?=[\s.,·<!?)\]]|$)")
+STYLE_BAN_PLAIN = re.compile(r"[가-힣]+다(?=[\s.,·<!?)\]]|$)")
+#      '다' 로 끝나지만 종결어미가 아닌 것 — 문장이 여기서 끝나지 않으므로 위반이 아니다.
+#        · 조사             때마다 · 이보다
+#        · 존댓말 종결       입니다 — 위 STYLE_BAN 이 이미 잡는다. 두 번 세지 않는다
+#        · 보조적 연결어미   가져다(쓰다) · 데려다 · 내려다 · 들여다 · 올려다
+#                           '-아다/-어다' 는 뒤에 다른 용언이 이어지는 자리다
+STYLE_PLAIN_OK = re.compile(r"(마다|보다|니다|가져다|데려다|내려다|들여다|올려다)$")
 STYLE_EXEMPT = re.compile(r"원문|설문 문항|survey-verbatim")
 
 # 토큰으로 관리하는 색 + 알파 표기. 이 밖의 raw hex는 경고 대상.
@@ -87,7 +94,13 @@ def _blank(html, pattern):
     return re.sub(pattern, lambda m: re.sub(r"[^\n]", " ", m.group()), html, flags=re.S)
 
 
-def check_style(html, rep):
+def style_violations(html):
+    """본문의 존댓말·평서형 종결을 찾아 「N행 '말' — 문맥」 목록으로 돌려준다.
+
+    슬라이드와 A4 문서가 같은 규칙을 쓴다. check_doc.py 가 이 함수를 불러 쓰므로
+    판정은 여기 한 곳에만 둔다 — 정규식만 넘겨주면 예외 처리가 한쪽에만 붙어
+    같은 낱말을 두 스크립트가 다르게 판정하게 된다.
+    """
     raw_lines = html.splitlines()
     # 단일 파일 덱은 CSS·JS 가 본문에 인라인돼 있고 그 주석은 한국어 서술형이다.
     # HTML 주석도 여러 줄이라 줄 단위로는 지워지지 않는다. 먼저 통째로 걷어낸다.
@@ -105,7 +118,14 @@ def check_style(html, rep):
         for m in STYLE_BAN.finditer(text):
             bad.append(f"{n}행 '{m.group(1)}' — {text.strip()[:60]}")
         for m in STYLE_BAN_PLAIN.finditer(text):
+            if STYLE_PLAIN_OK.search(m.group()):
+                continue
             bad.append(f"{n}행 '{m.group()}' 평서형 — {text.strip()[:60]}")
+    return bad
+
+
+def check_style(html, rep):
+    bad = style_violations(html)
     if bad:
         rep.f(f"문체 위반 {len(bad)}건 (개조식·명사형 아님)")
         for b in bad[:8]:
