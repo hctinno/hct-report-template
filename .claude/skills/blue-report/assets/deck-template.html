@@ -308,14 +308,16 @@
       <div class="br-col"><div class="br-col-val br-col-val--muted">64.4<span class="br-sup">%</span></div><div class="by d5 br-bar-v br-bar-v--mute" style="height:377px"></div></div>
       <div class="br-col"><div class="br-col-val br-col-val--muted">60.0<span class="br-sup">%</span></div><div class="by d6 br-bar-v br-bar-v--mute" style="height:351px"></div></div>
       <div class="br-col"><div class="br-col-val br-col-val--muted">56.9<span class="br-sup">%</span></div><div class="by d7 br-bar-v br-bar-v--mute" style="height:333px"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">44.9<span class="br-sup">%</span></div><div class="by d8 br-bar-v br-bar-v--mute" style="height:263px"></div></div>
-
-      <!-- 지시선 주석 — 한 지면에 하나만. 둘이 되면 둘 다 안 읽힌다.
-           점이 가리키는 곳이 시작점이고 --w · --h 가 ㄱ자 꺾임 크기다.
-           주석은 왼쪽으로 끌어낸다 — 오른쪽은 지면 끝이라 글자가 잘린다. -->
-      <div class="br-note br-note--left" style="right:0;bottom:263px;--w:190px;--h:255px">
-        <span class="br-note-dot"></span>
-        <span class="br-note-text">고객지원팀만 45% 미만 — 상담 이력 표준화 미완이 원인</span>
+      <!-- 지시선 주석 — 막대 안에 둔다. 막대 꼭대기를 자동으로 가리키므로 값이
+           바뀌어도 따라간다. 한 지면에 하나만 — 둘이 되면 둘 다 안 읽힌다.
+           지면 오른쪽 끝이라 --left 로 왼쪽으로 연다. -->
+      <div class="br-col"><div class="br-col-val br-col-val--muted">44.9<span class="br-sup">%</span></div>
+        <div class="by d8 br-bar-v br-bar-v--mute" style="height:263px">
+          <div class="br-note br-note--left" style="--w:210px;--h:210px">
+            <span class="br-note-dot"></span>
+            <span class="br-note-text">고객지원팀만 45% 미만 — 상담 이력 표준화 미완</span>
+          </div>
+        </div>
       </div>
     </div>
 

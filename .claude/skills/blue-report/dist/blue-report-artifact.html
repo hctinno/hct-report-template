@@ -610,12 +610,18 @@
    문제 지점만 ㄱ자로 끌어내 한 줄 붙인다. 한 지면에 하나만 — 둘이 되면 둘 다 안 읽힌다.
    참조 덱은 50장 내내 빨강을 이 용도로만 썼다.
    --w · --h 로 꺾임 크기를 정한다. 점이 가리키는 곳이 시작점이다. */
-.br-note      { position:absolute; --w:150px; --h:70px; pointer-events:none; }
-.br-note-dot  { position:absolute; left:-4px; top:-4px; width:8px; height:8px;
+/* 막대 안에 넣으면 막대 꼭대기를 자동으로 가리킨다. 절대 좌표로 붙이면 값이 바뀔
+   때마다 손으로 다시 맞춰야 하고, 실제로 그렇게 붙였다가 점이 빈 공간을 가리켰다.
+   .br-bar-v · .br-bar-h 안의 자식으로 두는 것이 기본 사용법이다. */
+.br-bar-v, .br-bar-h { position:relative; }
+.br-note      { position:absolute; left:50%; top:0; --w:150px; --h:70px; pointer-events:none; }
+.br-note-dot  { position:absolute; left:-5px; top:-5px; width:10px; height:10px;
                 border-radius:50%; background:var(--br-alert-text); }
+/* 선은 헤어라인(1.1:1)으로 그으면 지면에 묻어 안 보인다. 데이터 마크는 아니지만
+   읽히지 않으면 주석이 성립하지 않으므로 --br-text-3(2.79:1)으로 긋는다. */
 .br-note::before {
   content:""; position:absolute; left:0; top:0; width:var(--w); height:var(--h);
-  border-left:1px solid var(--br-hairline); border-bottom:1px solid var(--br-hairline);
+  border-left:1px solid var(--br-text-3); border-bottom:1px solid var(--br-text-3);
   transform:translateY(calc(-1 * var(--h)));
 }
 .br-note-text { position:absolute; left:calc(var(--w) + 12px); top:calc(-1 * var(--h));
@@ -624,8 +630,10 @@
 
 /* 왼쪽으로 여는 변형. 지면 오른쪽 끝을 짚을 때 쓴다 — 오른쪽으로 열면 글자가 잘린다.
    --w 를 음수로 주지 않는다. 음수 폭은 요소를 슬라이드 밖으로 밀어내 크기 검사에 걸린다. */
-.br-note--left::before { left:auto; right:0;
-                         border-left:0; border-right:1px solid var(--br-hairline); }
+/* 왼쪽으로 열 때도 세로획은 글자 쪽(먼 끝)에 있어야 한다. 점 쪽에 두면 선이
+   점과 글자를 잇지 못하고 장식이 된다 — 한 번 그렇게 짰다가 렌더에서 잡았다.
+   경로는 점 → 왼쪽 → 위 → 글자다. */
+.br-note--left::before { left:auto; right:0; }
 .br-note--left .br-note-dot  { left:auto; right:-4px; }
 .br-note--left .br-note-text { left:auto; right:calc(var(--w) + 12px); text-align:right; }
 
@@ -1087,14 +1095,16 @@ body { background:#111; margin:0; }
       <div class="br-col"><div class="br-col-val br-col-val--muted">64.4<span class="br-sup">%</span></div><div class="by d5 br-bar-v br-bar-v--mute" style="height:377px"></div></div>
       <div class="br-col"><div class="br-col-val br-col-val--muted">60.0<span class="br-sup">%</span></div><div class="by d6 br-bar-v br-bar-v--mute" style="height:351px"></div></div>
       <div class="br-col"><div class="br-col-val br-col-val--muted">56.9<span class="br-sup">%</span></div><div class="by d7 br-bar-v br-bar-v--mute" style="height:333px"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">44.9<span class="br-sup">%</span></div><div class="by d8 br-bar-v br-bar-v--mute" style="height:263px"></div></div>
-
-      <!-- 지시선 주석 — 한 지면에 하나만. 둘이 되면 둘 다 안 읽힌다.
-           점이 가리키는 곳이 시작점이고 --w · --h 가 ㄱ자 꺾임 크기다.
-           주석은 왼쪽으로 끌어낸다 — 오른쪽은 지면 끝이라 글자가 잘린다. -->
-      <div class="br-note br-note--left" style="right:0;bottom:263px;--w:190px;--h:255px">
-        <span class="br-note-dot"></span>
-        <span class="br-note-text">고객지원팀만 45% 미만 — 상담 이력 표준화 미완이 원인</span>
+      <!-- 지시선 주석 — 막대 안에 둔다. 막대 꼭대기를 자동으로 가리키므로 값이
+           바뀌어도 따라간다. 한 지면에 하나만 — 둘이 되면 둘 다 안 읽힌다.
+           지면 오른쪽 끝이라 --left 로 왼쪽으로 연다. -->
+      <div class="br-col"><div class="br-col-val br-col-val--muted">44.9<span class="br-sup">%</span></div>
+        <div class="by d8 br-bar-v br-bar-v--mute" style="height:263px">
+          <div class="br-note br-note--left" style="--w:210px;--h:210px">
+            <span class="br-note-dot"></span>
+            <span class="br-note-text">고객지원팀만 45% 미만 — 상담 이력 표준화 미완</span>
+          </div>
+        </div>
       </div>
     </div>
 
