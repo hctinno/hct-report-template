@@ -691,6 +691,10 @@
 /* ── 문서 타입 척도 ────────────────────────────────────────────────────────
    pt 로 적는다. 인쇄가 기준이기 때문이다. 1pt = 1.333px @96dpi */
 :root {
+  /* A4 는 794px 지면이다. 슬라이드용 --br-r-card(28px)를 그대로 쓰면
+     비율상 두 배 넘게 둥글어 인쇄물이 장난스러워 보인다. */
+  --bd-r-box: 10px;
+
   --bd-fs-title:   24pt;   /* 문서 제목 */
   --bd-fs-h1:      15pt;   /* 장 제목 */
   --bd-fs-h2:      12pt;   /* 절 제목 */
@@ -832,7 +836,7 @@
 
 /* ── 화면 캡처·도해 자리 ─────────────────────────────────────────────────
    .bd-figure-box 를 실제 <img> 로 갈아 끼운다. 자리를 비워 두지 않는다. */
-.bd-figure { border:1px solid var(--br-card-line); border-radius:var(--br-r-card);
+.bd-figure { border:1px solid var(--br-card-line); border-radius:var(--bd-r-box);
              background:var(--br-page); margin:0 0 12px; overflow:hidden; }
 .bd-figure .bd-figure-box {
   height:150px; display:flex; align-items:center; justify-content:center;
@@ -847,7 +851,7 @@
 /* 주의 상자 — 매뉴얼의 경고, 사규의 단서 조항에 쓴다. */
 .bd-callout {
   border:1px solid var(--br-warn-line); background:var(--br-warn-bg); color:var(--br-warn-text);
-  border-radius:var(--br-r-card); padding:12px 16px; margin:0 0 12px;
+  border-radius:var(--bd-r-box); padding:12px 16px; margin:0 0 12px;
 }
 
 .bd-callout--danger { border-color:var(--br-coral); background:var(--br-alert-bg); color:var(--br-alert-text); }
