@@ -6,6 +6,7 @@
     python3 scripts/verify_repo.py --only decks
 
 검사 항목
+  docs      A4 문서를 check_doc.py 8항목으로 판정한다.
   decks     덱 6종을 apply_brand.py 로 만들고 check_deck.py 로 판정한다.
             11항목 중 `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
@@ -43,6 +44,9 @@ DECKS = ["catalog", "internal", "weekly", "ax", "sales", "project", "training"]
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
 EXPECTED_PPTX = len(DECKS) - 1
+
+# A4 문서. 슬라이드가 아니라 지면이 794x1123 이고 검사기가 다르다.
+DOCS = ["doc-minutes.html"]
 
 # dist/ 의 두 파일은 빌드 명령이 서로 다르다. 아래가 그 정본이다.
 DIST_BUILDS = [
@@ -130,6 +134,37 @@ def check_decks(log, out_dir, shots_dir):
             log.warn(f"덱 {name}", detail)
         else:
             log.ok(f"덱 {name}", detail)
+
+
+# ------------------------------------------------------------------ A4 문서
+
+def check_docs(log):
+    """문서는 브랜드 적용 대상이 아니다. assets 의 원본을 그대로 본다.
+
+    blue-doc.css 가 blue-report.css 의 토큰을 전제하므로 같은 폴더에서 열어야
+    한다. assets/ 안에 둘 다 있어 경로를 옮기지 않는다."""
+    assets = os.path.join(SKILL, "assets")
+    for name in DOCS:
+        path = os.path.join(assets, name)
+        if not os.path.exists(path):
+            log.fail(f"문서 {name}", "파일이 없다")
+            continue
+        r = run([sys.executable, os.path.join(SCRIPTS, "check_doc.py"), path])
+        print(r.stdout, end="")
+        if r.stderr.strip():
+            print(r.stderr, end="", file=sys.stderr)
+        m = RESULT_RE.search(r.stdout)
+        if not m:
+            log.fail(f"문서 {name}", "check_doc.py 가 결과 줄을 내지 않았다")
+            continue
+        ok, warn, fail = (int(x) for x in m.groups())
+        detail = f"통과 {ok} · 주의 {warn} · 실패 {fail}"
+        if fail or r.returncode != 0:
+            log.fail(f"문서 {name}", detail)
+        elif warn:
+            log.warn(f"문서 {name}", detail)
+        else:
+            log.ok(f"문서 {name}", detail)
 
 
 # ---------------------------------------------------------------------- PPTX
@@ -413,12 +448,12 @@ def check_version(log):
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
     ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
-    ap.add_argument("--only", choices=["decks", "pptx", "dist", "encoding", "plugin", "sync", "version"],
+    ap.add_argument("--only", choices=["decks", "docs", "pptx", "dist", "encoding", "plugin", "sync", "version"],
                     action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
     ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
     a = ap.parse_args()
 
-    only = set(a.only or ["decks", "pptx", "dist", "encoding", "plugin", "sync", "version"])
+    only = set(a.only or ["decks", "docs", "pptx", "dist", "encoding", "plugin", "sync", "version"])
     log = Log()
 
     if a.shots:
@@ -430,6 +465,9 @@ def main():
         if "decks" in only:
             print("── 덱 6종 ──")
             check_decks(log, tmp, a.shots)
+        if "docs" in only:
+            print("\n── A4 문서 ──")
+            check_docs(log)
         if "pptx" in only:
             print("\n── PPTX ──")
             check_pptx(log, tmp)

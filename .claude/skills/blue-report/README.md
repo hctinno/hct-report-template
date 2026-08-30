@@ -16,6 +16,10 @@ blue-report/
 ├─ README.md                   이 문서 — 다른 AI 도구에 붙여넣는 자기완결 사양서
 ├─ assets/
 │  ├─ blue-report.css          토큰(색·타입·간격) + 파운데이션 + 애니메이션
+│  ├─ blue-doc.css             A4 문서 파운데이션 (토큰은 blue-report.css 를 씀)
+│  ├─ doc-viewer.css           문서 뷰어 껍데기
+│  ├─ doc-viewer.js            쪽번호 자동 · 축척 · 인쇄
+│  ├─ doc-minutes.html         회의록 2쪽
 │  ├─ deck-viewer.css          뷰어 껍데기 (디자인 시스템 아님)
 │  ├─ deck-viewer.js           넘김 · 축척 · 쪽번호 자동 · 발표자 노트
 │  ├─ deck-template.html       레이아웃 12종 카탈로그
@@ -38,6 +42,7 @@ blue-report/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
    ├─ check_deck.py            덱 자동 점검 11항목 + 슬라이드별 PNG
+   ├─ check_doc.py             A4 문서 점검 8항목 + 쪽별 PNG
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
    ├─ apply_brand.py           회사 정보·로고를 덱에 일괄 적용
    ├─ to_pdf.py                덱 HTML → 발표용 PDF (슬라이드 1장 = 1페이지)
@@ -152,6 +157,47 @@ python3 scripts/check_content_sync.py --deck internal
 
 단위(`%` · `h`)와 표의 `colspan` 은 형식 차이라 대조에서 제외한다. 단위는 PPTX 생성기가
 붙이고, HTML 은 지면에 직접 찍기 때문이다.
+
+### A4 문서판 — 슬라이드가 아닌 문서
+
+회의록 · 사규 · 매뉴얼 · 공지는 발표 슬라이드가 아니라 **A4 세로 문서**다.
+지면 794×1123px(210×297mm @96dpi)이고 인쇄하면 그대로 A4 한 장이다.
+
+```bash
+cp assets/doc-minutes.html ./회의록.html
+cp assets/blue-report.css assets/blue-doc.css assets/doc-viewer.css assets/doc-viewer.js ./
+python3 scripts/check_doc.py ./회의록.html --shots out/
+```
+
+**색·타입·간격 토큰은 슬라이드와 같은 것을 쓴다.** `blue-doc.css` 는 토큰을
+선언하지 않고 `blue-report.css` 를 전제한다. 두 파일을 함께 불러야 한다.
+그래서 슬라이드와 문서의 색이 갈라질 수 없다.
+
+| 항목 | 슬라이드 | A4 문서 |
+|---|---|---|
+| 지면 | 1920×1080 가로 | 794×1123 세로 |
+| 글자 하한 | 24px (멀리서 봄) | 10.5pt = 14px (손에 듦) |
+| 본문 대비 | 데이터 마크 2:1 | 본문 4.5:1 (인쇄물) |
+| 애니메이션 | 있음 (끌 수 있음) | 없음 |
+| 머리말·꼬리말 | 꼬리말만 | 쪽마다 둘 다 |
+| 검사기 | `check_deck.py` 11항목 | `check_doc.py` 8항목 |
+
+파일 구성도 덱과 같은 방식으로 나뉜다.
+
+| 파일 | 역할 |
+|---|---|
+| `blue-doc.css` | 문서 파운데이션. raw hex 0, `--br-*` 토큰만 참조 |
+| `doc-viewer.css` · `doc-viewer.js` | 껍데기 — 회색 바탕 · 조작 막대 · 인쇄 · 쪽번호 자동 |
+| `doc-minutes.html` | 회의록 2쪽 |
+
+**쪽번호와 문서명은 뷰어가 채운다.** `.bd-foot` 을 비워 두고 숫자를 적지 않는다.
+쪽을 넣거나 빼도 번호가 어긋나지 않으며, 손으로 적으면 `check_doc.py` 가 실패시킨다.
+문서명은 `.bd-doc` 의 `data-doc-title`, 문서번호는 `data-doc-no` 한 곳에서 읽는다.
+
+**한 쪽을 넘치면 쪽을 나눈다.** `.bd-page` 가 `overflow:hidden` 이라 넘친 내용은
+잘려 보이지 않고 꼬리말과 겹친다. `check_doc.py` 6번 항목이 이것을 잡는다.
+
+---
 
 ### PDF로 내보내기
 
