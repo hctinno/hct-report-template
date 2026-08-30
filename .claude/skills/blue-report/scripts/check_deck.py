@@ -53,6 +53,9 @@ STYLE_BAN_PLAIN = re.compile(r"[가-힣]+다(?=[\s.,·<!?)\]]|$)")
 #                           '복잡도·비용 과다' 처럼 명사구로 끝나는 개조식 표현이 정상이다
 STYLE_PLAIN_OK = re.compile(r"(마다|보다|니다|가져다|데려다|내려다|들여다|올려다|과다)$")
 STYLE_EXEMPT = re.compile(r"원문|설문 문항|survey-verbatim")
+# 낱말 가운데를 끊는 인라인 강조. 태그를 공백으로 바꾸면 종결어미를 놓친다 —
+# '<strong>구조</strong>다' 가 '구조 다' 가 되면 '구조다' 를 못 본다. 이것만 공백 없이 뗀다.
+INLINE_TAG = re.compile(r"</?(?:strong|em|b|i|u|span|a|mark|small|sup|sub)\b[^>]*>", re.I)
 
 # 토큰으로 관리하는 색 + 알파 표기. 이 밖의 raw hex는 경고 대상.
 ALLOWED_HEX = {
@@ -116,7 +119,8 @@ def style_violations(html):
         if STYLE_EXEMPT.search(raw):
             continue
         # 태그를 걷어낸 본문 텍스트만 본다. data-notes 는 태그 안이라 함께 사라진다.
-        text = re.sub(r"<[^>]+>", " ", line)
+        # 인라인 강조는 먼저 공백 없이 뗀다 — 낱말 한가운데를 끊고 있기 때문이다.
+        text = re.sub(r"<[^>]+>", " ", INLINE_TAG.sub("", line))
         for m in STYLE_BAN.finditer(text):
             bad.append(f"{n}행 '{m.group(1)}' — {text.strip()[:60]}")
         for m in STYLE_BAN_PLAIN.finditer(text):
