@@ -7,7 +7,8 @@
 
   <이름>-color.png          흰 배경을 투명으로 뺀 원색판 — 밝은 지면용
   <이름>-white.png          형태만 남긴 흰색 녹아웃 — 다크면용
-  <이름>-symbol-white.png   국문 병기를 떼고 심볼만 남긴 녹아웃 — 배경 워터마크용
+  <이름>-symbol-white.png   국문 병기를 떼고 심볼만 남긴 녹아웃 — 다크면 워터마크용
+  <이름>-symbol-color.png   같은 심볼의 원색판 — 밝은 지면 워터마크용
 
 배경 워터마크는 심볼만 쓴다. 전체 로고를 720px 로 키우면 국문 병기까지 함께 커져
 본문 괘선과 겹치고, 읽히지도 않으면서 자리만 차지한다. 우측 상단 마크는 작게 들어가
@@ -130,15 +131,18 @@ def build(path, out_dir, name):
     p_white = os.path.join(out_dir, f"{name}-white.png")
     color.save(p_color); white.save(p_white)
 
-    # 배경 워터마크용 — 국문 병기를 뗀 심볼만
+    # 배경 워터마크용 — 국문 병기를 뗀 심볼만. 다크면·밝은면 두 벌을 낸다.
     sym = split_symbol(white)
     if sym:
         sym_img, (cut, resume) = sym
         p_sym = os.path.join(out_dir, f"{name}-symbol-white.png")
         sym_img.save(p_sym)
+        # 같은 자리에서 원색판도 자른다. 자르는 위치는 알파 기준으로 이미 정해졌다.
+        p_sym_color = os.path.join(out_dir, f"{name}-symbol-color.png")
+        color.crop((0, 0, cw, cut)).save(p_sym_color)
         print(f"심볼 분리: {cut}행에서 자름 (국문은 {resume}행부터) → {sym_img.size}")
     else:
-        p_sym = None
+        p_sym = p_sym_color = None
         print("심볼 분리: 빈 띠를 못 찾았다. 심볼만 있는 로고로 보고 넘어간다.")
 
     ink = sum(1 for y in range(ch) for x in range(cw) if dw[x, y][3] > 0)
@@ -150,7 +154,8 @@ def build(path, out_dir, name):
     print(f"\n밝은 지면용: {p_color}")
     print(f"다크면용   : {p_white}")
     if p_sym:
-        print(f"워터마크용 : {p_sym}   (brand.json 의 watermark 에 넣는다)")
+        print(f"워터마크용 : {p_sym}   (brand.json 의 watermark)")
+        print(f"           : {p_sym_color}   (brand.json 의 watermarkOnLight)")
     if ch < 120:
         print(f"\n주의: 원본 높이가 {ch}px다. 1920x1080 캔버스에서 64px로 쓰면 충분하지만, "
               f"인쇄나 확대에는 부족하다. 가능하면 SVG 원본을 받는다.", file=sys.stderr)

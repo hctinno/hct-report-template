@@ -151,28 +151,30 @@
    z-index:-1 로 본문 뒤에 깔린다 — .br-slide 가 position:relative 라 슬라이드
    안쪽에 갇히고 배경보다는 위에 온다.
    불투명도가 낮아 원본 해상도를 넘겨 키워도 흐림이 드러나지 않는다.
-   밝은 지면에는 쓰지 않는다 — 옅은 회색 마크가 본문 대비를 갉아먹는다.
-   표지(--br-cover)에도 쓰지 않는다 — 표지는 본문이 왼쪽에 몰려 있어 가운데
-   마크와 제목이 겹치고, 우측 상단 마크와 안내선으로 이미 브랜드가 선다. */
+   표지(--br-cover)에는 쓰지 않는다 — 본문이 왼쪽에 몰려 있어 가운데 마크와
+   제목이 겹치고, 우측 상단 마크와 안내선으로 이미 브랜드가 선다.
+   그 밖의 모든 지면에 깔린다. 밝은 지면은 잉크가 진해 3%로 낮춘다. */
 /* isolation 이 없으면 z-index:-1 이 슬라이드 배경 뒤로 내려가 아예 안 보인다.
    .br-slide 는 position:relative 지만 z-index 가 없어 쌓임 맥락을 만들지 않는다. */
-.br-slide--dark { isolation:isolate; }
-.br-slide--dark .br-watermark {
+.br-slide { isolation:isolate; }
+.br-watermark {
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  z-index:-1; pointer-events:none; opacity:.05;
+  z-index:-1; pointer-events:none;
   width:720px; text-align:center;
 }
-.br-slide--dark .br-watermark img {
-  display:block; width:100%; height:auto;
-}
+.br-watermark img { display:block; width:100%; height:auto; }
+/* 다크면은 흰 잉크가 옅게 번지므로 5%. 밝은 지면은 진한 잉크라 같은 값이면
+   너무 세게 보이고 본문 대비를 갉아먹는다. 3%로 낮춘다. */
+.br-slide .br-watermark { opacity:.03; }
+.br-slide--dark .br-watermark { opacity:.05; }
 /* 브랜드를 넣기 전 템플릿 상태. 워드마크 글자는 벡터라 아무리 키워도 깨지지 않는다. */
 .br-watermark .br-wordmark {
   font:700 128px/1 var(--br-font-label) !important;
   letter-spacing:var(--br-ls-mark); color:var(--br-on-dark) !important;
 }
-/* 밝은 지면에서는 아예 그리지 않는다. */
-.br-slide .br-watermark { display:none; }
-.br-slide--dark .br-watermark { display:block; }
+/* 표지(첫 장)에는 마크업 자체를 넣지 않는다. 마무리 장은 --cover 조판이지만
+   표지가 아니므로 깔린다. --cover 는 지면이 짙으므로 다크면과 같은 5%다. */
+.br-slide--cover .br-watermark { opacity:.05; }
 
 /* 표지·간지의 세로 안내선. 장식색이 아니라 흰색 알파라서 배경 규칙에 걸리지 않는다. */
 .br-rule { position:absolute; top:0; bottom:0; border-left:1px solid rgba(244,246,248,.14); }

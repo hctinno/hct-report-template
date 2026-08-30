@@ -54,7 +54,7 @@ HANGUL = re.compile(r"[가-힣]")
 # 슬라이드 우측 상단 마크. 그룹1=배경 밝기, 그룹2=자리표시자 주석(다시 찾기 쉽게 남긴다).
 MARK = re.compile(r'<div class="br-mark" data-on="(dark|light)">(<!--.*?-->)?.*?</div>', re.S)
 # 다크면 가운데 배경 워터마크. 마크와 자리표시자 구조가 같지만 크기·색 처리가 달라 따로 잡는다.
-WATERMARK = re.compile(r'<div class="br-watermark" data-on="dark">(<!--.*?-->)?.*?</div>', re.S)
+WATERMARK = re.compile(r'<div class="br-watermark" data-on="(dark|light)">(<!--.*?-->)?.*?</div>', re.S)
 
 
 def resolve(name):
@@ -80,7 +80,8 @@ def load_brand(path):
     b.setdefault("website", "")
     b.setdefault("phone", "")
     b.setdefault("logoOnLight", "")
-    b.setdefault("watermark", "")   # 배경 워터마크용. 비우면 logo 를 키워 쓴다
+    b.setdefault("watermark", "")          # 다크면 배경 워터마크. 비우면 logo 를 키워 쓴다
+    b.setdefault("watermarkOnLight", "")   # 밝은 지면 배경 워터마크. 비우면 logoOnLight
     b.setdefault("logoHeight", 40)
     return b
 
@@ -147,12 +148,16 @@ def apply(html, brand, uris, title_override=None):
         return f'<div class="br-mark" data-on="{on}">{m.group(2)}{inner}</div>'
 
     def one_watermark(m):
-        # 워터마크는 다크면 전용이라 항상 흰색 녹아웃 로고를 쓴다.
-        # brand.json 에 watermark 를 따로 주면 그것을 먼저 쓴다 — 심볼만 잘라 낸
-        # 판을 넣고 싶을 때를 위한 자리다. 없으면 logo 를 그대로 키워 쓴다.
-        u = uris.get("watermark") or uris["dark"]
+        # 마크와 같이 배경 밝기에 따라 잉크를 고른다. 다크면은 흰색 녹아웃,
+        # 밝은 지면은 원색이다. brand.json 에 심볼만 잘라 낸 판을 주면 그것을 먼저
+        # 쓰고, 없으면 마크용 로고를 그대로 키워 쓴다.
+        on = m.group(1)
+        if on == "dark":
+            u = uris.get("watermark") or uris["dark"]
+        else:
+            u = uris.get("watermarkOnLight") or uris["light"]
         inner = f'<img src="{u}" alt="">' if u else wordmark_html(brand, 128)
-        return f'<div class="br-watermark" data-on="dark">{m.group(1) or ""}{inner}</div>'
+        return f'<div class="br-watermark" data-on="{on}">{m.group(2) or ""}{inner}</div>'
 
     html, n_wm = WATERMARK.subn(one_watermark, html)
     n += n_wm
@@ -226,7 +231,8 @@ def main():
     # 다크면용(흰색 녹아웃)과 밝은면용(원색) 두 벌을 읽는다.
     uris = {"dark":  logo_data_uri(brand, a.brand, "logo"),
             "light": logo_data_uri(brand, a.brand, "logoOnLight"),
-            "watermark": logo_data_uri(brand, a.brand, "watermark")}
+            "watermark": logo_data_uri(brand, a.brand, "watermark"),
+            "watermarkOnLight": logo_data_uri(brand, a.brand, "watermarkOnLight")}
     if uris["dark"] and not uris["light"]:
         print("주의: logoOnLight 가 없다. 흰색 로고를 밝은 지면에 얹으면 보이지 않으므로 "
               "밝은 슬라이드는 워드마크 텍스트로 둔다. brand.json 에 원색 로고 경로를 넣어라.",

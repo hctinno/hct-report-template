@@ -10,6 +10,7 @@ const W = 1920, H = 1080;
 function cover(pres, s, brand) {
   const sl = pres.addSlide();
   sl.background = { color: C.cover };
+  // 표지에는 워터마크를 깔지 않는다. 본문이 왼쪽에 몰려 있어 가운데 마크와 제목이 겹친다.
   txt(sl, s.eyebrow, { x: X(COVER_PAD.side), y: X(112), w: X(1200), h: X(40),
     fontFace: F.kr, fontSize: pt(30), color: C.soft[1], valign: 'middle' });
   txt(sl, s.titleLight, { x: X(COVER_PAD.side), y: X(168), w: X(1400), h: X(132),
@@ -42,6 +43,7 @@ function cover(pres, s, brand) {
 function agenda(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
+  L.watermark(sl, brand, false);   // 본문보다 먼저 그려야 뒤에 깔린다
   txt(sl, s.heading || 'Contents', { x: X(PAD.side), y: X(PAD.top), w: X(420), h: X(110),
     fontFace: F.label, fontSize: pt(92), bold: true, color: C.cobalt, valign: 'top' });
 
@@ -79,7 +81,7 @@ function agenda(pres, s, brand, page) {
 function darkSummary(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.dark };
-  L.watermark(sl, brand);   // 본문보다 먼저 그려야 뒤에 깔린다
+  L.watermark(sl, brand, true);
   const y0 = header(sl, { eyebrow: s.eyebrow, title: s.title, dark: true }) + 40;
 
   const cols = 2, gapX = 34, gapY = 30;
@@ -115,6 +117,7 @@ function darkSummary(pres, s, brand, page) {
 function tableSlide(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
+  L.watermark(sl, brand, false);   // 본문보다 먼저 그려야 뒤에 깔린다
   let y = header(sl, { eyebrow: s.eyebrow, title: s.title, titleBold: s.titleBold });
   y = lede(sl, s.lede, { y: y + 22 }) + 34;
 
@@ -163,6 +166,7 @@ function statusColor(kind) {
 function barSlide(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
+  L.watermark(sl, brand, false);   // 본문보다 먼저 그려야 뒤에 깔린다
   let y = header(sl, { eyebrow: s.eyebrow, title: s.title, titleBold: s.titleBold });
   y = lede(sl, s.lede, { y: y + 22 }) + 34;
 
@@ -193,6 +197,7 @@ function barSlide(pres, s, brand, page) {
 function donutSlide(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
+  L.watermark(sl, brand, false);   // 본문보다 먼저 그려야 뒤에 깔린다
   let y = header(sl, { eyebrow: s.eyebrow, title: s.title, titleBold: s.titleBold });
   y = lede(sl, s.lede, { y: y + 22 }) + 34;
 
@@ -256,6 +261,7 @@ function donutSlide(pres, s, brand, page) {
 function compareSlide(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
+  L.watermark(sl, brand, false);   // 본문보다 먼저 그려야 뒤에 깔린다
   let y = header(sl, { eyebrow: s.eyebrow, title: s.title, titleBold: s.titleBold });
   y = lede(sl, s.lede, { y: y + 22 }) + 34;
 
@@ -325,6 +331,7 @@ function compareSlide(pres, s, brand, page) {
 function roadmapSlide(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
+  L.watermark(sl, brand, false);   // 본문보다 먼저 그려야 뒤에 깔린다
   const y = header(sl, { eyebrow: s.eyebrow, title: s.title, titleBold: s.titleBold }) + 52;
   const colH = H - y - PAD.bottom - 50;
   const gap = 34, cw = (CW - gap * 2) / 3;
@@ -374,6 +381,7 @@ function roadmapSlide(pres, s, brand, page) {
 function timelineSlide(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
+  L.watermark(sl, brand, false);   // 본문보다 먼저 그려야 뒤에 깔린다
   let y = header(sl, { eyebrow: s.eyebrow, title: s.title, titleBold: s.titleBold });
   y = lede(sl, s.lede, { y: y + 22 }) + 40;
 
@@ -427,6 +435,7 @@ function timelineSlide(pres, s, brand, page) {
 function bigStatSlide(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
+  L.watermark(sl, brand, false);   // 본문보다 먼저 그려야 뒤에 깔린다
   txt(sl, s.title, { x: X(PAD.side), y: X(96), w: X(CW), h: X(80),
     fontFace: F.kr, fontSize: pt(62), bold: true, color: C.text, valign: 'middle', charSpacing: -1 });
 
@@ -467,6 +476,7 @@ function bigStatSlide(pres, s, brand, page) {
 function closingSlide(pres, s, brand) {
   const sl = pres.addSlide();
   sl.background = { color: C.cover };
+  L.watermark(sl, brand, true);
   sl.addText([
     { text: s.titleSoft, options: { color: C.soft[1], breakLine: true } },
     { text: s.titleMain, options: { color: C.onDark } },

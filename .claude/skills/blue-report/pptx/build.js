@@ -59,6 +59,9 @@ function loadBrand(p) {
   // 배경 워터마크. 따로 주지 않으면 다크면용 로고를 그대로 키워 쓴다 (HTML 과 같은 규칙).
   b.watermarkPath = (wm && wm.path) || b.logoPath;
   b.watermarkRatio = (wm && wm.ratio) || b.logoRatio;
+  const wmL = resolveLogo(b.watermarkOnLight, '밝은면 워터마크용');
+  b.watermarkPathOnLight = (wmL && wmL.path) || b.logoPathOnLight;
+  b.watermarkRatioOnLight = (wmL && wmL.ratio) || b.logoRatio;
   if (b.logoPath && !b.logoPathOnLight) {
     console.error('주의: logoOnLight 가 없다. 흰색 로고는 밝은 지면에서 보이지 않으므로 '
       + '밝은 슬라이드는 워드마크 텍스트로 둔다.');

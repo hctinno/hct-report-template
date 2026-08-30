@@ -157,28 +157,30 @@
    z-index:-1 로 본문 뒤에 깔린다 — .br-slide 가 position:relative 라 슬라이드
    안쪽에 갇히고 배경보다는 위에 온다.
    불투명도가 낮아 원본 해상도를 넘겨 키워도 흐림이 드러나지 않는다.
-   밝은 지면에는 쓰지 않는다 — 옅은 회색 마크가 본문 대비를 갉아먹는다.
-   표지(--br-cover)에도 쓰지 않는다 — 표지는 본문이 왼쪽에 몰려 있어 가운데
-   마크와 제목이 겹치고, 우측 상단 마크와 안내선으로 이미 브랜드가 선다. */
+   표지(--br-cover)에는 쓰지 않는다 — 본문이 왼쪽에 몰려 있어 가운데 마크와
+   제목이 겹치고, 우측 상단 마크와 안내선으로 이미 브랜드가 선다.
+   그 밖의 모든 지면에 깔린다. 밝은 지면은 잉크가 진해 3%로 낮춘다. */
 /* isolation 이 없으면 z-index:-1 이 슬라이드 배경 뒤로 내려가 아예 안 보인다.
    .br-slide 는 position:relative 지만 z-index 가 없어 쌓임 맥락을 만들지 않는다. */
-.br-slide--dark { isolation:isolate; }
-.br-slide--dark .br-watermark {
+.br-slide { isolation:isolate; }
+.br-watermark {
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  z-index:-1; pointer-events:none; opacity:.05;
+  z-index:-1; pointer-events:none;
   width:720px; text-align:center;
 }
-.br-slide--dark .br-watermark img {
-  display:block; width:100%; height:auto;
-}
+.br-watermark img { display:block; width:100%; height:auto; }
+/* 다크면은 흰 잉크가 옅게 번지므로 5%. 밝은 지면은 진한 잉크라 같은 값이면
+   너무 세게 보이고 본문 대비를 갉아먹는다. 3%로 낮춘다. */
+.br-slide .br-watermark { opacity:.03; }
+.br-slide--dark .br-watermark { opacity:.05; }
 /* 브랜드를 넣기 전 템플릿 상태. 워드마크 글자는 벡터라 아무리 키워도 깨지지 않는다. */
 .br-watermark .br-wordmark {
   font:700 128px/1 var(--br-font-label) !important;
   letter-spacing:var(--br-ls-mark); color:var(--br-on-dark) !important;
 }
-/* 밝은 지면에서는 아예 그리지 않는다. */
-.br-slide .br-watermark { display:none; }
-.br-slide--dark .br-watermark { display:block; }
+/* 표지(첫 장)에는 마크업 자체를 넣지 않는다. 마무리 장은 --cover 조판이지만
+   표지가 아니므로 깔린다. --cover 는 지면이 짙으므로 다크면과 같은 5%다. */
+.br-slide--cover .br-watermark { opacity:.05; }
 
 /* 표지·간지의 세로 안내선. 장식색이 아니라 흰색 알파라서 배경 규칙에 걸리지 않는다. */
 .br-rule { position:absolute; top:0; bottom:0; border-left:1px solid rgba(244,246,248,.14); }
@@ -541,6 +543,7 @@
 <div class="br-frame" data-label="목차" data-notes="목차. 파트 4개 구성과 각 파트의 한 줄 요지를 짚는다.">
   <section class="br-slide">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div style="display:grid;grid-template-columns:420px 1fr;gap:40px;flex:1;min-height:0">
       <h2 class="a" style="font:700 92px/1 var(--br-font-label);color:var(--br-cobalt);margin:8px 0 0;letter-spacing:-.01em">Contents</h2>
       <div style="display:flex;flex-direction:column;justify-content:space-between">
@@ -598,6 +601,7 @@
 <div class="br-frame" data-label="파트 간지" data-notes="파트 시작. 이 파트에서 답할 질문 하나를 명확히 말하고 넘어간다.">
   <section class="br-slide br-slide--cover" style="display:grid;grid-template-columns:460px 1fr;gap:60px;padding:110px 120px 90px">
     <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="dark"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div>
       <h2 class="a" style="font:700 var(--br-fs-part)/1 var(--br-font-label);color:var(--br-accent-on-dark);margin:0;letter-spacing:.01em">Part 01</h2>
     </div>
@@ -629,7 +633,7 @@
 <div class="br-frame" data-label="핵심 정리" data-notes="파트 마무리. 6개 항목을 다 읽지 말고 청중이 가져갈 2~3개만 강조한다.">
   <section class="br-slide br-slide--dark" style="padding:84px 96px 56px">
     <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
-    <div class="br-watermark" data-on="dark"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(없으면 logo)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="dark"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">Part 01</p>
     <h2 class="a br-title">도입 현황 핵심 정리</h2>
 
@@ -701,6 +705,7 @@
 <div class="br-frame" data-label="단일 수치 강조" data-notes="한 슬라이드 = 한 주장. 수치의 출처와 표본 크기를 준비해 둔다.">
   <section class="br-slide" style="padding:96px 96px 60px">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <h2 class="a br-title">교육 공백이 만드는 숙련도 편차</h2>
 
     <p class="a d2 br-split" style="font-size:var(--br-fs-lede);line-height:1.8;margin:46px 0 0;color:#333e4a">
@@ -730,6 +735,7 @@
 <div class="br-frame" data-label="도넛 차트" data-notes="구성비. 구간별 대응 방향까지 이어서 말한다. 질문은 대개 미사용층에서 나온다.">
   <section class="br-slide">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">Part 01. 도입 현황</p>
     <h2 class="a br-title br-title--light">사용 빈도 분포, <strong>절반 이상이 일상 사용</strong></h2>
     <p class="a d2 br-lede">일상 사용 <span class="br-key">58.4%</span> — 도구 보급 단계 종료<br>미사용 13.7% 잔존, 교육 대상 특정 가능</p>
@@ -784,6 +790,7 @@
 <div class="br-frame" data-label="막대 차트" data-notes="순위 비교. 기준선 대비 상·하위를 먼저 말하고 개별 값은 질문받을 때만.">
   <section class="br-slide">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">Part 01. 도입 현황</p>
     <h2 class="a br-title br-title--light">부서별 도입률, <strong>극명한 격차</strong></h2>
     <p class="a d2 br-lede">전사 평균 <span class="br-key">66.3%</span> 초과 — 기술본부, 재무팀, 마케팅팀<br>나머지 4개 부서 평균 미달, 최대 격차 <span class="br-key">35.4%p</span></p>
@@ -823,6 +830,7 @@
 <div class="br-frame" data-label="비교 2열" data-notes="평균 대비 정착 부서. 네 지표를 하나씩 읽지 말고 격차가 큰 지표부터.">
   <section class="br-slide">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">Part 03. 성과</p>
     <h2 class="a br-title br-title--light">정착 부서는 <strong>무엇이 달랐나</strong></h2>
     <p class="a d2 br-lede">전사 평균 대비 정착 부서 4개 지표 비교 — 결정 변수는 <span class="br-key">팀장 관여도</span></p>
@@ -889,6 +897,7 @@
 <div class="br-frame" data-label="지표 표" data-notes="과제별 진척. 표를 처음부터 읽지 말고 지연 2건만 짚고 넘어간다. 나머지는 질문받을 때.">
   <section class="br-slide">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">Part 02. 진척</p>
     <h2 class="a br-title br-title--light">과제별 진척, <strong>2건 지연</strong></h2>
     <p class="a d2 br-lede">전체 7개 과제 중 완료 3 · 정상 2 · 주의 <span class="br-key">1</span> · 지연 <span class="br-key">2</span><br>지연 2건은 모두 외부 의존 — 협력사 일정에 묶임</p>
@@ -927,6 +936,7 @@
 <div class="br-frame" data-label="3단계 로드맵" data-notes="실행안. 각 단계의 소요 기간과 다음 단계 진입 조건을 준비해 둔다.">
   <section class="br-slide" style="padding:84px 96px 56px">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">Part 04. 실행</p>
     <h2 class="a br-title br-title--light">정착까지 <strong>3단계 로드맵</strong></h2>
 
@@ -990,6 +1000,7 @@
 <div class="br-frame" data-label="일정 타임라인" data-notes="하반기 일정. 9월 착수와 12월 전사 확대 두 마일스톤만 강조한다. 세부 기간은 표로 배포.">
   <section class="br-slide">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">Part 04. 실행</p>
     <h2 class="a br-title br-title--light">하반기 일정, <strong>4개 과제 병행</strong></h2>
     <p class="a d2 br-lede">착수 <span class="br-key">9월</span> · 전사 확대 <span class="br-key">12월</span><br>교육과 정착은 겹쳐서 진행 — 진단 종료를 기다리지 않음</p>
@@ -1052,6 +1063,7 @@
 <div class="br-frame" data-label="마무리 CTA" data-notes="행동 하나만 남긴다. 신청 마감일과 담당 창구를 확인해 둔다.">
   <section class="br-slide br-slide--cover" style="justify-content:center">
     <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="dark"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-rule br-rule--a"></div>
 
     <h2 class="a" style="font:900 var(--br-fs-display)/1.18 var(--br-font-kr);margin:0;letter-spacing:var(--br-ls-tight)">

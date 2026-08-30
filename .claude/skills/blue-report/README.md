@@ -495,23 +495,33 @@ python3 scripts/make_logo_variants.py 로고.png --out-dir brand/hct --name hct-
 나온 파일을 `brand.json` 의 `watermark` 에 넣는다.
 
 ```json
-"logo":        "hct-logo-white.png",
-"logoOnLight": "hct-logo-color.png",
-"watermark":   "hct-logo-symbol-white.png"
+"logo":             "hct-logo-white.png",
+"logoOnLight":      "hct-logo-color.png",
+"watermark":        "hct-logo-symbol-white.png",
+"watermarkOnLight": "hct-logo-symbol-color.png"
 ```
 
 **비율은 마크와 따로 잡는다.** 심볼은 국문이 빠져 마크보다 납작하다(4.55 대 3.07).
 PPTX 생성기가 `logoRatio` 하나로 둘을 그리면 한쪽이 찌그러지므로 `watermarkRatio` 를
 따로 둔다.
 
-세 가지를 지킨다.
+**표지 한 장만 뺀다.** 그 밖의 모든 지면에 깔린다. 표지는 본문이 왼쪽에 몰려 있어
+가운데 마크와 제목이 겹치고, 우측 상단 마크와 안내선으로 이미 브랜드가 선다.
+마무리 장은 표지와 같은 `--br-cover` 조판이지만 표지가 아니므로 깔린다.
 
-- **밝은 지면에는 깔지 않는다.** 옅은 회색 마크가 본문 대비를 갉아먹는다.
-- **표지(`--br-cover`)에도 깔지 않는다.** 표지는 본문이 왼쪽에 몰려 있어 가운데 마크와
-  제목이 겹친다. 우측 상단 마크와 안내선으로 이미 브랜드가 선다.
-- **`.br-slide--dark` 에 `isolation:isolate` 가 필요하다.** 이것이 없으면 `z-index:-1` 이
-  슬라이드 배경보다 뒤로 내려가 아예 보이지 않는다. `position:relative` 만으로는 쌓임
-  맥락이 생기지 않는다.
+**지면 밝기에 따라 잉크와 농도가 다르다.** 마크와 같은 규칙이다.
+
+| 지면 | `data-on` | 자산 | 불투명도 |
+|---|---|---|---|
+| 다크 · 표지 조판 | `dark` | `watermark` (흰색 녹아웃) | 5% |
+| 밝은 지면 | `light` | `watermarkOnLight` (원색) | 3% |
+
+밝은 지면을 3% 로 낮추는 이유 — 진한 잉크는 같은 값이면 훨씬 세게 보이고 본문 대비를
+갉아먹는다. 3% 에서 본문 대비 변화는 16.5:1 → 15.6:1 로 무시할 수준이다.
+
+**`.br-slide` 에 `isolation:isolate` 가 필요하다.** 이것이 없으면 `z-index:-1` 이
+슬라이드 배경보다 뒤로 내려가 아예 보이지 않는다. `position:relative` 만으로는 쌓임
+맥락이 생기지 않는다.
 
 불투명도가 5% 라 원본 해상도를 넘겨 키워도 흐림이 드러나지 않는다. HCT 로고 원본은
 264×86 이고 720px 로 2.7배 확대되지만 눈에 띄지 않는다. `check_deck.py` 의 겹침 검사는

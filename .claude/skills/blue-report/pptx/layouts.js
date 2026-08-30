@@ -59,12 +59,16 @@ function card(slide, { x, y, w, h, dark = false, fill, line, topBar }) {
  * HTML 의 .br-watermark 와 같은 크기(720px)·같은 불투명도(5%)다. 슬라이드에
  * 가장 먼저 그려야 본문 뒤에 깔린다 — pptxgenjs 는 z-index 가 없고 추가 순서가
  * 곧 쌓임 순서다. */
-function watermark(slide, brand) {
-  const src = brand.watermarkPath;
+function watermark(slide, brand, dark = true) {
+  const src = dark ? brand.watermarkPath : brand.watermarkPathOnLight;
   if (!src) return;
   const w = X(720);
-  const h = w / (brand.watermarkRatio || brand.logoRatio || 3.07);
-  slide.addImage({ path: src, x: (SLIDE_W - w) / 2, y: (SLIDE_H - h) / 2, w, h, transparency: 95 });
+  const ratio = (dark ? brand.watermarkRatio : brand.watermarkRatioOnLight)
+    || brand.logoRatio || 3.07;
+  const h = w / ratio;
+  // 밝은 지면은 잉크가 진해 더 옅게 깐다. HTML 의 3% / 5% 와 같다.
+  slide.addImage({ path: src, x: (SLIDE_W - w) / 2, y: (SLIDE_H - h) / 2, w, h,
+    transparency: dark ? 95 : 97 });
 }
 
 /** 알약 칩 — 그림자 없음. HTML 의 .br-chip */
