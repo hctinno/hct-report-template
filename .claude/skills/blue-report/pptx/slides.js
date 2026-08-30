@@ -155,10 +155,13 @@ function tableSlide(pres, s, brand, page) {
   return sl;
 }
 
+// HTML 의 .br-status--ok / --warn / --late 와 같은 값을 쓴다. 토큰이 한곳이므로
+// blue-report.css 를 고치면 PowerPoint 판도 같이 바뀐다.
+// 정상이 회색이던 시절에는 표를 훑을 때 좋은 신호와 나쁜 신호가 갈리지 않았다.
 function statusColor(kind) {
   if (kind === 'warn') return { fg: C.warnText, bg: C.warnBg, line: C.warnLine };
-  if (kind === 'late') return { fg: C.alertText, bg: C.alertBg, line: C.coral };
-  return { fg: C.text2, bg: C.card, line: C.chipLine };
+  if (kind === 'late') return { fg: C.alertText, bg: C.alertBg, line: C.alertLine };
+  return { fg: C.okText, bg: C.okBg, line: C.okLine };
 }
 
 

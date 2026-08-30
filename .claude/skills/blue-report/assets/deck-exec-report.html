@@ -90,22 +90,22 @@
     <p class="br-eyebrow">01. 부문별 성과</p>
     <h2 class="br-title">목표 대비 달성률</h2>
 
-    <div class="br-bars-h" style="margin-top:54px">
-      <div class="br-bar-h">
-        <div class="br-bar-name">기술본부</div>
-        <div class="br-bar-track"><div class="br-bar-v" style="width:100%;background:var(--br-data-1)"></div></div>
-        <div class="br-bar-val">142<span class="br-sup">%</span></div>
-      </div>
-      <div class="br-bar-h">
-        <div class="br-bar-name">영업본부</div>
-        <div class="br-bar-track"><div class="br-bar-v" style="width:81.7%;background:var(--br-data-2)"></div></div>
-        <div class="br-bar-val">116<span class="br-sup">%</span></div>
-      </div>
-      <div class="br-bar-h">
-        <div class="br-bar-name">경영지원</div>
-        <div class="br-bar-track"><div class="br-bar-v" style="width:64.8%;background:var(--br-data-3)"></div></div>
-        <div class="br-bar-val">92<span class="br-sup">%</span></div>
-      </div>
+    <!-- .br-bars-h 는 [이름] [채널] [값] 3열 그리드다. 세 칸이 직계 자식이어야 한다.
+         행을 <div> 로 묶으면 그 래퍼가 칸 하나를 차지해 세 부문이 가로로 늘어선다.
+         채움 막대는 .br-bar-h (transform-origin:left) 다. .br-bar-v 는 세로 막대용이다.
+         폭은 최댓값 기준 환산 — 142/142=100 · 116/142=81.7 · 92/142=64.8 -->
+    <div class="br-bars-h" style="margin-top:54px;gap:30px 24px">
+      <div class="br-bar-name">기술본부</div>
+      <div class="br-bar-track"><div class="br-bar-h" style="width:100%;background:var(--br-data-1)"></div></div>
+      <div class="br-bar-val">142<span class="br-sup">%</span></div>
+
+      <div class="br-bar-name">영업본부</div>
+      <div class="br-bar-track"><div class="br-bar-h" style="width:81.7%;background:var(--br-data-2)"></div></div>
+      <div class="br-bar-val">116<span class="br-sup">%</span></div>
+
+      <div class="br-bar-name">경영지원</div>
+      <div class="br-bar-track"><div class="br-bar-h" style="width:64.8%;background:var(--br-data-3)"></div></div>
+      <div class="br-bar-val">92<span class="br-sup">%</span></div>
     </div>
 
     <p class="br-lede" style="margin-top:34px">측정 가능한 3개 부문 — 2개 목표 초과 · 경영지원 <span class="br-key">92%</span> 근접</p>

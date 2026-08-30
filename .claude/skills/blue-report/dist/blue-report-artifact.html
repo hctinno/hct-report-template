@@ -41,14 +41,32 @@
   --br-navy:   #0b2a6b;   /* 깊은 값 · 키워드 볼드 */
   --br-coral:  #ff7a59;   /* 경고 · 핵심 단일 수치 */
 
-  /* ---------- 주의 콜아웃 ---------- */
+  /* ---------- 상태 — 정상 · 주의 · 위험 ----------
+     세 상태는 계열색과 겹치지 않는다. 계열색이 "무엇"을 말한다면(부서 · 제품 · 분기)
+     상태색은 "어떤가"를 말한다. 같은 초록이 두 일을 하면 읽는 사람이 그 막대가
+     좋은 소식인지 3번 부서인지 알 수 없다. 그래서 이 여섯 값은 계열색으로 쓰지 않는다.
+
+     색만으로 상태를 말하지 않는다 — 칩에는 언제나 글자가 함께 온다(정상 · 지연 · 위험).
+     색각 이상이 있는 사람에게는 글자가 유일한 단서다.
+
+     글자 대비는 인쇄 기준 4.5:1 을 넘긴다 — 정상 5.90 · 주의 5.55 · 위험 6.22:1.
+     괘선은 콜아웃 상자의 테두리이지 데이터 마크가 아니므로 2:1 규칙 대상이 아니다. */
+  --br-ok-line:   #7fc7a0;
+  --br-ok-bg:     #e8f6ee;
+  --br-ok-text:   #0f6b3f;
+
   --br-warn-line: #f0c469;
   --br-warn-bg:   #fff7e4;
   --br-warn-text: #8a5a00;
 
-  /* 지연 · 위험 상태 표시 (코랄 계열). 텍스트 대비 6.22:1 */
+  --br-alert-line: #e8907a;
   --br-alert-bg:   #fff1ec;
   --br-alert-text: #a33418;
+
+  /* 다크면 위 상태. 밝은면 값을 그대로 쓰면 지면에 묻힌다. 대비 9.07 · 12.17 · 7.78:1 */
+  --br-ok-on-dark:    #4fd08a;
+  --br-warn-on-dark:  #ffcf6b;
+  --br-alert-on-dark: #ff8a80;
 
   /* ---------- 다크면 (2종까지) ---------- */
   --br-cover:     #071b45;  /* 표지 · 파트 간지 */
@@ -85,6 +103,36 @@
      아래는 7단계. 전 단계 지면 대비 2:1 이상, 인접 색 중복 없음. */
   --br-bar-1: #0b2a6b;  --br-bar-2: #20407e;  --br-bar-3: #345790;  --br-bar-4: #486da2;
   --br-bar-5: #5d83b5;  --br-bar-6: #729ac8;  --br-bar-7: #86b0da;
+
+  /* ---------- 계열색 (categorical) — 항목이 서로 다른 것일 때 ----------
+     부서 · 제품 · 분기처럼 순서가 없는 항목을 가른다. 크기를 나타내는 데이터 램프
+     (--br-data-*)와 쓰임이 다르다. 램프는 "얼마나", 계열색은 "무엇"이다.
+     값의 크기로 색을 고르면 안 된다 — 막대 길이가 이미 크기를 말한다.
+
+     슬롯 순서는 고정이다. 1번부터 차례로 배정하고 돌려 쓰지 않는다. 이 순서 자체가
+     색각 안전 장치다 — 인접한 두 색만 서로 닿으므로, 붙어 서는 쌍이 갈리도록 짠 것이다.
+     초록을 2번이 아니라 4번에 둔 이유가 이것이다. 초록과 주황이 이웃하면 적록색각
+     이상에서 ΔE 4.9 로 붕괴한다. 지금 순서의 최악 인접쌍은 ΔE 15.2 다.
+
+     일곱 번째 계열이 필요하면 색을 새로 만들지 않는다. 묶어서 "기타"로 내리거나
+     장을 나눈다.
+
+     전 슬롯이 지면 대비 3:1 이상. scripts/palette.py --check 가 판정한다. */
+  --br-cat-1: #2f4a9c;   /* 파랑 — HCT 코발트. 언제나 첫째 */
+  --br-cat-2: #c86a1a;   /* 주황 */
+  --br-cat-3: #8341c4;   /* 보라 */
+  --br-cat-4: #0d6b45;   /* 초록 */
+  --br-cat-5: #0d88a8;   /* 청록 */
+  --br-cat-6: #c02535;   /* 빨강 */
+
+  /* 다크면 계열색. 밝은면 값을 그대로 쓰면 짙은 지면에서 묻힌다.
+     밝게 뒤집은 것이 아니라 같은 방법으로 따로 고른 값이다. */
+  --br-cat-dark-1: #628eed;
+  --br-cat-dark-2: #d67523;
+  --br-cat-dark-3: #ae75d6;
+  --br-cat-dark-4: #3eab5e;
+  --br-cat-dark-5: #1f9ec4;
+  --br-cat-dark-6: #df6862;
 
   /* ---------- 소프트 램프 (다크면 위 데이터 · 밝은 면의 비데이터 요소) ----------
      밝은 지면에서는 대비 1.67~1.96:1로 2:1에 미달한다. 밝은 면의 데이터 마크에 쓰지 않는다. */
@@ -204,14 +252,29 @@
    2. 타이포 파운데이션
    ========================================================================= */
 
+/* ── 장별 강조색 ──────────────────────────────────────────────────────────
+   "모든 페이지가 같은 색이라 구별이 안 된다"에 대한 답이다.
+
+   슬라이드에 --br-accent 를 얹으면 눈썹말 · 제목 괘선 · 파트 번호가 그 색으로 간다.
+   본문 · 표 · 데이터 마크는 따라가지 않는다 — 장마다 데이터 색이 바뀌면
+   같은 부서가 3장에서 파랑, 5장에서 주황이 되어 색이 뜻을 잃는다.
+   바뀌는 것은 "지금 어느 장인가"를 말하는 자리뿐이다.
+
+       <section class="br-slide" style="--br-accent:var(--br-cat-2)">
+
+   한 파트 안의 슬라이드는 같은 값을 쓴다. 장마다 바꾸면 그냥 알록달록해질 뿐이다.
+   주지 않으면 딥네이비(밝은면) · 하늘색(다크면)으로, 지금까지와 같다. */
+.br-slide            { --br-accent-resolved: var(--br-accent, var(--br-navy)); }
+.br-slide--dark,
+.br-slide--cover     { --br-accent-resolved: var(--br-accent-dark, var(--br-accent-on-dark)); }
+
 .br-eyebrow {           /* 섹션 라벨 */
   margin:0 0 var(--br-sp-2);
   font:600 var(--br-fs-label)/1 var(--br-font-label);
   letter-spacing:var(--br-ls-label);
   text-transform:uppercase;
-  color:var(--br-navy);
+  color:var(--br-accent-resolved);
 }
-.br-slide--dark .br-eyebrow, .br-slide--cover .br-eyebrow { color:var(--br-accent-on-dark); }
 
 .br-title  { margin:0; font:900 var(--br-fs-h2)/1.2 var(--br-font-kr); letter-spacing:var(--br-ls-tight); }
 .br-title--sm { font-size:var(--br-fs-h2-sm); line-height:1.3; }
@@ -398,9 +461,21 @@
   display:inline-block; border-radius:var(--br-r-pill); padding:8px 18px;
   font:600 var(--br-fs-foot)/1 var(--br-font-kr); white-space:nowrap;
 }
-.br-status--ok    { background:var(--br-card);     border:1px solid var(--br-chip-line); color:var(--br-text-2); }
-.br-status--warn  { background:var(--br-warn-bg);  border:1px solid var(--br-warn-line); color:var(--br-warn-text); }
-.br-status--late  { background:var(--br-alert-bg); border:1px solid var(--br-coral);     color:var(--br-alert-text); }
+/* 정상은 초록이다. 예전에는 흰 바탕에 회색 글자였는데, 그러면 "정상"이 색으로는
+   아무 말도 하지 않아 표를 훑을 때 좋은 신호와 나쁜 신호가 한눈에 갈리지 않았다.
+   세 상태가 각자 색을 갖되, 글자(정상 · 지연 · 위험)는 그대로 남는다 — 색각 이상이
+   있는 사람에게는 글자가 유일한 단서이므로 색만으로 말하지 않는다. */
+.br-status--ok    { background:var(--br-ok-bg);    border:1px solid var(--br-ok-line);    color:var(--br-ok-text); }
+.br-status--warn  { background:var(--br-warn-bg);  border:1px solid var(--br-warn-line);  color:var(--br-warn-text); }
+.br-status--late  { background:var(--br-alert-bg); border:1px solid var(--br-alert-line); color:var(--br-alert-text); }
+
+/* 다크면 위에서는 밝은 바탕 칩이 지면을 뚫는다. 글자에만 색을 주고 바탕은 비운다. */
+.br-slide--dark .br-status, .br-slide--cover .br-status {
+  background:none; border-color:var(--br-dark-line); color:var(--br-on-dark-2);
+}
+.br-slide--dark .br-status--ok,   .br-slide--cover .br-status--ok   { color:var(--br-ok-on-dark);    border-color:var(--br-ok-on-dark); }
+.br-slide--dark .br-status--warn, .br-slide--cover .br-status--warn { color:var(--br-warn-on-dark);  border-color:var(--br-warn-on-dark); }
+.br-slide--dark .br-status--late, .br-slide--cover .br-status--late { color:var(--br-alert-on-dark); border-color:var(--br-alert-on-dark); }
 
 /* 일정 타임라인 — 이름 컬럼과 기간 격자를 분리해 막대가 이름을 덮지 않게 한다 */
 .br-tl        { display:flex; flex-direction:column; gap:16px; }
