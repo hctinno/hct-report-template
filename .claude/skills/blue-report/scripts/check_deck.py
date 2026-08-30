@@ -273,16 +273,41 @@ def check_render(path, rep, shots=None):
               }
             }
 
+            // 본문 안전영역 — 본문 잉크가 y 1000px 아래로 내려가지 않는다.
+            // 푸터까지 최소 70px 완충을 둔다. 참조 덱은 본문 하단선이 y 933 이었다.
+            // 겹침 검사는 "이미 부딪혔을 때"만 잡는다. 이건 부딪히기 전에 잡는다.
+            let deepest = null;
+            const sr0 = sec.getBoundingClientRect();
+            sec.querySelectorAll('*').forEach(el => {
+              if (el.closest('.br-footer, .br-mark, .br-watermark, .br-rule')) return;
+              const cs = getComputedStyle(el);
+              if (cs.visibility === 'hidden' || cs.display === 'none') return;
+              const own = Array.from(el.childNodes).some(n => n.nodeType === 3 && n.textContent.trim());
+              const solid = el.classList.contains('br-card') || el.classList.contains('br-bar-v')
+                         || el.classList.contains('br-bar-h') || el.tagName === 'IMG' || el.tagName === 'svg';
+              if (!own && !solid) return;
+              const r = el.getBoundingClientRect();
+              if (r.height <= 0) return;
+              const bottom = Math.round(r.bottom - sr0.top);
+              if (!deepest || bottom > deepest.y) {
+                deepest = { y: bottom, txt: (el.textContent || '').trim().slice(0, 26) || el.tagName.toLowerCase() };
+              }
+            });
+
             const marks = [];
             const blank = [];
             sec.querySelectorAll('.br-bar-v,.br-bar-h,.br-dot,circle').forEach(el => {
               const cs = getComputedStyle(el);
+              // 그라디언트로 칠한 막대는 backgroundColor 가 비어 있다. 그림 쪽에서
+              // 색 정지점을 뽑아 전부 대비 검사에 넣는다 — 한쪽 끝만 통과하고
+              // 다른 끝이 지면에 묻으면 막대의 절반이 사라진 것과 같다.
+              const stops = (cs.backgroundImage || '').match(/rgba?\([^)]*\)/g) || [];
+              if (el.tagName !== 'circle' && stops.length) { stops.forEach(c => marks.push(c)); return; }
               const c = el.tagName === 'circle' ? cs.stroke : cs.backgroundColor;
               // 색이 안 잡히면 건너뛰는 것이 아니라 잡아낸다. 예전에는 걸러 내기만 해서
               // 조각이 통째로 안 그려져도 대비 검사를 그냥 통과했다. var() 하나가
               // 풀리지 않으면 값 하나가 지면에서 조용히 사라진다.
               if (!c || c === 'none' || c === 'rgba(0, 0, 0, 0)') {
-                const r = el.getBoundingClientRect();
                 blank.push({ tag: el.tagName.toLowerCase(),
                              cls: (el.className.baseVal ?? el.className ?? '').toString().slice(0,30) });
                 return;
@@ -324,7 +349,7 @@ def check_render(path, rep, shots=None):
               i, label: fr.dataset.label,
               h: sec.scrollHeight, w: sec.scrollWidth,
               ch: sec.clientHeight, cw: sec.clientWidth,
-              bg, small, mark, collide, wm, blank, bars,
+              bg, small, mark, collide, wm, blank, bars, deepest,
               marks: [...new Set(marks)]
             });
           });
@@ -413,6 +438,21 @@ def check_render(path, rep, shots=None):
                 print(f"        {t}")
         else:
             rep.o("데이터 마크 — 전부 색이 잡힌다")
+
+        # 본문 안전영역. 푸터와 부딪히기 전에 잡는다.
+        SAFE_Y = 1000
+        deep_bad = []
+        for s_ in data:
+            d = s_.get("deepest")
+            if d and d["y"] > SAFE_Y:
+                deep_bad.append(f"{s_['i']+1}장 {s_['label']} — 본문이 y {d['y']}px 까지 내려간다"
+                                f"(상한 {SAFE_Y}) · {d['txt']}")
+        if deep_bad:
+            rep.f(f"본문 안전영역 이탈 {len(deep_bad)}건")
+            for t in deep_bad[:10]:
+                print(f"        {t}")
+        else:
+            rep.o(f"본문 안전영역 — 잉크가 y {SAFE_Y}px 위에 머문다")
 
         # 막대 길이가 값에 비례하는가. 최댓값을 1로 놓고 견준다.
         # 최소 폭·둥근 끝 때문에 짧은 막대가 조금 길게 잡히므로 3%p 를 허용한다.
