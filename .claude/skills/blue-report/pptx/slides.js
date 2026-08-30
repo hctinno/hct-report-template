@@ -103,7 +103,8 @@ function darkSummary(pres, s, brand, page) {
       { text: c.stat, options: {} },
       ...(c.sup ? [{ text: c.sup, options: { fontSize: pt(28) } }] : []),
     ], { x: X(cx + cw - 170), y: X(cy), w: X(140), h: X(ch),
-      align: 'right', valign: 'middle', fontFace: F.num, fontSize: pt(56), bold: true, color: C.accentOnDark });
+      align: 'right', valign: 'middle', fontFace: F.num, fontSize: pt(56), bold: true,
+      color: c.warn ? C.amber : C.accentOnDark });
   });
   footer(sl, { docTitle: brand.docTitle, page, dark: true });
   return sl;
