@@ -79,6 +79,7 @@ function agenda(pres, s, brand, page) {
 function darkSummary(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.dark };
+  L.watermark(sl, brand);   // 본문보다 먼저 그려야 뒤에 깔린다
   const y0 = header(sl, { eyebrow: s.eyebrow, title: s.title, dark: true }) + 40;
 
   const cols = 2, gapX = 34, gapY = 30;

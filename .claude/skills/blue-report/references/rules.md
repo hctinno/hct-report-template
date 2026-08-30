@@ -133,6 +133,10 @@ d = k × √value
 ## 5. 형태
 
 - 카드 라운드 18px (`--br-r-card`). 그림자는 `--br-card-shadow` 하나만.
+- **다크면 가운데에 워터마크(`.br-watermark`).** 720px · 5% · `z-index:-1`.
+  `apply_brand.py` 가 `brand.json` 의 `watermark`(없으면 `logo`)로 채운다.
+  밝은 지면과 표지에는 깔지 않는다. `.br-slide--dark` 의 `isolation:isolate` 가 있어야
+  배경 뒤로 내려가지 않는다.
 - **카드는 밝은 지면 전용.** 다크면에서는 CSS 가 바탕·테두리를 걷어내고 상단 괘선
   2px 으로 바꾼다. 짙은 면 위 짙은 판은 대비 1.12:1 이라 뭉개진다.
   다크면에 판을 다시 그리지 않는다.

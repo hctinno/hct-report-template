@@ -228,7 +228,9 @@ def check_render(path, rep, shots=None):
             // 그래서 박스가 아니라 자손까지 포함한 실제 차지 범위로 잰다.
             const bands = [];
             [...sec.children].forEach(el => {
-              if (el.classList.contains('br-mark') || el.classList.contains('br-rule')) return;
+              // .br-watermark 는 지면 뒤(z-index:-1)에 깔리는 배경 장치다. 본문과 겹치는 것이 정상.
+              if (el.classList.contains('br-mark') || el.classList.contains('br-rule')
+                  || el.classList.contains('br-watermark')) return;
               const cs = getComputedStyle(el);
               if (cs.display === 'none' || cs.visibility === 'hidden' || cs.position === 'absolute') return;
               let r = el.getBoundingClientRect();

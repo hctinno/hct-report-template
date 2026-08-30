@@ -50,6 +50,8 @@ function loadBrand(p) {
   };
   b.logoPath = resolveLogo(b.logo, '다크면용');
   b.logoPathOnLight = resolveLogo(b.logoOnLight, '밝은면용');
+  // 배경 워터마크. 따로 주지 않으면 다크면용 로고를 키워 쓴다 (HTML 과 같은 규칙).
+  b.watermarkPath = resolveLogo(b.watermark, '워터마크용') || b.logoPath;
   if (b.logoPath && !b.logoPathOnLight) {
     console.error('주의: logoOnLight 가 없다. 흰색 로고는 밝은 지면에서 보이지 않으므로 '
       + '밝은 슬라이드는 워드마크 텍스트로 둔다.');

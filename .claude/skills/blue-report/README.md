@@ -466,6 +466,33 @@ python3 scripts/install_blue_report_skill.py             # ~/.claude/skills/blue
 | 기준선 · 구분선 | `#c3cedb` | `--br-hairline` |
 | 알약 칩 테두리 | `#c8d1dc` | `--br-chip-line` |
 
+**다크면 가운데에 회사 마크를 아주 옅게 깐다.** `.br-watermark` 다. 720px · 불투명도
+5% 로 본문 뒤(`z-index:-1`)에 깔린다. 단색 한 장으로 지면이 죽는 것을 막는 장치이고,
+새 색을 들이지 않는다 — 같은 흰색의 투명도만 쓴다.
+
+```html
+<section class="br-slide br-slide--dark">
+  <div class="br-mark" data-on="dark">…</div>
+  <div class="br-watermark" data-on="dark"><span class="br-wordmark">COMPANY NAME</span></div>
+```
+
+`apply_brand.py` 가 `brand.json` 의 `watermark`(없으면 `logo`)로 바꾼다. **심볼만 잘라 낸
+판을 쓰고 싶으면 `watermark` 에 그 파일을 준다** — 전체 로고를 키우면 국문 병기가 함께
+커져 본문 괘선과 겹칠 수 있다.
+
+세 가지를 지킨다.
+
+- **밝은 지면에는 깔지 않는다.** 옅은 회색 마크가 본문 대비를 갉아먹는다.
+- **표지(`--br-cover`)에도 깔지 않는다.** 표지는 본문이 왼쪽에 몰려 있어 가운데 마크와
+  제목이 겹친다. 우측 상단 마크와 안내선으로 이미 브랜드가 선다.
+- **`.br-slide--dark` 에 `isolation:isolate` 가 필요하다.** 이것이 없으면 `z-index:-1` 이
+  슬라이드 배경보다 뒤로 내려가 아예 보이지 않는다. `position:relative` 만으로는 쌓임
+  맥락이 생기지 않는다.
+
+불투명도가 5% 라 원본 해상도를 넘겨 키워도 흐림이 드러나지 않는다. HCT 로고 원본은
+264×86 이고 720px 로 2.7배 확대되지만 눈에 띄지 않는다. `check_deck.py` 의 겹침 검사는
+`.br-watermark` 를 배경 장치로 보고 건너뛴다.
+
 **카드는 밝은 지면에서만 판이다.** 다크면(`--br-cover` · `--br-dark`)에서는 `.br-card`
 마크업을 그대로 써도 판이 그려지지 않는다 — 바탕과 테두리를 걷어내고 상단 괘선
 2px(`--br-accent-on-dark`)으로만 구획한다. `blue-report.css` 가 알아서 처리하므로

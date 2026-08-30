@@ -54,6 +54,19 @@ function card(slide, { x, y, w, h, dark = false, fill, line, topBar }) {
   }
 }
 
+/** 배경 워터마크 — 다크면 가운데에 회사 마크를 아주 옅게 깐다.
+ *
+ * HTML 의 .br-watermark 와 같은 크기(720px)·같은 불투명도(5%)다. 슬라이드에
+ * 가장 먼저 그려야 본문 뒤에 깔린다 — pptxgenjs 는 z-index 가 없고 추가 순서가
+ * 곧 쌓임 순서다. */
+function watermark(slide, brand) {
+  const src = brand.watermarkPath;
+  if (!src) return;
+  const w = X(720);
+  const h = w / (brand.logoRatio || 3.07);
+  slide.addImage({ path: src, x: (SLIDE_W - w) / 2, y: (SLIDE_H - h) / 2, w, h, transparency: 95 });
+}
+
 /** 알약 칩 — 그림자 없음. HTML 의 .br-chip */
 function chip(slide, { x, y, w, h, text, solid, fillColor, lineColor, color, fontSize }) {
   slide.addShape('roundRect', {
@@ -162,4 +175,4 @@ function mark(slide, brand) {
   });
 }
 
-module.exports = { X, SLIDE_W, SLIDE_H, PAD, COVER_PAD, CW, txt, card, chip, header, lede, footer, mark };
+module.exports = { X, SLIDE_W, SLIDE_H, PAD, COVER_PAD, CW, txt, card, chip, header, lede, footer, mark, watermark };
