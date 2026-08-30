@@ -13,8 +13,8 @@ HTML 이 기준이고 PPTX 는 그 내용을 데이터로 옮긴 것이라, 한�
     python3 scripts/check_content_sync.py --deck internal
 
 대조 항목
-  슬라이드 수 · 문서명 · 발표자 노트 · 세로 막대(이름·값) · 도넛(범례 이름·값)
-  · 표(머리글·행)
+  슬라이드 수 · 문서명 · 제목 · 리드 · 발표자 노트 · 세로 막대(이름·값)
+  · 도넛(범례 이름·값) · 표(머리글·행)
 
 레이아웃·문체·색은 대상이 아니다. 그쪽은 check_deck.py 가 본다.
 종료 코드는 어긋난 곳이 있으면 1 이다.
@@ -115,12 +115,31 @@ def split_frames(html):
     return [html[a:b] for a, b in zip(starts, ends)]
 
 
+def lines(fragment):
+    """줄바꿈을 공백으로 살려 두고 태그를 벗긴다.
+
+    리드는 <br> 로 두 줄을 적는다. 그냥 태그만 벗기면 앞줄 끝과 뒷줄 머리가
+    붙어 "…지연 2지연 2건은…" 이 되어 대조가 헛돈다."""
+    return text(re.sub(r"<br\s*/?>", " ", fragment))
+
+
 def html_facts(frame):
     """한 슬라이드에서 대조 가능한 사실만 뽑는다."""
     f = {}
 
     m = re.search(r'data-notes="([^"]*)"', frame)
     f["notes"] = norm(htmllib.unescape(m.group(1))) if m else ""
+
+    # 제목 — 한 지면에서 가장 많이 읽히는 한 줄이다. 여기가 갈라지면 같은 보고인데
+    # 형식에 따라 주장이 달라진다. v1.24.0 에서 실제로 그렇게 갈라졌고, 그때는
+    # 이 대조가 없어 검사가 통과했다. 표지·마무리는 br-title 을 쓰지 않아 빠진다.
+    m = re.search(r'<h2\b[^>]*\bclass="[^"]*\bbr-title\b[^"]*"[^>]*>(.*?)</h2>', frame, re.S)
+    if m:
+        f["title"] = lines(m.group(1))
+
+    led = re.findall(r'<p\b[^>]*\bclass="[^"]*\bbr-lede\b[^"]*"[^>]*>(.*?)</p>', frame, re.S)
+    if led:
+        f["lede"] = norm(" ".join(lines(x) for x in led))
 
     # 막대 — 세로(.br-col-*)와 가로(.br-bar-name/.br-bar-val) 두 배치를 모두 읽는다.
     # class 뒤에 style 같은 속성이 붙어도 걸리게 한다. 예전 정규식은 class 속성이
@@ -198,6 +217,11 @@ def read_content_js():
 def js_facts(slide):
     f = {"notes": norm(slide.get("notes", ""))}
 
+    if slide.get("title"):
+        f["title"] = norm(flat(slide.get("title")) + " " + flat(slide.get("titleBold", "")))
+    if slide.get("lede"):
+        f["lede"] = norm(" ".join(flat(l) for l in slide["lede"]))
+
     if slide.get("type") == "compare":
         # 좌우 두 카드에 가로 막대가 하나씩. HTML 도 좌 → 우 순서로 적혀 있다.
         # 예전에는 HTML 쪽 가로 막대를 못 읽어 이 슬라이드가 통째로 대조 밖이었다.
@@ -248,6 +272,12 @@ def compare_deck(key, hd, cd, problems):
 
         if h["notes"] != c["notes"]:
             problems.append(f"{at} 발표자 노트\n      HTML: {h['notes'][:80]}\n      PPTX: {c['notes'][:80]}")
+
+        # 제목·리드는 한쪽에만 있는 것이 정상이다 — 표지처럼 배치가 다른 장이 있다.
+        # 양쪽에 다 있을 때만 견준다.
+        for kind, label in (("title", "제목"), ("lede", "리드")):
+            if kind in h and kind in c and norm(h[kind]) != norm(c[kind]):
+                problems.append(f"{at} {label}\n      HTML: {h[kind]}\n      PPTX: {c[kind]}")
 
         # 형식 한계로 배치가 다른 슬라이드는 마크만 뺀다. 문서명·장수·노트는 계속 본다.
         # 덱을 통째로 빼는 것(ax)보다 잃는 범위가 작다.

@@ -177,7 +177,7 @@ function barSlide(pres, s, brand, page) {
   const ramp = s.values.length > 5 ? C.bar : C.data;
   const colors = s.values.map((_, i) => ramp[Math.min(i, ramp.length - 1)]);
 
-  const h = H - y - PAD.bottom - 60;
+  const h = H - y - PAD.bottom - 60 - (s.callout ? 120 : 0);
   sl.addChart(pres.ChartType.bar, [{ name: s.seriesName || '값', labels: s.categories, values: s.values }], {
     x: X(PAD.side), y: X(y), w: X(CW), h: X(h),
     barDir: 'col', barGapWidthPct: 40,
@@ -192,6 +192,15 @@ function barSlide(pres, s, brand, page) {
     valAxisMaxVal: s.max, valAxisMinVal: 0,
     border: { pt: 0, color: C.page }, fill: C.page,
   });
+  // 막대만으로 말할 수 없는 단서 — 값이 0 이 아니라 측정 자체가 없다는 것 같은 —
+  // 를 붙인다. HTML 덱은 같은 자리에 .br-callout 을 둔다.
+  if (s.callout) {
+    const cy = y + h + 10;
+    sl.addShape('roundRect', { x: X(PAD.side), y: X(cy), w: X(CW), h: X(96), rectRadius: 0.1,
+      fill: { color: C.warnBg }, line: { color: C.warnLine, width: 0.75 } });
+    txt(sl, s.callout, { x: X(PAD.side + 30), y: X(cy), w: X(CW - 60), h: X(96),
+      fontFace: F.kr, fontSize: pt(25), color: C.warnText, valign: 'middle', lineSpacingMultiple: 1.4 });
+  }
   footer(sl, { docTitle: brand.docTitle, page });
   return sl;
 }

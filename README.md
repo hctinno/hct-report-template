@@ -138,7 +138,7 @@ python .claude/skills/blue-report/scripts/build_single_file.py \
 python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 ```
 
-12항목을 기계로 판정한다.
+16항목을 기계로 판정한다.
 
 문체(금지 어미) · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 1920x1080 · 최소 글자 24px · 데이터 마크 대비 2:1 · **본문 영역 겹침** · 브랜드 마크 존재 · 마크와 본문 겹침 · 배경 밝기와 로고 변형 일치.
 
@@ -209,7 +209,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   assets/deck-*.html                     완성 덱 8종 + 레이아웃 카탈로그
   assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/doc-*.html · doc-viewer.*       A4 문서 4종과 그 뷰어
-  scripts/check_deck.py                  슬라이드 12항목 자동 점검
+  scripts/check_deck.py                  슬라이드 16항목 자동 점검
   scripts/check_doc.py                   A4 문서 9항목 자동 점검
   scripts/apply_brand.py                 브랜드 일괄 적용
   scripts/to_pdf.py                      PDF 내보내기

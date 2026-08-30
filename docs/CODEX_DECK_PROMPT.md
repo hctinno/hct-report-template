@@ -153,7 +153,7 @@ python scripts/check_content_sync.py
 python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 ```
 
-이 스크립트가 12항목을 기계로 판정한다.
+이 스크립트가 16항목을 기계로 판정한다.
 
 문체 · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 ·
 최소 글자 크기 · 데이터 마크 대비 · 브랜드 마크 존재 · 마크와 본문 겹침 ·

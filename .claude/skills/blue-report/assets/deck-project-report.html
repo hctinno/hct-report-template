@@ -153,13 +153,29 @@
     <p class="ad br-eyebrow">02. 일정과 산출물</p>
     <h2 class="a br-title br-title--light">산출물 8종, <strong>7종 제출 완료</strong></h2>
     <p class="a d2 br-lede">미제출 1건은 운영 3개월 실적이 필요한 문서 — <span class="br-key">11월 제출 예정</span></p>
+    <!-- 아이소타입 — 분모(8종)가 눈에 보인다. 표와 나란히 두므로 칸을 낮추고
+         설명을 옆에 붙여 한 줄로 앉힌다. 빈 칸도 데이터다. -->
+    <div class="a d3" style="display:flex;align-items:center;gap:22px;margin-top:16px">
+      <div class="br-iso" style="--cell-w:26px;--cell-h:24px;gap:8px">
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell"></span>
+      </div>
+      <div class="br-iso-cap" style="margin-top:0">8종 중 <b>7종 제출 완료</b> · 미제출 1종</div>
+    </div>
+
     <!-- 행 8개다. 규격서 상한은 7행이라 기본 여백으로는 푸터와 겹친다.
-         내용을 덜지 않고 표 위 여백과 머리글 아래 여백만 줄여 맞춘다. -->
-    <div class="a d3" style="flex:1;min-height:0;margin-top:16px">
-      <table class="br-table">
+         내용을 덜지 않고 .br-table--tight 로 행간만 줄여 맞춘다. -->
+    <div class="a d4" style="flex:1;min-height:0;margin-top:14px">
+      <table class="br-table br-table--tight">
         <thead><tr>
-          <th style="width:34%;padding-bottom:12px">산출물</th><th style="width:18%;padding-bottom:12px">담당</th>
-          <th style="width:18%;padding-bottom:12px">제출일</th><th style="width:14%;padding-bottom:12px">검토</th><th style="width:16%;padding-bottom:12px">상태</th>
+          <th style="width:34%">산출물</th><th style="width:18%">담당</th>
+          <th style="width:18%">제출일</th><th style="width:14%">검토</th><th style="width:16%">상태</th>
         </tr></thead>
         <tbody>
           <tr><td>요구 정의서</td><td>기획팀</td><td>2026.03.27</td><td>승인</td><td><span class="br-status br-status--ok">완료</span></td></tr>
@@ -191,7 +207,16 @@
       <div class="br-col"><div class="br-col-val">96<span class="br-sup">%</span></div><div class="by d3 br-bar-v" style="height:422px;"></div></div>
       <div class="br-col"><div class="br-col-val">92<span class="br-sup">%</span></div><div class="by d4 br-bar-v" style="height:405px;"></div></div>
       <div class="br-col"><div class="br-col-val br-col-val--muted">64<span class="br-sup">%</span></div><div class="by d5 br-bar-v br-bar-v--mute" style="height:282px;"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">20<span class="br-sup">%</span></div><div class="by d6 br-bar-v br-bar-v--mute" style="height:88px;"></div></div>
+      <!-- 지시선 주석 — 막대 안에 둔다. 지면 오른쪽 끝이라 --left 로 왼쪽으로 연다.
+           한 지면에 하나만. -->
+      <div class="br-col"><div class="br-col-val br-col-val--muted">20<span class="br-sup">%</span></div>
+        <div class="by d6 br-bar-v br-bar-v--mute" style="height:88px;">
+          <div class="br-note br-note--left" style="--w:190px;--h:330px">
+            <span class="br-note-dot"></span>
+            <span class="br-note-text">운영 안정화 20% — 무장애 18일 경과, 90일 충족 시점 2026.11.26</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:40px;margin-top:22px">
       <div class="f d7 br-col-name">요구 확정</div><div class="f d7 br-col-name">연계 개발</div>
@@ -235,42 +260,42 @@
     <div class="br-watermark" data-on="dark"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">04. 완료 판정</p>
     <h2 class="a br-title">판정 기준 6개 대조</h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px 34px;margin-top:52px;flex:1;min-height:0">
-      <div class="a d2 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">01</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">범위 내 5개 항목 완료</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">착수 합의 범위 전부 구현<br>변경 요청 2건은 이월 합의</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">충족</span>
+    <!-- 질문 칩 — 이 장이 판정하는 질문을 근거와 분리한다. 어두운 면에서는
+         칩 바탕이 옅은 반투명으로 바뀐다. -->
+    <div class="a d2 br-ask" style="margin-top:26px">착수 시 합의한 6개 기준을 다 충족했는가?</div>
+
+    <!-- 다크 요약장 — 짙은 지면에 짙은 카드를 얹지 않는다. 상단 괘선으로 구획한다.
+         값이 숫자가 아니라 판정어라 --word 로 한 단계 줄인다. -->
+    <div class="br-sumgrid" style="margin-top:34px;flex:1;min-height:0">
+      <div class="a d3 br-sumcard">
+        <span class="br-sumcard-n">01</span>
+        <div class="br-sumcard-t">범위 내 5개 항목 완료<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">착수 합의 범위 전부 구현<br>변경 요청 2건은 이월 합의</span></div>
+        <span class="br-sumcard-v br-sumcard-v--word">충족</span>
       </div>
-      <div class="a d3 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">02</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">검증 통과</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">시험 항목 142건 전수 통과<br>결과서 품질팀 승인</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">충족</span>
+      <div class="a d4 br-sumcard">
+        <span class="br-sumcard-n">02</span>
+        <div class="br-sumcard-t">검증 통과<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">시험 항목 142건 전수 통과<br>결과서 품질팀 승인</span></div>
+        <span class="br-sumcard-v br-sumcard-v--word">충족</span>
       </div>
-      <div class="a d4 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">03</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">산출물 제출</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">8종 중 7종 제출<br>1종은 90일 경과 후 제출</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-amber);align-self:center">일부</span>
+      <div class="a d5 br-sumcard">
+        <span class="br-sumcard-n">03</span>
+        <div class="br-sumcard-t">산출물 제출<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">8종 중 7종 제출<br>1종은 90일 경과 후 제출</span></div>
+        <span class="br-sumcard-v br-sumcard-v--word br-sumcard-v--warn">일부</span>
       </div>
-      <div class="a d5 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">04</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">담당자 교육</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">2회 실시 · 대상자 12명 전원 이수<br>이수 기록 제출 완료</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">충족</span>
+      <div class="a d6 br-sumcard">
+        <span class="br-sumcard-n">04</span>
+        <div class="br-sumcard-t">담당자 교육<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">2회 실시 · 대상자 12명 전원 이수<br>이수 기록 제출 완료</span></div>
+        <span class="br-sumcard-v br-sumcard-v--word">충족</span>
       </div>
-      <div class="a d6 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">05</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">운영 이관</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">운영 주체 기술본부로 이관<br>장애 대응 지침 보완 후 최종 승인</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-amber);align-self:center">조건부</span>
+      <div class="a d7 br-sumcard">
+        <span class="br-sumcard-n">05</span>
+        <div class="br-sumcard-t">운영 이관<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">운영 주체 기술본부로 이관<br>장애 대응 지침 보완 후 최종 승인</span></div>
+        <span class="br-sumcard-v br-sumcard-v--word br-sumcard-v--warn">조건부</span>
       </div>
-      <div class="a d7 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">06</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">무장애 운영 90일</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">18일 경과 · 장애 0건<br>2026.11.26 자동 충족 예정</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">진행</span>
+      <div class="a d8 br-sumcard">
+        <span class="br-sumcard-n">06</span>
+        <div class="br-sumcard-t">무장애 운영 90일<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">18일 경과 · 장애 0건<br>2026.11.26 자동 충족 예정</span></div>
+        <span class="br-sumcard-v br-sumcard-v--word">진행</span>
       </div>
     </div>
     <div class="br-footer"></div>
