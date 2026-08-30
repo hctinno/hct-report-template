@@ -101,7 +101,7 @@ def logo_html(uri, height):
             f'style="height:{height}px;width:auto">')
 
 
-def apply(html, brand, uris):
+def apply(html, brand, uris, title_override=None):
     """자리표시자를 실제 값으로 바꾼다. 바꾼 건수를 함께 돌려준다."""
     n = 0
 
@@ -151,11 +151,15 @@ def apply(html, brand, uris):
     sub(re.escape("© 2026 COMPANY NAME · All rights reserved"),
         f'© {brand["copyrightYear"]} {brand["company"]} · All rights reserved')
 
-    # 푸터의 문서명. 쪽번호는 뷰어가 자동으로 매기므로 여기서 건드리지 않는다.
-    # 슬라이드는 data-deck-title, A4 문서는 data-doc-title 을 쓴다.
+    # 슬라이드 푸터의 문서명. 쪽번호는 뷰어가 자동으로 매기므로 여기서 건드리지 않는다.
     if brand.get("docTitle"):
         sub(r'data-deck-title="[^"]*"', f'data-deck-title="{brand["docTitle"]}"', 1)
-        sub(r'data-doc-title="[^"]*"', f'data-doc-title="{brand["docTitle"]}"', 1)
+
+    # A4 문서의 data-doc-title 은 브랜드가 아니라 그 문서 자체의 제목이다
+    # (회의록이면 회의 이름). brand.json 의 docTitle 로 덮으면 문서가 이름을 잃는다.
+    # --title 로 명시했을 때만 바꾼다.
+    if title_override:
+        sub(r'data-doc-title="[^"]*"', f'data-doc-title="{title_override}"', 1)
 
     # A4 문서 꼬리말의 회사명. 슬라이드에는 없는 자리다.
     sub(r'<span class="bd-company">COMPANY NAME</span>',
@@ -198,10 +202,11 @@ def main():
     if not os.path.isfile(deck_path):
         sys.exit(f"오류: 덱을 찾지 못했다 — {deck_path}\n"
                  f"이름으로 고르려면: {' · '.join(DECKS)}")
-    print(f"덱: {os.path.basename(deck_path)}")
+    is_doc = os.path.basename(deck_path).startswith("doc-")
+    print(f"{'문서' if is_doc else '덱'}: {os.path.basename(deck_path)}")
 
     html = open(deck_path, encoding="utf-8").read()
-    html, n, left = apply(html, brand, uris)
+    html, n, left = apply(html, brand, uris, a.title)
 
     if a.single_file:
         from build_single_file import inline_assets
@@ -216,7 +221,8 @@ def main():
     print(f"  회사명   {brand['company']}")
     print(f"  마크     다크면 {'로고' if uris['dark'] else '워드마크 ' + brand['wordmark']}"
           f" · 밝은면 {'로고' if uris['light'] else '워드마크 ' + brand['wordmark']}"
-          f" (높이 {brand['logoHeight']}px, 우측 상단)")
+          + (" (쪽 머리말 · 높이 20px 로 blue-doc.css 가 맞춘다)" if is_doc
+             else f" (높이 {brand['logoHeight']}px, 우측 상단)"))
     if brand["email"]:
         print(f"  연락처   {brand['email']}")
     elif brand["website"]:
@@ -225,7 +231,11 @@ def main():
         print("  연락처   없음 — 연락처 줄 삭제")
     print(f"  전화     {brand['phone'] or '없음 — PHONE 행 삭제'}")
     print(f"  저작권   © {brand['copyrightYear']} {brand['company']}")
-    print(f"  문서명   {brand.get('docTitle') or '(미지정 — 템플릿 기본값 유지)'}")
+    if is_doc:
+        # A4 문서의 제목은 문서 자체의 내용이다. --title 로 덮었을 때만 알린다.
+        print(f"  문서명   {a.title}" if a.title else "  문서명   문서에 적힌 것 유지 (브랜드가 건드리지 않는다)")
+    else:
+        print(f"  문서명   {brand.get('docTitle') or '(미지정 — 템플릿 기본값 유지)'}")
     print(f"\n생성: {out}")
     if left:
         print(f"\n주의: 본문에 남은 자리표시자 {len(left)}건 — {', '.join(sorted(set(left)))}")
