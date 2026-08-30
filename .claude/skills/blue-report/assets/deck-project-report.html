@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>프로젝트 보고 템플릿</title>
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
+<!-- 폰트는 blue-report.css 의 @font-face 가 assets/fonts/ 에서 불러온다. 바깥 링크 없음 -->
 <link rel="stylesheet" href="blue-report.css">
 <link rel="stylesheet" href="deck-viewer.css">
 </head>
@@ -109,7 +108,7 @@
 
 <!-- 04 일정 (타임라인) -->
 <div class="br-frame" data-label="일정" data-notes="계획 대비 2주 지연이 있었고 원인과 회복 시점을 함께 말한다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-2)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">02. 일정과 산출물</p>
@@ -148,7 +147,7 @@
 
 <!-- 05 산출물 (표) -->
 <div class="br-frame" data-label="산출물" data-notes="8종 전부 읽지 말고 미제출 1건과 그 사유만 짚는다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-2)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">02. 일정과 산출물</p>
@@ -180,7 +179,7 @@
 
 <!-- 06 달성 현황 (막대) -->
 <div class="br-frame" data-label="달성 현황" data-notes="5개 마일스톤 중 마지막 하나만 미달이다. 원인은 다음 장에서.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-4)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">03. 달성 현황</p>
@@ -188,16 +187,16 @@
     <p class="a d2 br-lede">평균 달성률 <span class="br-key">74.4%</span> — 운영 안정화만 미달<br>미달 원인은 기간 부족이며 품질 문제 아님</p>
     <div style="position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:40px;align-items:end;flex:1;min-height:0;margin-top:34px">
       <div class="br-baseline" style="bottom:327px"><span>평균 74.4%</span></div>
-      <div class="br-col"><div class="br-col-val">100<span class="br-sup">%</span></div><div class="by d2 br-bar-v" style="height:440px;background:var(--br-data-1)"></div></div>
-      <div class="br-col"><div class="br-col-val">96<span class="br-sup">%</span></div><div class="by d3 br-bar-v" style="height:422px;background:var(--br-data-2)"></div></div>
-      <div class="br-col"><div class="br-col-val">92<span class="br-sup">%</span></div><div class="by d4 br-bar-v" style="height:405px;background:var(--br-data-3)"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">64<span class="br-sup">%</span></div><div class="by d5 br-bar-v" style="height:282px;background:var(--br-data-4)"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">20<span class="br-sup">%</span></div><div class="by d6 br-bar-v" style="height:88px;background:var(--br-data-5)"></div></div>
+      <div class="br-col"><div class="br-col-val">100<span class="br-sup">%</span></div><div class="by d2 br-bar-v" style="height:440px;"></div></div>
+      <div class="br-col"><div class="br-col-val">96<span class="br-sup">%</span></div><div class="by d3 br-bar-v" style="height:422px;"></div></div>
+      <div class="br-col"><div class="br-col-val">92<span class="br-sup">%</span></div><div class="by d4 br-bar-v" style="height:405px;"></div></div>
+      <div class="br-col"><div class="br-col-val br-col-val--muted">64<span class="br-sup">%</span></div><div class="by d5 br-bar-v br-bar-v--mute" style="height:282px;"></div></div>
+      <div class="br-col"><div class="br-col-val br-col-val--muted">20<span class="br-sup">%</span></div><div class="by d6 br-bar-v br-bar-v--mute" style="height:88px;"></div></div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:40px;margin-top:22px">
       <div class="f d7 br-col-name">요구 확정</div><div class="f d7 br-col-name">연계 개발</div>
-      <div class="f d8 br-col-name">검증</div><div class="f d8 br-col-name">운영 이관</div>
-      <div class="f d9 br-col-name">운영 안정화</div>
+      <div class="f d8 br-col-name">검증</div><div class="f d8 br-col-name br-col-name--mute">운영 이관</div>
+      <div class="f d9 br-col-name br-col-name--mute">운영 안정화</div>
     </div>
     <div class="br-footer"></div>
   </section>
@@ -231,7 +230,7 @@
 
 <!-- 08 완료 판정 (다크) -->
 <div class="br-frame" data-label="완료 판정" data-notes="착수 시 합의한 6개 기준을 그대로 가져와 하나씩 대조한다. 여기서 승인 여부가 갈린다.">
-  <section class="br-slide br-slide--dark" style="padding:84px 96px 56px">
+  <section class="br-slide br-slide--dark" style="--br-accent:var(--br-cat-3);padding:84px 96px 56px">
     <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="dark"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">04. 완료 판정</p>

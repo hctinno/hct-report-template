@@ -300,6 +300,26 @@ def check_encoding(log):
         log.ok("한국어 인코딩", "UTF-8 · 깨짐 패턴 없음")
 
 
+# ------------------------------------------------------------------ 계열색
+
+def check_palette(log):
+    """계열색 6종이 지면에서 갈리는지 본다.
+
+    부서·제품처럼 순서가 없는 항목을 색으로 가르는 자리라, 두 색이 닿았을 때
+    구별되지 않으면 그래프가 거짓말을 한다. 정상 시각만으로는 모자라서
+    적록색각 이상(남성 8%)까지 모의해서 본다. 판정은 palette.py --cat 이 한다."""
+    script = os.path.join(SKILL, "scripts", "palette.py")
+    r = run([sys.executable, script, "--cat"])
+    print(r.stdout, end="")
+    if r.returncode == 0:
+        worst = [l for l in r.stdout.splitlines() if "판정:" in l]
+        detail = " · ".join(w.split("판정:")[-1].strip() for w in worst)
+        log.ok("계열색", detail or "밝은면·다크면 6종 통과")
+    else:
+        bad = [l.strip() for l in r.stdout.splitlines() if "실패 —" in l]
+        log.fail("계열색", bad[0].replace("실패 — ", "") if bad else "인접쌍이 갈리지 않는다")
+
+
 # ------------------------------------------------------- HTML · PPTX 내용 동기화
 
 def check_sync(log):
@@ -451,12 +471,12 @@ def check_version(log):
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
     ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
-    ap.add_argument("--only", choices=["decks", "docs", "pptx", "dist", "encoding", "plugin", "sync", "version"],
+    ap.add_argument("--only", choices=["decks", "docs", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
                     action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
     ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
     a = ap.parse_args()
 
-    only = set(a.only or ["decks", "docs", "pptx", "dist", "encoding", "plugin", "sync", "version"])
+    only = set(a.only or ["decks", "docs", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
     log = Log()
 
     if a.shots:
@@ -465,8 +485,11 @@ def main():
     tmp = a.keep or tempfile.mkdtemp(prefix="blue-report-verify-")
     os.makedirs(tmp, exist_ok=True)
     try:
+        if "palette" in only:
+            print("── 계열색 ──")
+            check_palette(log)
         if "decks" in only:
-            print("── 덱 6종 ──")
+            print("\n── 덱 6종 ──")
             check_decks(log, tmp, a.shots)
         if "docs" in only:
             print("\n── A4 문서 ──")

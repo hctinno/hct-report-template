@@ -155,10 +155,13 @@ function tableSlide(pres, s, brand, page) {
   return sl;
 }
 
+// HTML 의 .br-status--ok / --warn / --late 와 같은 값을 쓴다. 토큰이 한곳이므로
+// blue-report.css 를 고치면 PowerPoint 판도 같이 바뀐다.
+// 정상이 회색이던 시절에는 표를 훑을 때 좋은 신호와 나쁜 신호가 갈리지 않았다.
 function statusColor(kind) {
   if (kind === 'warn') return { fg: C.warnText, bg: C.warnBg, line: C.warnLine };
-  if (kind === 'late') return { fg: C.alertText, bg: C.alertBg, line: C.coral };
-  return { fg: C.text2, bg: C.card, line: C.chipLine };
+  if (kind === 'late') return { fg: C.alertText, bg: C.alertBg, line: C.alertLine };
+  return { fg: C.okText, bg: C.okBg, line: C.okLine };
 }
 
 
@@ -258,6 +261,62 @@ function donutSlide(pres, s, brand, page) {
 }
 
 /* ── 비교 2열 ─────────────────────────────────────────────────────────── */
+/* 공유 트랙형 — 계획 대비 실적.
+   카드 둘로 갈라 좌우를 오가게 하지 않는다. 트랙 전체가 계획, 채워진 부분이 실적이다.
+   HTML 판(.br-bars-h + .br-bar-sub)과 같은 조판이다. */
+function progressSlide(pres, s, brand, page) {
+  const sl = pres.addSlide();
+  sl.background = { color: C.page };
+  L.watermark(sl, brand, false);
+  let y = header(sl, { eyebrow: s.eyebrow, title: s.title, titleBold: s.titleBold });
+  y = lede(sl, s.lede, { y: y + 22 }) + 40;
+
+  // 합계 두 개를 나란히. 계획은 물리고 실적만 브랜드색으로 세운다.
+  let tx = PAD.side;
+  (s.totals || []).forEach((t) => {
+    txt(sl, t.label, { x: X(tx), y: X(y), w: X(300), h: X(34),
+      fontFace: F.kr, fontSize: pt(24), bold: true, color: C.text2, valign: 'middle' });
+    txt(sl, [{ text: t.value, options: {} },
+             ...(t.sup ? [{ text: t.sup, options: { fontSize: pt(28) } }] : [])], {
+      x: X(tx), y: X(y + 46), w: X(300), h: X(80),
+      fontFace: F.num, fontSize: pt(64), bold: true, valign: 'middle',
+      color: t.muted ? C.text3 : C.cobalt });
+    tx += 300;
+  });
+  if (s.caption) {
+    txt(sl, s.caption, { x: X(tx), y: X(y + 60), w: X(CW - (tx - PAD.side)), h: X(50),
+      fontFace: F.kr, fontSize: pt(25), color: C.text2, valign: 'middle' });
+  }
+
+  const top = y + 170;
+  const avail = H - top - PAD.bottom - 40;
+  const gap = avail / s.bars.length;
+  const nameW = 320, valW = 260;
+  const trackX = PAD.side + nameW + 30;
+  const trackW = CW - nameW - valW - 60;
+  s.bars.forEach((b, i) => {
+    const by = top + i * gap;
+    txt(sl, b.name, { x: X(PAD.side), y: X(by), w: X(nameW), h: X(44),
+      fontFace: F.kr, fontSize: pt(25), bold: true, color: C.text, valign: 'middle' });
+    sl.addShape('roundRect', { x: X(trackX), y: X(by + 8), w: X(trackW), h: X(26),
+      rectRadius: 0.5, fill: { color: 'E3E9F0' }, line: { type: 'none' } });
+    sl.addShape('roundRect', { x: X(trackX), y: X(by + 8), w: X(trackW * b.pct / 100), h: X(26),
+      rectRadius: 0.5, fill: { color: b.alert ? C.alertText : C.cobalt }, line: { type: 'none' } });
+    txt(sl, [{ text: b.val, options: {} },
+             { text: ' / ' + b.of, options: { fontSize: pt(20), color: C.text3 } }], {
+      x: X(trackX + trackW + 20), y: X(by), w: X(valW - 20), h: X(40), align: 'right',
+      fontFace: F.num, fontSize: pt(32), bold: true,
+      color: b.alert ? C.alertText : C.cobalt, valign: 'middle' });
+    txt(sl, b.sub, { x: X(trackX + trackW + 20), y: X(by + 42), w: X(valW - 20), h: X(30),
+      align: 'right', fontFace: F.num, fontSize: pt(24),
+      color: b.alert ? C.alertText : C.text3, valign: 'middle' });
+  });
+  L.mark(sl, brand, false);
+  L.footer(sl, brand, page);
+  if (s.notes) sl.addNotes(s.notes);
+  return sl;
+}
+
 function compareSlide(pres, s, brand, page) {
   const sl = pres.addSlide();
   sl.background = { color: C.page };
@@ -515,6 +574,6 @@ function closingSlide(pres, s, brand) {
 
 module.exports = {
   cover, agenda, darkSummary, tableSlide, barSlide, donutSlide,
-  compareSlide, roadmapSlide, timelineSlide, bigStatSlide, closingSlide,
+  progressSlide, compareSlide, roadmapSlide, timelineSlide, bigStatSlide, closingSlide,
   statusColor, W, H,
 };

@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>교육 과정 템플릿</title>
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
+<!-- 폰트는 blue-report.css 의 @font-face 가 assets/fonts/ 에서 불러온다. 바깥 링크 없음 -->
 <link rel="stylesheet" href="blue-report.css">
 <link rel="stylesheet" href="deck-viewer.css">
 </head>
@@ -69,7 +68,7 @@
 
 <!-- 03 3단계 절차 -->
 <div class="br-frame" data-label="3단계 절차" data-notes="이 장이 과정의 뼈대다. 세 단계 이름을 학습자가 외우게 만든다. 실습 내내 이 단어로 부른다.">
-  <section class="br-slide" style="padding:84px 96px 56px">
+  <section class="br-slide" style="--br-accent:var(--br-cat-2);padding:84px 96px 56px">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">02. 만드는 법</p>
@@ -121,7 +120,7 @@
 
 <!-- 04 방식 비교 -->
 <div class="br-frame" data-label="방식 비교" data-notes="같은 업무를 두 방식으로 처리한 실측이다. 시간보다 편차 감소가 조직에는 더 중요하다는 점을 짚는다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-2)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">02. 만드는 법</p>
@@ -134,9 +133,9 @@
         <div class="br-body" style="margin-bottom:34px">1건 평균 소요</div>
         <div style="font:700 26px/1 var(--br-font-kr);color:var(--br-text-2);margin-top:auto;padding-bottom:20px;border-bottom:1px solid var(--br-card-line)">지표별 상세</div>
         <div class="br-bars-h" style="margin-top:30px;gap:30px 24px">
-          <div class="br-bar-name">평균 소요 시간</div><div class="br-bar-track"><div class="bx d5 br-bar-h" style="width:100%;background:var(--br-data-4)"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">184<span class="br-sup">분</span></div>
-          <div class="br-bar-name">담당자 간 편차</div><div class="br-bar-track"><div class="bx d6 br-bar-h" style="width:95%;background:var(--br-data-4)"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">3.8<span class="br-sup">배</span></div>
-          <div class="br-bar-name">재작업 발생률</div><div class="br-bar-track"><div class="bx d7 br-bar-h" style="width:41%;background:var(--br-data-4)"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">41<span class="br-sup">%</span></div>
+          <div class="br-bar-name">평균 소요 시간</div><div class="br-bar-track"><div class="bx d5 br-bar-h br-bar-h--mute" style="width:100%;"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">184<span class="br-sup">분</span></div>
+          <div class="br-bar-name">담당자 간 편차</div><div class="br-bar-track"><div class="bx d6 br-bar-h br-bar-h--mute" style="width:95%;"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">3.8<span class="br-sup">배</span></div>
+          <div class="br-bar-name">재작업 발생률</div><div class="br-bar-track"><div class="bx d7 br-bar-h br-bar-h--mute" style="width:41%;"></div></div><div class="br-bar-val" style="color:var(--br-text-2)">41<span class="br-sup">%</span></div>
         </div>
       </div>
       <div class="a d4 br-card" style="display:flex;flex-direction:column">
@@ -145,9 +144,9 @@
         <div class="br-body" style="margin-bottom:34px">1건 평균 · <span class="br-key">66% 단축</span></div>
         <div style="font:700 26px/1 var(--br-font-kr);color:var(--br-text-2);margin-top:auto;padding-bottom:20px;border-bottom:1px solid var(--br-card-line)">지표별 상세</div>
         <div class="br-bars-h" style="margin-top:30px;gap:30px 24px">
-          <div class="br-bar-name">평균 소요 시간</div><div class="br-bar-track"><div class="bx d5 br-bar-h" style="width:34%;background:var(--br-data-2)"></div></div><div class="br-bar-val">62<span class="br-sup">분</span></div>
-          <div class="br-bar-name">담당자 간 편차</div><div class="br-bar-track"><div class="bx d6 br-bar-h" style="width:38%;background:var(--br-data-2)"></div></div><div class="br-bar-val">1.5<span class="br-sup">배</span></div>
-          <div class="br-bar-name">재작업 발생률</div><div class="br-bar-track"><div class="bx d7 br-bar-h" style="width:12%;background:var(--br-data-2)"></div></div><div class="br-bar-val">12<span class="br-sup">%</span></div>
+          <div class="br-bar-name">평균 소요 시간</div><div class="br-bar-track"><div class="bx d5 br-bar-h" style="width:34%;"></div></div><div class="br-bar-val">62<span class="br-sup">분</span></div>
+          <div class="br-bar-name">담당자 간 편차</div><div class="br-bar-track"><div class="bx d6 br-bar-h" style="width:38%;"></div></div><div class="br-bar-val">1.5<span class="br-sup">배</span></div>
+          <div class="br-bar-name">재작업 발생률</div><div class="br-bar-track"><div class="bx d7 br-bar-h" style="width:12%;"></div></div><div class="br-bar-val">12<span class="br-sup">%</span></div>
         </div>
       </div>
     </div>
@@ -157,7 +156,7 @@
 
 <!-- 05 사전 수준 (도넛) -->
 <div class="br-frame" data-label="사전 수준" data-notes="교육 시작 전 설문 결과다. 입문이 38.5%라는 점을 짚고, 진도를 이 층에 맞춘다고 약속한다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-4)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">03. 실습 전 확인</p>
@@ -166,17 +165,20 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px;flex:1;min-height:0;margin-top:34px">
       <div class="a d3 br-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
         <div style="font:700 30px/1 var(--br-font-kr)">참석자 사전 수준</div>
-        <svg class="br-donut" viewBox="0 0 272 272" style="width:380px;height:380px" role="img" aria-label="참석자 사전 수준 분포">
+        <div class="br-donut-wrap">
+          <svg class="br-donut" viewBox="0 0 272 272" style="width:380px;height:380px" role="img" aria-label="참석자 사전 수준 분포">
           <g transform="translate(136,136)">
-            <circle class="dsh d5" r="110" stroke="var(--br-data-1)" stroke-width="48" stroke-dasharray="302.6 691.2" transform="rotate(-90)"></circle>
-            <circle class="dsh d6" r="110" stroke="var(--br-data-2)" stroke-width="48" stroke-dasharray="263.2 691.2" transform="rotate(69.12)"></circle>
-            <circle class="dsh d7" r="110" stroke="var(--br-data-3)" stroke-width="48" stroke-dasharray="116.7 691.2" transform="rotate(207.72)"></circle>
+            <circle class="dsh d5" r="110" stroke="var(--mark)" stroke-width="48" stroke-dasharray="302.6 691.2" transform="rotate(-90)"></circle>
+            <circle class="dsh d6" r="110" stroke="var(--mark-mid)" stroke-width="48" stroke-dasharray="263.2 691.2" transform="rotate(69.12)"></circle>
+            <circle class="dsh d7" r="110" stroke="var(--mark-mute)" stroke-width="48" stroke-dasharray="116.7 691.2" transform="rotate(207.72)"></circle>
           </g>
         </svg>
+          <div class="br-donut-center"><span class="br-donut-num">44.2<span class="br-sup">%</span></span><span class="br-donut-cap">중급</span></div>
+        </div>
         <div class="br-legend">
-          <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--br-data-1)"></span>중급</div><div class="br-legend-val">44.2<span class="br-sup">%</span></div></div>
-          <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--br-data-2)"></span>입문</div><div class="br-legend-val">38.5<span class="br-sup">%</span></div></div>
-          <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--br-data-3)"></span>고급</div><div class="br-legend-val">17.3<span class="br-sup">%</span></div></div>
+          <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--mark)"></span>중급</div><div class="br-legend-val">44.2<span class="br-sup">%</span></div></div>
+          <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--mark-mid)"></span>입문</div><div class="br-legend-val">38.5<span class="br-sup">%</span></div></div>
+          <div class="br-legend-item"><div class="br-legend-name"><span class="br-dot" style="background:var(--mark-mute)"></span>고급</div><div class="br-legend-val">17.3<span class="br-sup">%</span></div></div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:26px;min-height:0">
@@ -197,7 +199,7 @@
 
 <!-- 06 실습 체크리스트 (표) -->
 <div class="br-frame" data-label="실습 체크리스트" data-notes="실습 중에는 이 장을 띄워 둔다. 학습자가 스스로 진도를 확인하게 한다.">
-  <section class="br-slide">
+  <section class="br-slide" style="--br-accent:var(--br-cat-4)">
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">03. 실습</p>

@@ -49,9 +49,15 @@ DECKS = {
 
 # ------------------------------------------------------------------ 공통 도구
 
+# 분모(.br-bar-of)는 값이 아니라 견주는 대상이다. "174 / 180" 에서 막대가 말하는
+# 값은 174 뿐이므로, 대조 전에 통째로 걷어낸다. 단위(.br-sup)는 그대로 둔다 —
+# 양쪽에 단위가 있으면 그때는 같아야 한다는 기존 규칙이 있다.
+OF_RE = re.compile(r'<span class="br-bar-of">.*?</span>', re.S)
+
+
 def text(fragment):
     """태그를 벗기고 공백을 하나로 줄인다."""
-    s = re.sub(r"<[^>]+>", "", fragment)
+    s = re.sub(r"<[^>]+>", "", OF_RE.sub("", fragment))
     return re.sub(r"\s+", " ", htmllib.unescape(s)).strip()
 
 
@@ -196,6 +202,13 @@ def js_facts(slide):
         # 좌우 두 카드에 가로 막대가 하나씩. HTML 도 좌 → 우 순서로 적혀 있다.
         # 예전에는 HTML 쪽 가로 막대를 못 읽어 이 슬라이드가 통째로 대조 밖이었다.
         bars = list(slide.get("left", {}).get("bars", [])) + list(slide.get("right", {}).get("bars", []))
+        if bars:
+            f["bar"] = {"names": [norm(b.get("name", "")) for b in bars],
+                        "values": [norm(str(b.get("val", ""))) for b in bars]}
+    if slide.get("type") == "progress":
+        # 공유 트랙형. 트랙이 계획, 채움이 실적이므로 막대 하나에 값이 둘이다.
+        # HTML 은 "174" 와 "/ 180" 을 나눠 적으므로 값은 실적만 견준다.
+        bars = slide.get("bars", [])
         if bars:
             f["bar"] = {"names": [norm(b.get("name", "")) for b in bars],
                         "values": [norm(str(b.get("val", ""))) for b in bars]}
