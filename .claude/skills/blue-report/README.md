@@ -141,14 +141,15 @@ node pptx/build.js --brand brand.json --deck internal    # 한 종만
 | 항목 | HTML | PPTX |
 |---|---|---|
 | 등장 애니메이션 | 있음 | 없음 (PowerPoint 애니메이션은 넣지 않는다) |
-| 폰트 | Noto Sans KR · Barlow (웹폰트) | 맑은 고딕 · Arial (PC 설치 폰트) |
+| 폰트 | 프리텐다드 (저장소 내장 서브셋) | 프리텐다드 (PC 설치 폰트) |
 | 도넛 · 막대 | SVG · CSS | **PowerPoint 네이티브 차트** — 값을 직접 고칠 수 있다 |
 | 막대 기준선 | 차트에 선으로 표시 | 제목 아래 문장으로 표시 |
 | 목록 | 글머리 기호 | `키워드 — 내용` 구조만 |
 | 표 상태 | 알약 칩 | 색 있는 글자 |
 | 발표자 노트 | `N` 키로 표시 | 슬라이드 노트 창 |
 
-Noto Sans KR 과 Barlow 를 사내 PC 에 배포했다면 `pptx/tokens.js` 의 `F` 두 줄만 바꾼다.
+PPTX 는 PC 에 설치된 폰트만 쓴다. 프리텐다드를 사내 배포하지 않았다면 `pptx/tokens.js` 의
+`F` 세 줄을 `'맑은 고딕'` 으로 되돌린다.
 
 #### 내용이 두 곳에 있다 — 합치지 않고 갈라짐을 검사한다
 
@@ -366,7 +367,7 @@ python3 scripts/make_logo_variants.py 로고.png --out-dir . --name mylogo
   통째로 사라진다. 사내 배포용 덱은 대개 이쪽이 맞다.
 - **로고가 없으면** `logo`와 `logoOnLight`를 `null`로 둔다. `wordmark` 텍스트가 대신 들어가며,
   배경에 맞춰 밝은 면은 브랜드 파랑, 어두운 면은 흰색으로 자동 전환한다.
-  한글이면 Barlow Condensed에 한글 글리프가 없으므로 Noto Sans KR로 자동 전환한다.
+  프리텐다드 한 벌이 한글과 라틴을 모두 담으므로 폰트가 갈리지 않는다.
 - 항상 원본 템플릿에서 새로 만들기 때문에 몇 번을 실행해도 결과가 같다.
   로고를 바꾸면 다시 실행하기만 하면 된다.
 - 자리표시자 주석은 적용 후에도 남는다. 나중에 위치를 다시 찾기 쉽게 하기 위함이다.
@@ -613,18 +614,36 @@ PPTX 생성기가 `logoRatio` 하나로 둘을 그리면 한쪽이 찌그러지�
 
 ## 2. 타입
 
-폰트는 Google Fonts에서 불러온다.
+폰트는 **프리텐다드** 하나다. 저장소가 파일을 들고 있고 바깥에서 받아 오지 않는다.
+HTML 에 폰트 `<link>` 를 적지 않는다 — `blue-report.css` 의 `@font-face` 가 처리한다.
 
-```html
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
 ```
+assets/fonts/PretendardVariable.subset.woff2   425KB · 굵기 45~930 · KS X 1001 한글 2,350자
+assets/fonts/LICENSE-Pretendard.txt            SIL OFL 1.1 (재배포 조건)
+```
+
+가변 폰트 한 벌에 전 굵기가 들어 있다. 정적 폰트로 여섯 굵기를 받으면 965KB 인데
+이건 425KB 로 끝나고, 굵기를 하나 더 쓰기로 해도 파일이 늘지 않는다.
 
 | 용도 | 폰트 | 토큰 |
 |---|---|---|
-| 한글 제목 · 본문 | Noto Sans KR | `--br-font-kr` |
-| 숫자 | Barlow 700 | `--br-font-num` |
-| 섹션 라벨 | Barlow Condensed 600 + `letter-spacing:.14em` 대문자 | `--br-font-label` |
+| 한글 제목 · 본문 | 프리텐다드 | `--br-font-kr` |
+| 숫자 | 프리텐다드 + `tabular-nums` | `--br-font-num` |
+| 섹션 라벨 | 프리텐다드 600 + `letter-spacing:.14em` 대문자 | `--br-font-label` |
+
+세 토큰은 지금 같은 값이다(`--br-font-num` 과 `--br-font-label` 이 `--br-font-kr` 을
+가리킨다). 나눠 둔 것은 나중에 숫자나 라벨만 다른 폰트로 갈아 끼울 자리를 남기려는 것이다.
+
+**폰트를 다시 만들 때** — 손으로 받아 넣지 않는다.
+
+```bash
+python3 scripts/make_font_subset.py           # npm 에서 받아 잘라 넣는다
+python3 scripts/make_font_subset.py --check   # 지금 것이 규격에 맞는지만 본다
+```
+
+`--check` 는 크기만 보지 않는다. `tnum`(고정폭 숫자)과 `kern` 이 살아 있는지, 굵기 축이
+300~900 을 덮는지, 넣기로 한 글자가 다 들어갔는지를 본다. `tnum` 이 빠지면 표의 숫자
+자리가 흔들리는데 눈으로는 잘 안 보인다.
 
 - 제목은 **weight 300과 900을 한 문장에서 대비**시킨다. `가벼운 앞말 + <strong>굵은 핵심</strong>`
 - **1920×1080에서 24px 하한.** 예외는 큰 숫자에 붙는 `%` 첨자(`.br-sup`, `.44em`)뿐이다.
@@ -825,14 +844,20 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 모자란다. SVG 나 고해상도 원본이 생기면 교체하고 `make_logo_variants.py`로 두 벌을
 다시 뽑는다.
 
-### 사내 폰트 — 미확정
+### 사내 폰트 — 프리텐다드로 확정
 
-`blue-report.css`의 `--br-font-kr`, `--br-font-num`, `--br-font-label`의 첫 패밀리만
-교체한다. 나머지는 폴백으로 남긴다. 현재는 Google Fonts 의 Noto Sans KR · Barlow ·
-Barlow Condensed 를 쓴다.
+HTML 은 저장소가 들고 있는 서브셋을 쓰므로 어디서 열어도 같은 글자가 나온다.
 
-PPTX 판은 PC 설치 폰트를 쓰므로 별도다. 사내 폰트를 PC 에 배포했다면 `pptx/tokens.js`의
-`F` 두 줄도 함께 바꾼다.
+**PPTX 는 다르다.** PowerPoint 는 PC 에 설치된 폰트만 쓰고 `assets/fonts/` 의 파일을
+보지 못한다. `pptx/tokens.js` 의 `F` 가 이름으로 `Pretendard` 를 지목하지만, 설치되지
+않은 PC 에서는 PowerPoint 가 제멋대로 대체한다. pptxgenjs 는 대체 목록을 받지 않아
+한 이름만 적을 수 있다.
+
+- 사내 PC 에 프리텐다드를 배포했다면 → 그대로 둔다
+- 아직 배포 전이라면 → `F` 세 줄을 `'맑은 고딕'` 으로 되돌려 쓴다
+
+설치용 파일은 https://github.com/orioncactus/pretendard 의 릴리스에서 받는다.
+`assets/fonts/` 의 것은 KS X 1001 로 잘라 낸 웹용이라 설치용으로 쓰지 않는다.
 
 ### 연락처
 

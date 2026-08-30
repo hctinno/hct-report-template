@@ -4,9 +4,20 @@
    색은 이 파일의 커스텀 속성으로만 쓴다. 슬라이드에 raw hex를 직접 적지 않는다.
    ========================================================================= */
 
-/* 폰트는 문서 <head>에서 불러온다.
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"> */
+/* 폰트는 저장소가 들고 있다. 바깥에서 받아 오지 않는다.
+   그래야 인터넷 없이도, Artifact 로 발행해도 같은 글자로 나온다.
+
+   fonts/PretendardVariable.subset.woff2 — 425KB 한 벌에 굵기 45~930 이 전부 들어 있다.
+   KS X 1001 한글 2,350자 + ASCII + 호환 자모 + 문서 기호.
+   scripts/make_font_subset.py 가 만든다. 손으로 받아 넣지 않는다.
+   재배포 조건은 assets/fonts/LICENSE-Pretendard.txt (SIL OFL 1.1). */
+@font-face {
+  font-family:'Pretendard Variable';
+  src:url('fonts/PretendardVariable.subset.woff2') format('woff2-variations');
+  font-weight:45 930;   /* 가변 축 전 구간. 300·400·500·600·700·900 을 한 파일이 낸다 */
+  font-style:normal;
+  font-display:swap;
+}
 
 :root {
   /* ---------- 지면 ---------- */
@@ -80,10 +91,16 @@
   --br-soft-3: #a4c4e5;
 
   /* ---------- 타입 ---------- */
-  --br-font-kr:    'Noto Sans KR', system-ui, -apple-system, sans-serif;
-  --br-font-num:   'Barlow', 'Noto Sans KR', sans-serif;
-  --br-font-label: 'Barlow Condensed', 'Barlow', sans-serif;
-  /* 사내 폰트 배정 자리 — 확정되면 위 세 줄의 첫 패밀리만 교체한다. */
+  /* 사내 폰트는 프리텐다드로 확정. 본문·숫자·라벨 세 자리를 한 벌로 쓴다.
+     대체 순서의 뜻 — 'Pretendard' 는 PC 에 설치된 정식판(있으면 그것을 쓴다),
+     'Pretendard Variable' 은 위 @font-face 로 저장소가 들고 있는 서브셋,
+     그 뒤는 폰트가 아예 못 뜰 때의 시스템 대체다.
+     세 토큰을 나눠 둔 것은 값이 달라서가 아니라, 나중에 숫자나 라벨만
+     다른 폰트로 갈아 끼울 때 이 세 줄만 고치면 되게 하려는 것이다. */
+  --br-font-kr:    'Pretendard', 'Pretendard Variable', -apple-system, BlinkMacSystemFont,
+                   system-ui, 'Malgun Gothic', sans-serif;
+  --br-font-num:   var(--br-font-kr);
+  --br-font-label: var(--br-font-kr);
 
   --br-fs-cover:      108px;  /* 표지 제목 */
   --br-fs-display:     96px;  /* 마무리 CTA 제목 */
@@ -163,10 +180,14 @@
    너무 세게 보이고 본문 대비를 갉아먹는다. 3%로 낮춘다. */
 .br-slide .br-watermark { opacity:.03; }
 .br-slide--dark .br-watermark { opacity:.05; }
-/* 브랜드를 넣기 전 템플릿 상태. 워드마크 글자는 벡터라 아무리 키워도 깨지지 않는다. */
+/* 브랜드를 넣기 전 템플릿 상태. 워드마크 글자는 벡터라 아무리 키워도 깨지지 않는다.
+   nowrap 이 없으면 720px 상자 안에서 단어 중간이 잘려 COMPAN / Y NAME 으로 접힌다.
+   전역 word-break:keep-all 은 한글 규칙이라 라틴 낱말을 지켜 주지 않는다.
+   크기는 상자에 들어가는 값으로 잡는다 — 자간 .2em 이 붙어 128px 이면 두 배 넘게 넘친다. */
 .br-watermark .br-wordmark {
-  font:700 128px/1 var(--br-font-label) !important;
+  font:700 64px/1 var(--br-font-label) !important;
   letter-spacing:var(--br-ls-mark); color:var(--br-on-dark) !important;
+  white-space:nowrap;
 }
 /* 표지(첫 장)에는 마크업 자체를 넣지 않는다. 마무리 장은 --cover 조판이지만
    표지가 아니므로 깔린다. --cover 는 지면이 짙으므로 다크면과 같은 5%다. */

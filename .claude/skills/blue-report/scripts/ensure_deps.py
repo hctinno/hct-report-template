@@ -4,8 +4,9 @@
 사용자가 미리 설치할 것을 요구하지 않는다. 스크립트가 실행될 때 없는 것만 골라
 직접 받아 온다. 이미 있으면 아무것도 하지 않고 아무 말도 하지 않는다.
 
-    from ensure_deps import need_pillow, need_browser, need_node_modules
+    from ensure_deps import need_pillow, need_fonttools, need_browser, need_node_modules
     need_pillow()          # 로고 변환
+    need_fonttools()       # 폰트 서브셋
     need_browser()         # 렌더 점검 · PDF
     need_node_modules(d)   # PPTX
 
@@ -78,6 +79,12 @@ def need_pillow():
     need_python("PIL", "Pillow", "이미지 처리(Pillow)")
 
 
+def need_fonttools():
+    """폰트 서브셋. brotli 는 woff2 로 저장할 때 fontTools 가 부른다."""
+    need_python("fontTools", "fonttools", "폰트 서브셋(fontTools)")
+    need_python("brotli", "brotli", "woff2 압축(brotli)")
+
+
 def find_browser():
     """쓸 수 있는 Chromium 실행 파일을 찾는다. 없으면 None."""
     import glob
@@ -133,6 +140,7 @@ def need_node_modules(directory=PPTX_DIR):
 
 STATUS = [
     ("Pillow (로고 변환)", lambda: importlib.util.find_spec("PIL") is not None),
+    ("fontTools (폰트 서브셋)", lambda: importlib.util.find_spec("fontTools") is not None),
     ("Playwright (렌더 점검 · PDF)", lambda: importlib.util.find_spec("playwright") is not None),
     ("Chromium (렌더 점검 · PDF)", lambda: find_browser() is not None),
     ("pptxgenjs (PPTX)", lambda: os.path.isdir(os.path.join(PPTX_DIR, "node_modules", "pptxgenjs"))),
@@ -143,7 +151,7 @@ def main():
     import importlib.util  # noqa: F401  (STATUS 에서 쓴다)
     args = sys.argv[1:]
     if "--all" in args:
-        need_pillow(); need_browser(); need_node_modules()
+        need_pillow(); need_fonttools(); need_browser(); need_node_modules()
         print("전부 준비됨")
         return
     print("의존성 상태")

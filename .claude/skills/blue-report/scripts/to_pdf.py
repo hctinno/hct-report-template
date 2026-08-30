@@ -69,11 +69,11 @@ def _append_notes_page(pg, info):
         const d = document.createElement('div');
         d.className = 'br-frame';
         d.style.cssText = 'background:#fff;padding:96px;box-sizing:border-box;'
-            + 'width:1920px;height:1080px;font-family:"Noto Sans KR",sans-serif;';
-        d.innerHTML = '<h2 style="font:900 54px/1.2 \\'Noto Sans KR\\';margin:0 0 40px;'
-            + 'color:#10151c">발표자 노트</h2>'
+            + 'width:1920px;height:1080px;font-family:var(--br-font-kr);';
+        d.innerHTML = '<h2 style="font:900 54px/1.2 var(--br-font-kr);margin:0 0 40px;'
+            + 'color:var(--br-text)">발표자 노트</h2>'
             + '<table style="width:100%;border-collapse:collapse;font:400 22px/1.5 '
-            + '\\'Noto Sans KR\\';color:#333e4a">' + rows + '</table>';
+            + 'var(--br-font-kr);color:var(--br-text-2)">' + rows + '</table>';
         d.querySelectorAll('td').forEach(td => {
             td.style.padding = '14px 16px';
             td.style.borderBottom = '1px solid #dbe3ec';

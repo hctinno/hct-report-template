@@ -123,12 +123,15 @@ def logo_uris(brand, brand_path):
 
 
 def wordmark_html(brand, font_size):
-    """로고가 없을 때 쓰는 워드마크. 한글이면 폰트와 자간을 바꾼다.
+    """로고가 없을 때 쓰는 워드마크. 한글이면 자간을 줄인다.
+
+    폰트는 한글이든 라틴이든 같다 — 프리텐다드 한 벌이 둘 다 담는다.
+    갈라야 하는 것은 자간이다. 라틴 대문자 워드마크는 .2em 으로 벌려야
+    마크처럼 보이지만, 한글에 같은 값을 주면 글자가 흩어져 낱자로 읽힌다.
 
     색은 넣지 않는다. .br-mark[data-on] 규칙이 배경에 맞춰 정한다."""
     text = brand["wordmark"]
     if HANGUL.search(text):
-        # Barlow Condensed에는 한글이 없다. 폰트를 바꾸고 자간을 줄인다.
         style = f"font:700 {font_size}px/1 var(--br-font-kr);letter-spacing:.02em"
     else:
         style = (f"font:600 {font_size}px/1 var(--br-font-label);"

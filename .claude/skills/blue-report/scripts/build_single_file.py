@@ -13,6 +13,7 @@ CSS를 인라인해 첨부 파일 없이 어디서나 열리는 한 장짜리 �
 생략하면 카탈로그다.
 """
 import argparse
+import base64
 import os
 import re
 import sys
@@ -30,27 +31,52 @@ DECK = os.path.join(ASSETS, DECKS["catalog"])
 
 # 로컬 자원 참조. 이름을 목록으로 박아 두지 않는다 — 덱은 deck-viewer,
 # A4 문서는 doc-viewer 를 쓰므로 목록으로 두면 종류가 늘 때마다 여기를 고쳐야 한다.
-# 폰트는 https://fonts.googleapis.com/css2?family=... 라 .css 로 끝나지 않아 걸리지 않는다.
 LOCAL_CSS_RE = re.compile(r'<link rel="stylesheet" href="([^":/]+\.css)">')
 LOCAL_JS_RE = re.compile(r'<script src="([^":/]+\.js)"></script>')
+
+# @font-face 의 url(...). 인라인한 CSS 안에 남으면 상대 경로라 단일 파일에서 깨진다.
+FONT_URL_RE = re.compile(r"url\(\s*['\"]?(fonts/[^'\")]+\.woff2)['\"]?\s*\)")
 
 # 뷰어 CSS 가 지면 바깥 바탕을 정한다. 덱은 #111, A4 문서는 회색이다.
 BODY_BG_RE = re.compile(r'html\s*,\s*body\s*\{[^}]*?background:\s*([^;}]+)')
 
 
+def inline_fonts(css, assets_dir):
+    """@font-face 의 woff2 를 data URI 로 바꾼다.
+
+    단일 파일은 어디로든 옮겨 다니므로 상대 경로가 남으면 글자가 시스템
+    폰트로 떨어진다. Artifact 는 더 엄해서, 폰트를 fonts.gstatic.com 에서만
+    받는다 — 저장소가 들고 있는 파일이든 CDN 이든 링크로는 절대 못 들어간다.
+    본문에 심는 것이 유일한 길이다.
+
+    woff2 는 이미 압축돼 있어 base64 로 약 1.37배가 된다. 425KB → 582KB."""
+    def one(m):
+        path = os.path.join(assets_dir, m.group(1))
+        if not os.path.isfile(path):
+            raise SystemExit(f"폰트를 찾지 못했다: {path}\n"
+                             f"  만들려면: python3 scripts/make_font_subset.py")
+        b64 = base64.b64encode(open(path, "rb").read()).decode("ascii")
+        return f"url(data:font/woff2;base64,{b64})"
+
+    return FONT_URL_RE.sub(one, css)
+
+
 def inline_assets(html, assets_dir=None):
     """<link>·<script src>로 걸린 로컬 자원을 본문에 인라인한다.
 
-    폰트(fonts.googleapis.com)는 원격이므로 건드리지 않는다."""
+    폰트도 함께 심는다 — 바깥에서 받아 오는 글자는 이제 없다."""
     d = assets_dir or ASSETS
 
-    def one(m, wrap):
+    def one(m, wrap, is_css=False):
         path = os.path.join(d, m.group(1))
         if not os.path.isfile(path):
             return m.group(0)
-        return wrap[0] + open(path, encoding="utf-8").read() + wrap[1]
+        text = open(path, encoding="utf-8").read()
+        if is_css:
+            text = inline_fonts(text, d)
+        return wrap[0] + text + wrap[1]
 
-    html = LOCAL_CSS_RE.sub(lambda m: one(m, ("<style>\n", "\n</style>")), html)
+    html = LOCAL_CSS_RE.sub(lambda m: one(m, ("<style>\n", "\n</style>"), True), html)
     html = LOCAL_JS_RE.sub(lambda m: one(m, ("<script>\n", "\n</script>")), html)
     return html
 
@@ -84,9 +110,11 @@ def build(artifact=False, brand_path=None, deck="catalog", out_path=None):
         head = re.search(r"<head>(.*?)</head>", html, re.S).group(1)
         body = re.search(r"<body[^>]*>(.*?)</body>", html, re.S).group(1)
 
+        # 남기는 것은 <title> 과 인라인된 <style> 뿐이다. 바깥으로 나가는 <link> 는
+        # 하나도 없다 — 폰트까지 본문에 심었으므로 Artifact 가 무엇을 막든 상관없다.
         keep = []
         for tag in re.findall(r'<link[^>]+>|<title>.*?</title>|<style>.*?</style>', head, re.S):
-            if 'href="https://fonts.g' in tag or tag.startswith("<title") or tag.startswith("<style"):
+            if tag.startswith("<title") or tag.startswith("<style"):
                 keep.append(tag)
         # 지면 바깥 바탕은 뷰어 CSS 가 html,body 에 걸어 둔다. 껍데기를 벗기면서
         # 그 규칙이 바깥 body 에 닿도록 값을 그대로 옮겨 적는다. 덱과 문서가 다르므로

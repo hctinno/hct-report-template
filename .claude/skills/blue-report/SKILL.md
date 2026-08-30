@@ -166,7 +166,8 @@ python3 scripts/apply_brand.py --brand ./brand.json --single-file -o ./deck.html
 - 로고는 PNG·JPG·SVG·WEBP를 data URI로 박는다. 완성 HTML 하나만 들고 다니면 된다.
 - 연락처가 없으면 `email`·`website`·`phone`을 빈 문자열로 둔다. 해당 줄이 통째로 사라진다.
 - `logo`·`logoOnLight`가 `null`이면 `wordmark` 텍스트가 들어간다. 한글이면 폰트를
-  Noto Sans KR로 바꾸고, 색은 배경에 맞춰 밝은 면 브랜드 파랑·어두운 면 흰색으로 전환한다.
+  프리텐다드 한 벌이 한글과 라틴을 모두 담으므로 폰트가 갈리지 않는다. 색은 배경에 맞춰
+  밝은 면 브랜드 파랑·어두운 면 흰색으로 전환한다.
 - 항상 원본 템플릿에서 새로 만들므로 몇 번 실행해도 결과가 같다.
 
 사내 폰트가 확정되면 `blue-report.css`의 `--br-font-kr`, `--br-font-num`, `--br-font-label`
