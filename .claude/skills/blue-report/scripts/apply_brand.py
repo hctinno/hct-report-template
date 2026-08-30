@@ -108,6 +108,20 @@ def logo_data_uri(brand, brand_path, key="logo"):
     return f"data:{mime};base64,{data}"
 
 
+def logo_uris(brand, brand_path):
+    """브랜드가 쓰는 이미지 네 벌을 한 번에 data URI 로 만든다.
+
+    이 딕셔너리를 두 곳에서 따로 만들다 사고가 났다. build_single_file.py 가
+    watermark 키를 빠뜨려, 아티팩트에서만 워터마크가 전체 로고로 되돌아갔다.
+    호출부가 늘어도 키가 갈라지지 않게 여기 한 곳에서만 만든다."""
+    return {
+        "dark":  logo_data_uri(brand, brand_path, "logo"),
+        "light": logo_data_uri(brand, brand_path, "logoOnLight"),
+        "watermark":        logo_data_uri(brand, brand_path, "watermark"),
+        "watermarkOnLight": logo_data_uri(brand, brand_path, "watermarkOnLight"),
+    }
+
+
 def wordmark_html(brand, font_size):
     """로고가 없을 때 쓰는 워드마크. 한글이면 폰트와 자간을 바꾼다.
 
@@ -229,10 +243,7 @@ def main():
     if a.title:
         brand["docTitle"] = a.title
     # 다크면용(흰색 녹아웃)과 밝은면용(원색) 두 벌을 읽는다.
-    uris = {"dark":  logo_data_uri(brand, a.brand, "logo"),
-            "light": logo_data_uri(brand, a.brand, "logoOnLight"),
-            "watermark": logo_data_uri(brand, a.brand, "watermark"),
-            "watermarkOnLight": logo_data_uri(brand, a.brand, "watermarkOnLight")}
+    uris = logo_uris(brand, a.brand)
     if uris["dark"] and not uris["light"]:
         print("주의: logoOnLight 가 없다. 흰색 로고를 밝은 지면에 얹으면 보이지 않으므로 "
               "밝은 슬라이드는 워드마크 텍스트로 둔다. brand.json 에 원색 로고 경로를 넣어라.",

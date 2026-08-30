@@ -47,7 +47,7 @@ blue-report/
 └─ scripts/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
-   ├─ check_deck.py            덱 자동 점검 11항목 + 슬라이드별 PNG
+   ├─ check_deck.py            덱 자동 점검 12항목 + 슬라이드별 PNG
    ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
    ├─ apply_brand.py           회사 정보·로고를 덱에 일괄 적용
@@ -197,7 +197,7 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | 애니메이션 | 있음 (끌 수 있음) | 없음 |
 | 머리말·꼬리말 | 꼬리말만 | 쪽마다 둘 다 |
 | 브랜드 | 우측 상단 마크 | 머리말 로고 + 꼬리말 회사명 |
-| 검사기 | `check_deck.py` 11항목 | `check_doc.py` 9항목 |
+| 검사기 | `check_deck.py` 12항목 | `check_doc.py` 9항목 |
 
 파일 구성도 덱과 같은 방식으로 나뉜다.
 
@@ -786,7 +786,7 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
    → 마크는 상단 여백 띠 안에만 둔다. 우측 상단에 콘텐츠를 붙이지 않는다.
 
 `python3 scripts/check_deck.py deck.html --shots out/`이 위 1·4·5·6·7·8과 문체를 자동
-검사하고 슬라이드별 PNG를 남긴다. 판정은 11항목이다.
+검사하고 슬라이드별 PNG를 남긴다. 판정은 12항목이다.
 
 | # | 항목 | 실패하면 |
 |---|---|---|

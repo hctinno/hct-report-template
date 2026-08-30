@@ -7,7 +7,7 @@ Playwright가 없으면 정적 검사만 수행하고 그 사실을 보고한다
     python3 check_deck.py ../assets/deck-template.html
     python3 check_deck.py deck.html --shots out/     # 슬라이드별 PNG도 저장
 
-검사 항목 (11)
+검사 항목 (12)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 금지 문체 — 존댓말(~습니다 / ~해요)과 평서형(~한다 / ~없다) 없이 명사형인가
     2. 파이(<path> 호)를 쓰지 않았는가 — 도넛만 허용
@@ -21,6 +21,7 @@ Playwright가 없으면 정적 검사만 수행하고 그 사실을 보고한다
     9. 브랜드 마크가 모든 슬라이드 우측 상단에 있는가
    10. 브랜드 마크가 본문과 겹치지 않는가
    11. 로고 변형이 배경 밝기와 맞는가 (어두운 면 흰색 · 밝은 면 원색)
+   12. 배경 워터마크가 마크와 다른 자산인가 (국문 병기를 뗀 심볼이어야 한다)
 
 종료 코드는 실패가 하나라도 있으면 1, 아니면 0이다. 주의는 0을 유지한다.
 """
@@ -190,6 +191,16 @@ def check_render(path, rep, shots=None):
               const fs = parseFloat(getComputedStyle(el).fontSize);
               if (fs < 24) small.push({fs: Math.round(fs*10)/10, txt: txt.slice(0,32)});
             });
+            // 배경 워터마크 — 마크와 같은 자산이면 국문 병기가 딸려 온다.
+            // 원본 픽셀 비율로 가른다. 심볼은 국문이 빠져 더 납작하다.
+            let wm = null;
+            const wmImg = sec.querySelector('.br-watermark img');
+            const mkImg = sec.querySelector('.br-mark img');
+            if (wmImg && mkImg) {
+              wm = { w: wmImg.naturalWidth, h: wmImg.naturalHeight,
+                     mw: mkImg.naturalWidth, mh: mkImg.naturalHeight };
+            }
+
             // 우측 상단 브랜드 마크 — 존재 여부, 배경 선언, 본문과의 겹침
             const mk = sec.querySelector('.br-mark');
             let mark = null;
@@ -272,7 +283,7 @@ def check_render(path, rep, shots=None):
               i, label: fr.dataset.label,
               h: sec.scrollHeight, w: sec.scrollWidth,
               ch: sec.clientHeight, cw: sec.clientWidth,
-              bg, small, mark, collide, marks: [...new Set(marks)]
+              bg, small, mark, collide, wm, marks: [...new Set(marks)]
             });
           });
           return out;
@@ -366,6 +377,28 @@ def check_render(path, rep, shots=None):
                 print(f"        {t}")
         else:
             rep.o("브랜드 마크 — 본문과 겹치지 않는다")
+
+        # 12. 배경 워터마크가 마크와 다른 자산인가.
+        #     같은 파일이면 국문 병기가 720px 로 함께 커져 본문 괘선에 닿는다.
+        #     브랜드를 넣기 전 템플릿에는 이미지가 없으므로 그때는 건너뛴다.
+        wm_same = []
+        for s_ in data:
+            w = s_.get("wm")
+            if not w:
+                continue
+            if (w["w"], w["h"]) == (w["mw"], w["mh"]):
+                wm_same.append(f"{s_['i']+1}장 {s_['label']} — "
+                               f"워터마크가 마크와 같은 {w['w']}x{w['h']} 자산")
+        if wm_same:
+            rep.f(f"배경 워터마크가 마크와 같은 자산 {len(wm_same)}건")
+            for t in wm_same[:6]:
+                print(f"        {t}")
+            print("        → brand.json 의 watermark·watermarkOnLight 에 심볼만 잘라 낸 판을 준다")
+            print("        → make_logo_variants.py 가 -symbol-white.png · -symbol-color.png 로 만든다")
+        elif any(s_.get("wm") for s_ in data):
+            rep.o("배경 워터마크 — 마크와 다른 자산(심볼)을 쓴다")
+        else:
+            rep.w("배경 워터마크 — 브랜드 미적용 템플릿이라 확인 생략")
 
         if mark_variant:
             rep.f(f"로고 변형이 배경과 안 맞음 {len(mark_variant)}건")

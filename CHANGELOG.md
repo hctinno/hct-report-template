@@ -14,6 +14,39 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.19.0 — 2026-08-30
+
+### 수정 — 아티팩트의 워터마크가 전체 로고로 되돌아가 있었다
+
+1.17.0 에서 심볼만 쓰도록 바꿨는데, **발행본에는 국문 병기가 붙은 전체 로고
+(264×86)가 들어가고 있었다.** 심볼(264×58)이 아니었다.
+
+원인은 같은 딕셔너리를 두 곳에서 만든 것이다.
+
+```
+apply_brand.py      main()   → dark · light · watermark · watermarkOnLight
+build_single_file.py build()  → dark · light                    ← 워터마크 키 없음
+```
+
+아티팩트는 `build_single_file.py` 를 타므로 `uris.get("watermark")` 가 비어
+전체 로고로 되돌아갔다. 직접 `apply_brand.py --single-file` 로 확인할 때는
+제대로 나와서 드러나지 않았다 — 확인한 경로와 발행한 경로가 달랐다.
+
+`logo_uris(brand, brand_path)` 를 `apply_brand.py` 에 두고 두 곳이 함께 부른다.
+키 목록이 한곳에만 있으므로 다시 갈라지지 않는다.
+
+### 추가 — `check_deck.py` 12번째 항목
+
+이 결함을 검사가 못 잡았다. 사람 눈에 의존한 자리가 남아 있었다는 뜻이다.
+
+**배경 워터마크가 마크와 다른 자산인가.** 두 `<img>` 의 `naturalWidth`·`naturalHeight`
+를 견줘 같으면 실패시킨다. 심볼은 국문이 빠져 원본 픽셀이 다르다. 브랜드를 넣기 전
+템플릿은 이미지가 없으므로 주의로 넘어간다.
+
+되돌려 확인했다 — `brand.json` 에서 `watermark` 키를 빼자 6장 전부를 잡아냈다.
+
+---
+
 ## 1.18.0 — 2026-08-30
 
 ### 변경 — 워터마크를 표지 빼고 모든 지면에 깐다
