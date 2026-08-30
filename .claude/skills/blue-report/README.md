@@ -466,6 +466,15 @@ python3 scripts/install_blue_report_skill.py             # ~/.claude/skills/blue
 | 기준선 · 구분선 | `#c3cedb` | `--br-hairline` |
 | 알약 칩 테두리 | `#c8d1dc` | `--br-chip-line` |
 
+**카드는 밝은 지면에서만 판이다.** 다크면(`--br-cover` · `--br-dark`)에서는 `.br-card`
+마크업을 그대로 써도 판이 그려지지 않는다 — 바탕과 테두리를 걷어내고 상단 괘선
+2px(`--br-accent-on-dark`)으로만 구획한다. `blue-report.css` 가 알아서 처리하므로
+슬라이드에서 따로 할 일은 없다.
+
+짙은 지면 위에 짙은 판을 얹으면 경계가 뭉개진다. 예전에 쓰던 `#182238` 카드는
+지면 `#101827` 과 대비가 **1.12:1**, 테두리 `#2b3852` 도 **1.52:1** 이었다.
+사람 눈에는 초점이 안 맞는 얼룩으로 보인다. 그래서 다크면 카드 바탕 토큰을 없앴다.
+
 ### 텍스트
 
 | 역할 | 값 | CSS 토큰 |
@@ -505,8 +514,7 @@ python3 scripts/install_blue_report_skill.py             # ~/.claude/skills/blue
 |---|---|---|
 | 표지 · 파트 간지 | `#071b45` | `--br-cover` |
 | 핵심 정리 | `#101827` | `--br-dark` |
-| 다크면 카드 | `#182238` | `--br-dark-card` |
-| 다크면 카드 테두리 | `#2b3852` | `--br-dark-line` |
+| 다크면 구분선 | `#2b3852` | `--br-dark-line` |
 | 다크면 본문 | `#f4f6f8` | `--br-on-dark` |
 | 다크면 보조 | `#a9bcd6` | `--br-on-dark-2` |
 | 다크면 약함 | `#6b7c96` | `--br-on-dark-3` |

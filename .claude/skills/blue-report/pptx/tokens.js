@@ -47,7 +47,7 @@ const C = {
   cobalt: hex('cobalt'), cyan: hex('cyan'), navy: hex('navy'), coral: hex('coral'),
   warnLine: hex('warn-line'), warnBg: hex('warn-bg'), warnText: hex('warn-text'),
   alertBg: hex('alert-bg'), alertText: hex('alert-text'),
-  cover: hex('cover'), dark: hex('dark'), darkCard: hex('dark-card'), darkLine: hex('dark-line'),
+  cover: hex('cover'), dark: hex('dark'), darkLine: hex('dark-line'),
   onDark: hex('on-dark'), onDark2: hex('on-dark-2'), onDark3: hex('on-dark-3'),
   onCover2: hex('on-cover-2'), onCover3: hex('on-cover-3'),
   accentOnDark: hex('accent-on-dark'), amber: hex('amber'),
