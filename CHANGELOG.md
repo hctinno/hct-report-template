@@ -14,6 +14,28 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.9.0 — 2026-08-30
+
+### 추가 — 덱 단위 애니메이션 끄기
+
+`#stage` 에 `data-no-anim` 을 주면 등장 효과가 전부 꺼진다.
+
+```html
+<div id="stage" data-no-anim data-deck-title="…">
+```
+
+주간보고처럼 화면에 띄워 놓고 읽거나 인쇄해 돌리는 문서는 꺼 두는 편이 낫다.
+넘길 때마다 요소가 하나씩 나타나면 표를 훑는 속도가 느려진다.
+
+- `weekly` · `ax` 덱에 적용했다. 발표용 5종은 켠 채로 둔다
+- 미디어 쿼리 밖에 두어 `prefers-reduced-motion` 과 무관하게 항상 이긴다
+- 파일마다 `.a` · `.bx` 같은 클래스를 지우는 대신 스위치 하나로 처리한다.
+  되돌리려면 속성만 빼면 된다
+
+렌더로 확인했다 — `ax` 는 `animation-name: none`, `internal` 은 `br-fu` 로 갈린다.
+
+---
+
 ## 1.8.0 — 2026-08-29
 
 ### 바뀐 것 — 한 장 보고를 업무 카테고리 × 이번 주·다음 주 로

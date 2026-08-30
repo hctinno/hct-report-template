@@ -69,6 +69,9 @@ cp assets/blue-report.css assets/deck-viewer.css assets/deck-viewer.js <작업�
 | 11 | 일정 타임라인 | `--br-page` | 기간 병행과 마일스톤 |
 | 12 | 마무리 CTA | `--br-cover` | 행동 하나만 제시 |
 
+읽고 인쇄하는 문서(주간보고 등)는 `#stage` 에 `data-no-anim` 을 주어 등장 효과를 끈다.
+발표용 덱은 켠 채로 둔다.
+
 **쪽번호와 문서명은 뷰어가 자동으로 채운다.** 푸터(`.br-footer`)는 비워 두고 숫자를 적지 않는다.
 문서명은 `#stage`의 `data-deck-title` 한 곳에서 읽는다. 발표자 노트는 `.br-frame`의
 `data-notes` 속성에 적고 뷰어에서 `N` 키로 본다.

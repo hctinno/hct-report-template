@@ -532,6 +532,16 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 넘으면 요소가 너무 많은 것이므로 슬라이드를 쪼갠다.
 `prefers-reduced-motion: reduce`에서는 전부 꺼지므로, 애니메이션에 의존해 정보를 전달하지 않는다.
 
+**덱 단위로 끌 수 있다.** `#stage` 에 `data-no-anim` 을 주면 등장 효과가 전부 꺼진다.
+
+```html
+<div id="stage" data-no-anim data-deck-title="…">
+```
+
+주간보고처럼 화면에 띄워 놓고 읽거나 인쇄해서 돌리는 문서는 꺼 두는 편이 낫다.
+넘길 때마다 요소가 하나씩 나타나면 표를 훑는 속도가 느려진다.
+`weekly` 와 `ax` 덱은 이미 꺼져 있고, 발표용 덱(`internal` · `sales` · `project` · `training` · `catalog`)은 켜져 있다.
+
 ```css
 @keyframes br-fu   { from { opacity:0; transform:translateY(22px) } }
 @keyframes br-fd   { from { opacity:0; transform:translateY(-16px) } }

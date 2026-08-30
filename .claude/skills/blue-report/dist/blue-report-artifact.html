@@ -389,6 +389,18 @@
   .d11{animation-delay:.88s!important} .d12{animation-delay:.96s!important}
 }
 
+/* 등장 효과를 끄는 덱. #stage 에 data-no-anim 을 주면 전부 꺼진다.
+   주간보고처럼 정적으로 읽고 인쇄하는 문서에 쓴다. 발표용 덱은 켠 채로 둔다.
+   미디어 쿼리 밖이라 prefers-reduced-motion 과 무관하게 항상 이긴다. */
+[data-no-anim] [data-deck-active] .a,
+[data-no-anim] [data-deck-active] .ad,
+[data-no-anim] [data-deck-active] .f,
+[data-no-anim] [data-deck-active] .bx,
+[data-no-anim] [data-deck-active] .by,
+[data-no-anim] [data-deck-active] .p,
+[data-no-anim] [data-deck-active] .dsh { animation:none!important }
+
+
 </style>
 <style>
 /* 덱 뷰어 전용 스타일 — 디자인 시스템이 아니라 브라우저에서 넘겨 보기 위한 껍데기.
