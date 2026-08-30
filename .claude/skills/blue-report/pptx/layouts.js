@@ -38,12 +38,15 @@ function card(slide, { x, y, w, h, dark = false, fill, line, topBar }) {
     });
     return;
   }
+  // 테두리를 두르지 않는다 — HTML 과 같은 규칙이다. 테두리와 그림자를 함께 쓰면
+  // 그림자가 하는 일이 사라지고 카드가 「떠 있는 면」이 아니라 「상자」로 읽힌다.
+  // rectRadius 0.19 ≈ 28px (X() 가 px→inch 이므로 높이 대비 비율이 아니라 절대값이다).
   slide.addShape('roundRect', {
-    x: X(x), y: X(y), w: X(w), h: X(h), rectRadius: 0.125,
+    x: X(x), y: X(y), w: X(w), h: X(h), rectRadius: 0.19,
     fill: { color: fill || C.card },
-    line: { color: line || C.cardLine, width: 0.75 },
-    shadow: { type: 'outer', color: '0B2A6B', opacity: 0.07,
-              blur: 14, offset: 5, angle: 90 },
+    line: { type: 'none' },
+    shadow: { type: 'outer', color: '101828', opacity: 0.12,
+              blur: 20, offset: 7, angle: 90 },
   });
   if (topBar) {
     // 단계 강조 카드에만 허용하는 상단 굵은 선 (HTML 의 .br-card--step)

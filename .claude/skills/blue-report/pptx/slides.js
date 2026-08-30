@@ -299,7 +299,7 @@ function progressSlide(pres, s, brand, page) {
     txt(sl, b.name, { x: X(PAD.side), y: X(by), w: X(nameW), h: X(44),
       fontFace: F.kr, fontSize: pt(25), bold: true, color: C.text, valign: 'middle' });
     sl.addShape('roundRect', { x: X(trackX), y: X(by + 8), w: X(trackW), h: X(26),
-      rectRadius: 0.5, fill: { color: 'E3E9F0' }, line: { type: 'none' } });
+      rectRadius: 0.5, fill: { color: C.tint }, line: { type: 'none' } });
     sl.addShape('roundRect', { x: X(trackX), y: X(by + 8), w: X(trackW * b.pct / 100), h: X(26),
       rectRadius: 0.5, fill: { color: b.alert ? C.alertText : C.cobalt }, line: { type: 'none' } });
     txt(sl, [{ text: b.val, options: {} },
@@ -372,7 +372,7 @@ function compareSlide(pres, s, brand, page) {
       txt(sl, b.name, { x: X(cx + 34), y: X(by), w: X(nameW), h: X(40),
         fontFace: F.kr, fontSize: pt(25), color: C.text, valign: 'middle' });
       sl.addShape('roundRect', { x: X(trackX), y: X(by + 6), w: X(trackW), h: X(28),
-        rectRadius: 0.02, fill: { color: 'E6ECF3' }, line: { type: 'none' } });
+        rectRadius: 0.02, fill: { color: C.tint }, line: { type: 'none' } });
       sl.addShape('roundRect', { x: X(trackX), y: X(by + 6), w: X(trackW * b.pct / 100), h: X(28),
         rectRadius: 0.02, fill: { color: ci === 1 ? C.data[1] : C.data[3] }, line: { type: 'none' } });
       txt(sl, [{ text: b.val, options: {} },

@@ -42,6 +42,7 @@ const pt = (n) => n / 2;              // css px → pt (같은 물리 크기)
 
 const C = {
   page: hex('page'), card: hex('card'), cardLine: hex('card-line'),
+  tint: hex('tint'),        // 대조군 카드 · 막대 트랙
   hairline: hex('hairline'), chipLine: hex('chip-line'),
   text: hex('text'), text2: hex('text-2'), text3: hex('text-3'),
   cobalt: hex('cobalt'), cyan: hex('cyan'), navy: hex('navy'), coral: hex('coral'),
