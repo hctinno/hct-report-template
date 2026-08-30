@@ -296,7 +296,7 @@ def check_render(path, rep, shots=None):
 
             const marks = [];
             const blank = [];
-            sec.querySelectorAll('.br-bar-v,.br-bar-h,.br-dot,circle').forEach(el => {
+            sec.querySelectorAll('.br-bar-v,.br-bar-h,.br-dot,.br-iso-cell,circle').forEach(el => {
               const cs = getComputedStyle(el);
               // 그라디언트로 칠한 막대는 backgroundColor 가 비어 있다. 그림 쪽에서
               // 색 정지점을 뽑아 전부 대비 검사에 넣는다 — 한쪽 끝만 통과하고

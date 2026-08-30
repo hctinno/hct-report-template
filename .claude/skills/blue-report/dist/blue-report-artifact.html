@@ -39,7 +39,8 @@
      한 번 비웠다가 표에서 행 구분선이 통째로 사라졌다. 지면이 밝아진 만큼 값만 낮춘다. */
   --br-card-line:   #e3e8f0;
   --br-card-shadow: 0 2px 4px rgba(16,24,40,.04), 0 14px 36px rgba(16,24,40,.10);
-  --br-tint:        #eef2f8;   /* 대조군 카드 · 막대 트랙. 흰 카드가 요점, 이것이 대조군 */
+  --br-tint:        #eef2f8;   /* 대조군 카드 · 칩 바탕. 흰 카드가 요점, 이것이 대조군 */
+  --br-track:       #e3e9f0;   /* 막대 채널. 데이터가 아니라 그릇이다 */
   --br-hairline:    #dfe4ec;   /* 기준선 전용. 면을 나누는 데 쓰지 않는다 */
   --br-chip-line:   #dfe4ec;   /* 알약 칩 테두리 */
 
@@ -204,6 +205,7 @@
   --br-fs-card-title:  32px;
   --br-fs-lede:        28px;  /* 제목 아래 요약 문장 */
   --br-fs-label:       26px;  /* 섹션 라벨 (Barlow Condensed) */
+  --br-fs-datalabel:   30px;  /* 막대 항목명 · 질문 칩 · 요약 카드 한 줄 */
   --br-fs-body:        25px;
   --br-fs-foot:        24px;  /* 하한 */
   --br-fs-stat-hero:  120px;  /* 단일 수치 강조. 참조 덱 최대가 121px 이고
@@ -537,7 +539,7 @@
 /* 가로 막대 — 이름 / 채널 / 값을 각각 다른 그리드 컬럼에 둔다.
    채널(트랙)을 항상 깔아 둔다. 트랙이 없으면 "얼마나 남았나"가 보이지 않는다. */
 .br-bars-h    { display:grid; grid-template-columns:auto 1fr 140px; align-items:center; gap:22px 26px; }
-.br-bar-track { height:26px; background:#e3e9f0; border-radius:var(--br-r-pill); overflow:hidden; }
+.br-bar-track { height:26px; background:var(--br-track); border-radius:var(--br-r-pill); overflow:hidden; }
 .br-slide--dark .br-bar-track, .br-slide--cover .br-bar-track { background:#1c2740; }
 .br-bar-h     { height:100%; transform-origin:left; border-radius:var(--br-r-pill);
                 background:var(--br-grad-bar); }
@@ -555,6 +557,85 @@
    "174/ 180" 을 값 하나로 읽는다. 분모는 값이 아니라 견주는 대상이다. */
 .br-bar-of    { font-size:var(--br-fs-foot); font-weight:600; color:var(--br-text-3); margin-left:5px; }
 .br-bar-sub--alert { color:var(--br-alert-text); }
+
+/* ── 질문 칩 ──────────────────────────────────────────────────────────────
+   설문 문항 · 판정 질문처럼 「무엇을 물었나」를 여기 가둔다. 답과 섞지 않는다.
+   Gate 장표에서 판정 질문을 본문과 같은 활자로 적으면 질문과 답이 붙어 보인다.
+   알약(999px)이 아니라 둥근 사각이다 — 상태 칩과 형태로 구분된다. */
+.br-ask {
+  display:inline-block; box-sizing:border-box;
+  background:var(--br-tint); color:var(--br-text); border:0;
+  border-radius:var(--br-r-chip); padding:16px 26px;
+  font:600 var(--br-fs-datalabel)/1.3 var(--br-font-kr);
+}
+.br-slide--dark .br-ask, .br-slide--cover .br-ask {
+  background:rgba(244,246,248,.10); color:var(--br-on-dark);
+}
+
+/* ── 아이소타입 — 비율을 개수로 ───────────────────────────────────────────
+   분모가 눈에 보인다. 「12개 중 8개 확인, 4개 미확인」 형식과 같은 도해다.
+   분모를 반드시 정수 칸으로 나눠 떨어지게 만든다 — 42/63 을 10칸 중 7칸으로
+   반올림하지 않는다. 떨어지지 않으면 이 도해를 쓰지 않는다.
+   빈 칸도 데이터다(분모를 말한다). 그래서 트랙 회색이 아니라 맥락 마크 색을
+   쓰고 2:1 규칙을 지킨다 — 셀 수 없으면 도해가 성립하지 않는다. */
+/* 칸 크기는 지면 사정에 맞춘다. 기본 44x60px, 표와 같이 놓을 때는 낮춘다. */
+.br-iso      { display:flex; flex-wrap:wrap; gap:12px; --cell-w:44px; --cell-h:60px; }
+.br-iso-cell { width:var(--cell-w); height:var(--cell-h); border-radius:6px;
+               background:var(--mark-mute); }
+.br-iso-cell--on { background:var(--mark); }
+.br-iso-cap  { margin-top:18px; font:600 var(--br-fs-body)/1.4 var(--br-font-kr);
+               color:var(--br-text-2); }
+.br-iso-cap b { color:var(--br-text); font-weight:700; }
+
+/* ── 다크 요약장 — 구간의 끝을 표시한다 ───────────────────────────────────
+   Part 가 끝날 때마다 한 장씩 넣는다. 밝은 본문이 이어지다 한 번 어두워지는 것이
+   구간 종료 신호가 된다.
+
+   짙은 지면에 짙은 카드를 얹지 않는다. 참조 덱은 그렇게 하지만 우리 지면에서
+   대비가 1.16:1 이라 초점이 안 맞는 얼룩으로 보인다 — 예전에 그렇게 만들었다가
+   걷어낸 자리다. 카드 대신 상단 괘선으로 구획한다. 밝은면의 흰 카드와 같은 일을
+   그림자 없이 해내는 방법이다. */
+.br-sumgrid  { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--br-gap-card) 64px; }
+.br-sumcard  { border-top:2px solid var(--br-accent-on-dark); padding:24px 0 0;
+               display:flex; align-items:baseline; gap:20px; }
+.br-sumcard-n { flex:none; font:700 var(--br-fs-foot)/1 var(--br-font-num);
+                color:var(--br-on-dark-3); letter-spacing:var(--br-ls-label); }
+.br-sumcard-t { flex:1; min-width:0; font:600 var(--br-fs-datalabel)/1.35 var(--br-font-kr);
+                color:var(--br-on-dark); }
+.br-sumcard-v { flex:none; font:800 52px/1 var(--br-font-num); color:var(--br-accent-on-dark);
+                letter-spacing:var(--br-ls-tight); }
+.br-sumcard-v--warn { color:var(--br-amber); }
+
+/* ── 지시선 주석 ──────────────────────────────────────────────────────────
+   문제 지점만 ㄱ자로 끌어내 한 줄 붙인다. 한 지면에 하나만 — 둘이 되면 둘 다 안 읽힌다.
+   참조 덱은 50장 내내 빨강을 이 용도로만 썼다.
+   --w · --h 로 꺾임 크기를 정한다. 점이 가리키는 곳이 시작점이다. */
+/* 막대 안에 넣으면 막대 꼭대기를 자동으로 가리킨다. 절대 좌표로 붙이면 값이 바뀔
+   때마다 손으로 다시 맞춰야 하고, 실제로 그렇게 붙였다가 점이 빈 공간을 가리켰다.
+   .br-bar-v · .br-bar-h 안의 자식으로 두는 것이 기본 사용법이다. */
+.br-bar-v, .br-bar-h { position:relative; }
+.br-note      { position:absolute; left:50%; top:0; --w:150px; --h:70px; pointer-events:none; }
+.br-note-dot  { position:absolute; left:-5px; top:-5px; width:10px; height:10px;
+                border-radius:50%; background:var(--br-alert-text); }
+/* 선은 헤어라인(1.1:1)으로 그으면 지면에 묻어 안 보인다. 데이터 마크는 아니지만
+   읽히지 않으면 주석이 성립하지 않으므로 --br-text-3(2.79:1)으로 긋는다. */
+.br-note::before {
+  content:""; position:absolute; left:0; top:0; width:var(--w); height:var(--h);
+  border-left:1px solid var(--br-text-3); border-bottom:1px solid var(--br-text-3);
+  transform:translateY(calc(-1 * var(--h)));
+}
+.br-note-text { position:absolute; left:calc(var(--w) + 12px); top:calc(-1 * var(--h));
+                transform:translateY(-50%); width:340px;
+                font:700 var(--br-fs-foot)/1.4 var(--br-font-kr); color:var(--br-alert-text); }
+
+/* 왼쪽으로 여는 변형. 지면 오른쪽 끝을 짚을 때 쓴다 — 오른쪽으로 열면 글자가 잘린다.
+   --w 를 음수로 주지 않는다. 음수 폭은 요소를 슬라이드 밖으로 밀어내 크기 검사에 걸린다. */
+/* 왼쪽으로 열 때도 세로획은 글자 쪽(먼 끝)에 있어야 한다. 점 쪽에 두면 선이
+   점과 글자를 잇지 못하고 장식이 된다 — 한 번 그렇게 짰다가 렌더에서 잡았다.
+   경로는 점 → 왼쪽 → 위 → 글자다. */
+.br-note--left::before { left:auto; right:0; }
+.br-note--left .br-note-dot  { left:auto; right:-4px; }
+.br-note--left .br-note-text { left:auto; right:calc(var(--w) + 12px); text-align:right; }
 
 /* 표 — 얼룩무늬를 쓰지 않는다. 얇은 구분선과 머리행 아래선만으로 구분한다 */
 .br-table { width:100%; border-collapse:collapse; font-family:var(--br-font-kr); }
@@ -851,60 +932,42 @@ body { background:#111; margin:0; }
     <p class="ad br-eyebrow">Part 01</p>
     <h2 class="a br-title">도입 현황 핵심 정리</h2>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px 34px;margin-top:52px;flex:1;min-height:0">
+    <div class="br-sumgrid" style="margin-top:52px;flex:1;min-height:0">
 
-      <div class="a d2 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">01</span>
-        <div>
-          <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">일상 도구로 정착한 자동화</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">전사 58.4% 거의 매일 사용<br>도구 보급 단계 종료</div>
-        </div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">58.4<span class="br-sup">%</span></span>
+      <div class="a d2 br-sumcard">
+        <span class="br-sumcard-n">01</span>
+        <div class="br-sumcard-t">일상 도구로 정착한 자동화<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">전사 58.4% 거의 매일 사용<br>도구 보급 단계 종료</span></div>
+        <span class="br-sumcard-v">58.4<span class="br-sup">%</span></span>
       </div>
 
-      <div class="a d3 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">02</span>
-        <div>
-          <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">개발 직군만의 도구 아님</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">비개발 직무 주력 사용 비중<br>전년 대비 2.4배 증가</div>
-        </div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">61.5<span class="br-sup">%</span></span>
+      <div class="a d3 br-sumcard">
+        <span class="br-sumcard-n">02</span>
+        <div class="br-sumcard-t">개발 직군만의 도구 아님<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">비개발 직무 주력 사용 비중<br>전년 대비 2.4배 증가</span></div>
+        <span class="br-sumcard-v">61.5<span class="br-sup">%</span></span>
       </div>
 
-      <div class="a d4 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">03</span>
-        <div>
-          <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">업무 방식 변화 3배 격차</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">주력 사용자 81.7% 대비<br>비주력 사용자 27.7%</div>
-        </div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">81.7<span class="br-sup">%</span></span>
+      <div class="a d4 br-sumcard">
+        <span class="br-sumcard-n">03</span>
+        <div class="br-sumcard-t">업무 방식 변화 3배 격차<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">주력 사용자 81.7% 대비<br>비주력 사용자 27.7%</span></div>
+        <span class="br-sumcard-v">81.7<span class="br-sup">%</span></span>
       </div>
 
-      <div class="a d5 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">04</span>
-        <div>
-          <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">회사 지원 없는 자가학습</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">사내 교육 없이 스스로 습득<br>그중 74% 업무 방식 전환</div>
-        </div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">45.6<span class="br-sup">%</span></span>
+      <div class="a d5 br-sumcard">
+        <span class="br-sumcard-n">04</span>
+        <div class="br-sumcard-t">회사 지원 없는 자가학습<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">사내 교육 없이 스스로 습득<br>그중 74% 업무 방식 전환</span></div>
+        <span class="br-sumcard-v">45.6<span class="br-sup">%</span></span>
       </div>
 
-      <div class="a d6 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">05</span>
-        <div>
-          <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">교육 계획 부재</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">하반기 교육 미확정 또는 논의 중<br>정착 지연의 직접 원인</div>
-        </div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">64.9<span class="br-sup">%</span></span>
+      <div class="a d6 br-sumcard">
+        <span class="br-sumcard-n">05</span>
+        <div class="br-sumcard-t">교육 계획 부재<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">하반기 교육 미확정 또는 논의 중<br>정착 지연의 직접 원인</span></div>
+        <span class="br-sumcard-v">64.9<span class="br-sup">%</span></span>
       </div>
 
-      <div class="a d7 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">06</span>
-        <div>
-          <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">산출물 자산화 미비</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">개인 경험에 머문 결과물<br>조직 자산 전환율 저조</div>
-        </div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">18.2<span class="br-sup">%</span></span>
+      <div class="a d7 br-sumcard">
+        <span class="br-sumcard-n">06</span>
+        <div class="br-sumcard-t">산출물 자산화 미비<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">개인 경험에 머문 결과물<br>조직 자산 전환율 저조</span></div>
+        <span class="br-sumcard-v">18.2<span class="br-sup">%</span></span>
       </div>
 
     </div>
@@ -957,7 +1020,9 @@ body { background:#111; margin:0; }
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px;flex:1;min-height:0;margin-top:34px">
 
       <div class="a d3 br-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
-        <div style="font:700 30px/1 var(--br-font-kr)">전사 사용 빈도</div>
+        <!-- 질문 칩 — 「무엇을 물었나」를 여기 가둔다. 답(도넛)과 섞지 않는다.
+             본문과 같은 활자로 적으면 질문과 답이 붙어 보인다. -->
+        <div class="br-ask">업무에 자동화 도구를 얼마나 자주 쓰십니까?</div>
         <!-- 조각 색은 값의 크기가 아니라 "무엇이 결론인가"로 정한다.
              제목이 "절반 이상이 일상 사용"이라 하므로 그 조각만 주인공이고
              나머지 둘은 물린다. 결론 수치는 홀 가운데에 둔다. -->
@@ -1030,7 +1095,17 @@ body { background:#111; margin:0; }
       <div class="br-col"><div class="br-col-val br-col-val--muted">64.4<span class="br-sup">%</span></div><div class="by d5 br-bar-v br-bar-v--mute" style="height:377px"></div></div>
       <div class="br-col"><div class="br-col-val br-col-val--muted">60.0<span class="br-sup">%</span></div><div class="by d6 br-bar-v br-bar-v--mute" style="height:351px"></div></div>
       <div class="br-col"><div class="br-col-val br-col-val--muted">56.9<span class="br-sup">%</span></div><div class="by d7 br-bar-v br-bar-v--mute" style="height:333px"></div></div>
-      <div class="br-col"><div class="br-col-val br-col-val--muted">44.9<span class="br-sup">%</span></div><div class="by d8 br-bar-v br-bar-v--mute" style="height:263px"></div></div>
+      <!-- 지시선 주석 — 막대 안에 둔다. 막대 꼭대기를 자동으로 가리키므로 값이
+           바뀌어도 따라간다. 한 지면에 하나만 — 둘이 되면 둘 다 안 읽힌다.
+           지면 오른쪽 끝이라 --left 로 왼쪽으로 연다. -->
+      <div class="br-col"><div class="br-col-val br-col-val--muted">44.9<span class="br-sup">%</span></div>
+        <div class="by d8 br-bar-v br-bar-v--mute" style="height:263px">
+          <div class="br-note br-note--left" style="--w:210px;--h:210px">
+            <span class="br-note-dot"></span>
+            <span class="br-note-text">고객지원팀만 45% 미만 — 상담 이력 표준화 미완</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 이름은 차트와 다른 그리드 형제. 절대 위치로 막대 위에 겹치지 않게 한다 -->
@@ -1124,10 +1199,27 @@ body { background:#111; margin:0; }
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><img class="br-logo" src="data:image/png;base64,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" alt="회사 로고" style="height:40px;width:auto"></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><img src="data:image/png;base64,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" alt=""></div>
     <p class="ad br-eyebrow">Part 02. 진척</p>
-    <h2 class="a br-title br-title--light">과제별 진척, <strong>2건 지연</strong></h2>
-    <p class="a d2 br-lede">전체 7개 과제 중 완료 3 · 정상 2 · 주의 <span class="br-key">1</span> · 지연 <span class="br-key">2</span><br>지연 2건은 모두 외부 의존 — 협력사 일정에 묶임</p>
+    <h2 class="a br-title br-title--light">과제별 진척, <strong>2건 조치 필요</strong></h2>
+    <p class="a d2 br-lede">주의 1건 · 지연 1건 모두 <span class="br-key">외부 의존</span> — 협력사 일정에 묶임</p>
 
-    <div class="a d3" style="flex:1;min-height:0;margin-top:34px">
+    <!-- 아이소타입 — 비율을 개수로. 분모(7개 과제)가 눈에 보인다.
+         7개가 정수 칸으로 떨어지므로 쓸 수 있다. 떨어지지 않으면 이 도해를 쓰지 않는다 —
+         104/123 을 10칸 중 8칸으로 반올림하면 도해가 거짓말을 한다.
+         빈 칸도 데이터다. 셀 수 있어야 분모가 성립한다. -->
+    <div class="a d3" style="margin-top:24px">
+      <div class="br-iso" style="--cell-h:34px;gap:10px">
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell"></span>
+        <span class="br-iso-cell"></span>
+      </div>
+      <div class="br-iso-cap" style="margin-top:12px">7개 과제 중 <b>5개 정상 진행</b> · 2개 조치 필요</div>
+    </div>
+
+    <div class="a d4" style="flex:1;min-height:0;margin-top:20px">
       <table class="br-table">
         <thead>
           <tr>
