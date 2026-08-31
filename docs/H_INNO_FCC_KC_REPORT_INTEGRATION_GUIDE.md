@@ -89,13 +89,39 @@
 
 ## 5. DOCX · PPTX 이식 기준
 
-**현재 상태 — 이식 기준은 이 문서로만 있다. 대표 시안 바이너리는 없다.**
-까닭은 둘이다.
+A/B/C 대표 시안을 만든다.
 
-- 이 저장소에 DOCX 생성 경로가 없다. HTML·PDF·PPTX 만 있다.
-- PPTX 생성기는 1920x1080 발표 덱 전용이라 A4 문서를 그대로 옮기지 못한다.
+```bash
+python3 .claude/skills/blue-report/scripts/build_fcc_office.py
+```
 
-추정으로 만들어 통과 처리하지 않았다. 다음 단계는 6장에 적었다.
+`decks-out/fcc-kc/` 에 DOCX 3벌과 PPTX 3벌이 나온다. 값은 `fixture-baseline.json`
+하나에서 파생하므로 HTML·PDF 와 수치가 갈라지지 않는다. **손으로 다른 수치를 적은
+문서를 따로 관리하지 않는다.**
+
+색은 `blue-report.css` 의 `--br-*` 를 읽어 쓴다. 파이썬 쪽에 hex 를 적지 않는다.
+
+**세 종은 순서가 다르다.** 색만 다른 변형이 아니다.
+
+| | DOCX 구성 | PPTX |
+|---|---|---|
+| A | 결론 → 뒷받침 → 해석·경계 → 권고 → 근거·계보 | 7장 · 지표 먼저 |
+| B | 계약 → 지표 → 추이·순위 → 품질·근거 (**가로**) | 8장 · 계약 먼저 |
+| C | 문서 통제 → 집계 의미 → 필드 대응 → 품질 예외 → 근거 → 계보·검토란 | 8장 · 통제 먼저 |
+
+### 검수 방법과 한계
+
+**LibreOffice 가 이 환경에서 돌지 않아 그림으로 검수하지 못했다.** 텍스트 파일
+변환조차 실패한다(`Error: source file could not be loaded`). 추정으로 통과 처리하지
+않고, 파일을 다시 열어 **구조로 판정**한다.
+
+```bash
+python3 .claude/skills/blue-report/scripts/build_fcc_office.py --check
+```
+
+방향(A·C 세로 · B 가로) · 구성 순서 · 시안 도장 개수 · 범위 계약 · 서술 출처 3종 ·
+근거와 체크섬 · 네이티브 차트 2개 · zip 무결성을 본다. **지면의 여백과 밀도는
+사람이 열어 봐야 한다** — Word·PowerPoint 가 있는 환경에서 한 번 확인한다.
 
 ### 모듈 변환 표
 
@@ -139,8 +165,8 @@ Report Model 에서 파생한다.
 | 항목 | 내용 |
 |---|---|
 | 필드 대조 | `report_model.py` · `REPORT-CONTRACT-1.3.1.md` 와 3장 표 대조 |
-| DOCX 생성 경로 | `python-docx` 기반 생성기 신설 · A/B/C 대표 시안 |
-| PPTX A4 이식 | 발표 덱 생성기와 별개로 A4 유래 슬라이드 매핑 |
+| DOCX·PPTX 눈 검수 | Word·PowerPoint 가 있는 환경에서 여백·밀도 확인 |
+| 특수 11종 이식 | 지금은 A/B/C 만 · 특수 템플릿의 DOCX·PPTX 는 미작성 |
 | 렌더러 연결 | 슬롯 채움 · 시안 도장 제거 · 커버리지 클래스 전환 |
 | 회귀 시험 | 템플릿별 스냅샷 · fixture 14종 교차 |
 
