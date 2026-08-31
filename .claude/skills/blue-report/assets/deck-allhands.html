@@ -114,7 +114,16 @@
         <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr);text-align:center;margin-bottom:26px">의뢰 접수 처리</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;flex:1;min-height:0">
           <div class="br-col"><div class="br-col-val br-col-val--muted">1.6<span class="br-sup">h</span></div><div class="by d4 br-bar-v br-bar-v--mute" style="height:139px;"></div><div class="br-col-name br-col-name--mute" style="margin-top:22px">이전</div></div>
-          <div class="br-col"><div class="br-col-val">1.1<span class="br-sup">h</span></div><div class="by d5 br-bar-v" style="height:96px;"></div><div class="br-col-name" style="margin-top:22px">지금</div></div>
+          <!-- 지시선 주석 — 막대 안에 둔다. 막대 꼭대기를 자동으로 가리킨다.
+               한 지면에 하나만. 오른쪽으로 열면 글자가 5.4h 막대에 겹친다 — 왼쪽으로 연다. -->
+          <div class="br-col"><div class="br-col-val">1.1<span class="br-sup">h</span></div>
+            <div class="by d5 br-bar-v" style="height:96px;">
+              <div class="br-note br-note--left" style="--w:70px;--h:330px">
+                <span class="br-note-dot"></span>
+                <span class="br-note-text">접수 처리만 0.5h 단축 — 부서마다 접수 양식이 달라서</span>
+              </div>
+            </div>
+            <div class="br-col-name" style="margin-top:22px">지금</div></div>
         </div>
       </div>
       <div class="a d4" style="display:flex;flex-direction:column;min-height:0">
@@ -140,17 +149,19 @@
     <p class="ad br-eyebrow">02. 많이 들어온 질문</p>
     <h2 class="a br-title">궁금해하시는 것</h2>
 
+    <!-- 질문 칩 — 들어온 질문을 그대로 칩에 가두고 답을 아래에 붙인다.
+         질문과 답을 같은 활자로 적으면 둘이 붙어 보인다. -->
     <div style="display:flex;flex-direction:column;gap:26px;flex:1;min-height:0;margin-top:54px">
       <div class="a d2 br-card" style="flex:1;display:flex;flex-direction:column;justify-content:center">
-        <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr);color:var(--br-cobalt)">사람을 줄이려는 것인가</div>
+        <div class="br-ask">사람을 줄이려는 것인가</div>
         <p class="br-split" style="margin:18px 0 0">아님 — <strong>상반기 인원 감축 0명</strong>. 줄어든 시간은 밀려 있던 시험 물량 처리에 사용</p>
       </div>
       <div class="a d3 br-card" style="flex:1;display:flex;flex-direction:column;justify-content:center">
-        <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr);color:var(--br-cobalt)">기존 방식으로 일하면 불이익이 있는가</div>
+        <div class="br-ask">기존 방식으로 일하면 불이익이 있는가</div>
         <p class="br-split" style="margin:18px 0 0">없음 — <strong>도구 사용은 선택</strong>. 다만 성적서 초안은 9월부터 새 양식으로 통일</p>
       </div>
       <div class="a d4 br-card" style="flex:1;display:flex;flex-direction:column;justify-content:center">
-        <div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr);color:var(--br-cobalt)">내 업무에 맞을지 모르겠음</div>
+        <div class="br-ask">내 업무에 맞을지 모르겠음</div>
         <p class="br-split" style="margin:18px 0 0">부서별 상담 창구 운영 — <strong>9월 2주부터 팀 단위 30분 상담</strong> 신청 가능</p>
       </div>
     </div>
@@ -220,7 +231,45 @@
   </section>
 </div>
 
-<!-- 07 여러분이 할 일 ───────────────────────────────────────────────────
+<!-- 07 오늘 가져갈 것 (다크 요약장) ───────────────────────────────────
+     교체: 오늘 남길 것 넷. 앞에서 이미 말한 숫자만 되짚는다 — 새 숫자를 여기서 꺼내지 않는다.
+     구간 끝에서 한 번 어두워지는 것이 "이야기가 끝났다"는 신호가 된다.
+     ══════════════════════════════════════════════════════════════════ -->
+<div class="br-frame" data-label="오늘 가져갈 것" data-notes="질의응답으로 넘어가기 전에 네 가지만 되짚는다. 앞에서 말한 숫자를 다시 설명하지 않는다.">
+  <section class="br-slide br-slide--dark" style="padding:84px 96px 56px">
+    <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="dark"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <p class="ad br-eyebrow">Wrap-up</p>
+    <h2 class="a br-title">오늘 가져갈 것</h2>
+
+    <!-- 다크 요약장 — 짙은 지면에 짙은 카드를 얹지 않는다. 상단 괘선으로 구획한다. -->
+    <div class="br-sumgrid" style="margin-top:56px;flex:1;min-height:0">
+      <div class="a d2 br-sumcard">
+        <span class="br-sumcard-n">01</span>
+        <div class="br-sumcard-t">한 건 처리에 걸리던 시간<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">세 업무 합계 11.0h → 5.2h<br>시험 성적서 초안이 가장 크게 감소</span></div>
+        <span class="br-sumcard-v">53<span class="br-sup">%</span></span>
+      </div>
+      <div class="a d3 br-sumcard">
+        <span class="br-sumcard-n">02</span>
+        <div class="br-sumcard-t">상반기 인원 감축<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">줄어든 시간은 밀려 있던 시험 물량 처리에 사용<br>도구 사용은 선택</span></div>
+        <span class="br-sumcard-v">0<span class="br-sup">명</span></span>
+      </div>
+      <div class="a d4 br-sumcard">
+        <span class="br-sumcard-n">03</span>
+        <div class="br-sumcard-t">오늘 나가서 할 일<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">교육 수강 신청 9월 12일(금)까지<br>팀 단위 상담은 상시 신청</span></div>
+        <span class="br-sumcard-v">2<span class="br-sup">가지</span></span>
+      </div>
+      <div class="a d5 br-sumcard">
+        <span class="br-sumcard-n">04</span>
+        <div class="br-sumcard-t">하반기 확산 일정<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">9월부터 12월까지 부서별 순차<br>교육은 전 부서 공통</span></div>
+        <span class="br-sumcard-v">4<span class="br-sup">개월</span></span>
+      </div>
+    </div>
+    <div class="br-footer"></div>
+  </section>
+</div>
+
+<!-- 08 여러분이 할 일 ───────────────────────────────────────────────────
      교체: 전직원이 실제로 해야 하는 행동과 마감일.
      타운홀에서 가장 자주 빠지는 장이다. 없으면 듣고 아무도 움직이지 않는다.
      ══════════════════════════════════════════════════════════════════ -->
@@ -247,7 +296,7 @@
   </section>
 </div>
 
-<!-- 08 마무리 ───────────────────────────────────────────────────────────
+<!-- 09 마무리 ───────────────────────────────────────────────────────────
      교체: 질의응답 안내와 문의처.
      ══════════════════════════════════════════════════════════════════ -->
 <div class="br-frame" data-label="마무리" data-notes="질의응답으로 넘어간다. 손이 안 올라오면 미리 받아 둔 익명 질문부터 읽는다.">

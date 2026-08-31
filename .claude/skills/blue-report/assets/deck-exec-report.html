@@ -54,25 +54,23 @@
       하반기 예산을 성과 확인된 2개 부문에 집중 배분
     </p>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--br-gap-card);margin:auto 0">
-      <div class="br-card">
-        <div class="br-body" style="color:var(--br-on-dark-2)">연간 목표 대비 절감액</div>
-        <div class="br-num" style="font-size:92px;line-height:1.05;margin-top:14px;color:var(--br-accent-on-dark)">
-          128<span style="font-size:44px">%</span>
-        </div>
-        <div class="br-body" style="margin-top:12px;color:var(--br-on-dark-3)">목표 4.2억 · 실적 5.4억</div>
+    <!-- 다크 요약장 — 근거가 셋이라 3열로 연다(기본은 2열).
+         짙은 지면에 짙은 카드를 얹지 않는다. 상단 괘선으로 구획한다. -->
+    <div class="br-sumgrid" style="grid-template-columns:repeat(3,1fr);gap:var(--br-gap-card) 48px;margin:auto 0">
+      <div class="br-sumcard">
+        <span class="br-sumcard-n">01</span>
+        <div class="br-sumcard-t">연간 목표 대비 절감액<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">목표 4.2억 · 실적 5.4억</span></div>
+        <span class="br-sumcard-v">128<span class="br-sup">%</span></span>
       </div>
-      <div class="br-card">
-        <div class="br-body" style="color:var(--br-on-dark-2)">업무 처리 시간 단축</div>
-        <div class="br-num" style="font-size:92px;line-height:1.05;margin-top:14px;color:var(--br-accent-on-dark)">
-          31<span style="font-size:44px">%</span>
-        </div>
-        <div class="br-body" style="margin-top:12px;color:var(--br-on-dark-3)">시험 의뢰 접수 기준</div>
+      <div class="br-sumcard">
+        <span class="br-sumcard-n">02</span>
+        <div class="br-sumcard-t">업무 처리 시간 단축<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">시험 의뢰 접수 기준</span></div>
+        <span class="br-sumcard-v">31<span class="br-sup">%</span></span>
       </div>
-      <div class="br-card">
-        <div class="br-body" style="color:var(--br-on-dark-2)">성과 측정 불가 부문</div>
-        <div class="br-num" style="font-size:92px;line-height:1.05;margin-top:14px;color:var(--br-amber)">1</div>
-        <div class="br-body" style="margin-top:12px;color:var(--br-on-dark-3)">품질본부 — 기준 데이터 부재</div>
+      <div class="br-sumcard">
+        <span class="br-sumcard-n">03</span>
+        <div class="br-sumcard-t">성과 측정 불가 부문<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">품질본부 — 기준 데이터 부재</span></div>
+        <span class="br-sumcard-v br-sumcard-v--warn">1<span class="br-sup">개</span></span>
       </div>
     </div>
     <div class="br-footer" style="margin-top:34px;border-top-color:var(--br-dark-line)"></div>
@@ -130,7 +128,9 @@
     <h2 class="br-title">5.4억 원의 출처</h2>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px;flex:1;min-height:0;margin-top:34px">
-      <div class="br-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
+      <div class="br-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px">
+        <!-- 질문 칩 — 「무엇을 물었나」를 답(도넛)과 분리한다. -->
+        <div class="br-ask">5.4억은 어디서 나온 돈인가?</div>
         <div style="font:700 30px/1 var(--br-font-kr)">절감 항목별 구성비</div>
   <div class="br-donut-wrap">
           <svg class="br-donut" viewBox="0 0 196 196" style="width:360px;height:360px" role="img" aria-label="비율 분포">
@@ -176,10 +176,26 @@
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <h2 class="br-title">담당 인력 집중</h2>
-    <p class="br-split" style="font-size:var(--br-fs-lede);line-height:1.8;margin:46px 0 0;color:var(--br-text-2)">
-      전체 자동화 과제 <span class="br-key">14건</span> 중 <span class="br-key">9건</span>이 담당자 2명에 집중<br>
-      인수인계 문서가 있는 과제 <span class="br-key">3건</span>
+    <p class="br-split" style="font-size:var(--br-fs-lede);line-height:1.8;margin:40px 0 0;color:var(--br-text-2)">
+      전체 자동화 과제 <span class="br-key">14건</span> 중 <span class="br-key">9건</span>이 담당자 2명에 집중
     </p>
+
+    <!-- 아이소타입 — 개수는 도해가 말한다. 분모 14가 정수 칸으로 떨어지므로 쓸 수 있다.
+         빈 칸도 데이터다 — 인수인계 문서가 없는 11건이 세어진다. -->
+    <div style="margin-top:30px">
+      <div class="br-iso" style="--cell-w:36px;--cell-h:48px;gap:10px">
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell"></span><span class="br-iso-cell"></span>
+        <span class="br-iso-cell"></span><span class="br-iso-cell"></span>
+        <span class="br-iso-cell"></span><span class="br-iso-cell"></span>
+        <span class="br-iso-cell"></span><span class="br-iso-cell"></span>
+        <span class="br-iso-cell"></span><span class="br-iso-cell"></span>
+        <span class="br-iso-cell"></span>
+      </div>
+      <div class="br-iso-cap" style="margin-top:12px">14개 과제 중 <b>3개만 인수인계 문서 확보</b> · 11개 미작성</div>
+    </div>
     <p class="br-split" style="font-size:var(--br-fs-lede);line-height:1.8;margin:44px 0 0;color:var(--br-text-2)">
       이탈 시 자체 복구 불가 — <span class="br-key">하반기 확산 계획 전면 재수립</span>
     </p>

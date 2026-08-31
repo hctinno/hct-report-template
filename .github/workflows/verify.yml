@@ -64,7 +64,7 @@ jobs:
       - name: 렌더 점검 준비
         run: |
           python -m pip install --quiet --upgrade pip
-          python -m pip install --quiet playwright pillow
+          python -m pip install --quiet playwright pillow jsonschema
           python -m playwright install --with-deps chromium
 
       - name: PPTX 생성기 준비

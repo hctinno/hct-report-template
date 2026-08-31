@@ -19,7 +19,7 @@ docs/CODEX_DECK_PROMPT.md 를 읽고 그대로 수행해라. 용도는 사내 �
 
 | 넘길 값 | 고르는 것 |
 |---|---|
-| 용도 | 사내 보고 · 외부 제안 · 프로젝트 보고 · 교육 |
+| 용도 | 사내 월간 · 주간 · AX 주간 · 경영진 · 전직원 · 외부 제안 · 프로젝트 · 교육 · A4 문서 |
 | 주제 | 덱 제목과 내용 |
 | 형식 | HTML(기본) · PDF · PPTX. 여러 개 가능 |
 
@@ -66,19 +66,31 @@ brand/hct/brand.json
 
 ### 2. 덱 고르기 — 새로 만들지 말고 골라서 내용만 바꾼다
 
-`.claude/skills/blue-report/assets/` 에 완성된 덱이 5종과 레이아웃 카탈로그 1종 있다.
-용도에 맞는 것을 복사해
+`.claude/skills/blue-report/assets/` 에 완성된 덱이 8종, 레이아웃 카탈로그 1종,
+A4 세로 문서가 4종 있다. 용도에 맞는 것을 복사해
 **내용만** 교체한다. 레이아웃과 스타일을 새로 설계하지 않는다.
 
-| 파일 | 용도 | 장수 |
-|---|---|---|
-| `deck-internal-report.html` | 사내 보고 (월간) | 9 |
-| `deck-weekly-report.html` | 조직 주간보고 | 7 |
-| `deck-ax-weekly.html` | AX 조직 1장 보고 + 부록 | 5 |
-| `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
-| `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
-| `deck-training.html` | 교육·기술 설명 | 8 |
-| `deck-template.html` | 레이아웃 12종 카탈로그 | 12 |
+| 파일 | `--deck` 이름 | 용도 | 장수 |
+|---|---|---|---|
+| `deck-internal-report.html` | `internal` | 사내 보고 (월간) | 9 |
+| `deck-weekly-report.html` | `weekly` | 조직 주간보고 | 7 |
+| `deck-ax-weekly.html` | `ax` | AX 조직 1장 보고 + 부록 | 5 |
+| `deck-exec-report.html` | `exec` | 경영진 보고 (결론 먼저) | 6 |
+| `deck-allhands.html` | `allhands` | 전직원 보고 (타운홀) | 9 |
+| `deck-sales-proposal.html` | `sales` | 외부 제안·영업 | 10 |
+| `deck-project-report.html` | `project` | 프로젝트 착수·완료 | 9 |
+| `deck-training.html` | `training` | 교육·기술 설명 | 8 |
+| `deck-template.html` | `catalog` | 레이아웃 12종 카탈로그 | 12 |
+
+발표 덱이 아니라 **A4 세로 문서**가 필요하면 `--doc` 을 쓴다. 1920x1080 이 아니라
+794x1123 지면이고, 검사기도 `check_doc.py` 로 다르다.
+
+| 파일 | `--doc` 이름 | 용도 | 쪽수 |
+|---|---|---|---|
+| `doc-minutes.html` | `minutes` | 회의록 | 4 |
+| `doc-policy.html` | `policy` | 사규·규정 | 6 |
+| `doc-manual.html` | `manual` | 매뉴얼·가이드 | 6 |
+| `doc-notice.html` | `notice` | 공지 (1쪽 완결) | 2 |
 
 같은 레이아웃을 쓰되 배치 순서가 용도에 맞게 다르다. 사내 보고는 다크 요약이 3번째에
 있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤
@@ -119,7 +131,7 @@ assets/deck-viewer.js
 # HTML — 회사명·로고·저작권을 넣어 한 파일로 만든다
 python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
 
-# --deck 은 이름(catalog · internal · weekly · ax · sales · project · training) 또는 HTML 파일 경로
+# --deck 은 위 표의 이름 또는 HTML 파일 경로. A4 문서는 --deck 대신 --doc minutes 처럼 준다
 # 내용을 직접 편집한 덱이면 파일 경로를 준다:
 #   --deck decks-out/my-deck.html
 
@@ -153,7 +165,7 @@ python scripts/check_content_sync.py
 python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 ```
 
-이 스크립트가 12항목을 기계로 판정한다.
+이 스크립트가 16항목을 기계로 판정한다.
 
 문체 · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 ·
 최소 글자 크기 · 데이터 마크 대비 · 브랜드 마크 존재 · 마크와 본문 겹침 ·

@@ -104,10 +104,12 @@
     <h2 class="a br-title br-title--light">동종 업계 현황, <strong>절반이 검토 단계에 정체</strong></h2>
     <p class="a d2 br-lede">검토 중 <span class="br-key">46.2%</span> — 도입 의사는 있으나 시작점을 못 정함<br>실제 도입 예정 31.5%, 미검토 22.3%</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px;flex:1;min-height:0;margin-top:34px">
-      <div class="a d3 br-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
+      <div class="a d3 br-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">
+        <!-- 질문 칩 — 「무엇을 물었나」를 답(도넛)과 분리한다. -->
+        <div class="br-ask">동종 업계는 지금 어디까지 와 있나?</div>
         <div style="font:700 30px/1 var(--br-font-kr)">도입 검토 단계 분포</div>
         <div class="br-donut-wrap">
-          <svg class="br-donut" viewBox="0 0 272 272" style="width:380px;height:380px" role="img" aria-label="도입 검토 단계 분포">
+          <svg class="br-donut" viewBox="0 0 272 272" style="width:330px;height:330px" role="img" aria-label="도입 검토 단계 분포">
           <g transform="translate(136,136)">
             <circle class="dsh d5" r="110" stroke="var(--mark)" stroke-width="48" stroke-dasharray="316.4 691.2" transform="rotate(-90)"></circle>
             <circle class="dsh d6" r="110" stroke="var(--mark-mid)" stroke-width="48" stroke-dasharray="214.8 691.2" transform="rotate(76.32)"></circle>
@@ -237,7 +239,25 @@
     <p class="ad br-eyebrow">03. 도입 효과와 사례</p>
     <h2 class="a br-title br-title--light">동종 규모 <strong>3개사 도입 결과</strong></h2>
     <p class="a d2 br-lede">사명은 비공개 — 업종과 규모로만 표기<br>기간은 모두 착수부터 6개월 시점 기준</p>
-    <div class="a d3" style="flex:1;min-height:0;margin-top:34px">
+
+    <!-- 아이소타입 — 비율을 개수로. 분모(착수 9개 과제)가 눈에 보인다.
+         표의 착수 3+3+3, 가동 3+3+2 를 그대로 센 것이다. 빈 칸도 데이터다. -->
+    <div class="a d3" style="margin-top:22px">
+      <div class="br-iso" style="--cell-w:38px;--cell-h:30px;gap:10px">
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell"></span>
+      </div>
+      <div class="br-iso-cap" style="margin-top:10px">3개사 착수 9개 과제 중 <b>8개 가동</b> · 1개 정착 진행</div>
+    </div>
+
+    <div class="a d4" style="flex:1;min-height:0;margin-top:18px">
       <table class="br-table">
         <thead><tr>
           <th style="width:22%">업종</th><th style="width:14%">규모</th>
@@ -303,30 +323,27 @@
     <div class="br-watermark" data-on="dark"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <p class="ad br-eyebrow">Summary</p>
     <h2 class="a br-title">제안 요약</h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px 34px;margin-top:52px;flex:1;min-height:0">
-      <div class="a d2 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">01</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">문제는 도구가 아니라 편차</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">담당자 간 처리 속도 3.8배 차이<br>교육으로 해소 가능한 장애 요인</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">3.8<span class="br-sup">배</span></span>
+    <!-- 다크 요약장 — 짙은 지면에 짙은 카드를 얹지 않는다. 상단 괘선으로 구획한다. -->
+    <div class="br-sumgrid" style="margin-top:52px;flex:1;min-height:0">
+      <div class="a d2 br-sumcard">
+        <span class="br-sumcard-n">01</span>
+        <div class="br-sumcard-t">문제는 도구가 아니라 편차<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">담당자 간 처리 속도 3.8배 차이<br>교육으로 해소 가능한 장애 요인</span></div>
+        <span class="br-sumcard-v">3.8<span class="br-sup">배</span></span>
       </div>
-      <div class="a d3 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">02</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">진단부터 시작, 비용 없음</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">2주 진단 후 결과를 보고 계약 결정<br>진단 보고서는 계약 여부와 무관하게 제공</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">2<span class="br-sup">주</span></span>
+      <div class="a d3 br-sumcard">
+        <span class="br-sumcard-n">02</span>
+        <div class="br-sumcard-t">진단부터 시작, 비용 없음<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">2주 진단 후 결과를 보고 계약 결정<br>진단 보고서는 계약 여부와 무관하게 제공</span></div>
+        <span class="br-sumcard-v">2<span class="br-sup">주</span></span>
       </div>
-      <div class="a d4 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">03</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">6개월 후 자체 운영</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">외부 의존을 남기지 않는 것이 목표<br>운영 인수 후 지원은 분기 점검만</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">6<span class="br-sup">개월</span></span>
+      <div class="a d4 br-sumcard">
+        <span class="br-sumcard-n">03</span>
+        <div class="br-sumcard-t">6개월 후 자체 운영<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">외부 의존을 남기지 않는 것이 목표<br>운영 인수 후 지원은 분기 점검만</span></div>
+        <span class="br-sumcard-v">6<span class="br-sup">개월</span></span>
       </div>
-      <div class="a d5 br-card" style="display:grid;grid-template-columns:64px 1fr auto;gap:22px;align-items:start">
-        <span class="br-index">04</span>
-        <div><div style="font:700 var(--br-fs-card-title)/1.3 var(--br-font-kr)">동종 3개사 도입 완료</div>
-          <div style="font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:16px">평균 월 302시간 절감 (자기 보고 기준)<br>2개사는 자체 운영 단계 진입</div></div>
-        <span class="br-num" style="font-size:var(--br-fs-stat);line-height:1;color:var(--br-accent-on-dark);align-self:center">302<span class="br-sup">h</span></span>
+      <div class="a d5 br-sumcard">
+        <span class="br-sumcard-n">04</span>
+        <div class="br-sumcard-t">동종 3개사 도입 완료<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">평균 월 302시간 절감 (자기 보고 기준)<br>2개사는 자체 운영 단계 진입</span></div>
+        <span class="br-sumcard-v">302<span class="br-sup">h</span></span>
       </div>
     </div>
     <div class="br-footer"></div>

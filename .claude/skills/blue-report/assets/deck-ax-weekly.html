@@ -159,7 +159,24 @@
     <p class="ad br-eyebrow">부록 B. 자원 현황</p>
     <h2 class="a br-title br-title--light">정원 8명 중 <strong>5명 충원</strong></h2>
     <p class="a d2 br-lede">충원률 <span class="br-key">62.5%</span> · 예산 집행 <span class="br-key">12%</span> — 발족 3주 차 기준<br>데이터분석 <span class="br-key">1명 공백</span>이 도구 검토 속도를 제한</p>
-    <div class="a d3" style="flex:1;min-height:0;margin-top:34px">
+
+    <!-- 아이소타입 — 사람 수는 개수로 보이는 편이 빠르다. 분모(정원 8)가
+         정수 칸으로 떨어진다. 빈 칸 셋이 미충원 인원이다. -->
+    <div class="a d3" style="display:flex;align-items:center;gap:22px;margin-top:22px">
+      <div class="br-iso" style="--cell-w:32px;--cell-h:44px;gap:10px">
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell br-iso-cell--on"></span>
+        <span class="br-iso-cell"></span>
+        <span class="br-iso-cell"></span>
+        <span class="br-iso-cell"></span>
+      </div>
+      <div class="br-iso-cap" style="margin-top:0">빈 칸 셋이 <b>미충원</b> — 기획 1 · 엔지니어 1 · 데이터분석 1</div>
+    </div>
+
+    <div class="a d4" style="flex:1;min-height:0;margin-top:20px">
       <table class="br-table">
         <thead><tr>
           <th style="width:22%">직무</th><th class="num" style="width:12%">정원</th>
@@ -186,7 +203,9 @@
     <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <div class="br-watermark" data-on="light"><!-- 배경 워터마크 자리: apply_brand.py 가 brand.json 의 watermark(다크면)·watermarkOnLight(밝은면)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     <h2 class="a br-title">사내 데이터 접근 권한 미승인</h2>
-    <p class="a d2 br-split" style="font-size:var(--br-fs-lede);line-height:1.8;margin:46px 0 0;color:#333e4a">
+    <!-- 질문 칩 — 이 장이 묻는 것을 근거와 분리한다. -->
+    <div class="a d2 br-ask" style="margin-top:28px">정보보안 심의 상정을 경영진이 요청해 줄 것인가?</div>
+    <p class="a d3 br-split" style="font-size:var(--br-fs-lede);line-height:1.8;margin:38px 0 0;color:#333e4a">
       8월 12일 신청 — <span class="br-key">16일째 회신 없음</span><br>
       파일럿 후보 과제 <span class="br-key">3건</span>이 이 권한에 묶여 대기
     </p>

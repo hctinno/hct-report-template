@@ -79,6 +79,11 @@ def need_pillow():
     need_python("PIL", "Pillow", "이미지 처리(Pillow)")
 
 
+def need_jsonschema():
+    """fixture 계약 검증. 스키마를 두고 검사하지 않으면 장식이 된다."""
+    need_python("jsonschema", "jsonschema", "fixture 계약 검증(jsonschema)")
+
+
 def need_fonttools():
     """폰트 서브셋. brotli 는 woff2 로 저장할 때 fontTools 가 부른다."""
     need_python("fontTools", "fonttools", "폰트 서브셋(fontTools)")

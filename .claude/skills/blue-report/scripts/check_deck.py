@@ -294,6 +294,49 @@ def check_render(path, rep, shots=None):
               }
             });
 
+            // 지시선 주석이 실제로 그려지는가. 조상 중 하나라도 overflow 를 잘라
+            // 두면 절대 배치한 글자와 점이 조용히 사라진다. 가로 막대 트랙이
+            // overflow:hidden 이라 실제로 통째로 잘렸고, 다른 검사는 다 통과했다.
+            const notes = [];
+            sec.querySelectorAll('.br-note').forEach(nt => {
+              const parts = [['점이', nt.querySelector('.br-note-dot')],
+                             ['글자가', nt.querySelector('.br-note-text')]];
+              const label = (nt.textContent || '').trim().slice(0, 24);
+              for (const [what, el] of parts) {
+                if (!el) continue;
+                const r = el.getBoundingClientRect();
+                for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+                  const ov = getComputedStyle(a).overflow;
+                  if (ov === 'visible') continue;
+                  const ar = a.getBoundingClientRect();
+                  if (r.top < ar.top - .5 || r.bottom > ar.bottom + .5 ||
+                      r.left < ar.left - .5 || r.right > ar.right + .5) {
+                    notes.push({ kind: '잘림', what,
+                                 by: a.className.toString().split(' ')[0] || a.tagName.toLowerCase(),
+                                 txt: label });
+                    break;
+                  }
+                }
+              }
+              // 선이 점과 글자를 잇는가. 세로획은 글자 쪽 끝에 있어야 한다 —
+              // 점 쪽에 두면 ㄱ 자가 글자에 닿지 않고 장식이 된다.
+              const tx = nt.querySelector('.br-note-text');
+              const bs = getComputedStyle(nt, '::before');
+              if (tx && bs.content !== 'none') {
+                const br = nt.getBoundingClientRect();   // 폭 0 — 점이 서 있는 자리다
+                const w = parseFloat(bs.width) || 0;
+                const left = nt.classList.contains('br-note--left');
+                const boxLeft = left ? br.left - w : br.left;
+                // 세로획이 실제로 어느 쪽에 그어졌는지는 테두리 폭으로 읽는다.
+                // 변형 이름으로 짐작하면 테두리를 반대로 준 실수를 못 잡는다.
+                const strokeX = parseFloat(bs.borderLeftWidth) > 0 ? boxLeft : boxLeft + w;
+                const near = left ? tx.getBoundingClientRect().right : tx.getBoundingClientRect().left;
+                if (Math.abs(strokeX - near) > 40)
+                  notes.push({ kind: '끊김', what: '선', by: Math.round(Math.abs(strokeX - near)) + 'px',
+                               txt: label });
+              }
+            });
+
             const marks = [];
             const blank = [];
             sec.querySelectorAll('.br-bar-v,.br-bar-h,.br-dot,.br-iso-cell,circle').forEach(el => {
@@ -349,7 +392,7 @@ def check_render(path, rep, shots=None):
               i, label: fr.dataset.label,
               h: sec.scrollHeight, w: sec.scrollWidth,
               ch: sec.clientHeight, cw: sec.clientWidth,
-              bg, small, mark, collide, wm, blank, bars, deepest,
+              bg, small, mark, collide, wm, blank, bars, deepest, notes,
               marks: [...new Set(marks)]
             });
           });
@@ -453,6 +496,25 @@ def check_render(path, rep, shots=None):
                 print(f"        {t}")
         else:
             rep.o(f"본문 안전영역 — 잉크가 y {SAFE_Y}px 위에 머문다")
+
+        # 16. 지시선 주석이 잘리지 않는가. 절대 배치라 조상이 자르면 조용히 사라진다.
+        clip_bad = []
+        for s_ in data:
+            for n in s_.get("notes", []):
+                if n["kind"] == "잘림":
+                    clip_bad.append(f"{s_['i']+1}장 {s_['label']} — 지시선 {n['what']} "
+                                    f".{n['by']} 의 overflow 에 잘린다 · {n['txt']}")
+                else:
+                    clip_bad.append(f"{s_['i']+1}장 {s_['label']} — 지시선이 글자에 닿지 않는다"
+                                    f"(세로획과 {n['by']} 떨어짐) · {n['txt']}")
+        if clip_bad:
+            rep.f(f"지시선 주석 결함 {len(clip_bad)}건")
+            for t in clip_bad[:10]:
+                print(f"        {t}")
+            print("        → 지시선은 세로 막대(.br-bar-v) 안에 둔다. 가로 막대 트랙은 잘라 낸다")
+            print("        → 세로획은 글자 쪽 끝에 둔다. 점 쪽에 두면 선이 글자까지 이어지지 않는다")
+        else:
+            rep.o("지시선 주석 — 잘리지 않고 점과 글자를 잇는다")
 
         # 막대 길이가 값에 비례하는가. 최댓값을 1로 놓고 견준다.
         # 최소 폭·둥근 끝 때문에 짧은 막대가 조금 길게 잡히므로 3%p 를 허용한다.
