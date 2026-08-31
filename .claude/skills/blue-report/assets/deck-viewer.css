@@ -22,6 +22,16 @@
          font:400 15px/1.6 system-ui,sans-serif;border-top:1px solid #2b3852;z-index:8}
   #notes b{display:block;color:#8fa4bd;font:600 11px/1 system-ui,sans-serif;
            letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+  /* 발표 모드 — 진짜 전체화면. 버튼과 노트를 완전히 감춘다.
+     발표 중에 버튼이 보이면 그건 발표 자료가 아니라 편집 화면이다.
+     .all-mode--live 가 #hud 를 다시 켜므로 !important 로 눌러야 한다.
+     전체화면을 막는 환경(iframe·Artifact)에서는 진입이 거부되는데, 그때도 이 클래스만
+     붙여 두면 적어도 버튼은 사라지고 지면이 창을 가득 채운다. */
+  body.present{background:#000}
+  body.present #hud,body.present #notes{display:none!important}
+  /* 발표 중 마우스가 멎으면 커서를 감춘다. 화면 한가운데 화살표가 떠 있으면 눈에 걸린다. */
+  body.present.idle{cursor:none}
+
   /* 전 슬라이드 세로 나열. ?all=1 은 스크린샷·PDF 내보내기·검수용이라 HUD 를 감추고,
      버튼으로 켠 경우(.all-mode--live)는 되돌아갈 수 있게 HUD 를 남긴다. */
   body.all-mode #stage{position:static;display:block;overflow:visible}

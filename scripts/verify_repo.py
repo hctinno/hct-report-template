@@ -600,6 +600,98 @@ def check_viewer(log):
     else:
         log.ok("뷰어 축척", f"해상도 {len(VIEWPORTS)}종 모두 지면 전체가 화면 안에 들어온다")
 
+    check_present(log)
+
+
+def check_present(log):
+    """덱 9종이 전부 전체화면 발표 모드로 들어가고, 그 상태로 슬라이드를 넘기는가.
+
+    HTML 덱은 발표에 쓴다. 발표 모드가 없으면 화면만 커지고 이전·다음·노트 버튼이
+    그대로 남아 발표 자료가 아니라 편집 화면이 된다. 실제로 뷰어에 전체화면 코드가
+    아예 없었고, 축척 검사 8종은 전부 통과했다 — 창 크기만 봤기 때문이다.
+
+    네 가지를 본다. 하나라도 어기면 그 덱으로는 발표를 못 한다.
+      1. F 키로 발표 모드에 들어가는가
+      2. 그때 HUD 와 노트 띠가 완전히 사라지는가
+      3. 지면이 세로 스크롤이 아니라 한 장으로 화면을 채우는가
+      4. 그 상태로 좌우 키가 슬라이드를 넘기는가
+
+    콘솔 예외도 함께 본다. 덱 2종에 #notes-text 가 빠져 있어 슬라이드를 넘길 때마다
+    show() 가 던지고 있었고, 그래서 목록에서 발표로 넘어가는 길이 조용히 막혀 있었다.
+    화면은 멀쩡해 보이므로 예외를 보지 않으면 잡히지 않는다."""
+    sys.path.insert(0, SCRIPTS)
+    from ensure_deps import need_browser
+    chrome = need_browser()
+    from playwright.sync_api import sync_playwright
+
+    decks = sorted(f for f in os.listdir(ASSETS)
+                   if f.startswith("deck-") and f.endswith(".html"))
+    bad = []
+    with sync_playwright() as pw:
+        br = pw.chromium.launch(executable_path=chrome)
+        for name in decks:
+            errs = []
+            pg = br.new_page(viewport={"width": 1440, "height": 900}, reduced_motion="reduce")
+            pg.on("pageerror", lambda e, box=errs: box.append(str(e).splitlines()[0]))
+            pg.goto("file://" + os.path.abspath(os.path.join(ASSETS, name)))
+            pg.wait_for_timeout(700)
+            # 목록(세로 나열)에서 시작해도 발표로 들어가야 한다. 사용자가 실제로
+            # 겪은 순서다 — 전체 보기를 전체화면으로 알고 누른 뒤 발표하려 했다.
+            pg.click("#all")
+            pg.wait_for_timeout(250)
+            pg.keyboard.press("f")
+            pg.wait_for_timeout(400)
+            st = pg.evaluate("""() => {
+              const hud = document.getElementById('hud');
+              const nt = document.getElementById('notes');
+              const f = document.querySelector('.br-frame.is-active');
+              const r = f ? f.getBoundingClientRect() : null;
+              return {
+                present: document.body.classList.contains('present'),
+                all: document.body.classList.contains('all-mode--live'),
+                hud: getComputedStyle(hud).display,
+                notes: nt ? getComputedStyle(nt).display : 'none',
+                scroll: document.documentElement.scrollHeight,
+                win: innerHeight,
+                w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
+                vw: innerWidth, vh: innerHeight,
+                pos: (document.getElementById('pos') || {}).textContent || '',
+              };
+            }""")
+            pg.keyboard.press("ArrowRight")
+            pg.wait_for_timeout(250)
+            pos2 = pg.evaluate("() => (document.getElementById('pos')||{}).textContent || ''")
+            pg.close()
+
+            if not st["present"]:
+                bad.append(f"{name} — F 키로 발표 모드에 들어가지 않는다")
+                continue
+            if st["all"]:
+                bad.append(f"{name} — 발표 모드인데 목록(세로 나열)이 켜져 있다")
+            if st["hud"] != "none" or st["notes"] != "none":
+                bad.append(f"{name} — 발표 중에 HUD·노트가 보인다 "
+                           f"(hud={st['hud']} notes={st['notes']})")
+            # 세로 스크롤이 생기면 한 장짜리 지면이 아니다.
+            if st["scroll"] > st["win"] + 2:
+                bad.append(f"{name} — 발표 중에 세로 스크롤이 생긴다 "
+                           f"({st['scroll']}px > {st['win']}px)")
+            # 가로·세로 중 빡빡한 쪽에 맞추므로 한 변은 화면에 닿아야 한다.
+            if not (abs(st["w"] - st["vw"]) <= 2 or abs(st["h"] - st["vh"]) <= 2):
+                bad.append(f"{name} — 지면이 화면을 채우지 않는다 "
+                           f"({st['w']}x{st['h']} · 화면 {st['vw']}x{st['vh']})")
+            if st["pos"] and pos2 == st["pos"]:
+                bad.append(f"{name} — 발표 중에 좌우 키가 넘기지 않는다 ({st['pos']})")
+            if errs:
+                bad.append(f"{name} — 콘솔 예외: {errs[0]}")
+        br.close()
+
+    if bad:
+        log.fail("뷰어 발표 모드", f"덱 {len(decks)}종 중 {len(bad)}건 이상")
+        for t in bad[:10]:
+            print(f"    · {t}")
+    else:
+        log.ok("뷰어 발표 모드", f"덱 {len(decks)}종 모두 전체화면·한 장씩·버튼 없음")
+
 
 # ------------------------------------------------------- HTML · PPTX 내용 동기화
 
