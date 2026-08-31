@@ -401,10 +401,21 @@ def check_fcc(log):
                f"{len(files)}종 모두 시안 표시·범위 계약·서술 출처·근거 계보를 지면에 밝힌다")
 
     # 4) fixture 가 계약(schema)을 지키는가. 스키마를 두고 검사하지 않으면 장식이 된다.
+    #    ensure_deps 는 자동 설치가 막힌 환경(CI)에서 sys.exit 로 멈춘다. 그대로 두면
+    #    점검 결과 요약이 아예 찍히지 않아 무엇이 문제인지 로그에서 보이지 않는다.
+    #    여기서 받아 실패 한 줄로 바꾸고 나머지 검사는 계속 돌린다.
     sys.path.insert(0, SCRIPTS)
-    from ensure_deps import need_jsonschema
-    need_jsonschema()
-    import jsonschema
+    try:
+        from ensure_deps import need_jsonschema
+        need_jsonschema()
+        import jsonschema
+    except SystemExit as e:
+        log.fail("FCC/KC fixture 계약", "jsonschema 가 없다 — "
+                 f"{sys.executable} -m pip install jsonschema")
+        print(f"    · {str(e).splitlines()[0]}")
+        jsonschema = None
+    if jsonschema is None:
+        return
     schema = json.load(open(os.path.join(FCC_DIR, "schemas", "report-model.schema.json"),
                             encoding="utf-8"))
     fxdir = os.path.join(FCC_DIR, "fixtures")
