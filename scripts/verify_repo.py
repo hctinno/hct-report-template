@@ -229,19 +229,91 @@ def check_pptx_integrity(log, out_dir, made):
         total = sum(expect.get(n, 0) for n in made)
         log.ok("PPTX 무결성", f"{len(made)}종 모두 정상 · 슬라이드 합계 {total}장")
 
+    check_pptx_slides(log, out_dir, made)
 
-def expected_slide_counts():
-    """content.js 가 선언한 덱별 파일명과 슬라이드 수."""
+
+# 슬라이드 본문에 절대 나오면 안 되는 글자. 값이 아니라 자바스크립트가 흘린 흔적이다.
+# progressSlide 가 footer(slide, {docTitle, page, dark}) 를 L.footer(sl, brand, page) 로
+# 잘못 불러 쪽번호 자리에 undefined 가 찍혀 있었다. 인자 모양이 어긋나도 build.js 는
+# 아무 소리 없이 성공하므로, 결과물 글자를 직접 봐야 잡힌다.
+JS_LEAK = ("undefined", "NaN", "[object Object]")
+
+
+def check_pptx_slides(log, out_dir, made):
+    """만든 슬라이드의 글자와 그림을 실제로 들여다본다.
+
+    두 가지를 본다.
+      1. 자바스크립트가 흘린 글자(undefined 따위)가 지면에 찍히지 않았는가
+      2. 브랜드 그림이 장마다 정확히 제 개수인가
+         — 표지는 마크 1개, 나머지는 마크 + 배경 워터마크 2개.
+         build.js 가 모든 장에 마크를 그리므로 생성기가 또 그리면 2번 겹친다.
+         같은 자리에 같은 그림이라 열어 봐도 티가 잘 나지 않는다. 세는 편이 확실하다."""
+    try:
+        types = expected_slide_types()
+    except Exception as e:
+        log.warn("PPTX 지면", f"슬라이드 종류를 읽지 못했다 — {e}")
+        return
+
+    leaks, pics = [], []
+    for name in made:
+        want_types = types.get(name)
+        if want_types is None:
+            continue
+        try:
+            with zipfile.ZipFile(os.path.join(out_dir, name)) as z:
+                slides = sorted(
+                    (n for n in z.namelist()
+                     if re.fullmatch(r"ppt/slides/slide\d+\.xml", n)),
+                    key=lambda n: int(re.search(r"(\d+)\.xml$", n).group(1)))
+                for i, member in enumerate(slides):
+                    xml = z.read(member).decode("utf-8")
+                    text = "".join(re.findall(r"<a:t>([^<]*)</a:t>", xml))
+                    for word in JS_LEAK:
+                        if word in text:
+                            leaks.append(f"{name} {i+1}장: '{word}'")
+                    n_pic = len(re.findall(r"<p:pic>", xml))
+                    want = 1 if (i < len(want_types) and want_types[i] == "cover") else 2
+                    if n_pic != want:
+                        pics.append(f"{name} {i+1}장: 그림 {n_pic}개 (기대 {want}개)")
+        except Exception as e:
+            leaks.append(f"{name} (열지 못함 — {e})")
+
+    for bad, ok_msg, fail_msg, hint in (
+        (leaks, "PPTX 지면 글자 — undefined·NaN 이 찍힌 곳 없음",
+         "PPTX 지면에 자바스크립트가 흘린 글자",
+         "→ 그 슬라이드 생성기의 인자 모양을 layouts.js 의 선언과 맞춘다"),
+        (pics, "PPTX 브랜드 그림 — 표지 마크 1 · 나머지 마크+워터마크 2",
+         "PPTX 브랜드 그림 개수 이탈",
+         "→ 생성기가 L.mark 를 부르지 않는다. build.js 가 모든 장에 그린다"),
+    ):
+        if bad:
+            log.fail(fail_msg, "; ".join(bad[:6]))
+            print(f"    · {hint}")
+        else:
+            log.ok(ok_msg.split(" — ")[0], ok_msg.split(" — ", 1)[1])
+
+
+def _content_query(expr):
     script = (
         "const c = require(%s);\n"
         "const o = {};\n"
-        "for (const v of Object.values(c)) if (v && v.slides) o[v.file] = v.slides.length;\n"
+        "for (const v of Object.values(c)) if (v && v.slides) o[v.file] = %s;\n"
         "process.stdout.write(JSON.stringify(o));\n"
-    ) % json.dumps(os.path.join(SKILL, "pptx", "content.js"))
+    ) % (json.dumps(os.path.join(SKILL, "pptx", "content.js")), expr)
     r = subprocess.run(["node", "-e", script], capture_output=True, text=True)
     if r.returncode != 0:
         raise RuntimeError(r.stderr.strip()[:200])
     return json.loads(r.stdout)
+
+
+def expected_slide_counts():
+    """content.js 가 선언한 덱별 파일명과 슬라이드 수."""
+    return _content_query("v.slides.length")
+
+
+def expected_slide_types():
+    """content.js 가 선언한 덱별 슬라이드 종류. 표지만 워터마크가 없다."""
+    return _content_query("v.slides.map(s => s.type)")
 
 
 # ---------------------------------------------------------------------- dist

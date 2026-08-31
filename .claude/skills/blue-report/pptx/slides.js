@@ -320,9 +320,7 @@ function progressSlide(pres, s, brand, page) {
       align: 'right', fontFace: F.num, fontSize: pt(24),
       color: b.alert ? C.alertText : C.text3, valign: 'middle' });
   });
-  L.mark(sl, brand, false);
-  L.footer(sl, brand, page);
-  if (s.notes) sl.addNotes(s.notes);
+  footer(sl, { docTitle: brand.docTitle, page });
   return sl;
 }
 

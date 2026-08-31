@@ -17,7 +17,17 @@ claude plugin marketplace add dytc880915-commits/hct-report-template
 claude plugin install blue-report@hct-tools
 ```
 
-설치 뒤 "블루 리포트로 사내 보고 덱 만들어줘" 처럼 말하면 스킬이 뜬다.
+설치 뒤 **세션을 새로 시작**하면 다음 중 어느 말로 불러도 스킬이 뜬다.
+
+```
+보고서 템플릿 활용해서 8월 사내 월간보고 만들어줘.
+우리 회사 양식으로 주간보고 덱 만들어줘.
+블루 리포트로 경영진 보고 만들어줘.
+```
+
+「보고서 템플릿」 · 「사내 보고서 템플릿」 · 「회사 양식」 · 「우리 템플릿」 ·
+「HCT 템플릿」 · 「블루 리포트」 · 「AX 리포트 스타일」 · 「딥 코발트」 가 모두 스위치다.
+설치 직후 실행 중인 세션은 새 스킬을 읽지 않는다 — 반드시 세션을 새로 연다.
 
 > `.claude/settings.json` 의 `extraKnownMarketplaces` 는 마켓플레이스를 **등록**만 한다. 설치는 하지 않는다. `plugin install` 은 PC 마다 한 번 실행해야 한다.
 
