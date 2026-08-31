@@ -202,6 +202,8 @@
 .fk-legend b { color:var(--br-text); font-weight:700; }
 .fk-legend span::before { content:"— "; font-weight:700; color:var(--br-cobalt); }
 .fk-legend span.fk-legend--partial::before { content:"╌ "; }
+/* 코호트 범례의 두 번째 계열은 주황이다. 표식까지 파랑으로 두면 범례가 거짓말을 한다. */
+.fk-legend span.fk-legend--b::before { color:var(--br-cat-2); }
 
 /* ── 10. 품질 요약 · 계보 · 근거 ─────────────────────────────────────────
    보고서의 신뢰는 여기서 정해진다. 작게 줄이지 않는다. */
@@ -241,3 +243,163 @@
   padding:18px 16px; margin:0 0 12px; text-align:center; color:var(--br-text-2);
 }
 .fk-empty-k { display:block; font-weight:700; color:var(--br-navy); margin-bottom:4px; }
+
+/* ── 12. A4 가로 지면 ────────────────────────────────────────────────────
+   분석 대시보드(B)처럼 표와 차트를 나란히 놓아야 하는 문서가 쓴다.
+   세로 지면의 값을 뒤집기만 한다 — 여백·활자 체계는 그대로다.
+   check_doc.py 가 이 클래스로 세로/가로를 가르므로 클래스를 빼고 크기만
+   바꾸지 않는다. 빼면 "넘친 세로 지면"과 구별되지 않는다. */
+.bd-page--land {
+  width:var(--bd-page-h); min-height:var(--bd-page-w); height:var(--bd-page-w);
+}
+.bd-page--land .fk-metrics { grid-template-columns:repeat(6, 1fr); }
+.bd-page--land .fk-metrics--4 { grid-template-columns:repeat(4, 1fr); }
+/* 가로 지면은 두 단으로 나눠 쓴다. 한 단으로 쓰면 한 줄이 너무 길어 읽히지 않는다. */
+.fk-cols { display:grid; grid-template-columns:1fr 1fr; gap:0 26px; }
+.fk-cols--wide-left  { grid-template-columns:1.4fr 1fr; }
+.fk-cols--wide-right { grid-template-columns:1fr 1.4fr; }
+
+@media print {
+  /* 가로 지면이 섞이면 @page 크기를 지면마다 바꿀 수 없다. 인쇄는 지면 방향을
+     문서 단위로 정하므로, 가로 문서는 가로 전용으로 뽑는다. */
+  .bd-doc[data-orientation="landscape"] { --bd-print-orient: landscape; }
+}
+
+/* ============================================================================
+   13. 특수 분석 모듈
+   분석 질문마다 필요한 도해가 다르다. 순위 막대 하나로 열한 가지를 다 그리면
+   보고서가 열한 번 같아 보인다. 아래 모듈은 각 분석의 질문에만 답한다.
+   여기서도 색은 --br-* 토큰만 쓰고, 상태는 낱말·기호를 함께 둔다.
+   ========================================================================= */
+
+/* ── 교차 히트맵 — 제품군 x 기술 ─────────────────────────────────────────
+   단조 램프(--br-bar-*) 5단계. 값의 크기를 색의 진하기로 말하는 자리라
+   계열색(--br-cat-*)을 쓰지 않는다. 칸마다 숫자를 함께 찍는다 —
+   색만으로는 값을 읽을 수 없다. */
+.fk-hm { width:100%; border-collapse:collapse; margin:0 0 12px; font-size:var(--bd-fs-body); }
+.fk-hm th {
+  font:700 var(--bd-fs-body)/1.35 var(--br-font-kr); color:var(--br-navy);
+  padding:6px 8px; text-align:left; border-bottom:2px solid var(--br-navy);
+}
+.fk-hm th.fk-hm-col { text-align:center; }
+.fk-hm td { padding:0; border:1px solid var(--br-card); }
+.fk-hm td:first-child {
+  padding:6px 8px; font-weight:700; color:var(--br-text); border:0;
+  border-bottom:1px solid var(--br-card-line); white-space:nowrap;
+}
+.fk-hm-cell {
+  display:block; padding:9px 6px; text-align:center; font-family:var(--br-font-num);
+  font-weight:700; font-variant-numeric:tabular-nums;
+}
+.fk-hm-cell--l0 { background:var(--br-page);  color:var(--br-text-3); }
+.fk-hm-cell--l1 { background:var(--br-bar-7); color:var(--br-navy); }
+.fk-hm-cell--l2 { background:var(--br-bar-6); color:var(--br-navy); }
+.fk-hm-cell--l3 { background:var(--br-bar-4); color:var(--br-on-dark); }
+.fk-hm-cell--l4 { background:var(--br-bar-2); color:var(--br-on-dark); }
+.fk-hm-cell--l5 { background:var(--br-bar-1); color:var(--br-on-dark); }
+.fk-hm-scale { display:flex; align-items:center; gap:6px; margin:-6px 0 12px;
+               font-size:var(--bd-fs-body); color:var(--br-text-2); }
+.fk-hm-scale i { display:block; width:26px; height:12px; border-radius:2px; }
+
+/* ── 전이 행렬 — 시험기관 이동 ───────────────────────────────────────────
+   대각선(제자리)과 이동을 눈으로 가른다. 흐름 총합과 고유 엔터티 수는
+   다른 값이므로 표 아래에 둘을 나란히 적는다. */
+.fk-mx td.fk-mx-self { background:var(--br-tint); color:var(--br-text-2); }
+.fk-mx td.fk-mx-move { font-weight:700; color:var(--br-navy); }
+
+/* ── 흐름도 — 유입·이탈·재진입 ───────────────────────────────────────────
+   화살표를 그리지 않고 단계 칸으로 적는다. A4 에서 곡선 흐름도는 라벨이
+   겹쳐 읽히지 않는다. 방향은 기호(→)와 낱말로 말한다. */
+.fk-flow { display:grid; grid-template-columns:1fr auto 1fr; gap:10px 14px;
+           align-items:center; margin:0 0 12px; }
+.fk-flow-node {
+  border:1px solid var(--br-card-line); border-radius:var(--bd-r-box);
+  padding:9px 12px; background:var(--br-card);
+}
+.fk-flow-node b { display:block; color:var(--br-navy); }
+.fk-flow-arrow { font:700 14pt/1 var(--br-font-num); color:var(--br-cobalt); text-align:center; }
+.fk-flow-arrow small { display:block; font:600 var(--bd-fs-body)/1.4 var(--br-font-kr);
+                       color:var(--br-text-2); white-space:nowrap; }
+
+/* ── 작은 배수 — 최대 20개 엔터티 ────────────────────────────────────────
+   같은 축·같은 단위로 나란히. 축이 다르면 비교가 아니라 착시다. */
+.fk-sm { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin:0 0 12px; }
+.fk-sm-c { border:1px solid var(--br-card-line); border-radius:var(--bd-r-box); padding:8px 10px; }
+.fk-sm-n { font:700 var(--bd-fs-body)/1.3 var(--br-font-kr); color:var(--br-text);
+           white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fk-sm-v { font:800 13pt/1.2 var(--br-font-num); color:var(--br-navy); margin:3px 0 5px; }
+.fk-sm-bar { height:8px; background:var(--br-track); border-radius:var(--br-r-pill); overflow:hidden; }
+.fk-sm-bar i { display:block; height:100%; width:var(--w); background:var(--br-cobalt); }
+.fk-sm-c--alert { border-color:var(--br-alert-line); }
+.fk-sm-c--alert .fk-sm-v { color:var(--br-alert-text); }
+
+/* ── 버전 변경 카드 ──────────────────────────────────────────────────────
+   신규·변경·제외·미확정을 섞지 않는다. 특히 "제외"는 인증 취소가 아니다. */
+.fk-delta { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin:0 0 12px; }
+.fk-delta-c { border:1px solid var(--br-card-line); border-radius:var(--bd-r-box); padding:10px 12px; }
+.fk-delta-k { font:700 var(--bd-fs-body)/1.35 var(--br-font-kr); color:var(--br-text-2); }
+.fk-delta-v { font:800 17pt/1.15 var(--br-font-num); margin-top:4px; color:var(--br-navy); }
+.fk-delta-c--new .fk-delta-v::before { content:"+ "; }
+.fk-delta-c--gone .fk-delta-v::before { content:"− "; }
+.fk-delta-c--gone .fk-delta-v { color:var(--br-warn-text); }
+.fk-delta-c--open .fk-delta-v { color:var(--br-text-2); }
+.fk-delta-n { font:400 var(--bd-fs-body)/1.45 var(--br-font-kr); color:var(--br-text-3); margin-top:4px; }
+
+/* ── 텔레매틱스 세 체계 ──────────────────────────────────────────────────
+   상호배타 4분류 · 집계형 6그룹 · 독립 순위 3목록은 서로 다른 체계다.
+   한 지면에 두더라도 시각 영역을 갈라 놓는다 — 붙여 놓으면 합산해 읽는다. */
+/* 세 체계를 한 쪽에 담아야 하므로 여백이 빠듯하다. 활자 크기는 건드리지 않고
+   테두리 안쪽 여백만 줄인다 — 크기를 줄이면 인쇄 하한을 어긴다. */
+.fk-tele { border:1px solid var(--br-card-line); border-radius:var(--bd-r-box);
+           padding:8px 12px; margin:0 0 9px; }
+.fk-tele-k { display:block; font:700 var(--bd-fs-body)/1.4 var(--br-font-kr);
+             color:var(--br-navy); margin-bottom:6px; }
+/* small 은 기본이 0.83em 이라 그대로 두면 인쇄 하한(10.5pt) 아래로 내려간다. */
+.fk-tele-k small { font-size:1em; font-weight:400; color:var(--br-text-2); }
+.fk-tele--excl { border-left:3px solid var(--br-cat-1); }
+.fk-tele--agg  { border-left:3px solid var(--br-cat-2); }
+.fk-tele--rank { border-left:3px solid var(--br-cat-3); }
+
+/* ── 집계 의미 대조 ──────────────────────────────────────────────────────
+   "왜 숫자가 다른가"에 답하는 자리. 각주로 줄이지 않는다. */
+.fk-cnt { margin:0 0 12px; }
+.fk-cnt-row { display:grid; grid-template-columns:1fr auto; gap:12px;
+              padding:8px 0; border-top:1px solid var(--br-card-line); }
+.fk-cnt-row:last-child { border-bottom:1px solid var(--br-card-line); }
+.fk-cnt-k b { color:var(--br-navy); }
+.fk-cnt-v { font:700 var(--bd-fs-body)/1.5 var(--br-font-num); color:var(--br-navy);
+            font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+/* ── 코호트 비교 — 두 계열 ───────────────────────────────────────────────
+   같은 축·같은 단위. 모집단이 다르면 비교 가능 여부를 먼저 적는다. */
+.fk-coh { margin:0 0 12px; }
+.fk-coh-row { display:grid; grid-template-columns:132px 1fr; gap:10px; align-items:center;
+              padding:5px 0; }
+.fk-coh-n { font-size:var(--bd-fs-body); }
+.fk-coh-pair { display:grid; gap:3px; }
+.fk-coh-b { display:grid; grid-template-columns:1fr 64px; gap:8px; align-items:center; }
+.fk-coh-t { height:11px; background:var(--br-track); border-radius:var(--br-r-pill); overflow:hidden; }
+.fk-coh-t i { display:block; height:100%; width:var(--w); background:var(--br-cat-1); }
+.fk-coh-b--b .fk-coh-t i { background:var(--br-cat-2); }
+.fk-coh-v { font:700 var(--bd-fs-body)/1 var(--br-font-num); text-align:right;
+            font-variant-numeric:tabular-nums; }
+
+/* ── 근거 커버리지 표시 ──────────────────────────────────────────────────
+   반환된 근거가 전체의 몇인지. 부분 반환을 조용히 넘기지 않는다. */
+.fk-covind { margin:0 0 12px; }
+.fk-covind-t { height:15px; background:var(--br-track); border-radius:var(--br-r-pill);
+               overflow:hidden; display:flex; }
+.fk-covind-t i { display:block; height:100%; width:var(--w); background:var(--br-cobalt); }
+.fk-covind-l { display:flex; justify-content:space-between; margin-top:5px;
+               font-size:var(--bd-fs-body); color:var(--br-text-2); }
+.fk-covind-l b { color:var(--br-navy); }
+
+/* ── 엔터티 해소 패널 ────────────────────────────────────────────────────
+   별칭과 미해소를 함께 보인다. 해소를 못 한 것을 없는 것처럼 다루지 않는다. */
+.fk-idp { border:1px solid var(--br-card-line); border-radius:var(--bd-r-box);
+          padding:10px 14px; margin:0 0 12px; }
+.fk-idp-n { font:700 12pt/1.35 var(--br-font-kr); color:var(--br-navy); }
+.fk-idp-a { margin:5px 0 0; font-size:var(--bd-fs-body); color:var(--br-text-2); }
+.fk-idp-a b { color:var(--br-text); }
+
+.fk-tele > .bd-table:last-child, .fk-tele > p:last-child { margin-bottom:0; }

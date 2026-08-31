@@ -321,6 +321,128 @@ def check_palette(log):
         log.fail("계열색", bad[0].replace("실패 — ", "") if bad else "인접쌍이 갈리지 않는다")
 
 
+# --------------------------------------------------------------- FCC/KC 템플릿
+
+# 지시서 12장이 요구하는 판정 중 A4 공통 규칙(크기·대비·글자·머리말)은 check_doc.py
+# 가 이미 본다. 여기서는 FCC/KC 템플릿에만 있는 규칙을 본다 — 중복 구현하지 않는다.
+FCC_DIR = os.path.join(SKILL, "assets", "fcc-kc")
+
+
+def fcc_templates():
+    out = []
+    for root, _, files in os.walk(os.path.join(FCC_DIR, "templates")):
+        for f in sorted(files):
+            if f.endswith(".html"):
+                out.append(os.path.join(root, f))
+    return sorted(out)
+
+
+def check_fcc(log):
+    """FCC/KC 템플릿 14종을 A4 규칙 + 제품 규칙으로 본다.
+
+    제품 규칙은 지시서 12장에서 왔다. 요약하면 「이 지면이 무엇을 센 것인지,
+    누가 말한 것인지, 시안인지」를 지면 스스로 밝히는가다."""
+    files = fcc_templates()
+    if not files:
+        log.fail("FCC/KC 템플릿", "assets/fcc-kc/templates 가 비어 있다")
+        return
+
+    # 1) 재생성 대조 — 조립 스크립트 산출물과 저장소 파일이 같은가
+    r = run([sys.executable, os.path.join(SCRIPTS, "build_fcc_templates.py"), "--check"])
+    print(r.stdout, end="")
+    if r.returncode == 0:
+        log.ok("FCC/KC 재생성 대조", f"템플릿 {len(files)}종 — 스크립트 산출물과 일치")
+    else:
+        log.fail("FCC/KC 재생성 대조", "스크립트를 다시 돌려야 한다")
+
+    # 2) A4 공통 9항목
+    bad = []
+    for f in files:
+        rr = run([sys.executable, os.path.join(SCRIPTS, "check_doc.py"), f])
+        tail = [l for l in rr.stdout.splitlines() if l.startswith("결과:")]
+        if rr.returncode != 0:
+            bad.append(f"{os.path.basename(f)} — {tail[0] if tail else '실패'}")
+    if bad:
+        log.fail("FCC/KC A4 규칙", f"{len(bad)}종 실패")
+        for b in bad[:8]:
+            print(f"    · {b}")
+    else:
+        log.ok("FCC/KC A4 규칙", f"{len(files)}종 모두 check_doc 9항목 통과")
+
+    # 3) 제품 규칙 — 지면이 스스로 밝혀야 하는 것들
+    import re as _re
+    need = {
+        "DESIGN FIXTURE 표시": lambda h, n: h.count("fk-fixture") >= n,
+        "데이터 버전": lambda h, n: 'data-field="scope.sourceDataVersion"' in h,
+        "분석 기간": lambda h, n: 'data-field="scope.appliedPeriod"' in h,
+        "모집단 정의": lambda h, n: 'data-field="scope.populationDefinition"' in h,
+        "레코드 단위": lambda h, n: 'data-field="scope.recordGrain"' in h,
+        "커버리지 상태": lambda h, n: "fk-cov" in h,
+        "서술 출처 구분": lambda h, n: "data-narrative-origin" in h or "fk-tele" in h,
+        "근거·계보": lambda h, n: "fk-lineage" in h and "fk-evi" in h,
+        "제품 서명": lambda h, n: "H-INNO" in h,
+        "템플릿 식별자": lambda h, n: 'data-template-id="' in h,
+    }
+    miss = []
+    for f in files:
+        h = open(f, encoding="utf-8").read()
+        # 꼬리말의 class="bd-pageno" 가 'class="bd-page' 를 접두로 갖는다.
+        # 그냥 세면 쪽수가 두 배로 잡혀 도장 개수 판정이 헛돈다.
+        pages = h.count('<section class="bd-page')
+        for k, fn in need.items():
+            if not fn(h, pages):
+                miss.append(f"{os.path.basename(f)} — {k} 없음")
+    if miss:
+        log.fail("FCC/KC 제품 규칙", f"{len(miss)}건 누락")
+        for m in miss[:10]:
+            print(f"    · {m}")
+    else:
+        log.ok("FCC/KC 제품 규칙",
+               f"{len(files)}종 모두 시안 표시·범위 계약·서술 출처·근거 계보를 지면에 밝힌다")
+
+    # 4) fixture 가 계약(schema)을 지키는가. 스키마를 두고 검사하지 않으면 장식이 된다.
+    sys.path.insert(0, SCRIPTS)
+    from ensure_deps import need_jsonschema
+    need_jsonschema()
+    import jsonschema
+    schema = json.load(open(os.path.join(FCC_DIR, "schemas", "report-model.schema.json"),
+                            encoding="utf-8"))
+    fxdir = os.path.join(FCC_DIR, "fixtures")
+    fxs = sorted(f for f in os.listdir(fxdir) if f.endswith(".json"))
+    fx_bad = []
+    for f in fxs:
+        try:
+            jsonschema.validate(json.load(open(os.path.join(fxdir, f), encoding="utf-8")), schema)
+        except jsonschema.ValidationError as e:
+            fx_bad.append(f"{f} — {e.message[:90]}")
+    if fx_bad:
+        log.fail("FCC/KC fixture 계약", f"{len(fx_bad)}건 위반")
+        for x in fx_bad[:8]:
+            print(f"    · {x}")
+    else:
+        log.ok("FCC/KC fixture 계약", f"{len(fxs)}종 모두 schema 통과")
+
+    # 5) 비밀값·로컬 경로·개인정보 패턴이 섞이지 않았는가
+    LEAK = [(_re.compile(r"[A-Za-z]:\\\\"), "윈도 절대경로"),
+            (_re.compile(r"/home/[a-z]+/"), "로컬 절대경로"),
+            (_re.compile(r"(?i)(api[_-]?key|secret|password|token)\s*[:=]"), "비밀값 표기"),
+            (_re.compile(r"\b\d{6}-\d{7}\b"), "주민등록번호 꼴"),
+            (_re.compile(r"\b01[016-9]-?\d{3,4}-?\d{4}\b"), "휴대전화 번호")]
+    leaks = []
+    for f in files + [os.path.join(FCC_DIR, "fixtures", x) for x in
+                      os.listdir(os.path.join(FCC_DIR, "fixtures"))]:
+        h = open(f, encoding="utf-8").read()
+        for rx, what in LEAK:
+            if rx.search(h):
+                leaks.append(f"{os.path.basename(f)} — {what}")
+    if leaks:
+        log.fail("FCC/KC 안전", f"{len(leaks)}건")
+        for x in leaks[:8]:
+            print(f"    · {x}")
+    else:
+        log.ok("FCC/KC 안전", "비밀값·로컬 경로·개인정보 패턴 없음")
+
+
 # ------------------------------------------------------------------ 뷰어 축척
 
 # 실제로 쓰이는 화면들. 16:9 정배수만 보면 이 검사가 하는 일이 없다 —
@@ -547,12 +669,12 @@ def check_version(log):
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
     ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
-    ap.add_argument("--only", choices=["decks", "docs", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
+    ap.add_argument("--only", choices=["decks", "docs", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
                     action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
     ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
     a = ap.parse_args()
 
-    only = set(a.only or ["decks", "docs", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
+    only = set(a.only or ["decks", "docs", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
     log = Log()
 
     if a.shots:
@@ -570,6 +692,9 @@ def main():
         if "docs" in only:
             print("\n── A4 문서 ──")
             check_docs(log)
+        if "fcc" in only:
+            print("\n── H-INNO FCC/KC 템플릿 ──")
+            check_fcc(log)
         if "viewer" in only:
             print("\n── 뷰어 축척 ──")
             check_viewer(log)

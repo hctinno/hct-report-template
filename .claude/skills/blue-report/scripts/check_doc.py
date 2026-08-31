@@ -34,7 +34,11 @@ from check_deck import (  # noqa: E402
     Report, STYLE_BAN, STYLE_BAN_PLAIN, STYLE_EXEMPT, ALLOWED_HEX, _blank, _rgb_to_hex,
 )
 
-PAGE_W, PAGE_H = 794, 1123
+PAGE_W, PAGE_H = 794, 1123        # A4 세로 210x297mm @96dpi
+# A4 가로. 분석 대시보드처럼 표·차트를 나란히 놓아야 하는 문서가 쓴다.
+# 세로/가로를 지면 클래스(.bd-page--land)로 가른다 — 렌더된 크기로 짐작하지 않는다.
+# 짐작하면 "가로가 아니라 그냥 넘친 세로 지면"을 통과시킨다.
+PAGE_W_LAND, PAGE_H_LAND = 1123, 794
 MIN_BODY_PX = 14        # 10.5pt @96dpi
 MIN_TEXT_CONTRAST = 4.5  # 인쇄물 본문
 
@@ -157,6 +161,7 @@ def check_render(path, rep, shots=None):
             const body = pgel.querySelector('.bd-body');
             const cs = getComputedStyle(pgel);
             return { i, w: pgel.scrollWidth, h: pgel.clientHeight,
+                     land: pgel.classList.contains('bd-page--land'),
                      bg: cs.backgroundColor,
                      fg: body ? getComputedStyle(body).color : cs.color,
                      collide, small };
@@ -166,8 +171,10 @@ def check_render(path, rep, shots=None):
         size_bad, collide_all, small_all, contrast_bad = [], [], [], []
         for s in data:
             here = f"{s['i']+1}쪽"
-            if s["w"] != PAGE_W or s["h"] != PAGE_H:
-                size_bad.append(f"{here}: {s['w']}x{s['h']} (기대 {PAGE_W}x{PAGE_H})")
+            w, h = (PAGE_W_LAND, PAGE_H_LAND) if s.get("land") else (PAGE_W, PAGE_H)
+            if s["w"] != w or s["h"] != h:
+                size_bad.append(f"{here}: {s['w']}x{s['h']} (기대 {w}x{h} · "
+                                f"{'가로' if s.get('land') else '세로'})")
             for c in s["collide"]:
                 collide_all.append(f"{here}: {c['a']} 와 {c['b']} 가 세로로 {c['ov']}px 겹침")
             for t in s["small"]:
@@ -179,7 +186,8 @@ def check_render(path, rep, shots=None):
                     contrast_bad.append(f"{here}: {fg} vs {bg} = {cr:.2f}:1")
 
         for bad, ok_msg, fail_msg, hint in (
-            (size_bad, f"지면 크기 — {len(data)}쪽 모두 정확히 {PAGE_W}x{PAGE_H}",
+            (size_bad, ("지면 크기 — %d쪽 모두 규격대로 (세로 %dx%d · 가로 %dx%d)"
+                        % (len(data), PAGE_W, PAGE_H, PAGE_W_LAND, PAGE_H_LAND)),
              "지면 크기 이탈", None),
             (collide_all, "본문 영역 — 머리말·꼬리말과 겹치지 않는다",
              "본문이 머리말·꼬리말을 침범", "→ 내용을 다음 쪽으로 넘기거나 여백을 줄인다"),
