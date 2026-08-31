@@ -1,0 +1,243 @@
+/* ============================================================================
+   H-INNO FCC/KC Insight — 보고서 전용 덧층(additive layer)
+   ----------------------------------------------------------------------------
+   blue-report.css(토큰·문자)와 blue-doc.css(A4 지면) 위에만 얹는다.
+   여기서 색을 새로 만들지 않는다 — 모든 색은 --br-* 토큰을 그대로 읽는다.
+   여기서 크기 체계를 새로 만들지 않는다 — --bd-fs-* 를 그대로 읽는다.
+
+   이 층이 맡는 것은 하나뿐이다: FCC/KC 분석 결과가 지면에서 **무엇으로 읽히는가**.
+     · 서버가 계산한 사실 / AI 해석 / 사람 메모를 눈으로 갈라 놓는다
+     · 검증 범위(기간·필터·모집단·레코드 단위·커버리지)를 늘 같은 자리에 둔다
+     · 근거·계보·품질 경고를 각주로 축소하지 않는다
+
+   상태는 색만으로 말하지 않는다. 모든 상태 표시에 낱말이나 기호를 함께 둔다 —
+   흑백 인쇄와 색각 이상에서 색은 사라지지만 낱말은 남는다.
+   ========================================================================= */
+
+/* ── 0. 데이터 슬롯 ───────────────────────────────────────────────────────
+   렌더러가 채우는 자리다. 회사명·수치를 이 파일이나 템플릿에 박지 않는다.
+   빈 슬롯은 지면에서 보이게 둔다 — 조용히 사라지면 안 채운 것을 모른다. */
+[data-field]:empty::after,
+[data-metric-id]:empty::after {
+  content:"—"; color:var(--br-text-3); font-family:var(--br-font-num);
+}
+
+/* ── 1. DESIGN FIXTURE 도장 ──────────────────────────────────────────────
+   시안은 운영 분석 결과가 아니다. 지면마다 보이게 찍는다. 렌더러가 실제
+   데이터로 채울 때 이 요소를 지운다. */
+.fk-fixture {
+  display:inline-block; padding:3px 9px; border-radius:var(--br-r-chip);
+  background:var(--br-warn-bg); border:1px solid var(--br-warn-line);
+  color:var(--br-warn-text); font:700 var(--bd-fs-body)/1.3 var(--br-font-kr);
+  letter-spacing:.02em; white-space:nowrap;
+}
+.fk-fixture::before { content:"◆ "; }
+.bd-page--dark .fk-fixture {
+  background:transparent; border-color:var(--br-amber); color:var(--br-amber);
+}
+
+/* ── 2. 표지 ─────────────────────────────────────────────────────────────
+   딥네이비 한 장. 발행 브랜드는 HCT, 제품명은 서명으로 둔다 —
+   경쟁하는 큰 로고 둘을 나란히 놓지 않는다. */
+.bd-page--dark {
+  background:var(--br-dark); color:var(--br-on-dark);
+}
+.bd-page--dark .bd-head, .bd-page--dark .bd-foot {
+  border-color:var(--br-dark-line); color:var(--br-on-dark-2);
+}
+.bd-page--dark .bd-company { color:var(--br-on-dark-2); }
+.bd-page--dark .bd-head .br-wordmark { color:var(--br-on-dark) !important; }
+
+.fk-cover-eyebrow {
+  font:700 var(--bd-fs-body)/1.4 var(--br-font-kr); color:var(--br-accent-on-dark);
+  letter-spacing:var(--br-ls-label); margin:0 0 14px;
+}
+.fk-cover-title {
+  font:800 26pt/1.35 var(--br-font-kr); color:var(--br-on-dark);
+  letter-spacing:var(--br-ls-tight); margin:0 0 12px;
+}
+.fk-cover-sub {
+  font:400 12pt/1.6 var(--br-font-kr); color:var(--br-on-dark-2); margin:0 0 26px;
+}
+/* 제품 서명 — 제품명은 로고가 아니라 글자로 둔다 */
+.fk-signature {
+  display:flex; align-items:baseline; gap:8px; margin-top:auto;
+  padding-top:14px; border-top:1px solid var(--br-dark-line);
+  font:400 var(--bd-fs-body)/1.4 var(--br-font-kr); color:var(--br-on-dark-3);
+}
+.fk-signature b { font-weight:700; color:var(--br-on-dark); }
+
+/* ── 3. 검증 범위 띠 ─────────────────────────────────────────────────────
+   기간·필터·모집단·레코드 단위·커버리지. 서버가 준 계약을 그대로 옮긴다.
+   이 띠가 없으면 아래 수치가 무엇을 센 것인지 알 수 없다. */
+.fk-scope {
+  border:1px solid var(--br-card-line); border-left:3px solid var(--br-cobalt);
+  border-radius:var(--bd-r-box); padding:10px 14px; margin:0 0 12px;
+  display:grid; grid-template-columns:repeat(2, auto 1fr); gap:5px 10px;
+  font-size:var(--bd-fs-body);
+}
+.fk-scope dt { font-weight:700; color:var(--br-navy); white-space:nowrap; }
+.fk-scope dd { margin:0; color:var(--br-text-2); }
+.fk-scope--narrow { grid-template-columns:auto 1fr; }
+
+/* 커버리지 상태 — 낱말과 기호를 함께 쓴다. 색만으로 말하지 않는다. */
+.fk-cov { font-weight:700; white-space:nowrap; }
+.fk-cov--full    { color:var(--br-ok-text); }
+.fk-cov--full::before    { content:"● 완전 "; }
+.fk-cov--bounded { color:var(--br-warn-text); }
+.fk-cov--bounded::before { content:"◐ 부분 "; }
+.fk-cov--none    { color:var(--br-alert-text); }
+.fk-cov--none::before    { content:"○ 없음 "; }
+
+/* ── 4. 서버 지표 카드 ───────────────────────────────────────────────────
+   서버가 계산한 값만 들어간다. 템플릿이 합계·비율·순위를 다시 계산하지 않는다. */
+.fk-metrics { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin:0 0 14px; }
+.fk-metrics--3 { grid-template-columns:repeat(3, 1fr); }
+.fk-metrics--2 { grid-template-columns:repeat(2, 1fr); }
+.fk-metric {
+  border:1px solid var(--br-card-line); border-radius:var(--bd-r-box);
+  padding:9px 11px; background:var(--br-card);
+}
+.fk-metric-k { font:600 var(--bd-fs-body)/1.35 var(--br-font-kr); color:var(--br-text-2); }
+.fk-metric-v {
+  font:800 17pt/1.15 var(--br-font-num); color:var(--br-navy);
+  letter-spacing:var(--br-ls-tight); margin-top:4px;
+  font-variant-numeric:tabular-nums;
+}
+.fk-metric-v .fk-unit { font-size:11pt; font-weight:700; margin-left:2px; }
+.fk-metric-n { font:400 var(--bd-fs-body)/1.4 var(--br-font-kr); color:var(--br-text-3); margin-top:4px; }
+.fk-metric--warn .fk-metric-v { color:var(--br-warn-text); }
+
+/* ── 5. 서술 블록 — 출처를 갈라 놓는다 ───────────────────────────────────
+   검증된 사실 · AI 해석 · 사람 메모는 같은 활자로 적으면 같은 무게로 읽힌다.
+   왼쪽 띠와 머리표로 가른다. 머리표가 곧 낱말 표시라 색이 빠져도 남는다. */
+.fk-narr { border-left:3px solid var(--br-card-line); padding:2px 0 2px 12px; margin:0 0 12px; }
+.fk-narr-k {
+  display:block; font:700 var(--bd-fs-body)/1.3 var(--br-font-kr);
+  letter-spacing:var(--br-ls-label); margin-bottom:5px;
+}
+.fk-narr p { margin:0 0 6px; }
+.fk-narr p:last-child { margin-bottom:0; }
+
+[data-narrative-origin="server_fact"]        { border-left-color:var(--br-cobalt); }
+[data-narrative-origin="server_fact"] .fk-narr-k::before      { content:"■ 서버 검증 사실 · "; }
+[data-narrative-origin="server_fact"] .fk-narr-k             { color:var(--br-navy); }
+[data-narrative-origin="ai_interpretation"]  { border-left-color:var(--br-cat-3); }
+[data-narrative-origin="ai_interpretation"] .fk-narr-k::before { content:"▲ AI 해석 · "; }
+[data-narrative-origin="ai_interpretation"] .fk-narr-k        { color:var(--br-cat-3); }
+[data-narrative-origin="human_note"]         { border-left-color:var(--br-text-3); }
+[data-narrative-origin="human_note"] .fk-narr-k::before        { content:"✎ 검토자 메모 · "; }
+[data-narrative-origin="human_note"] .fk-narr-k               { color:var(--br-text-2); }
+
+/* ── 6. 경고·제한 배너 ───────────────────────────────────────────────────
+   품질 경고를 각주로 줄이지 않는다. 본문 흐름 안에 둔다. */
+.fk-warn {
+  border:1px solid var(--br-warn-line); background:var(--br-warn-bg); color:var(--br-warn-text);
+  border-radius:var(--bd-r-box); padding:10px 14px; margin:0 0 12px;
+}
+.fk-warn-k { display:block; font-weight:700; margin-bottom:4px; }
+.fk-warn-k::before { content:"⚠ "; }
+.fk-warn ul { margin:6px 0 0; padding-left:18px; }
+.fk-warn li { margin-bottom:3px; }
+.fk-warn--limit { border-color:var(--br-cobalt); background:var(--br-page); color:var(--br-navy); }
+.fk-warn--limit .fk-warn-k::before { content:"◆ "; }
+
+/* ── 7. 권고·다음 행동 ───────────────────────────────────────────────────
+   누가·언제까지가 없으면 권고가 아니라 감상이다. */
+.fk-actions { counter-reset:fk-act; margin:0 0 12px; }
+.fk-act {
+  display:grid; grid-template-columns:24px 1fr auto; gap:10px; align-items:baseline;
+  padding:9px 0; border-top:1px solid var(--br-card-line);
+}
+.fk-act:last-child { border-bottom:1px solid var(--br-card-line); }
+.fk-act::before {
+  counter-increment:fk-act; content:counter(fk-act, decimal-leading-zero);
+  font:700 var(--bd-fs-body)/1.5 var(--br-font-num); color:var(--br-text-3);
+}
+.fk-act-t { font-size:var(--bd-fs-body); }
+.fk-act-t b { color:var(--br-navy); }
+.fk-act-w { font:600 var(--bd-fs-body)/1.5 var(--br-font-kr); color:var(--br-navy); white-space:nowrap; }
+
+/* ── 8. 순위 가로 막대 ───────────────────────────────────────────────────
+   값은 fixture 가 준 순서 그대로 그린다. 템플릿이 정렬하지 않는다.
+   폭은 --w(0~100) 로 받는다. 라벨을 반드시 함께 찍는다 — 축만으로 읽히지 않는다. */
+.fk-rank { margin:0 0 12px; }
+.fk-rank-row {
+  display:grid; grid-template-columns:132px 1fr 78px; gap:10px; align-items:center;
+  padding:4px 0;
+}
+.fk-rank-n { font-size:var(--bd-fs-body); color:var(--br-text); }
+/* span 으로 적어도 채움 막대가 그려지게 display 를 못 박는다. inline 요소는
+   width·height 를 먹지 않아 트랙만 남고 막대가 통째로 사라진다 — 실제로 그랬다. */
+.fk-rank-track { display:block; height:13px; background:var(--br-track);
+                 border-radius:var(--br-r-pill); overflow:hidden; }
+.fk-rank-bar   { display:block; height:100%; width:var(--w);
+                 background:var(--br-cobalt); border-radius:var(--br-r-pill); }
+.fk-rank-row--mute .fk-rank-bar { background:var(--br-mark-mute); }
+.fk-rank-v {
+  font:700 var(--bd-fs-body)/1 var(--br-font-num); color:var(--br-navy);
+  text-align:right; font-variant-numeric:tabular-nums;
+}
+.fk-rank-row--mute .fk-rank-v { color:var(--br-text-2); }
+
+/* ── 9. 추이 선 ──────────────────────────────────────────────────────────
+   부분 기간은 점선과 음영으로 가르고 라벨을 붙인다. 실선과 같은 무게로
+   그리면 아직 끝나지 않은 달이 끝난 달처럼 읽힌다. */
+.fk-line { width:100%; height:auto; display:block; margin:0 0 6px; }
+.fk-line .fk-axis { stroke:var(--br-hairline); stroke-width:1; }
+.fk-line .fk-grid { stroke:var(--br-hairline); stroke-width:1; stroke-dasharray:2 3; }
+.fk-line .fk-path { fill:none; stroke:var(--br-cobalt); stroke-width:2; }
+.fk-line .fk-path--partial { stroke-dasharray:4 3; }
+.fk-line .fk-partial-bg { fill:var(--br-tint); }
+.fk-line .fk-dot { fill:var(--br-cobalt); }
+/* SVG 글자는 viewBox 배율을 타므로 pt 값이 그대로 지면 크기가 아니다.
+   640 단위를 지면 폭에 채우면 배율이 약 1.0 이라 11pt 가 14px 를 넘긴다 —
+   인쇄 하한(10.5pt)을 지키려면 여기서 8pt 로 적으면 안 된다. */
+.fk-line text { font:600 11pt/1 var(--br-font-num); fill:var(--br-text-2); }
+.fk-line .fk-lbl { font-family:var(--br-font-kr); }
+.fk-legend {
+  display:flex; gap:16px; flex-wrap:wrap; margin:0 0 12px;
+  font-size:var(--bd-fs-body); color:var(--br-text-2);
+}
+.fk-legend b { color:var(--br-text); font-weight:700; }
+.fk-legend span::before { content:"— "; font-weight:700; color:var(--br-cobalt); }
+.fk-legend span.fk-legend--partial::before { content:"╌ "; }
+
+/* ── 10. 품질 요약 · 계보 · 근거 ─────────────────────────────────────────
+   보고서의 신뢰는 여기서 정해진다. 작게 줄이지 않는다. */
+.fk-quality { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 12px; }
+.fk-q { border:1px solid var(--br-card-line); border-radius:var(--bd-r-box); padding:9px 11px; }
+.fk-q-k { font:600 var(--bd-fs-body)/1.35 var(--br-font-kr); color:var(--br-text-2); }
+.fk-q-v { font:700 13pt/1.2 var(--br-font-num); color:var(--br-navy); margin-top:3px; }
+
+.fk-lineage {
+  border:1px solid var(--br-card-line); border-radius:var(--bd-r-box);
+  background:var(--br-page); padding:10px 14px; margin:0 0 12px;
+  display:grid; grid-template-columns:auto 1fr; gap:5px 12px;
+  font-size:var(--bd-fs-body);
+}
+.fk-lineage dt { font-weight:700; color:var(--br-navy); white-space:nowrap; }
+.fk-lineage dd { margin:0; font-family:var(--br-font-num); color:var(--br-text-2); word-break:break-all; }
+
+/* 근거 목록 — 식별자가 길다. 잘라 내지 않고 접어 내린다. */
+.fk-evi td:first-child, .fk-evi td:nth-child(2) { font-family:var(--br-font-num); word-break:break-all; }
+.fk-evi .fk-evi-st { white-space:nowrap; font-weight:700; }
+.fk-evi .fk-evi-st--ok::before  { content:"● "; }
+.fk-evi .fk-evi-st--bnd::before { content:"◐ "; }
+.fk-evi .fk-evi-st--ok  { color:var(--br-ok-text); }
+.fk-evi .fk-evi-st--bnd { color:var(--br-warn-text); }
+
+/* 이어지는 표 — 다음 쪽으로 넘어갈 때 앞뒤에 표시를 남긴다. */
+.fk-cont {
+  font:600 var(--bd-fs-body)/1.4 var(--br-font-kr); color:var(--br-text-3);
+  text-align:right; margin:-6px 0 12px;
+}
+.fk-cont::before { content:"▸ "; }
+
+/* ── 11. 빈 상태 ─────────────────────────────────────────────────────────
+   0건은 실패가 아니라 결과다. 빈 지면을 남기지 않고 까닭을 적는다. */
+.fk-empty {
+  border:1px dashed var(--br-chip-line); border-radius:var(--bd-r-box);
+  padding:18px 16px; margin:0 0 12px; text-align:center; color:var(--br-text-2);
+}
+.fk-empty-k { display:block; font-weight:700; color:var(--br-navy); margin-bottom:4px; }

@@ -14,6 +14,46 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.27.0 — 2026-08-31
+
+### H-INNO FCC/KC 보고서 템플릿 — 1단계 토대
+
+`docs/H_INNO_FCC_KC_REPORT_TEMPLATE_WORK_ORDER.md` 의 1단계다. 14종을 한꺼번에
+찍어 내지 않고 **토대와 첫 템플릿 하나**를 먼저 세워 규격을 굳힌다.
+
+| 넣은 것 | 자리 |
+|---|---|
+| FCC/KC 덧층 CSS (의미 부품 16종) | `assets/fcc-kc/fcc-kc.css` |
+| fixture 계약(JSON Schema) | `assets/fcc-kc/schemas/report-model.schema.json` |
+| 기준 fixture — 정상·완전 커버리지·부분 기간 포함 | `assets/fcc-kc/fixtures/fixture-baseline.json` |
+| 템플릿 manifest 14종 선언 + 선택 규칙 | `assets/fcc-kc/manifest.json` |
+| **A — Executive Editorial** (A4 세로 6쪽) | `assets/fcc-kc/templates/tpl-a-executive.html` |
+
+덧층은 **색도 크기 체계도 새로 만들지 않는다.** `--br-*` 와 `--bd-fs-*` 를 그대로
+읽고, 이 층은 "FCC/KC 결과가 지면에서 무엇으로 읽히는가"만 맡는다.
+
+### 서버 사실 · AI 해석 · 사람 메모를 지면에서 가른다
+
+`data-narrative-origin` 이 셋을 왼쪽 띠와 머리표로 나눈다. 머리표가 낱말이라
+흑백 인쇄와 색각 이상에서도 남는다 — **상태를 색만으로 말하지 않는다**는 규칙을
+커버리지·근거 상태·순위 강조에도 그대로 적용했다.
+
+### 만들면서 잡은 것 셋
+
+- **순위 막대가 통째로 비어 있었다.** `<span>` 이 inline 이라 `width`·`height` 를
+  먹지 않았다. 트랙만 남고 채움이 사라진 채 9항목 검사는 전부 통과했다 — PNG 를
+  보고 찾았다. `display:block` 을 못 박았다.
+- **9pt 보조 글자 90곳이 인쇄 하한(10.5pt)을 어겼다.** 크기로 만들던 위계를
+  굵기·색으로 옮겼다. SVG 글자는 viewBox 배율을 타므로 pt 값이 그대로 지면
+  크기가 아니라는 것도 여기서 드러났다(8pt → 11pt).
+- **검사기 오탐 하나** — 명사 「최다」가 `[가-힣]다` 평서형 규칙에 걸린다.
+  이번에는 문구를 「1위」로 돌려 피했다. 오탐 자체는 `fix/style-false-positive-and-mark-none`
+  브랜치가 다루고 있다.
+
+`check_doc.py` — 통과 9 · 주의 0 · 실패 0
+
+---
+
 ## 1.26.0 — 2026-08-30
 
 ### 노트북에서 지면 오른쪽이 잘려 나가고 있었다
