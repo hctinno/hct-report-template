@@ -6,7 +6,20 @@
 
 ---
 
-## 쓰는 법 — 세 가지
+## 쓰는 법 — 네 가지
+
+넷 다 같은 스킬을 뜨게 하지만 **미치는 범위와 갱신 방식이 다르다.**
+
+| | 어디까지 뜨나 | 최신판 유지 | 손이 가는 횟수 |
+|---|---|---|---|
+| 1. 플러그인 | 그 PC 의 모든 프로젝트 | `plugin marketplace update` 로 당긴다 | PC 마다 한 번 |
+| 2. 계정 스킬 | **그 계정의 모든 세션** — claude.ai · 각 PC · 원격 | 판올림마다 다시 올린다 | 계정에 한 번 |
+| 3. 클론 | 그 폴더 안에서만 | `git pull` | 쓸 때마다 |
+| 4. 복사 | 그 PC 의 모든 프로젝트 | 다시 복사한다 | PC 마다 한 번 |
+
+**1 과 2 를 같이 쓰는 것이 무난하다.** 2 로 어디서든 뜨게 해 두고, 주로 쓰는 PC 에는
+1 을 깔아 판올림을 자동으로 당긴다.
+
 
 ### 1. Claude Code — 플러그인 (권장)
 
@@ -31,7 +44,31 @@ claude plugin install blue-report@hct-tools
 
 > `.claude/settings.json` 의 `extraKnownMarketplaces` 는 마켓플레이스를 **등록**만 한다. 설치는 하지 않는다. `plugin install` 은 PC 마다 한 번 실행해야 한다.
 
-### 2. Codex 등 다른 에이전트 — 클론
+### 2. Claude 계정 스킬 — 계정 전체에 한 번
+
+플러그인은 **PC 마다** 깔아야 한다. 계정 스킬로 올리면 그 계정의 모든 세션
+— claude.ai 대화, 각 PC 의 Claude Code, 원격 세션 — 에 자동으로 동기화된다.
+PC 를 바꾸거나 원격 세션을 새로 띄워도 따라온다.
+
+```bash
+python3 scripts/build_account_skill_bundle.py
+```
+
+`decks-out/blue-report-skill-v<버전>.zip` 이 뜬다.
+claude.ai → Settings → Capabilities → Skills 에서 이 zip 을 올린다.
+
+묶음은 저장소 판과 두 가지가 다르다. 홀로 돌아야 하기 때문이다.
+
+| | 저장소 판 | 계정 스킬 묶음 |
+|---|---|---|
+| 브랜드 자산 | 루트의 `brand/hct/` 를 `../../../` 로 가리킨다 | 안에 넣는다 (`brand/hct/`) |
+| `pptx/node_modules` | 있다 | 뺀다 — `cd pptx && npm install` |
+| `dist/` | 있다 | 뺀다 — 스킬이 읽지 않는다 |
+
+**판올림하면 묶음을 다시 떠서 다시 올린다.** 계정 스킬은 저장소를 보고 있지 않다.
+자동으로 최신판이 되는 것은 1번 플러그인 쪽뿐이다(`plugin marketplace update`).
+
+### 3. Codex 등 다른 에이전트 — 클론
 
 Codex 는 `.claude/skills/` 를 인식하지 못한다. 파일이 디스크에 있어야 한다.
 
@@ -48,7 +85,10 @@ docs/CODEX_DECK_PROMPT.md 를 읽고 그대로 수행해라. 용도는 사내 �
 
 용도와 주제를 빼도 된다. 그 경우 에이전트가 먼저 묻는다.
 
-### 3. 다른 프로젝트에 복사
+### 4. 그 PC 안에서만 복사
+
+계정을 거치지 않고 이 PC 의 사용자 스킬 폴더(`~/.claude/skills/`)에만 두고 싶을 때다.
+그 PC 의 모든 프로젝트에서 뜨지만 다른 PC 나 원격 세션에는 따라가지 않는다.
 
 ```bash
 python scripts/install_blue_report_skill.py                       # 사용자 스킬 폴더
