@@ -21,7 +21,7 @@ blue-report/
 │  ├─ doc-viewer.js            쪽번호 자동 · 축척 · 인쇄
 │  ├─ doc-minutes.html         회의록 2쪽
 │  ├─ deck-viewer.css          뷰어 껍데기 (디자인 시스템 아님)
-│  ├─ deck-viewer.js           넘김 · 축척 · 쪽번호 자동 · 발표자 노트
+│  ├─ deck-viewer.js           넘김 · 축척 · 전체화면 발표 · 쪽번호 자동 · 노트
 │  ├─ deck-template.html       레이아웃 12종 카탈로그
 │  ├─ deck-internal-report.html   사내 보고 (월간) 9장
 │  ├─ deck-weekly-report.html     조직 주간보고 7장
@@ -47,7 +47,7 @@ blue-report/
 └─ scripts/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
-   ├─ check_deck.py            덱 자동 점검 16항목 + 슬라이드별 PNG
+   ├─ check_deck.py            덱 자동 점검 17항목 + 슬라이드별 PNG
    ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
    ├─ apply_brand.py           회사 정보·로고를 덱에 일괄 적용
@@ -199,7 +199,7 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | 애니메이션 | 있음 (끌 수 있음) | 없음 |
 | 머리말·꼬리말 | 꼬리말만 | 쪽마다 둘 다 |
 | 브랜드 | 우측 상단 마크 | 머리말 로고 + 꼬리말 회사명 |
-| 검사기 | `check_deck.py` 16항목 | `check_doc.py` 9항목 |
+| 검사기 | `check_deck.py` 17항목 | `check_doc.py` 9항목 |
 
 파일 구성도 덱과 같은 방식으로 나뉜다.
 
@@ -441,7 +441,22 @@ python3 scripts/install_blue_report_skill.py             # ~/.claude/skills/blue
 | `~/.claude/skills/blue-report` | 내 모든 프로젝트 |
 | `<프로젝트>/.claude/skills/blue-report` | 그 프로젝트만. 팀과 공유하려면 저장소에 커밋 |
 
-브라우저에서 `deck.html`을 열면 좌우 화살표로 넘긴다. `N` 키로 발표자 노트를 켜고 끈다.
+브라우저에서 `deck.html`을 열면 좌우 화살표로 넘긴다.
+
+| 키 · 버튼 | 하는 일 |
+|---|---|
+| `←` `→` `Space` `PageUp/Down` | 슬라이드 넘김 |
+| `Home` `End` | 처음 · 마지막 |
+| **`F` · 「발표」** | **전체화면 발표 모드** — 버튼과 노트가 사라지고 지면이 화면을 채운다 |
+| `Esc` | 발표 모드 나가기 |
+| `N` · 「노트」 | 발표자 노트 |
+| 「목록」 | 전 슬라이드 세로 나열 (검수용) |
+
+**발표할 때는 `F` 를 쓴다.** 브라우저 `F11` 도 발표 모드로 인식한다. 발표 중에는
+마우스 클릭으로도 넘어가고, 2초간 움직임이 없으면 커서가 사라진다.
+
+「목록」은 발표용이 아니다 — 전 슬라이드를 세로로 늘어놓아 한눈에 훑거나 스크린샷을
+뜨려는 것이다. 예전 이름이 「전체 보기」였는데 전체화면으로 읽혀서 바꿨다.
 `deck.html?all=1`은 전 슬라이드를 원본 크기로 세로 나열한다(스크린샷 · PDF 내보내기용).
 
 **화면 크기와 무관하게 지면 전체가 보인다.** 1920x1080 지면을 창에 맞춰 줄이되
@@ -921,7 +936,7 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
    → 마크는 상단 여백 띠 안에만 둔다. 우측 상단에 콘텐츠를 붙이지 않는다.
 
 `python3 scripts/check_deck.py deck.html --shots out/`이 위 1·4·5·6·7·8과 문체를 자동
-검사하고 슬라이드별 PNG를 남긴다. 판정은 16항목이다.
+검사하고 슬라이드별 PNG를 남긴다. 판정은 17항목이다.
 
 | # | 항목 | 실패하면 |
 |---|---|---|

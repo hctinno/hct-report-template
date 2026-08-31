@@ -7,7 +7,7 @@ Playwright가 없으면 정적 검사만 수행하고 그 사실을 보고한다
     python3 check_deck.py ../assets/deck-template.html
     python3 check_deck.py deck.html --shots out/     # 슬라이드별 PNG도 저장
 
-검사 항목 (12)
+검사 항목 (13)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 금지 문체 — 존댓말(~습니다 / ~해요)과 평서형(~한다 / ~없다) 없이 명사형인가
     2. 파이(<path> 호)를 쓰지 않았는가 — 도넛만 허용
@@ -20,8 +20,9 @@ Playwright가 없으면 정적 검사만 수행하고 그 사실을 보고한다
     8. 본문 영역이 위아래로 서로 겹치지 않는가
     9. 브랜드 마크가 모든 슬라이드 우측 상단에 있는가
    10. 브랜드 마크가 본문과 겹치지 않는가
-   11. 로고 변형이 배경 밝기와 맞는가 (어두운 면 흰색 · 밝은 면 원색)
-   12. 배경 워터마크가 마크와 다른 자산인가 (국문 병기를 뗀 심볼이어야 한다)
+   11. 표지를 뺀 모든 지면에 배경 워터마크가 있는가 (표지에는 없어야 한다)
+   12. 로고 변형이 배경 밝기와 맞는가 (어두운 면 흰색 · 밝은 면 원색)
+   13. 배경 워터마크가 마크와 다른 자산인가 (국문 병기를 뗀 심볼이어야 한다)
 
 종료 코드는 실패가 하나라도 있으면 1, 아니면 0이다. 주의는 0을 유지한다.
 """
@@ -393,6 +394,11 @@ def check_render(path, rep, shots=None):
               h: sec.scrollHeight, w: sec.scrollWidth,
               ch: sec.clientHeight, cw: sec.clientWidth,
               bg, small, mark, collide, wm, blank, bars, deepest, notes,
+              // 표지에만 워터마크를 넣지 않는다. 표지는 --cover 조판을 쓴 '첫 장'이다.
+              // 마무리 장도 --cover 조판이지만 표지가 아니므로 워터마크가 깔린다.
+              // 조판 클래스만 보면 마무리 장을 표지로 착각한다.
+              cover: i === 0 && sec.classList.contains('br-slide--cover'),
+              hasWm: !!sec.querySelector('.br-watermark'),
               marks: [...new Set(marks)]
             });
           });
@@ -401,9 +407,17 @@ def check_render(path, rep, shots=None):
 
         overflow, small_all, contrast_bad, collide_all = [], [], [], []
         mark_missing, mark_overlap, mark_variant, mark_pos = [], [], [], []
+        wm_missing, wm_extra = [], []
         for s in data:
             m = s.get("mark")
             here = f"{s['i']+1}. {s['label']}"
+            # 배경 워터마크 — 표지만 빼고 모든 지면에 깔린다. PPTX 판도 같은 규칙으로
+            # 그리므로, 한쪽만 어기면 같은 보고가 형식에 따라 다르게 보인다.
+            # ax 덱 1장이 실제로 그랬고 다른 검사는 전부 통과했다.
+            if s.get("cover") and s.get("hasWm"):
+                wm_extra.append(here)
+            elif not s.get("cover") and not s.get("hasWm"):
+                wm_missing.append(here)
             if not m:
                 mark_missing.append(here)
             else:
@@ -558,6 +572,19 @@ def check_render(path, rep, shots=None):
                 print(f"        {t}")
         else:
             rep.o(f"브랜드 마크 — {len(data)}장 모두 우측 상단에 있다")
+
+        if wm_missing or wm_extra:
+            if wm_missing:
+                rep.f(f"워터마크 배치 — 없는 슬라이드 {len(wm_missing)}장")
+                for t in wm_missing[:10]:
+                    print(f"        {t}")
+            if wm_extra:
+                rep.f(f"워터마크 배치 — 표지에 있다 {len(wm_extra)}장 · 제목과 겹친다")
+                for t in wm_extra[:10]:
+                    print(f"        {t}")
+        else:
+            n = sum(1 for s in data if not s.get("cover"))
+            rep.o(f"워터마크 배치 — 표지를 뺀 {n}장 모두 있다")
 
         if mark_overlap:
             rep.f(f"브랜드 마크가 본문과 겹침 {len(mark_overlap)}건")
