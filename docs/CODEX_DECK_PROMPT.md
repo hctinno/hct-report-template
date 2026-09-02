@@ -19,7 +19,7 @@ docs/CODEX_DECK_PROMPT.md 를 읽고 그대로 수행해라. 용도는 사내 �
 
 | 넘길 값 | 고르는 것 |
 |---|---|
-| 용도 | 사내 월간 · 주간 · AX 주간 · 경영진 · 전직원 · 외부 제안 · 프로젝트 · 교육 · A4 문서 |
+| 용도 | 사내 월간 · 주간 · AX 주간 · 팀 압축 주간 · 경영진 · 전직원 · 외부 제안 · 프로젝트 · 교육 · A4 문서 |
 | 주제 | 덱 제목과 내용 |
 | 형식 | HTML(기본) · PDF · PPTX. 여러 개 가능 |
 
@@ -75,6 +75,7 @@ A4 세로 문서가 4종 있다. 용도에 맞는 것을 복사해
 | `deck-internal-report.html` | `internal` | 사내 보고 (월간) | 9 |
 | `deck-weekly-report.html` | `weekly` | 조직 주간보고 | 7 |
 | `deck-ax-weekly.html` | `ax` | AX 조직 1장 보고 + 부록 | 5 |
+| `deck-team-weekly.html` | `team` | 팀 압축 주간보고 (2장 · 팀장 보고용) | 2 |
 | `deck-exec-report.html` | `exec` | 경영진 보고 (결론 먼저) | 6 |
 | `deck-allhands.html` | `allhands` | 전직원 보고 (타운홀) | 9 |
 | `deck-sales-proposal.html` | `sales` | 외부 제안·영업 | 10 |

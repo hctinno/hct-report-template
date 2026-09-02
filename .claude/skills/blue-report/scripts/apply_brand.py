@@ -30,6 +30,7 @@ DECKS = {
     "internal": "deck-internal-report.html",  # 사내 보고 (월간)
     "weekly":   "deck-weekly-report.html",    # 조직 주간보고
     "ax":       "deck-ax-weekly.html",        # AX 조직 주간보고 (1장 + 부록)
+    "team":     "deck-team-weekly.html",      # 팀 단위 압축 주간보고 (2장 · 가로)
     "sales":    "deck-sales-proposal.html",   # 외부 제안·영업
     "project":  "deck-project-report.html",   # 프로젝트 착수·완료
     "training": "deck-training.html",         # 교육·기술 설명
