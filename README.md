@@ -246,6 +246,10 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
 
 `.claude/skills/blue-report/references/rules.md` 는 같은 내용의 압축본이다.
 
+규격을 바꾼 근거(외부 자료 실측·대조)는 `.claude/skills/blue-report/references/decisions/`
+에 주제별로 모아 둔다. `CHANGELOG.md` 가 "무엇을 바꿨는가"라면 이쪽은 "왜 그렇게
+판단했는가"의 원본이다.
+
 ---
 
 ## 구성
@@ -256,6 +260,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   SKILL.md                               스킬 트리거 정의
   README.md                              자기완결 사양서
   references/rules.md                    압축 규칙
+  references/decisions/                  규격을 바꾼 근거(실측·대조) 원본 — README.md 가 색인
   assets/blue-report.css                 토큰 77개 — 단일 소스
   assets/deck-*.html                     완성 덱 9종 + 레이아웃 카탈로그
   assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다

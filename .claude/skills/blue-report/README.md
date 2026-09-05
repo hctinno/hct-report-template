@@ -38,7 +38,8 @@ blue-report/
 │  ├─ doc-notice.html            공지 A4 1쪽
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
 ├─ references/
-│  └─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
+│  ├─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
+│  └─ decisions/                규격을 바꾼 근거(실측·대조) 원본. README.md 가 색인이다
 ├─ pptx/                       PowerPoint 판 생성기
 │  ├─ tokens.js                blue-report.css 의 토큰을 읽어 온다 (색 값 중복 없음)
 │  ├─ layouts.js               카드 · 칩 · 머리말 · 꼬리말 등 원자 helper
