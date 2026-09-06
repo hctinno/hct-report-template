@@ -46,17 +46,35 @@
 
 ## 브랜치 지도
 
-| 브랜치 | 상태 | 처리 |
-|---|---|---|
-| `full/main` | **기본 브랜치. 기준선.** | — |
-| `main` | 1커밋 스냅샷 · 고유 내용 없음 | 삭제 후보. 승인 필요 |
-| `full/origin` | v1.32.0 · **회수 완료** | 삭제 후보. 승인 필요 |
-| `full/claude/blue-report-handover-ih4bnv` | `full/origin` 과 같은 커밋 · **회수 완료** | 삭제 후보. 승인 필요 |
-| `full/fix/style-false-positive-and-mark-none` | 검사기 오탐 수정 · **회수 완료**(cherry-pick) | 삭제 후보. 승인 필요 |
-| `full/claude/on-premise-ai-repo-m686j9` | 이 저장소 주제와 무관 | 별도 저장소로 이관 |
+| 브랜치 | 끝 커밋 | 상태 | 처리 |
+|---|---|---|---|
+| `full/main` | `48fc1e2` | **기본 브랜치. 기준선.** | — |
+| `main` | `35f0897` | 1커밋 스냅샷 · 고유 내용 없음 | 삭제 후보 |
+| `full/origin` | `cbab49f` | v1.32.0 · **회수 완료**(SHA 포함) | 삭제 가능 |
+| `full/claude/blue-report-handover-ih4bnv` | `cbab49f` | `full/origin` 과 같은 커밋 · **회수 완료**(SHA 포함) | 삭제 가능 |
+| `full/fix/style-false-positive-and-mark-none` | `9b66310` | 검사기 오탐 수정 · **회수 완료**(cherry-pick) | 태그로 남기고 삭제 |
+| `full/claude/on-premise-ai-repo-m686j9` | `d00f263` | 이 저장소 주제와 무관 | 별도 저장소로 이관 |
 
-「회수 완료」는 그 브랜치의 내용이 `full/main` 에 들어왔다는 뜻이다. 커밋을 잃지 않고
-지울 수 있다. 다만 **브랜치를 지우는 일은 승인을 받고 한다.**
+「회수 완료」는 그 브랜치의 내용이 `full/main` 에 들어왔다는 뜻이다. 다만 **회수 방식이
+두 가지고, 삭제 안전도가 다르다.**
+
+- **SHA 포함** — 그 커밋이 `full/main` 의 조상이다. 브랜치를 지워도 커밋은 그대로
+  남는다. 잃을 것이 없다.
+- **cherry-pick** — 내용만 옮겨 담았고 커밋 SHA 는 `full/main` 에 없다. 브랜치를 지우면
+  원본 커밋이 참조를 잃고, 언젠가 GitHub 의 정리 대상이 된다.
+
+`full/fix/style-false-positive-and-mark-none` 이 그 cherry-pick 쪽이다. 세 커밋의 내용은
+`68b902c` 「검사기 오탐 셋을 회수한다」로 전부 들어왔고 문체 케이스 11건으로 확인했으므로
+기능상 잃을 것은 없다. 그래도 원본을 되짚을 수 있게 **지우기 전에 태그로 고정한다.**
+
+```
+453e6ed15c2649a4ac227a5fe4837c5da03acacc  검사기 오탐 둘 — 문체 낱말 경계와 마크 자리표시자 None
+bda0202489c64579d0bcc6845b3a0feec516b434  문체 예외에 과다(過多) 추가
+9b66310018a79b7e5c449e90c648309d001d794d  인라인 강조에 가려진 종결어미도 잡는다
+```
+
+이 브랜치를 통째로 병합하지 않은 이유도 함께 적어 둔다 — 기준선보다 15커밋 뒤처져 있어
+그대로 합치면 FCC/KC 템플릿 체계가 지워진다(-13500줄).
 
 ### `full/` 접두사
 
@@ -75,13 +93,38 @@
 
 승인 없이 해도 되는 것은 없다. 전부 브랜치 정리이고, 되돌리기 어렵기 때문이다.
 
-1. 회수 완료된 세 브랜치(`full/origin` · `full/claude/blue-report-handover-ih4bnv` ·
-   `full/fix/style-false-positive-and-mark-none`)를 지운다.
+1. 회수 완료된 브랜치를 지운다. 아래 「브랜치 지우는 법」 참고.
 2. `main` 스냅샷을 지울지 정한다. 지운다면 기본 브랜치 이름을 `full/main` 에서
    `main` 으로 되돌릴지 함께 정한다. 되돌리면 `.github/workflows/verify.yml` 의
    push 트리거와 `verify_repo.py` 의 기준 브랜치 후보를 다시 볼 필요는 없다 —
    둘 다 이미 양쪽을 본다.
 3. `full/claude/on-premise-ai-repo-m686j9` 를 별도 저장소로 옮긴다.
+
+### 브랜치 지우는 법
+
+**Claude Code 원격 세션에서는 되지 않는다.** 그 세션의 push 정책이 지정 작업 브랜치
+외의 ref 를 만들거나 지우는 것을 막아, 브랜치 삭제도 태그 생성도 `HTTP 403` 으로
+거부된다. 사람이 로컬 클론이나 GitHub 웹에서 해야 한다.
+
+로컬 클론에서 한다면 태그부터 만들고 지운다.
+
+```bash
+git fetch origin
+git tag -a archive/fix-style-false-positive-and-mark-none 9b66310 \
+        -m "검사기 오탐 수정 원본 — 68b902c 로 cherry-pick 회수한 뒤 남긴다"
+git push origin archive/fix-style-false-positive-and-mark-none
+
+git push origin --delete full/origin
+git push origin --delete full/claude/blue-report-handover-ih4bnv
+git push origin --delete full/fix/style-false-positive-and-mark-none
+```
+
+GitHub 웹에서는 `Branches` 탭(<https://github.com/hctinno/hct-report-template/branches>)
+에서 지운다. 다만 웹에는 태그를 만드는 자리가 따로 없으므로, 위 태그는 먼저 로컬에서
+밀어 넣거나 릴리스를 만들어 대신한다. **태그 없이 `full/fix/...` 를 지우면 원본 세
+커밋을 되짚을 수 없게 된다.**
+
+지운 뒤에는 이 문서의 브랜치 지도에서 해당 줄을 지운다.
 
 ### 브랜치와 무관한 미해결 항목
 
