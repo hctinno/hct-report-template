@@ -53,7 +53,7 @@
 | `full/origin` | `cbab49f` | v1.32.0 · **회수 완료**(SHA 포함) | 삭제 가능 |
 | `full/claude/blue-report-handover-ih4bnv` | `cbab49f` | `full/origin` 과 같은 커밋 · **회수 완료**(SHA 포함) | 삭제 가능 |
 | `full/fix/style-false-positive-and-mark-none` | `9b66310` | 검사기 오탐 수정 · **회수 완료**(cherry-pick) | 태그로 남기고 삭제 |
-| `full/claude/on-premise-ai-repo-m686j9` | `d00f263` | 이 저장소 주제와 무관 | 별도 저장소로 이관 |
+| `full/claude/on-premise-ai-repo-m686j9` | `d00f263` | 이 저장소 주제와 무관 · **병합 금지** | 별도 저장소로 이관 |
 
 「회수 완료」는 그 브랜치의 내용이 `full/main` 에 들어왔다는 뜻이다. 다만 **회수 방식이
 두 가지고, 삭제 안전도가 다르다.**
@@ -97,6 +97,7 @@ bda0202489c64579d0bcc6845b3a0feec516b434  문체 예외에 과다(過多) 추가
 2. `main` 스냅샷을 지우고 기본 브랜치 이름을 `main` 으로 되돌린다.
    아래 「기본 브랜치 이름 되돌리는 법」 참고.
 3. `full/claude/on-premise-ai-repo-m686j9` 를 별도 저장소로 옮긴다.
+   아래 「온프레미스 AI 스택 옮기는 법」 참고.
 
 ### 브랜치 지우는 법
 
@@ -173,6 +174,49 @@ git branch -u origin/main main
 `CLAUDE.md` 의 시작 순서 1번, `verify.yml` 의 주석이다. `verify.yml` 과
 `verify_repo.py` 에서 `full/main` 을 빼도 되고 그대로 둬도 무해하다 — 양쪽을 보는
 편이 이런 사고를 한 번 더 막는다.
+
+### 온프레미스 AI 스택 옮기는 법
+
+`full/claude/on-premise-ai-repo-m686j9` 의 `onpremise-ai/` 는 이 저장소와 주제가
+다르다. 사내 폐쇄망 로컬 LLM · RAG · 하네스 스택이고, **새 저장소를 만들 권한이 없던
+세션이 여기 브랜치에 임시로 얹어 둔 것**이다. 그 사정이 원래 그 README 서두에 적혀
+있었다.
+
+**이 브랜치를 `full/main` 에 병합하지 않는다.** 온프레미스 AI 코드가 들어오는 동시에
+보고서 템플릿 파일 63개가 지워진다.
+
+옮길 것은 `onpremise-ai/` 59파일뿐이고 그 밖에 추가된 것은 없다. 서드파티 의존이
+없어 표준 라이브러리만으로 돌며, 떼어낸 상태에서 테스트 98개가 통과한다.
+
+Claude Code 원격 세션에서는 새 저장소를 만들 수 없다 — `POST /user/repos` 가
+`403 Resource not accessible by integration` 이다. 그 브랜치를 만든 세션이 막힌
+자리와 같다. 사람이 만들어야 한다.
+
+**첫째, GitHub 에서 `hct-onpremise-ai` 를 private 으로 만든다.** README 없이 빈
+저장소로 둔다. 아래에서 첫 커밋을 밀어 넣는다.
+
+**둘째, 이 저장소에서 떼어내 밀어 넣는다.** `onpremise-ai/` 는 `d00f263` 한 커밋에서
+통째로 추가됐으므로 쪼갠 결과도 한 커밋이다.
+
+```bash
+git fetch origin full/claude/on-premise-ai-repo-m686j9
+git checkout -b onprem-tmp origin/full/claude/on-premise-ai-repo-m686j9
+git subtree split --prefix=onpremise-ai -b onpremise-ai-main
+git push https://github.com/hctinno/hct-onpremise-ai.git onpremise-ai-main:main
+git checkout full/main && git branch -D onprem-tmp onpremise-ai-main
+```
+
+이 길로 가면 새 저장소의 `README.md` 서두에 **임시 안내 블록이 그대로 남는다.**
+「독립 저장소로 분리하기 위한 완결된 프로젝트다 … 분리 후 이 안내 블록을 지운다」로
+시작하는 인용구다. 옮긴 뒤 지운다.
+
+**셋째, 원 브랜치를 지운다.**
+
+```bash
+git push origin --delete full/claude/on-premise-ai-repo-m686j9
+```
+
+지운 뒤 이 문서의 브랜치 지도에서 해당 줄과 이 절을 함께 지운다.
 
 ### 브랜치와 무관한 미해결 항목
 
