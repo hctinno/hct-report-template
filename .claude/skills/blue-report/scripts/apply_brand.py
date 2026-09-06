@@ -163,7 +163,9 @@ def apply(html, brand, uris, title_override=None):
         on = m.group(1)
         u = uris["dark"] if on == "dark" else uris["light"]
         inner = logo_html(u, h) if u else wordmark_html(brand, 28)
-        return f'<div class="br-mark" data-on="{on}">{m.group(2)}{inner}</div>'
+        # 그룹2(자리표시자 주석)는 선택이라 없으면 None 이다. 그대로 f-string 에
+        # 넣으면 슬라이드에 'None' 이 찍힌다 — 워터마크 쪽과 같이 빈 문자열로 접는다.
+        return f'<div class="br-mark" data-on="{on}">{m.group(2) or ""}{inner}</div>'
 
     def one_watermark(m):
         # 마크와 같이 배경 밝기에 따라 잉크를 고른다. 다크면은 흰색 녹아웃,

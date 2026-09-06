@@ -31,7 +31,7 @@ sys.path.insert(0, HERE)
 from palette import contrast  # noqa: E402
 from ensure_deps import need_browser  # noqa: E402
 from check_deck import (  # noqa: E402
-    Report, STYLE_BAN, STYLE_BAN_PLAIN, STYLE_EXEMPT, ALLOWED_HEX, _blank, _rgb_to_hex,
+    Report, style_violations, ALLOWED_HEX, _blank, _rgb_to_hex,
 )
 
 PAGE_W, PAGE_H = 794, 1123        # A4 세로 210x297mm @96dpi
@@ -44,20 +44,12 @@ MIN_TEXT_CONTRAST = 4.5  # 인쇄물 본문
 
 
 def check_style(html, rep):
-    """슬라이드와 같은 문체 규칙. 주석·CSS·JS 를 걷어내고 본문만 본다."""
-    raw = html.splitlines()
-    h = _blank(html, r"<!--.*?-->")
-    h = _blank(h, r"<style[^>]*>.*?</style>")
-    h = _blank(h, r"<script[^>]*>.*?</script>")
-    bad = []
-    for n, (r0, line) in enumerate(zip(raw, h.splitlines()), 1):
-        if STYLE_EXEMPT.search(r0):
-            continue
-        text = re.sub(r"<[^>]+>", " ", line)
-        for m in STYLE_BAN.finditer(text):
-            bad.append(f"{n}행 '{m.group(1)}' — {text.strip()[:60]}")
-        for m in STYLE_BAN_PLAIN.finditer(text):
-            bad.append(f"{n}행 '{m.group()}' 평서형 — {text.strip()[:60]}")
+    """슬라이드와 같은 문체 규칙. 판정은 check_deck.style_violations 하나만 쓴다.
+
+    예전에는 같은 순회를 여기에 한 벌 더 두고 정규식만 가져다 썼다. 그러면 규칙에
+    예외가 붙을 때 한쪽만 따라가고, 같은 낱말을 덱과 문서가 다르게 판정한다.
+    """
+    bad = style_violations(html)
     if bad:
         rep.f(f"문체 위반 {len(bad)}건 (개조식·명사형 아님)")
         for b in bad[:8]:
