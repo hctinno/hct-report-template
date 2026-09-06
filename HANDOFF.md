@@ -49,7 +49,7 @@
 | 브랜치 | 끝 커밋 | 상태 | 처리 |
 |---|---|---|---|
 | `full/main` | `48fc1e2` | **기본 브랜치. 기준선.** | — |
-| `main` | `35f0897` | 1커밋 스냅샷 · 고유 내용 없음 | 삭제 후보 |
+| `main` | `35f0897` | 1커밋 스냅샷 · 고유 내용 없음 · 뿌리가 다르다 | 태그로 남기고 삭제 |
 | `full/origin` | `cbab49f` | v1.32.0 · **회수 완료**(SHA 포함) | 삭제 가능 |
 | `full/claude/blue-report-handover-ih4bnv` | `cbab49f` | `full/origin` 과 같은 커밋 · **회수 완료**(SHA 포함) | 삭제 가능 |
 | `full/fix/style-false-positive-and-mark-none` | `9b66310` | 검사기 오탐 수정 · **회수 완료**(cherry-pick) | 태그로 남기고 삭제 |
@@ -94,10 +94,8 @@ bda0202489c64579d0bcc6845b3a0feec516b434  문체 예외에 과다(過多) 추가
 승인 없이 해도 되는 것은 없다. 전부 브랜치 정리이고, 되돌리기 어렵기 때문이다.
 
 1. 회수 완료된 브랜치를 지운다. 아래 「브랜치 지우는 법」 참고.
-2. `main` 스냅샷을 지울지 정한다. 지운다면 기본 브랜치 이름을 `full/main` 에서
-   `main` 으로 되돌릴지 함께 정한다. 되돌리면 `.github/workflows/verify.yml` 의
-   push 트리거와 `verify_repo.py` 의 기준 브랜치 후보를 다시 볼 필요는 없다 —
-   둘 다 이미 양쪽을 본다.
+2. `main` 스냅샷을 지우고 기본 브랜치 이름을 `main` 으로 되돌린다.
+   아래 「기본 브랜치 이름 되돌리는 법」 참고.
 3. `full/claude/on-premise-ai-repo-m686j9` 를 별도 저장소로 옮긴다.
 
 ### 브랜치 지우는 법
@@ -125,6 +123,56 @@ GitHub 웹에서는 `Branches` 탭(<https://github.com/hctinno/hct-report-templa
 커밋을 되짚을 수 없게 된다.**
 
 지운 뒤에는 이 문서의 브랜치 지도에서 해당 줄을 지운다.
+
+### 기본 브랜치 이름 되돌리는 법
+
+`full/` 은 복구 과정에서 붙은 것이지 뜻이 있는 이름이 아니다. `main` 으로 되돌리려면
+그 자리를 차지하고 있는 구 스냅샷을 먼저 치워야 한다.
+
+**`main` 에 `full/main` 을 force push 해서 덮지 않는다.** 두 계통은 뿌리가 달라
+fast-forward 가 되지 않으므로 force 가 필요해지는데, 그러면 이력이 한 번 끊기고
+열린 PR 의 base 도 손으로 옮겨야 한다. GitHub 의 이름 바꾸기를 쓰면 그럴 일이 없다 —
+기본 브랜치 설정, 열린 PR, 웹 링크 리다이렉트가 함께 따라간다.
+
+**첫째, 구 `main` 을 태그로 남기고 지운다.** 뿌리가 달라 지우면 그 커밋이 참조를
+잃는다. 트리는 full 계통 `4ae7a0e` 와 같아 내용을 잃지는 않지만, 「복구가 이렇게
+이뤄졌다」는 기록은 사라진다.
+
+```bash
+git fetch origin
+git tag -a archive/recovery-snapshot 35f0897 \
+        -m "구 계정 삭제 후 복구용 1커밋 스냅샷 — full 계통 4ae7a0e 와 트리가 같다"
+git push origin archive/recovery-snapshot
+git push origin --delete main
+```
+
+**둘째, GitHub 웹에서 이름을 바꾼다.** `Settings` → `General` → `Default branch` 의
+연필, 또는 `Branches` 페이지에서 `full/main` 을 `main` 으로 바꾼다. 명령줄에는 이에
+해당하는 것이 없다 — git 에는 원격 브랜치 이름 바꾸기가 없어서 지우고 새로 미는
+것이 되고, 그러면 리다이렉트도 PR 이관도 얻지 못한다.
+
+**셋째, 로컬 클론을 맞춘다.**
+
+```bash
+git fetch origin
+git remote set-head origin -a
+git branch -m full/main main
+git branch -u origin/main main
+```
+
+#### 바꾼 뒤 저장소에서 손볼 곳
+
+**깨지는 것은 없다.** 브랜치 이름에 기대던 자리를 미리 없애 뒀다.
+
+- `plugin.json` 의 `homepage` 는 브랜치를 가리키지 않는다(저장소 루트).
+- `.github/workflows/verify.yml` 의 push 트리거는 `[main, full/main]` 로 양쪽을 건다.
+- `verify_repo.py` 의 기준 브랜치 탐색은 `origin/HEAD` 를 먼저 보고, 이름 후보에도
+  `origin/main` · `main` 이 들어 있다.
+
+낡는 것은 서술뿐이다. 급하지 않으나 정리한다면 이 문서, `README.md` 의 「이력」 절,
+`CLAUDE.md` 의 시작 순서 1번, `verify.yml` 의 주석이다. `verify.yml` 과
+`verify_repo.py` 에서 `full/main` 을 빼도 되고 그대로 둬도 무해하다 — 양쪽을 보는
+편이 이런 사고를 한 번 더 막는다.
 
 ### 브랜치와 무관한 미해결 항목
 
