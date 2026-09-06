@@ -396,14 +396,14 @@ python3 scripts/make_logo_variants.py 로고.png --out-dir . --name mylogo
 저장소를 클론하지 않아도 되고, 저장소를 갱신하면 자동으로 최신판을 받는다.
 
 ```
-/plugin marketplace add dytc880915-commits/hct-report-template
+/plugin marketplace add hctinno/hct-report-template
 /plugin install blue-report@hct-tools
 ```
 
 터미널에서는 한 줄로 붙여넣을 수 있다. **새 PC 에서 하는 일은 이 한 줄이 전부다.**
 
 ```bash
-claude plugin marketplace add dytc880915-commits/hct-report-template && claude plugin install blue-report@hct-tools
+claude plugin marketplace add hctinno/hct-report-template && claude plugin install blue-report@hct-tools
 ```
 
 한 번만 실행하면 그 PC의 모든 프로젝트에서 쓸 수 있다.
@@ -413,7 +413,7 @@ claude plugin marketplace add dytc880915-commits/hct-report-template && claude p
 아직 병합하지 않은 브랜치의 판을 쓰려면 URL 뒤에 브랜치를 붙인다.
 
 ```
-/plugin marketplace add https://github.com/dytc880915-commits/hct-report-template.git#브랜치이름
+/plugin marketplace add https://github.com/hctinno/hct-report-template.git#브랜치이름
 ```
 
 설치 뒤 스킬 이름은 `blue-report:blue-report` 로 바뀐다(플러그인 이름이 앞에 붙는다).

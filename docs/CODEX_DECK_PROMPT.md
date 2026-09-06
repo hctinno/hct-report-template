@@ -26,7 +26,7 @@ docs/CODEX_DECK_PROMPT.md 를 읽고 그대로 수행해라. 용도는 사내 �
 저장소가 아직 없는 PC라면 먼저 받는다. 폴더 이름과 위치는 아무래도 좋다.
 
 ```bash
-git clone https://github.com/dytc880915-commits/hct-report-template.git
+git clone https://github.com/hctinno/hct-report-template.git
 cd hct-report-template
 ```
 
@@ -228,7 +228,7 @@ Claude Code 라면 저장소를 클론하지 않고 플러그인으로 받을 �
 실행하면 된다.
 
 ```bash
-claude plugin marketplace add dytc880915-commits/hct-report-template
+claude plugin marketplace add hctinno/hct-report-template
 claude plugin install blue-report@hct-tools
 ```
 

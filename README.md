@@ -26,7 +26,7 @@
 저장소를 클론하지 않아도 되고, PC 마다 한 번만 실행하면 그 PC 의 모든 프로젝트에서 쓸 수 있다.
 
 ```bash
-claude plugin marketplace add dytc880915-commits/hct-report-template
+claude plugin marketplace add hctinno/hct-report-template
 claude plugin install blue-report@hct-tools
 ```
 
@@ -73,7 +73,7 @@ claude.ai → Settings → Capabilities → Skills 에서 이 zip 을 올린다.
 Codex 는 `.claude/skills/` 를 인식하지 못한다. 파일이 디스크에 있어야 한다.
 
 ```bash
-git clone https://github.com/dytc880915-commits/hct-report-template.git
+git clone https://github.com/hctinno/hct-report-template.git
 cd hct-report-template
 ```
 
@@ -290,4 +290,9 @@ scripts/install_blue_report_skill.py     오프라인 복사 설치기
 
 ## 이력
 
-이 저장소는 `dytc880915-commits/claude-workspace` 에서 분리해 나왔다. 그전 개발 이력은 그 저장소에 남아 있다.
+이 저장소는 `dytc880915-commits/claude-workspace` 에서 분리해 나왔다. 그 계정은 이후
+삭제되어 분리 이전 개발 이력에는 접근할 수 없다.
+
+계정 삭제 뒤 `hctinno` 로 복구하면서 뿌리가 다른 두 계통이 함께 들어왔다. 기본 브랜치는
+개발 이력을 그대로 이어받은 `full/main` 이고, `main` 은 복구 과정에서 만든 1커밋
+스냅샷이다. 계통 사정과 남은 정리 항목은 `HANDOFF.md` 에 적어 두었다.

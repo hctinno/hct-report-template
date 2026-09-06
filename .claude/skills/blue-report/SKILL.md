@@ -181,7 +181,7 @@ GitHub 플러그인으로 받는 것이 기본이다. 저장소를 클론하지 
 새 PC 에서 하는 일은 아래 한 줄이 전부다.
 
 ```bash
-claude plugin marketplace add dytc880915-commits/hct-report-template && \
+claude plugin marketplace add hctinno/hct-report-template && \
 claude plugin install blue-report@hct-tools
 ```
 
