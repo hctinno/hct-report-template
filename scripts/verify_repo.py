@@ -41,7 +41,7 @@ SCRIPTS = os.path.join(SKILL, "scripts")
 ASSETS = os.path.join(SKILL, "assets")
 BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
 
-DECKS = ["catalog", "internal", "weekly", "ax", "exec", "allhands",
+DECKS = ["catalog", "internal", "weekly", "ax", "team", "exec", "allhands",
          "sales", "project", "training"]
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
@@ -786,24 +786,39 @@ def check_plugin(log):
 
 # ------------------------------------------------------------------ 버전 올림
 
+def _base_candidates():
+    """기준 브랜치 후보를 우선순위대로 돌려준다.
+
+    이름을 main 으로 못 박지 않는다. 저장소를 계정 사이로 옮기면 기본 브랜치
+    이름이 달라지고, 복구 과정에서 뿌리가 다른 동명 브랜치가 함께 남기도 한다.
+    origin/HEAD 가 가리키는 기본 브랜치를 먼저 보고, 없으면 이름으로 찾는다."""
+    head = run(["git", "symbolic-ref", "--short", "refs/remotes/origin/HEAD"])
+    if head.returncode == 0 and head.stdout.strip():
+        yield head.stdout.strip()
+    for name in ("origin/full/main", "full/main", "origin/main", "main"):
+        yield name
+
+
 def check_version(log):
     """스킬 폴더가 바뀌었는데 version 이 그대로면 실패.
 
-    기준 브랜치를 찾지 못하는 환경(얕은 클론, main 이 없는 저장소)에서는
+    기준 브랜치를 찾지 못하는 환경(얕은 클론, 기본 브랜치가 없는 저장소)에서는
     실패가 아니라 주의로 넘긴다. 없는 것을 근거로 실패시키지 않는다."""
-    base = next((r for r in ("origin/main", "main")
-                 if run(["git", "rev-parse", "--verify", "--quiet", r]).returncode == 0), None)
-    if base is None:
-        log.warn("버전 올림", "기준 브랜치(main)가 없어 건너뜀")
-        return
-
-    # 갈라진 지점 기준으로 본다. 아직 커밋하지 않은 것도 포함하려고 작업 트리와 견준다.
-    mb = run(["git", "merge-base", base, "HEAD"])
-    if mb.returncode != 0:
-        log.warn("버전 올림", "merge-base 를 찾지 못해 건너뜀 "
+    # 이름만 맞는 브랜치를 잡으면 안 된다. 뿌리가 다른 동명 브랜치는 merge-base 가
+    # 없어 검사가 통째로 건너뛰어진다 — 갈라진 지점이 실제로 나오는 후보를 고른다.
+    base = ref = None
+    for cand in _base_candidates():
+        if run(["git", "rev-parse", "--verify", "--quiet", cand]).returncode != 0:
+            continue
+        # 갈라진 지점 기준으로 본다. 아직 커밋하지 않은 것도 포함하려고 작업 트리와 견준다.
+        mb = run(["git", "merge-base", cand, "HEAD"])
+        if mb.returncode == 0 and mb.stdout.strip():
+            base, ref = cand, mb.stdout.strip()
+            break
+    if ref is None:
+        log.warn("버전 올림", "기준 브랜치와의 갈라진 지점을 찾지 못해 건너뜀 "
                              "(얕은 클론이면 checkout 의 fetch-depth 를 0 으로 둔다)")
         return
-    ref = mb.stdout.strip()
 
     rel = os.path.relpath(SKILL, ROOT).replace(os.sep, "/")
     r = run(["git", "diff", "--name-only", ref, "--", rel])
@@ -812,7 +827,7 @@ def check_version(log):
         return
     changed = [x for x in r.stdout.splitlines() if x.strip()]
     if not changed:
-        log.ok("버전 올림", f"{rel} 변경 없음")
+        log.ok("버전 올림", f"{rel} 변경 없음 · 기준 {base}")
         return
 
     manifest = f"{rel}/.claude-plugin/plugin.json"
@@ -836,7 +851,7 @@ def check_version(log):
                  f"스킬 파일 {len(changed)}개가 바뀌었는데 version 이 {now} 그대로 — "
                  f"{manifest} 와 CHANGELOG.md 를 올린다")
     else:
-        log.ok("버전 올림", f"{before} → {now} · 스킬 파일 {len(changed)}개 변경")
+        log.ok("버전 올림", f"{before} → {now} · 스킬 파일 {len(changed)}개 변경 · 기준 {base}")
 
 
 # ------------------------------------------------------------------------ main

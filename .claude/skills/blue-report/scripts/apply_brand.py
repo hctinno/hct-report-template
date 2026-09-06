@@ -30,6 +30,7 @@ DECKS = {
     "internal": "deck-internal-report.html",  # 사내 보고 (월간)
     "weekly":   "deck-weekly-report.html",    # 조직 주간보고
     "ax":       "deck-ax-weekly.html",        # AX 조직 주간보고 (1장 + 부록)
+    "team":     "deck-team-weekly.html",      # 팀 단위 압축 주간보고 (2장 · 가로)
     "sales":    "deck-sales-proposal.html",   # 외부 제안·영업
     "project":  "deck-project-report.html",   # 프로젝트 착수·완료
     "training": "deck-training.html",         # 교육·기술 설명
@@ -162,7 +163,9 @@ def apply(html, brand, uris, title_override=None):
         on = m.group(1)
         u = uris["dark"] if on == "dark" else uris["light"]
         inner = logo_html(u, h) if u else wordmark_html(brand, 28)
-        return f'<div class="br-mark" data-on="{on}">{m.group(2)}{inner}</div>'
+        # 그룹2(자리표시자 주석)는 선택이라 없으면 None 이다. 그대로 f-string 에
+        # 넣으면 슬라이드에 'None' 이 찍힌다 — 워터마크 쪽과 같이 빈 문자열로 접는다.
+        return f'<div class="br-mark" data-on="{on}">{m.group(2) or ""}{inner}</div>'
 
     def one_watermark(m):
         # 마크와 같이 배경 밝기에 따라 잉크를 고른다. 다크면은 흰색 녹아웃,

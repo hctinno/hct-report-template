@@ -300,9 +300,18 @@
   letter-spacing:var(--br-ls-mark); color:var(--br-on-dark) !important;
   white-space:nowrap;
 }
-/* 표지(첫 장)에는 마크업 자체를 넣지 않는다. 마무리 장은 --cover 조판이지만
-   표지가 아니므로 깔린다. --cover 는 지면이 짙으므로 다크면과 같은 5%다. */
-.br-slide--cover .br-watermark { opacity:.05; }
+/* 표지(첫 장)에는 마크업 자체를 넣지 않는다. 마무리·결정 요청·단일 수치 강조처럼
+   --cover 조판을 쓰는 다른 장에는 깔린다. --cover 는 지면이 짙으므로 다크면과
+   같은 5%다.
+   위치는 정가운데가 아니라 우측 하단이다 — --cover 조판은 본문이 화면을 넓게
+   쓰고(결정 요청 3건이 위아래로 늘어선다든지) 좌우 끝까지 닿는 경우가 많아,
+   정가운데에 두면 본문 글자와 겹칠 여지가 다른 지면보다 크다. 구석은 항상
+   비어 있다시피 해 안전하다. right·bottom 값은 --br-pad-cover(110px 132px 80px)
+   의 좌우·하단 여백과 맞춰 지면 여백 선 안쪽에 얌전히 앉게 한다. */
+.br-slide--cover .br-watermark {
+  opacity:.05;
+  left:auto; top:auto; right:132px; bottom:130px; transform:none;
+}
 
 /* 표지·간지의 세로 안내선. 장식색이 아니라 흰색 알파라서 배경 규칙에 걸리지 않는다. */
 .br-rule { position:absolute; top:0; bottom:0; border-left:1px solid rgba(244,246,248,.14); }

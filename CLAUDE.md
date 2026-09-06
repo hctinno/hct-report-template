@@ -6,10 +6,12 @@
 
 ## 시작 순서
 
-1. `README.md` 에서 쓰는 법과 구성을 확인한다.
-2. `.claude/skills/blue-report/README.md` 를 전부 읽는다. 이것이 규격서다.
-3. 압축본이 필요하면 `.claude/skills/blue-report/references/rules.md` 를 본다.
-4. Claude Code 가 아닌 에이전트에게 시킬 때는 `docs/CODEX_DECK_PROMPT.md` 를 지목한다.
+1. `HANDOFF.md` 에서 저장소 사정을 확인한다. 뿌리가 다른 두 계통이 들어 있고 기본
+   브랜치가 `main` 이 아니라 `full/main` 이다. 브랜치를 합치거나 지우려면 승인을 받는다.
+2. `README.md` 에서 쓰는 법과 구성을 확인한다.
+3. `.claude/skills/blue-report/README.md` 를 전부 읽는다. 이것이 규격서다.
+4. 압축본이 필요하면 `.claude/skills/blue-report/references/rules.md` 를 본다.
+5. Claude Code 가 아닌 에이전트에게 시킬 때는 `docs/CODEX_DECK_PROMPT.md` 를 지목한다.
 
 ## 작업 방식
 

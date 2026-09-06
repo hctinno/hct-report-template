@@ -26,7 +26,7 @@
 저장소를 클론하지 않아도 되고, PC 마다 한 번만 실행하면 그 PC 의 모든 프로젝트에서 쓸 수 있다.
 
 ```bash
-claude plugin marketplace add dytc880915-commits/hct-report-template
+claude plugin marketplace add hctinno/hct-report-template
 claude plugin install blue-report@hct-tools
 ```
 
@@ -73,7 +73,7 @@ claude.ai → Settings → Capabilities → Skills 에서 이 zip 을 올린다.
 Codex 는 `.claude/skills/` 를 인식하지 못한다. 파일이 디스크에 있어야 한다.
 
 ```bash
-git clone https://github.com/dytc880915-commits/hct-report-template.git
+git clone https://github.com/hctinno/hct-report-template.git
 cd hct-report-template
 ```
 
@@ -97,7 +97,7 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 
 ---
 
-## 덱 8종
+## 덱 9종
 
 같은 레이아웃을 쓰되 배치 순서와 장수가 용도에 맞게 다르다. 조직 주간보고는 매주 반복하므로 목차를 두지 않고 타임라인이 요일 단위다. 사내 보고는 다크 요약이 3번째에 있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤 정리한다).
 
@@ -106,8 +106,9 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 | `deck-internal-report.html` | 사내 보고 (월간) | 9 |
 | `deck-weekly-report.html` | 조직 주간보고 | 7 |
 | `deck-ax-weekly.html` | AX 조직 1장 보고 + 부록 | 5 |
+| `deck-team-weekly.html` | 팀 압축 주간보고 | 2 |
 | `deck-exec-report.html` | 경영진 보고 (결론 먼저) | 6 |
-| `deck-allhands.html` | 전직원 보고 (타운홀) | 8 |
+| `deck-allhands.html` | 전직원 보고 (타운홀) | 9 |
 | `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |
@@ -162,7 +163,7 @@ python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
 ```
 
-`--deck` 은 덱 이름(`catalog` · `internal` · `weekly` · `ax` · `exec` · `allhands` · `sales` · `project` · `training`), A4 문서 이름(`minutes` · `policy` · `manual` · `notice`), 또는 HTML 파일 경로를 받는다.
+`--deck` 은 덱 이름(`catalog` · `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training`), A4 문서 이름(`minutes` · `policy` · `manual` · `notice`), 또는 HTML 파일 경로를 받는다.
 
 덱을 웹페이지로 올려 링크로 공유하려면 Artifact 발행용 단일 파일을 만든다. `<html>` 껍데기를 뺀 판이다.
 
@@ -202,10 +203,10 @@ python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 
 ```bash
 python3 scripts/verify_repo.py            # 전부
-python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 55장도 남긴다
+python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 77장도 남긴다
 ```
 
-덱 9종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로 판정하고, PPTX 8종 생성과
+덱 10종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로 판정하고, PPTX 9종 생성과
 무결성 · `dist/` 재생성 대조 ·
 한국어 인코딩 · 배포 매니페스트 · 내용 동기화 · 버전 올림을 함께 본다.
 실패가 있으면 종료 코드가 1 이다.
@@ -245,6 +246,10 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
 
 `.claude/skills/blue-report/references/rules.md` 는 같은 내용의 압축본이다.
 
+규격을 바꾼 근거(외부 자료 실측·대조)는 `.claude/skills/blue-report/references/decisions/`
+에 주제별로 모아 둔다. `CHANGELOG.md` 가 "무엇을 바꿨는가"라면 이쪽은 "왜 그렇게
+판단했는가"의 원본이다.
+
 ---
 
 ## 구성
@@ -255,8 +260,9 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   SKILL.md                               스킬 트리거 정의
   README.md                              자기완결 사양서
   references/rules.md                    압축 규칙
+  references/decisions/                  규격을 바꾼 근거(실측·대조) 원본 — README.md 가 색인
   assets/blue-report.css                 토큰 77개 — 단일 소스
-  assets/deck-*.html                     완성 덱 8종 + 레이아웃 카탈로그
+  assets/deck-*.html                     완성 덱 9종 + 레이아웃 카탈로그
   assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/doc-*.html · doc-viewer.*       A4 문서 4종과 그 뷰어
   scripts/check_deck.py                  슬라이드 17항목 자동 점검
@@ -284,4 +290,9 @@ scripts/install_blue_report_skill.py     오프라인 복사 설치기
 
 ## 이력
 
-이 저장소는 `dytc880915-commits/claude-workspace` 에서 분리해 나왔다. 그전 개발 이력은 그 저장소에 남아 있다.
+이 저장소는 `dytc880915-commits/claude-workspace` 에서 분리해 나왔다. 그 계정은 이후
+삭제되어 분리 이전 개발 이력에는 접근할 수 없다.
+
+계정 삭제 뒤 `hctinno` 로 복구하면서 뿌리가 다른 두 계통이 함께 들어왔다. 기본 브랜치는
+개발 이력을 그대로 이어받은 `full/main` 이고, `main` 은 복구 과정에서 만든 1커밋
+스냅샷이다. 계통 사정과 남은 정리 항목은 `HANDOFF.md` 에 적어 두었다.

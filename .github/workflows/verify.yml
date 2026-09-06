@@ -10,11 +10,15 @@
 
 name: 저장소 점검
 
-# push 는 main 만 본다. 작업 브랜치는 PR 쪽에서 보므로,
+# push 는 기본 브랜치만 본다. 작업 브랜치는 PR 쪽에서 보므로,
 # 양쪽을 다 걸면 같은 커밋에 두 번 돈다.
+#
+# 기본 브랜치는 full/main 이다 — 구 계정 삭제 뒤 복구하면서 뿌리가 다른 두 계통이
+# 들어왔고, 개발 이력을 이어받은 쪽이 full/main 이다. main 은 1커밋 스냅샷이다.
+# 둘 다 걸어 둔다. 어느 쪽이 기본 브랜치가 되든 push 점검이 끊기지 않는다.
 on:
   push:
-    branches: [main]
+    branches: [main, full/main]
   pull_request:
   workflow_dispatch:
     inputs:

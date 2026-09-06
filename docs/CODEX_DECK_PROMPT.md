@@ -19,14 +19,14 @@ docs/CODEX_DECK_PROMPT.md 를 읽고 그대로 수행해라. 용도는 사내 �
 
 | 넘길 값 | 고르는 것 |
 |---|---|
-| 용도 | 사내 월간 · 주간 · AX 주간 · 경영진 · 전직원 · 외부 제안 · 프로젝트 · 교육 · A4 문서 |
+| 용도 | 사내 월간 · 주간 · AX 주간 · 팀 압축 주간 · 경영진 · 전직원 · 외부 제안 · 프로젝트 · 교육 · A4 문서 |
 | 주제 | 덱 제목과 내용 |
 | 형식 | HTML(기본) · PDF · PPTX. 여러 개 가능 |
 
 저장소가 아직 없는 PC라면 먼저 받는다. 폴더 이름과 위치는 아무래도 좋다.
 
 ```bash
-git clone https://github.com/dytc880915-commits/hct-report-template.git
+git clone https://github.com/hctinno/hct-report-template.git
 cd hct-report-template
 ```
 
@@ -75,6 +75,7 @@ A4 세로 문서가 4종 있다. 용도에 맞는 것을 복사해
 | `deck-internal-report.html` | `internal` | 사내 보고 (월간) | 9 |
 | `deck-weekly-report.html` | `weekly` | 조직 주간보고 | 7 |
 | `deck-ax-weekly.html` | `ax` | AX 조직 1장 보고 + 부록 | 5 |
+| `deck-team-weekly.html` | `team` | 팀 압축 주간보고 (2장 · 팀장 보고용) | 2 |
 | `deck-exec-report.html` | `exec` | 경영진 보고 (결론 먼저) | 6 |
 | `deck-allhands.html` | `allhands` | 전직원 보고 (타운홀) | 9 |
 | `deck-sales-proposal.html` | `sales` | 외부 제안·영업 | 10 |
@@ -168,8 +169,9 @@ python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
 이 스크립트가 17항목을 기계로 판정한다.
 
 문체 · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 ·
-최소 글자 크기 · 데이터 마크 대비 · 브랜드 마크 존재 · 마크와 본문 겹침 ·
-배경 밝기와 로고 변형 일치.
+최소 글자 크기 · 데이터 마크 대비 · 본문 겹침 · 브랜드 마크 존재 · 마크와 본문 겹침 ·
+배경 워터마크 배치(표지 제외) · 배경 밝기와 로고 변형 일치 · 워터마크 자산 구분 ·
+지시선 주석 잘림.
 
 **실패가 0 이 아니면 완료가 아니다.** 실패가 남은 채로 "완료"라고 쓰지 않는다.
 
@@ -184,6 +186,20 @@ python scripts/verify_repo.py
 
 레이아웃 검수까지 하려면 `--shots 폴더명` 을 붙여 슬라이드별 PNG 를 남기고 눈으로 본다.
 겹침은 스크립트가 잡지만 어색한 여백은 잡지 못한다.
+
+### 5-1. HTML 덱은 발표에 쓴다
+
+만든 HTML 을 넘길 때 조작법을 함께 알린다. 모르면 발표를 못 한다.
+
+| 키 · 버튼 | 하는 일 |
+|---|---|
+| `F` · 「발표」 | 전체화면 발표 모드 — 버튼과 노트가 사라진다 |
+| `←` `→` `Space` · 클릭 | 슬라이드 넘김 |
+| `Esc` | 발표 모드 나가기 |
+| `N` · 「노트」 | 발표자 노트 |
+| 「목록」 | 전 슬라이드 세로 나열 (검수용, 발표용 아님) |
+
+**「목록」을 발표용으로 안내하지 않는다.** 세로 스크롤이라 발표가 되지 않는다.
 
 ### 6. 보고 형식
 
@@ -212,7 +228,7 @@ Claude Code 라면 저장소를 클론하지 않고 플러그인으로 받을 �
 실행하면 된다.
 
 ```bash
-claude plugin marketplace add dytc880915-commits/hct-report-template
+claude plugin marketplace add hctinno/hct-report-template
 claude plugin install blue-report@hct-tools
 ```
 

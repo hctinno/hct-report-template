@@ -39,6 +39,10 @@ DECKS = {
     "weekly": "deck-weekly-report.html",
     # AX 덱은 본문 1장 + 부록 구조라 HTML 과 PPTX 의 슬라이드 구성이 다르다.
     # HTML 1장(대시보드)을 PPTX 는 표 1장으로 옮긴다. 그래서 이 대조에서 뺀다.
+    # team 덱의 2쪽(부록)도 같은 이유로 뺀다 — HTML 은 표 + 특이사항 목록을 나란히
+    # 두 상자로 나누는데, PPTX 는 슬라이드 종류를 늘리지 않으려고 특이사항을 표
+    # 아래 강조 행으로 붙인다(ax 덱의 "결정 요청"과 같은 방법). DOM 모양이 달라
+    # 표 개수·열 비교가 애초에 성립하지 않는다.
     "exec": "deck-exec-report.html",
     "allhands": "deck-allhands.html",
     "sales": "deck-sales-proposal.html",

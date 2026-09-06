@@ -67,7 +67,7 @@ FCC/KC 보고서는 추가 설치 없이 그대로 만들어진다.
 
 ## 원본
 
-<https://github.com/dytc880915-commits/hct-report-template>
+<https://github.com/hctinno/hct-report-template>
 
 규격서는 이 폴더의 `README.md` 다. 고칠 일이 생기면 이 설치본이 아니라 저장소를
 고치고 묶음을 다시 뜬다 — 설치본을 고치면 다음 판올림에 덮인다.
