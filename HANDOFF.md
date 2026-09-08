@@ -10,7 +10,7 @@
 
 ## 지금 상태
 
-정상이다. `python3 scripts/verify_repo.py` 가 실패 0 으로 통과하고, 덱 9종 · A4 문서
+정상이다. `python3 scripts/verify_repo.py` 가 실패 0 으로 통과하고, 덱 10종 · A4 문서
 4종 · FCC/KC 템플릿 14종 · PPTX 8종이 모두 살아 있다.
 
 다만 **브랜치 모양이 보통과 다르다.** 기본 브랜치가 `main` 이 아니라 `full/main` 이다.

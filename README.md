@@ -97,7 +97,7 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 
 ---
 
-## 덱 9종
+## 덱 10종
 
 같은 레이아웃을 쓰되 배치 순서와 장수가 용도에 맞게 다르다. 조직 주간보고는 매주 반복하므로 목차를 두지 않고 타임라인이 요일 단위다. 사내 보고는 다크 요약이 3번째에 있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤 정리한다).
 
@@ -112,6 +112,7 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 | `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |
+| `deck-strategy-report.html` | 전략 보고 (논증형 결정 요청) | 16 |
 | `deck-template.html` | 레이아웃 12종 카탈로그 | 12 |
 
 전부 `.claude/skills/blue-report/assets/` 에 있다.
@@ -163,7 +164,7 @@ python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
 ```
 
-`--deck` 은 덱 이름(`catalog` · `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training`), A4 문서 이름(`minutes` · `policy` · `manual` · `notice`), 또는 HTML 파일 경로를 받는다.
+`--deck` 은 덱 이름(`catalog` · `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy`), A4 문서 이름(`minutes` · `policy` · `manual` · `notice`), 또는 HTML 파일 경로를 받는다.
 
 덱을 웹페이지로 올려 링크로 공유하려면 Artifact 발행용 단일 파일을 만든다. `<html>` 껍데기를 뺀 판이다.
 
@@ -206,7 +207,7 @@ python3 scripts/verify_repo.py            # 전부
 python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 77장도 남긴다
 ```
 
-덱 10종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로 판정하고, PPTX 9종 생성과
+덱 11종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로 판정하고, PPTX 10종 생성과
 무결성 · `dist/` 재생성 대조 ·
 한국어 인코딩 · 배포 매니페스트 · 내용 동기화 · 버전 올림을 함께 본다.
 실패가 있으면 종료 코드가 1 이다.
@@ -262,7 +263,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   references/rules.md                    압축 규칙
   references/decisions/                  규격을 바꾼 근거(실측·대조) 원본 — README.md 가 색인
   assets/blue-report.css                 토큰 77개 — 단일 소스
-  assets/deck-*.html                     완성 덱 9종 + 레이아웃 카탈로그
+  assets/deck-*.html                     완성 덱 10종 + 레이아웃 카탈로그
   assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/doc-*.html · doc-viewer.*       A4 문서 4종과 그 뷰어
   scripts/check_deck.py                  슬라이드 17항목 자동 점검

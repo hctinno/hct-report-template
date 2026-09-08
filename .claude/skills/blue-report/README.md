@@ -44,7 +44,7 @@ blue-report/
 │  ├─ tokens.js                blue-report.css 의 토큰을 읽어 온다 (색 값 중복 없음)
 │  ├─ layouts.js               카드 · 칩 · 머리말 · 꼬리말 등 원자 helper
 │  ├─ slides.js                슬라이드 종류별 생성기 11종
-│  ├─ content.js               용도별 덱 9종의 내용
+│  ├─ content.js               용도별 덱 10종의 내용
 │  └─ build.js                 실행 진입점
 └─ scripts/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
