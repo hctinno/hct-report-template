@@ -1,6 +1,6 @@
 ---
 name: blue-report
-description: "사내 보고서·발표 덱·A4 문서를 회사 공용 양식으로 만든다. \"보고서 템플릿\", \"사내 보고서 템플릿\", \"회사 양식\", \"우리 템플릿\", \"HCT 템플릿\", \"블루 리포트\", \"AX 리포트 스타일\", \"딥 코발트 리포트\", \"Deep Cobalt\" 중 무엇으로 부르든 이 스킬을 쓴다. 사용자가 보고서·슬라이드·덱·발표자료·회의록·공지·매뉴얼을 요청하면서 템플릿·양식·서식을 활용하라고 하면 반드시 사용한다. 새 스타일을 만들지 않고 assets/ 의 견본을 복사해 내용만 바꾼다. 1920x1080 HTML 슬라이드 덱 9종, A4 문서 4종, FCC/KC 보고서 14종, 코발트·딥네이비 팔레트, 도넛·막대 차트 규칙, 개조식 문체를 강제하고 HTML·PDF·PPTX·DOCX 로 내보낸다."
+description: "사내 보고서·발표 덱·A4 문서를 회사 공용 양식으로 만든다. \"보고서 템플릿\", \"사내 보고서 템플릿\", \"회사 양식\", \"우리 템플릿\", \"HCT 템플릿\", \"블루 리포트\", \"AX 리포트 스타일\", \"딥 코발트 리포트\", \"Deep Cobalt\" 중 무엇으로 부르든 이 스킬을 쓴다. 사용자가 보고서·슬라이드·덱·발표자료·회의록·공지·매뉴얼을 요청하면서 템플릿·양식·서식을 활용하라고 하면 반드시 사용한다. 새 스타일을 만들지 않고 assets/ 의 견본을 복사해 내용만 바꾼다. 1920x1080 HTML 슬라이드 덱 10종(전략 보고·경영진 보고·사내 보고·주간보고 등), A4 문서 4종, FCC/KC 보고서 14종, 코발트·딥네이비 팔레트, 도넛·막대 차트 규칙, 개조식 문체를 강제하고 HTML·PDF·PPTX·DOCX 로 내보낸다."
 ---
 
 # 블루 리포트
@@ -37,9 +37,13 @@ description: "사내 보고서·발표 덱·A4 문서를 회사 공용 양식으
 | 사내 보고 (월간) | `internal` | `deck-internal-report.html` | 9 |
 | 조직 주간보고 | `weekly` | `deck-weekly-report.html` | 7 |
 | AX 조직 1장 보고 + 부록 | `ax` | `deck-ax-weekly.html` | 5 |
+| 팀 압축 주간보고 | `team` | `deck-team-weekly.html` | 2 |
+| 경영진 보고 (결론 먼저) | `exec` | `deck-exec-report.html` | 6 |
+| 전직원 보고 (타운홀) | `allhands` | `deck-allhands.html` | 9 |
 | 외부 제안·영업 | `sales` | `deck-sales-proposal.html` | 10 |
 | 프로젝트 착수·완료 | `project` | `deck-project-report.html` | 9 |
 | 교육·기술 설명 | `training` | `deck-training.html` | 8 |
+| 전략 보고 (논증형 결정 요청) | `strategy` | `deck-strategy-report.html` | 16 |
 | 레이아웃 카탈로그 | `catalog` | `deck-template.html` | 12 |
 
 ```bash

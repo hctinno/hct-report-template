@@ -42,7 +42,7 @@ ASSETS = os.path.join(SKILL, "assets")
 BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
 
 DECKS = ["catalog", "internal", "weekly", "ax", "team", "exec", "allhands",
-         "sales", "project", "training"]
+         "sales", "project", "training", "strategy"]
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
 EXPECTED_PPTX = len(DECKS) - 1

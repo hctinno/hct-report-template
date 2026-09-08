@@ -36,6 +36,7 @@ DECKS = {
     "training": "deck-training.html",         # 교육·기술 설명
     "exec":     "deck-exec-report.html",      # 경영진 보고 (결론 먼저 · 6장)
     "allhands": "deck-allhands.html",         # 전직원 보고 (타운홀)
+    "strategy": "deck-strategy-report.html",  # 전략 보고 (논증형 결정 요청 · 16장)
 }
 
 # A4 문서. 덱과 달리 가로 슬라이드가 아니라 794x1123 세로 지면이다.

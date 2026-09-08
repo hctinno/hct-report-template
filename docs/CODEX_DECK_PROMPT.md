@@ -81,6 +81,7 @@ A4 세로 문서가 4종 있다. 용도에 맞는 것을 복사해
 | `deck-sales-proposal.html` | `sales` | 외부 제안·영업 | 10 |
 | `deck-project-report.html` | `project` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | `training` | 교육·기술 설명 | 8 |
+| `deck-strategy-report.html` | `strategy` | 전략 보고 (논증형 결정 요청 · 16장) | 16 |
 | `deck-template.html` | `catalog` | 레이아웃 12종 카탈로그 | 12 |
 
 발표 덱이 아니라 **A4 세로 문서**가 필요하면 `--doc` 을 쓴다. 1920x1080 이 아니라
