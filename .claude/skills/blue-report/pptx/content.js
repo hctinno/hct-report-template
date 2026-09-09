@@ -674,8 +674,8 @@ const strategy = {
   file: 'blue-report-전략보고.pptx',
   docTitle: '설비 가동 모니터링 전략 보고',
   slides: [
-    { type: 'cover', eyebrow: '시험인증·교정 서비스 맞춤형 설비 모니터링 — 과제 재개 여부 결정 요청',
-      titleLight: '설비 가동', titleBold: '모니터링',
+    { type: 'cover', eyebrow: '시험인증·교정 서비스 맞춤형 · 외주 개발비 없이 자체 구현',
+      titleLight: '설비 가동 모니터링', titleBold: '전략 보고서',
       metaLabel: '보고 시점', metaValue: '2026.09 · 문석호 CJ · 조정래 GJ',
       notes: '표지. 외주 개발비 없이 자체 구현했다는 사실이 이 보고의 출발점이다. 한 문장으로 말하고 넘어간다.' },
 
