@@ -48,6 +48,13 @@ DOCS = {
     "notice":  "doc-notice.html",            # 공지 (1쪽 완결)
 }
 
+# 웹 보드. 슬라이드도 A4 도 아닌 제3의 계통이다 — 지면 크기가 없고 화면 폭에
+# 따라 흐른다. 글자 하한 12.5px, 판정은 check_board.py 가 한다.
+# 읽는 물건이 아니라 상태를 바꾸는 화면이라 PPTX·PDF 대상이 아니다.
+BOARDS = {
+    "board": "board-task.html",              # 과제 실행보드 (레일 · KPI · 표 · 메모)
+}
+
 LOGO_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
               ".svg": "image/svg+xml", ".webp": "image/webp"}
 LOGO_WARN_BYTES = 400 * 1024
@@ -61,14 +68,16 @@ WATERMARK = re.compile(r'<div class="br-watermark" data-on="(dark|light)">(<!--.
 
 
 def resolve(name):
-    """덱·문서 이름 또는 파일 경로를 실제 경로로 바꾼다.
+    """덱·문서·보드 이름 또는 파일 경로를 실제 경로로 바꾼다.
 
-    이름 두 벌을 한곳에서 푼다. 다른 스크립트도 이것을 불러 쓰므로
-    새 덱이나 문서가 생겨도 고칠 곳은 위 표 두 개뿐이다."""
+    이름 세 벌을 한곳에서 푼다. 다른 스크립트도 이것을 불러 쓰므로
+    새 덱·문서·보드가 생겨도 고칠 곳은 위 표 세 개뿐이다."""
     if name in DECKS:
         return os.path.join(ASSETS, DECKS[name])
     if name in DOCS:
         return os.path.join(ASSETS, DOCS[name])
+    if name in BOARDS:
+        return os.path.join(ASSETS, BOARDS[name])
     return os.path.abspath(name)
 
 

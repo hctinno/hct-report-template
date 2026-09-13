@@ -47,6 +47,8 @@ BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
 sys.path.insert(0, SCRIPTS)
 from apply_brand import DECKS as _DECK_FILES  # noqa: E402
 DECKS = list(_DECK_FILES)
+from apply_brand import BOARDS as _BOARD_FILES  # noqa: E402
+BOARDS = list(_BOARD_FILES.values())
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
 EXPECTED_PPTX = len(DECKS) - 1
@@ -173,6 +175,38 @@ def check_docs(log):
             log.warn(f"문서 {name}", detail)
         else:
             log.ok(f"문서 {name}", detail)
+
+
+# ---------------------------------------------------------------------- 웹 보드
+
+def check_boards(log):
+    """보드는 슬라이드도 A4 도 아니다. check_board.py 가 따로 판정한다.
+
+    문서와 같이 브랜드 적용 대상이 아니라 assets 원본을 그대로 본다 —
+    blue-web.css 가 blue-report.css 의 색 토큰을 전제하므로 같은 폴더에서
+    열어야 한다."""
+    assets = os.path.join(SKILL, "assets")
+    for name in BOARDS:
+        path = os.path.join(assets, name)
+        if not os.path.exists(path):
+            log.fail(f"보드 {name}", "파일이 없다")
+            continue
+        r = run([sys.executable, os.path.join(SCRIPTS, "check_board.py"), path])
+        print(r.stdout, end="")
+        if r.stderr.strip():
+            print(r.stderr, end="", file=sys.stderr)
+        m = RESULT_RE.search(r.stdout)
+        if not m:
+            log.fail(f"보드 {name}", "check_board.py 가 결과 줄을 내지 않았다")
+            continue
+        ok, warn, fail = (int(x) for x in m.groups())
+        detail = f"통과 {ok} · 주의 {warn} · 실패 {fail}"
+        if fail or r.returncode != 0:
+            log.fail(f"보드 {name}", detail)
+        elif warn:
+            log.warn(f"보드 {name}", detail)
+        else:
+            log.ok(f"보드 {name}", detail)
 
 
 # ---------------------------------------------------------------------- PPTX
@@ -863,12 +897,12 @@ def check_version(log):
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
     ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
-    ap.add_argument("--only", choices=["decks", "docs", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
+    ap.add_argument("--only", choices=["decks", "docs", "boards", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
                     action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
     ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
     a = ap.parse_args()
 
-    only = set(a.only or ["decks", "docs", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
+    only = set(a.only or ["decks", "docs", "boards", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
     log = Log()
 
     if a.shots:
@@ -886,6 +920,9 @@ def main():
         if "docs" in only:
             print("\n── A4 문서 ──")
             check_docs(log)
+        if "boards" in only:
+            print("\n── 웹 보드 ──")
+            check_boards(log)
         if "fcc" in only:
             print("\n── H-INNO FCC/KC 템플릿 ──")
             check_fcc(log)

@@ -16,7 +16,7 @@ Playwright가 없으면 정적 검사만 수행하고 그 사실을 보고한다
   렌더 — 실제 브라우저 레이아웃. Playwright가 필요하다.
     5. 슬라이드 렌더 크기가 정확히 1920x1080인가 (넘침 없음)
     6. 24px 미만 텍스트가 없는가 (% 첨자 .br-sup 만 예외)
-    7. 데이터 마크가 슬라이드 배경 대비 2:1 이상인가
+    7. 데이터 마크가 **실제 뒷배경** 대비 2:1 이상인가 (막대는 채널, 나머지는 지면)
     8. 본문 영역이 위아래로 서로 겹치지 않는가
     9. 브랜드 마크가 모든 슬라이드 우측 상단에 있는가
    10. 브랜드 마크가 본문과 겹치지 않는가
@@ -386,13 +386,28 @@ def check_render(path, rep, shots=None):
 
             const marks = [];
             const blank = [];
+            // 마크가 실제로 무엇 위에 놓였는지 찾는다. 슬라이드 배경과 견주면
+            // 막대 채널(.br-bar-track, 지면보다 어둡다) 위에 놓인 막대를 놓친다.
+            // 인증은 지면 기준으로 했는데 실제 뒷배경은 트랙이라 값이 달라진다.
+            const backdrop = el => {
+              for (let p = el.parentElement; p; p = p.parentElement) {
+                const c = getComputedStyle(p).backgroundColor;
+                if (c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) return c;
+                if (p === sec) break;
+              }
+              return bg;
+            };
             sec.querySelectorAll('.br-bar-v,.br-bar-h,.br-dot,.br-iso-cell,circle').forEach(el => {
               const cs = getComputedStyle(el);
+              const under = backdrop(el);
               // 그라디언트로 칠한 막대는 backgroundColor 가 비어 있다. 그림 쪽에서
               // 색 정지점을 뽑아 전부 대비 검사에 넣는다 — 한쪽 끝만 통과하고
               // 다른 끝이 지면에 묻으면 막대의 절반이 사라진 것과 같다.
               const stops = (cs.backgroundImage || '').match(/rgba?\([^)]*\)/g) || [];
-              if (el.tagName !== 'circle' && stops.length) { stops.forEach(c => marks.push(c)); return; }
+              if (el.tagName !== 'circle' && stops.length) {
+                stops.forEach(c => marks.push({ c, bg: under }));
+                return;
+              }
               const c = el.tagName === 'circle' ? cs.stroke : cs.backgroundColor;
               // 색이 안 잡히면 건너뛰는 것이 아니라 잡아낸다. 예전에는 걸러 내기만 해서
               // 조각이 통째로 안 그려져도 대비 검사를 그냥 통과했다. var() 하나가
@@ -402,7 +417,7 @@ def check_render(path, rep, shots=None):
                              cls: (el.className.baseVal ?? el.className ?? '').toString().slice(0,30) });
                 return;
               }
-              marks.push(c);
+              marks.push({ c, bg: under });
             });
 
             // 막대 길이가 값에 비례하는가. 도넛은 원주로 검산하면서 막대는 아무도
@@ -493,8 +508,8 @@ def check_render(path, rep, shots=None):
             for t in s["small"]:
                 small_all.append(f"{s['i']+1}. {s['label']}: {t['fs']}px — “{t['txt']}”")
             for m in s["marks"]:
-                hexc = _rgb_to_hex(m)
-                bgh = _rgb_to_hex(s["bg"])
+                hexc = _rgb_to_hex(m["c"])
+                bgh = _rgb_to_hex(m["bg"])
                 if not hexc or not bgh:
                     continue
                 cr = contrast(hexc, bgh)
