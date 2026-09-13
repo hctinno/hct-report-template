@@ -51,9 +51,20 @@ DOCS = {
 # 웹 보드. 슬라이드도 A4 도 아닌 제3의 계통이다 — 지면 크기가 없고 화면 폭에
 # 따라 흐른다. 글자 하한 12.5px, 판정은 check_board.py 가 한다.
 # 읽는 물건이 아니라 상태를 바꾸는 화면이라 PPTX·PDF 대상이 아니다.
+# 이름은 덱·문서와 겹치면 안 된다 — resolve() 가 덱을 먼저 보므로 겹친 이름은
+# 보드에 영영 닿지 않는다. exec·team 이 실제로 덱에 있어 그렇게 묻혔다.
+# 아래 NAMES 검사가 같은 실수를 다시 못 하게 막는다.
 BOARDS = {
-    "board": "board-task.html",              # 과제 실행보드 (레일 · KPI · 표 · 메모)
+    "board":     "board-task.html",    # 과제 실행보드 — 레일 · KPI · 표 · 메모 (가장 작은 견본)
+    "manage":    "board-manage.html",  # 관리보드 — 절 12 · 표 8 대시보드형. 전사 여러 축을 한 화면에
+    "execboard": "board-exec.html",    # 실행보드 — 항목마다 상태 알약과 메모. 매일 움직이는 목록
+    "teamboard": "board-team.html",    # 팀보드 — 칸반 4열. 주간 회의에서 화면을 같이 보며 좁힐 때
+    "gapcheck":  "board-gap.html",     # 점검보드 — 공백 부모 + 대응 자식. 빠진 칸을 찾을 때
 }
+
+# 세 표의 이름이 겹치면 뒤에 오는 쪽이 통째로 묻힌다. 불러오는 순간 걸리게 둔다.
+_dup = ([k for k in DOCS if k in DECKS] + [k for k in BOARDS if k in DECKS or k in DOCS])
+assert not _dup, f"덱·문서·보드 이름 충돌: {_dup}"
 
 LOGO_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
               ".svg": "image/svg+xml", ".webp": "image/webp"}
