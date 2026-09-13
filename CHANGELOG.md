@@ -14,6 +14,40 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.39.2 — 2026-09-13
+
+### `--brand` 경로가 어느 기준인지 적혀 있지 않았다
+
+`build_single_file.py` 의 docstring 과 `pptx/build.js` 머리, 스킬 `README.md` 가
+`--brand ../../../brand/hct/brand.json` 만 보여 줬다. 저장소 **스킬 폴더**에서 돌릴
+때만 맞는 경로다. 저장소 루트나 계정 스킬 설치본에서는 `brand/hct/brand.json` 이다.
+
+계정 스킬 묶음은 `brand/` 를 안에 담고 있어 루트와 같은 경로를 쓴다 — 묶음의
+`INSTALL.md` 는 이 사실을 적어 두지만 스크립트 docstring 은 그대로였다. 세 자리를
+나란히 적어 헷갈릴 여지를 없앴다.
+
+### 보드를 주면 알 수 없는 메시지로 죽었다
+
+`build_single_file.py --deck manage` 가 이렇게 끝났다.
+
+    AssertionError: 뷰어 JS 인라인 실패 (data-deck-title 없음)
+
+docstring 은 *"`--deck` 은 `apply_brand.py` 와 같은 이름을 받는다"* 라고 적혀 있었고
+1.39.0 에서 `apply_brand.py` 가 보드 이름을 받기 시작하면서 그 문장이 거짓이 됐다.
+보드에는 뷰어가 없어 이 스크립트가 기대하는 두 가지 — 뷰어 JS 의 제목 표식,
+뷰어 CSS 의 `html,body` 배경 — 가 둘 다 없다.
+
+무엇을 쓰라는 것인지 먼저 말하고 멈추게 했다.
+
+    웹 보드는 이 스크립트가 묶지 않는다: manage
+            보드에는 뷰어가 없어 제목 표식과 html,body 배경이 둘 다 없다.
+            한 파일로 묶으려면 apply_brand.py 를 쓴다 —
+            python3 apply_brand.py --brand <brand.json> --deck manage --single-file -o 보드.html
+
+덱·문서를 못 찾았을 때의 안내에도 보드 이름과 그 경로를 덧붙였다.
+
+---
+
 ## 1.39.1 — 2026-09-13
 
 ### 배포 설명이 보드를 가리지 못하고 있었다

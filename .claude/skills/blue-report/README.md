@@ -263,6 +263,10 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 ```bash
 python3 scripts/build_single_file.py --artifact --deck minutes \
         --brand ../../../brand/hct/brand.json -o ./회의록.html
+
+`--brand` 경로는 실행 위치에 따라 다르다. 스킬 폴더에서는 `../../../brand/hct/brand.json`,
+저장소 루트와 계정 스킬 설치본에서는 `brand/hct/brand.json` 이다. 설치본은 묶음 안에
+`brand/` 를 담고 있어 루트와 같은 경로를 쓴다.
 ```
 
 `--deck` 은 덱 이름과 A4 문서 이름(`minutes`)을 함께 받는다. `--artifact` 를 빼면
