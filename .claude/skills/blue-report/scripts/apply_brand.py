@@ -26,7 +26,7 @@ ASSETS = os.path.join(ROOT, "assets")
 
 # 용도별 덱. 이름으로 고르거나 --deck 에 파일 경로를 직접 준다.
 DECKS = {
-    "catalog":  "deck-template.html",         # 레이아웃 12종 카탈로그
+    "catalog":  "deck-template.html",         # 레이아웃 19종 카탈로그
     "internal": "deck-internal-report.html",  # 사내 보고 (월간)
     "weekly":   "deck-weekly-report.html",    # 조직 주간보고
     "ax":       "deck-ax-weekly.html",        # AX 조직 주간보고 (1장 + 부록)
@@ -264,7 +264,8 @@ def main():
     ap.add_argument("--title", help="이 덱의 문서명 (푸터에 들어간다). brand.json의 docTitle보다 우선한다")
     ap.add_argument("--deck", default="catalog",
                     help="덱 이름(" + " · ".join(DECKS) + ") · A4 문서 이름("
-                         + " · ".join(DOCS) + ") · 또는 HTML 파일 경로")
+                         + " · ".join(DOCS) + ") · 웹 보드 이름("
+                         + " · ".join(BOARDS) + ") · 또는 HTML 파일 경로")
     a = ap.parse_args()
 
     brand = load_brand(a.brand)

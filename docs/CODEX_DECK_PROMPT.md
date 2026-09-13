@@ -82,17 +82,33 @@ A4 세로 문서가 4종 있다. 용도에 맞는 것을 복사해
 | `deck-project-report.html` | `project` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | `training` | 교육·기술 설명 | 8 |
 | `deck-strategy-report.html` | `strategy` | 전략 보고 (논증형 결정 요청 · 16장) | 16 |
-| `deck-template.html` | `catalog` | 레이아웃 12종 카탈로그 | 12 |
+| `deck-report.html` | `report` | 고밀도 보고 (본문 14 + 부록 5 · 도해 중심) | 19 |
+| `deck-template.html` | `catalog` | 레이아웃 19종 카탈로그 | 19 |
 
-발표 덱이 아니라 **A4 세로 문서**가 필요하면 `--doc` 을 쓴다. 1920x1080 이 아니라
-794x1123 지면이고, 검사기도 `check_doc.py` 로 다르다.
+발표 덱이 아니라 **A4 세로 문서**가 필요하면 아래 이름을 같은 `--deck` 에 준다.
+1920x1080 이 아니라 794x1123 지면이고, 검사기도 `check_doc.py` 로 다르다.
 
-| 파일 | `--doc` 이름 | 용도 | 쪽수 |
+| 파일 | `--deck` 이름 | 용도 | 쪽수 |
 |---|---|---|---|
 | `doc-minutes.html` | `minutes` | 회의록 | 4 |
 | `doc-policy.html` | `policy` | 사규·규정 | 6 |
 | `doc-manual.html` | `manual` | 매뉴얼·가이드 | 6 |
 | `doc-notice.html` | `notice` | 공지 (1쪽 완결) | 2 |
+
+읽는 물건이 아니라 **화면에서 상태를 바꾸는 것**이면 웹 보드를 쓴다. 지면 크기가 없고
+화면 폭에 따라 흐른다. 글자 하한이 12.5px 로 다르고 검사기도 `check_board.py` 다.
+PPTX·PDF 대상이 아니다.
+
+| 파일 | `--deck` 이름 | 용도 | 특징 |
+|---|---|---|---|
+| `board-task.html` | `board` | 과제 실행보드 (가장 작은 견본) | 레일 · KPI · 필터 표 · 메모 |
+| `board-manage.html` | `manage` | 관리보드 (대시보드형) | 절 12 · 표 8 · 일정 격자 |
+| `board-exec.html` | `execboard` | 실행보드 (항목 상태 · 메모) | 상태 알약 4단 순환 · 진행판 |
+| `board-team.html` | `teamboard` | 팀보드 (칸반) | 칸반 4열 · 주차 격자 · 겹칩 |
+| `board-gap.html` | `gapcheck` | 점검보드 (공백 대조) | 공백 부모 + 대응 자식 · 대조표 |
+
+보드는 `blue-report.css` 와 `blue-web.css` 두 벌을 함께 부른다. 복사할 때 덱용 3개가
+아니라 이 둘을 옮긴다.
 
 같은 레이아웃을 쓰되 배치 순서가 용도에 맞게 다르다. 사내 보고는 다크 요약이 3번째에
 있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤
@@ -133,7 +149,8 @@ assets/deck-viewer.js
 # HTML — 회사명·로고·저작권을 넣어 한 파일로 만든다
 python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
 
-# --deck 은 위 표의 이름 또는 HTML 파일 경로. A4 문서는 --deck 대신 --doc minutes 처럼 준다
+# --deck 은 위 표의 이름 또는 HTML 파일 경로. A4 문서와 웹 보드도 같은 --deck 으로 준다
+#   --deck minutes   A4 회의록      --deck manage   관리보드
 # 내용을 직접 편집한 덱이면 파일 경로를 준다:
 #   --deck decks-out/my-deck.html
 
