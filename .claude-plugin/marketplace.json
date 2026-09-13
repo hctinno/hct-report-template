@@ -8,7 +8,7 @@
     {
       "name": "blue-report",
       "source": "./.claude/skills/blue-report",
-      "description": "블루 리포트 사내 공용 보고서 템플릿. 용도별 발표 덱 10종, A4 문서 4종, FCC/KC 보고서 14종, 레이아웃 카탈로그. HTML·PDF·PPTX·DOCX 출력."
+      "description": "블루 리포트 사내 공용 보고서 템플릿. 용도별 발표 덱 12종, A4 문서 4종, 웹 보드 5종, FCC/KC 보고서 14종, 레이아웃 카탈로그 19종. HTML·PDF·PPTX·DOCX 출력."
     }
   ]
 }

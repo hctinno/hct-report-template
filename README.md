@@ -97,7 +97,7 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 
 ---
 
-## 덱 10종
+## 덱 12종
 
 같은 레이아웃을 쓰되 배치 순서와 장수가 용도에 맞게 다르다. 조직 주간보고는 매주 반복하므로 목차를 두지 않고 타임라인이 요일 단위다. 사내 보고는 다크 요약이 3번째에 있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤 정리한다).
 
@@ -113,9 +113,29 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 | `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
 | `deck-training.html` | 교육·기술 설명 | 8 |
 | `deck-strategy-report.html` | 전략 보고 (논증형 결정 요청) | 16 |
-| `deck-template.html` | 레이아웃 12종 카탈로그 | 12 |
+| `deck-report.html` | 고밀도 보고 (본문 14 + 부록 5 · 도해 중심) | 19 |
+| `deck-template.html` | 레이아웃 19종 카탈로그 | 19 |
 
 전부 `.claude/skills/blue-report/assets/` 에 있다.
+
+---
+
+## 웹 보드 5종
+
+슬라이드도 A4 도 아닌 제3의 계통이다. 지면 크기가 없고 화면 폭에 따라 흐르며,
+**읽는 물건이 아니라 상태를 바꾸는 화면**이다. 회차 중간에 값이 바뀌고 다음 사람이
+이어받는다. PPTX·PDF 대상이 아니다.
+
+| 파일 | 용도 | 특징 |
+|---|---|---|
+| `board-task.html` | 과제 실행보드 (가장 작은 견본) | 레일 내비 · KPI 스트립 · 필터 표 · 메모 |
+| `board-manage.html` | 관리보드 (대시보드형) | 절 12 · 표 8 · 일정 격자 · 가로 막대 |
+| `board-exec.html` | 실행보드 (항목 상태 · 메모) | 상태 알약 4단 순환 · 설비 진행판 · 주차 막대 |
+| `board-team.html` | 팀보드 (칸반) | 칸반 4열 · 주차 격자 · 상세 겹칩 |
+| `board-gap.html` | 점검보드 (공백 대조) | 공백 부모 + 대응 자식 · 비율 띠 · 대조표 |
+
+보드는 `blue-report.css` + `blue-web.css` 두 파일을 함께 부른다. 글자 하한이
+12.5px 이고 `check_board.py` 가 11항목을 판정한다.
 
 ---
 
@@ -207,8 +227,8 @@ python3 scripts/verify_repo.py            # 전부
 python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 77장도 남긴다
 ```
 
-덱 11종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로 판정하고, PPTX 10종 생성과
-무결성 · `dist/` 재생성 대조 ·
+덱 12종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로, 웹 보드 5종을
+`check_board.py` 로 판정하고, PPTX 11종 생성과 무결성 · `dist/` 재생성 대조 ·
 한국어 인코딩 · 배포 매니페스트 · 내용 동기화 · 버전 올림을 함께 본다.
 실패가 있으면 종료 코드가 1 이다.
 
@@ -263,11 +283,14 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   references/rules.md                    압축 규칙
   references/decisions/                  규격을 바꾼 근거(실측·대조) 원본 — README.md 가 색인
   assets/blue-report.css                 토큰 77개 — 단일 소스
-  assets/deck-*.html                     완성 덱 10종 + 레이아웃 카탈로그
+  assets/deck-*.html                     완성 덱 11종 + 레이아웃 카탈로그 19종
   assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/doc-*.html · doc-viewer.*       A4 문서 4종과 그 뷰어
+  assets/blue-web.css                    웹 보드 파운데이션 — 토큰은 위 파일 것을 쓴다
+  assets/board-*.html                    웹 보드 5종
   scripts/check_deck.py                  슬라이드 17항목 자동 점검
   scripts/check_doc.py                   A4 문서 9항목 자동 점검
+  scripts/check_board.py                 웹 보드 11항목 자동 점검
   scripts/apply_brand.py                 브랜드 일괄 적용
   scripts/to_pdf.py                      PDF 내보내기
   scripts/make_logo_variants.py          로고 두 벌 생성

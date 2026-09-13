@@ -22,7 +22,7 @@ blue-report/
 │  ├─ doc-minutes.html         회의록 2쪽
 │  ├─ deck-viewer.css          뷰어 껍데기 (디자인 시스템 아님)
 │  ├─ deck-viewer.js           넘김 · 축척 · 전체화면 발표 · 쪽번호 자동 · 노트
-│  ├─ deck-template.html       레이아웃 12종 카탈로그
+│  ├─ deck-template.html       레이아웃 19종 카탈로그
 │  ├─ deck-internal-report.html   사내 보고 (월간) 9장
 │  ├─ deck-weekly-report.html     조직 주간보고 7장
 │  ├─ deck-ax-weekly.html         AX 조직 1장 보고 + 부록 5장
@@ -44,7 +44,7 @@ blue-report/
 │  ├─ tokens.js                blue-report.css 의 토큰을 읽어 온다 (색 값 중복 없음)
 │  ├─ layouts.js               카드 · 칩 · 머리말 · 꼬리말 등 원자 helper
 │  ├─ slides.js                슬라이드 종류별 생성기 11종
-│  ├─ content.js               용도별 덱 10종의 내용
+│  ├─ content.js               용도별 덱 11종의 내용
 │  └─ build.js                 실행 진입점
 └─ scripts/
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
@@ -62,7 +62,7 @@ blue-report/
 
 ### 용도별 덱 고르기
 
-`deck-template.html`은 레이아웃 12종을 모아 둔 **카탈로그**다. 실제 문서를 만들 때는
+`deck-template.html`은 레이아웃 19종을 모아 둔 **카탈로그**다. 실제 문서를 만들 때는
 용도에 맞는 덱에서 시작한다. 각 덱은 슬라이드 순서와 내용 골격이 그 용도에 맞춰져 있다.
 
 | 용도 | 파일 | 장수 | 구성 |
