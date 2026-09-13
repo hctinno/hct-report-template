@@ -46,6 +46,10 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 `apply_brand.py --help` 도 덱과 A4 문서만 나열하고 보드를 빼먹고 있었다.
 
+CI 작업 이름도 *"덱 8종 · A4 문서 4종 · PPTX …"* 이었다. PR 마다 이 줄이 보이는데
+덱이 12종이고 보드 검사가 따로 도는 사실이 안 보였다. 워크플로 머리 주석의
+`check_deck.py 12항목` 도 실제 17항목과 어긋나 있었다.
+
 ---
 
 ## 1.39.0 — 2026-09-13

@@ -4,8 +4,9 @@
 #
 #     python3 scripts/verify_repo.py
 #
-# 덱 8종을 check_deck.py 12항목, A4 문서 4종을 check_doc.py 9항목으로 판정하고,
-# dist/ 재생성 대조, 한국어 인코딩, 배포 매니페스트를 함께 본다.
+# 덱 12종을 check_deck.py 17항목, A4 문서 4종을 check_doc.py 9항목, 웹 보드 5종을
+# check_board.py 11항목으로 판정하고, PPTX 11종 생성과 무결성, dist/ 재생성 대조,
+# 한국어 인코딩, 배포 매니페스트, 내용 동기화, 버전 올림을 함께 본다.
 # `실패` 가 하나라도 있으면 이 워크플로가 빨간불이 된다. `주의` 는 통과다.
 
 name: 저장소 점검
@@ -37,7 +38,7 @@ permissions:
 
 jobs:
   verify:
-    name: 덱 8종 · A4 문서 4종 · PPTX · dist · 인코딩 · 배포 · 버전
+    name: 덱 12종 · A4 문서 4종 · 웹 보드 5종 · PPTX · dist · 인코딩 · 배포 · 버전
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
