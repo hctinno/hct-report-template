@@ -12,10 +12,22 @@
   var deckTitle = stage.dataset.deckTitle || '';
 
   // 푸터의 문서명과 쪽번호는 여기서 채운다. 슬라이드를 넣거나 빼도 번호가 어긋나지 않는다.
-  frames.forEach(function (f, n) {
+  //
+  // data-apx 가 붙은 지면은 부록이다. 본문과 다른 체계로 센다 — 본문은 01·02,
+  // 부록은 「부록 1 / 6」. 같은 자리에 다른 체계가 찍히는 것이 부록으로 넘어왔다는
+  // 신호다. 부록이 없는 덱에서는 apxTotal 이 0 이라 예전과 똑같이 동작한다.
+  var apxTotal = 0;
+  frames.forEach(function (f) { if (f.hasAttribute('data-apx')) apxTotal++; });
+
+  var bodyN = 0, apxN = 0;
+  frames.forEach(function (f) {
+    var isApx = f.hasAttribute('data-apx');
+    if (isApx) apxN++; else bodyN++;
     var foot = f.querySelector('.br-footer');
     if (!foot) return;                       // 표지·간지·마무리는 푸터가 없다
-    var page = String(n + 1).padStart(2, '0');
+    var page = isApx
+      ? '부록 ' + apxN + ' / ' + apxTotal
+      : String(bodyN).padStart(2, '0');
     foot.innerHTML = deckTitle
       ? deckTitle + ' <strong>' + page + '</strong>'
       : '<strong>' + page + '</strong>';

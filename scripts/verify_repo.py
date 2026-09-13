@@ -41,8 +41,12 @@ SCRIPTS = os.path.join(SKILL, "scripts")
 ASSETS = os.path.join(SKILL, "assets")
 BRAND = os.path.join(ROOT, "brand", "hct", "brand.json")
 
-DECKS = ["catalog", "internal", "weekly", "ax", "team", "exec", "allhands",
-         "sales", "project", "training", "strategy"]
+# 덱 목록을 여기 또 적지 않는다. apply_brand.py 가 한 곳에서 정하고
+# build_single_file.py 도 거기서 읽는다. 목록이 두 곳에 있으면 덱을 늘릴 때
+# 한쪽이 남아 검사가 엉뚱한 개수를 기대한다 — 실제로 그렇게 한 번 걸렸다.
+sys.path.insert(0, SCRIPTS)
+from apply_brand import DECKS as _DECK_FILES  # noqa: E402
+DECKS = list(_DECK_FILES)
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
 EXPECTED_PPTX = len(DECKS) - 1
