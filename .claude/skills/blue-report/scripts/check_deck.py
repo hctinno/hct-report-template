@@ -142,10 +142,30 @@ def check_style(html, rep):
 
 
 def check_pie(html, rep):
-    pies = [m for m in re.findall(r"<path[^>]*\sd=\"([^\"]+)\"", html)
-            if re.search(r"[Aa]\s*[\d.]", m)]
+    """파이 조각을 찾는다. 호가 들어간 path 를 전부 막으면 안 된다.
+
+    파이를 금지하는 까닭은 손으로 적은 각도가 수치와 어긋나기 때문이다.
+    그 위험은 **채워진 부채꼴**에만 있다 — 값이 면적으로 읽히는 형태다.
+    관문 아치·회귀 화살표·둥근 연결선은 호를 쓰지만 값을 나르지 않는다.
+    fill="none" 인 열린 호까지 막으면 선으로 그린 도해를 아예 못 쓴다.
+
+    그래서 둘 중 하나일 때만 파이로 본다.
+      · Z 로 닫혀 부채꼴이 된다
+      · fill 이 none 이 아니다 (fill 속성이 없으면 SVG 기본값이 검정이므로 채워진 것)
+    """
+    pies = []
+    for tag, d in re.findall(r"(<path[^>]*\sd=\"([^\"]+)\"[^>]*>)", html):
+        if not re.search(r"[Aa]\s*[\d.]", d):
+            continue
+        closed = bool(re.search(r"[Zz]\s*$", d.strip()))
+        fill = re.search(r'\sfill="([^"]*)"', tag)
+        filled = not fill or fill.group(1).strip().lower() not in ("none", "transparent")
+        if closed or filled:
+            pies.append(d[:60])
     if pies:
         rep.f(f"파이 추정 <path> {len(pies)}개 — 도넛(stroke-dasharray)으로 바꾼다")
+        for d in pies[:5]:
+            print(f"        d=\"{d}…\"")
     else:
         rep.o("파이 없음 — 도넛만 사용")
 

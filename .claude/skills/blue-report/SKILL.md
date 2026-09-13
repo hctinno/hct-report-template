@@ -32,10 +32,18 @@ description: "사내 보고서·발표 덱·A4 문서를 회사 공용 양식으
   "착수 보고" · "완료 보고" · "킥오프" · "산출물" → `project`
   "교육 자료" · "사내 강의" · "온보딩" · "설명 자료" → `training`
   "전략 보고" · "과제 재개" · "투자 결정" · "대안 비교" · "자체개발 vs 외주" → `strategy`
+  "부록까지" · "근거 자료 붙여" · "예상 질문" · "도해로" · "제대로 된 보고서" → `report`
+
+  발표가 아니라 인쇄해 철할 문서면 A4 쪽으로 간다.
+  "회의록" · "미팅 노트" · "회의 결과" → `minutes`
+  "사규" · "규정" · "지침" · "개정" → `policy`
+  "매뉴얼" · "가이드" · "절차서" · "사용법" → `manual`
+  "공지" · "안내문" · "알림" · "한 쪽으로" → `notice`
 
   주기로 가른다 — 매주면 `weekly`, 매달이면 `internal`.
   받는 사람으로 가른다 — 임원 한 명이면 `exec`, 전 직원이면 `allhands`, 팀장이면 `team`.
   결론을 먼저 놓으면 `exec`, 근거를 밟아 올라가 결정을 받으면 `strategy`.
+  부록에 근거를 붙여야 하면 `report` — 질문이 많이 나올 자리에 쓴다.
 - 읽히지 않을 때 → **추천을 붙여서** 묻는다. 선택지만 나열하지 않는다.
   예: "사내 공유용이면 사내 보고, 외부에 보낼 거면 제안서 쪽이 맞다. 어느 쪽인가?"
 - 내용을 받아 보니 고른 덱과 안 맞으면 → 그때 말하고 바꾼다. 말없이 다른 구성을 쓰지 않는다.
@@ -52,7 +60,20 @@ description: "사내 보고서·발표 덱·A4 문서를 회사 공용 양식으
 | 프로젝트 착수·완료 | `project` | `deck-project-report.html` | 9 |
 | 교육·기술 설명 | `training` | `deck-training.html` | 8 |
 | 전략 보고 (논증형 결정 요청) | `strategy` | `deck-strategy-report.html` | 16 |
-| 레이아웃 카탈로그 | `catalog` | `deck-template.html` | 12 |
+| 고밀도 보고 (본문+부록 2부) | `report` | `deck-report.html` | 19 |
+| 레이아웃 카탈로그 | `catalog` | `deck-template.html` | 19 |
+
+**A4 문서 4종.** 발표 덱이 아니라 인쇄해 철하는 물건이다. 794x1123(A4 세로),
+머리말에 로고·꼬리말에 회사명이 쪽마다 들어간다. `--deck` 에 같은 방식으로 넘긴다.
+
+| 용도 | `--deck` | 파일 | 특징 |
+|---|---|---|---|
+| 회의록 | `minutes` | `doc-minutes.html` | 결정사항 · 액션아이템 표 분리 |
+| 사규·규정 | `policy` | `doc-policy.html` | 조·항·호 · 개정 이력 · 결재란 |
+| 매뉴얼·가이드 | `manual` | `doc-manual.html` | 목차 · 절차 단계 · 캡처 자리 |
+| 공지 | `notice` | `doc-notice.html` | 1쪽 완결 |
+
+A4 문서는 `check_deck.py` 가 아니라 `check_doc.py` 가 판정한다(9항목).
 
 ```bash
 # 회사 정보까지 한 번에 (권장)
@@ -79,7 +100,14 @@ cp assets/blue-report.css assets/deck-viewer.css assets/deck-viewer.js <작업�
 | 09 | 지표 표 | `--br-page` | 과제·지표 목록. 행 7개가 상한 |
 | 10 | 3단계 로드맵 | `--br-page` | 실행 계획 |
 | 11 | 일정 타임라인 | `--br-page` | 기간 병행과 마일스톤 |
-| 12 | 마무리 CTA | `--br-cover` | 행동 하나만 제시 |
+| 12 | 순환 고리 | `--br-page` | 회차가 되돌아옴. 칸 3~6개 · `diagram.py cycle` |
+| 13 | 통과 관문 | `--br-page` | 직렬 조건. 관문 2~5개 · `diagram.py gate` |
+| 14 | 단계 계단 | `--br-page` | 단마다 기준 상승. 단 3~6개 · `diagram.py stair` |
+| 15 | 연표 | `--br-page` | 실적/계획 분기. 시점 3~8개 · `diagram.py track` |
+| 16 | 구간 블록 | `--br-page` | 시간축 위 구간 · `diagram.py interval` |
+| 17 | 결정 요청 표 | `--br-page` | 미결 시 영향 열 필수. 행 4개가 상한 |
+| 18 | 부록 간지 | `--br-cover` | 본문/부록 경계. 이후 지면에 `data-apx` |
+| 19 | 마무리 CTA | `--br-cover` | 행동 하나만 제시 |
 
 읽고 인쇄하는 문서(주간보고 등)는 `#stage` 에 `data-no-anim` 을 주어 등장 효과를 끈다.
 발표용 덱은 켠 채로 둔다.
@@ -88,9 +116,10 @@ cp assets/blue-report.css assets/deck-viewer.css assets/deck-viewer.js <작업�
 문서명은 `#stage`의 `data-deck-title` 한 곳에서 읽는다. 발표자 노트는 `.br-frame`의
 `data-notes` 속성에 적고 뷰어에서 `N` 키로 본다.
 
-## 3. 차트는 반드시 스크립트로 만든다
+## 3. 차트와 도해는 반드시 스크립트로 만든다
 
-각도를 손으로 적으면 수치와 그림이 어긋난다.
+각도와 좌표를 손으로 적으면 수치와 그림이 어긋난다. 더 큰 문제는 항목 수가
+바뀔 때다 — 손으로 찍은 좌표에 칸을 하나 끼워 넣으면 간격이 어긋난다.
 
 ```bash
 # 도넛 — 구간 퍼센트를 넘기면 SVG와 범례가 나온다
@@ -102,6 +131,34 @@ python3 scripts/palette.py --steps 7
 # 팔레트 대비표
 python3 scripts/palette.py --check
 ```
+
+**구조 도해 5종.** 좌표가 항목 순번의 1차식으로 떨어지는 것만 생성한다.
+출력을 슬라이드에 그대로 붙인다.
+
+```bash
+python3 scripts/diagram.py cycle 선정,제작,코칭,공유,자산화 --back "한 회차 8주"
+python3 scripts/diagram.py gate 기술검증,현장적용,비용회수,조직정착 --out 성과
+python3 scripts/diagram.py stair 인식,시범,확산,정착
+python3 scripts/diagram.py track 2024,2025,2026,2027 --done 2 --unit 년
+python3 scripts/diagram.py interval "내부 챔버|8-9:점검:준비,10-12:시험:매뉴얼" --domain 0 24
+```
+
+스크립트가 검산까지 한다 — 라벨이 칸에 넘치면 경고하고, 구간이 겹치면 알리고,
+구간 종류가 램프 5색을 넘으면 실패시킨다. **경고를 무시하고 붙이지 않는다.**
+
+`viewBox` 를 본문 폭 1728 에 1:1 로 맞춰 두었다. SVG 를 좁은 칸에 넣으려고 폭을
+줄이면 안 글자가 같이 줄어 24px 하한을 깬다. 좁혀야 하면 `diagram.py` 의 `W` 를 바꾼다.
+
+**개념 흐름도는 생성하지 않는다.** 좌표가 값에서 나오지 않기 때문이다. 손으로
+그리되 `viewBox` 를 1728 기준으로 잡고, 글자는 24px 이상, 색은 `--br-*` 만 쓴다.
+
+### 밀도 높은 지면에 붙이는 두 부품
+
+- `.br-ribbon` — 지면 맨 아래 결론 한 줄. 「무엇을 읽어야 하나」를 닫는다.
+  `margin-top:auto` 가 이미 들어 있으므로 슬라이드의 마지막 형제로 둔다.
+- `.br-conf` — 확신도 칩 4종(`--fixed` 확정 · `--plan` 제안 · `--open` 협의필요 ·
+  `--none` 미정). `.br-status` 가 진행 상태를 말한다면 이쪽은 근거의 굳기를 말한다.
+  **어휘를 넷으로 고정한다.** 늘리면 읽는 사람이 등급을 구분하지 못한다.
 
 ## 4. PDF로 내보내기
 
