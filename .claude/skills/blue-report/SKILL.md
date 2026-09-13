@@ -33,6 +33,12 @@ description: "사내 보고서·발표 덱·A4 문서를 회사 공용 양식으
   "교육 자료" · "사내 강의" · "온보딩" · "설명 자료" → `training`
   "전략 보고" · "과제 재개" · "투자 결정" · "대안 비교" · "자체개발 vs 외주" → `strategy`
 
+  발표가 아니라 인쇄해 철할 문서면 A4 쪽으로 간다.
+  "회의록" · "미팅 노트" · "회의 결과" → `minutes`
+  "사규" · "규정" · "지침" · "개정" → `policy`
+  "매뉴얼" · "가이드" · "절차서" · "사용법" → `manual`
+  "공지" · "안내문" · "알림" · "한 쪽으로" → `notice`
+
   주기로 가른다 — 매주면 `weekly`, 매달이면 `internal`.
   받는 사람으로 가른다 — 임원 한 명이면 `exec`, 전 직원이면 `allhands`, 팀장이면 `team`.
   결론을 먼저 놓으면 `exec`, 근거를 밟아 올라가 결정을 받으면 `strategy`.
@@ -53,6 +59,18 @@ description: "사내 보고서·발표 덱·A4 문서를 회사 공용 양식으
 | 교육·기술 설명 | `training` | `deck-training.html` | 8 |
 | 전략 보고 (논증형 결정 요청) | `strategy` | `deck-strategy-report.html` | 16 |
 | 레이아웃 카탈로그 | `catalog` | `deck-template.html` | 12 |
+
+**A4 문서 4종.** 발표 덱이 아니라 인쇄해 철하는 물건이다. 794x1123(A4 세로),
+머리말에 로고·꼬리말에 회사명이 쪽마다 들어간다. `--deck` 에 같은 방식으로 넘긴다.
+
+| 용도 | `--deck` | 파일 | 특징 |
+|---|---|---|---|
+| 회의록 | `minutes` | `doc-minutes.html` | 결정사항 · 액션아이템 표 분리 |
+| 사규·규정 | `policy` | `doc-policy.html` | 조·항·호 · 개정 이력 · 결재란 |
+| 매뉴얼·가이드 | `manual` | `doc-manual.html` | 목차 · 절차 단계 · 캡처 자리 |
+| 공지 | `notice` | `doc-notice.html` | 1쪽 완결 |
+
+A4 문서는 `check_deck.py` 가 아니라 `check_doc.py` 가 판정한다(9항목).
 
 ```bash
 # 회사 정보까지 한 번에 (권장)
