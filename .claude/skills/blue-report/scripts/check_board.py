@@ -9,7 +9,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
 마크 대비)은 check_deck.py 에서 불러 쓴다 — 같은 낱말을 두 스크립트가 다르게
 판정하는 일이 없도록 한 곳에만 둔다.
 
-검사 항목 (10)
+검사 항목 (11)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 문체 — 존댓말·평서형 종결 없이 명사형인가 (check_deck.py 규칙 재사용)
     2. 색 — 토큰 밖 raw hex 를 본문에 직접 쓰지 않았는가
@@ -26,6 +26,10 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
        있으면 붙지 않는다. 육안으로는 스크롤해 봐야 알고, 대개 아무도 안 해 본다
     9. 1440px·400px 두 폭에서 문서가 가로로 넘치지 않는가
    10. 상태를 색으로만 말하지 않는가 — 상태 알약에 글자가 함께 있는가
+   11. 문체 — **그려진 뒤의** 본문까지 개조식인가
+       보드 넷 중 셋이 내용을 JS 데이터로 들고 그린다. 원문만 보는 1번은 그 글자를
+       한 자도 못 본다 — <script> 안은 규칙상 걷어내기 때문이다. 렌더 뒤 DOM 을
+       한 번 더 읽어 실제로 화면에 뜬 글자를 판정한다
 
 종료 코드는 실패가 하나라도 있으면 1, 아니면 0 이다. 주의는 0 을 유지한다.
 """
@@ -142,7 +146,11 @@ PROBE = r"""() => {
     }
     return getComputedStyle(document.body).backgroundColor;
   };
-  document.querySelectorAll('.bw-bar,.bw-dot,.br-bar-h,.br-bar-v,circle').forEach(el => {
+  // .bw-stage-s 는 채움이 있어도 글자를 언제나 함께 지므로 뺀다. .bw-wk 는 값이
+  // 배정된 칸(data-s)만 마크이고, 비어 있는 칸은 채널이라 지면 대비가 낮아도 된다.
+  const MARKS = '.bw-bar,.bw-dot,.bw-meter>span,.bw-wk[data-s],.bw-tl-bar,.bw-tl-dot,'
+              + '.br-bar-h,.br-bar-v,circle';
+  document.querySelectorAll(MARKS).forEach(el => {
     const cs = getComputedStyle(el);
     const c = el.tagName === 'circle' ? cs.stroke : cs.backgroundColor;
     if (!c || c === 'none' || c === 'rgba(0, 0, 0, 0)') return;
@@ -175,7 +183,7 @@ PROBE = r"""() => {
 }"""
 
 
-def check_render(path, rep, shots=None):
+def check_render(path, rep, shots=None, seen_style=()):
     chrome = need_browser()
     if not chrome:
         rep.w("렌더 검사 생략 — 브라우저를 찾지 못했다")
@@ -183,7 +191,7 @@ def check_render(path, rep, shots=None):
     from playwright.sync_api import sync_playwright
 
     url = "file://" + os.path.abspath(path)
-    overflow, small, marks, sticky, no_text = [], [], [], [], []
+    overflow, small, marks, sticky, no_text, drawn = [], [], [], [], [], ""
     with sync_playwright() as pw:
         br = pw.chromium.launch(executable_path=chrome)
         for w in WIDTHS:
@@ -204,6 +212,7 @@ def check_render(path, rep, shots=None):
                 d = pg.evaluate(PROBE)
                 small, marks, sticky, no_text = (d["small"], d["marks"],
                                                  d["sticky"], d["statusNoText"])
+                drawn = pg.evaluate("() => document.body.innerHTML")
                 if shots:
                     os.makedirs(shots, exist_ok=True)
                     pg.screenshot(path=os.path.join(shots, "board.png"), full_page=True)
@@ -254,6 +263,19 @@ def check_render(path, rep, shots=None):
     else:
         rep.o("상태 — 색과 함께 글자가 온다")
 
+    # JS 로 그린 내용은 원문 검사(1번)가 못 본다. 그려진 DOM 을 한 번 더 판정한다.
+    # 행 번호는 원문과 DOM 이 다르므로 떼고 견준다 — 안 그러면 같은 문장을 두 번 센다.
+    def _key(b):
+        return b.split("행 ", 1)[-1]
+    seen = {_key(b) for b in seen_style}
+    late = [b for b in style_violations(drawn) if _key(b) not in seen]
+    if late:
+        rep.f(f"문체 위반 {len(late)}건 — JS 로 그린 본문 (개조식·명사형 아님)")
+        for b in late[:8]:
+            print(f"        {b}")
+    else:
+        rep.o("문체 — 그려진 본문까지 금지 어미 없음")
+
 
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 웹 보드 점검기")
@@ -278,7 +300,7 @@ def main():
     check_literal_fs(html, rep)
     check_links(html, rep)
     check_scroll_sticky_mix(html, rep)
-    check_render(a.path, rep, a.shots)
+    check_render(a.path, rep, a.shots, seen_style=bad)
 
     sys.exit(rep.render())
 
