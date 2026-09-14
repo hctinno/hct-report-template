@@ -6,10 +6,12 @@
     python3 scripts/verify_repo.py --only decks
 
 검사 항목
-  docs      A4 문서를 check_doc.py 8항목으로 판정한다.
-  decks     덱 6종을 apply_brand.py 로 만들고 check_deck.py 로 판정한다.
-            11항목 중 `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
+  docs      A4 문서 4종을 check_doc.py 9항목으로 판정한다.
+  decks     덱을 apply_brand.py 로 만들고 check_deck.py 17항목으로 판정한다.
+            목록은 apply_brand.py 의 DECKS 가 정한다 — 여기 세지 않는다.
+            `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
+  boards    웹 보드 5종을 check_board.py 11항목으로 판정한다.
   pptx      build.js 가 돌고 .pptx 4종이 나오는가.
   dist      dist/ 의 두 파일이 소스에서 재생성한 것과 같은가.
             assets/ 를 고치고 dist/ 를 다시 만들지 않으면 여기서 걸린다.
@@ -113,7 +115,7 @@ def run(cmd, cwd=None):
     return subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True)
 
 
-# ------------------------------------------------------------------- 덱 6종
+# ---------------------------------------------------------------------- 덱
 
 def check_decks(log, out_dir, shots_dir):
     for name in DECKS:
@@ -915,7 +917,7 @@ def main():
             print("── 계열색 ──")
             check_palette(log)
         if "decks" in only:
-            print("\n── 덱 6종 ──")
+            print("\n── 덱 ──")
             check_decks(log, tmp, a.shots)
         if "docs" in only:
             print("\n── A4 문서 ──")

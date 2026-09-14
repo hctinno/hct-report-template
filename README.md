@@ -6,19 +6,38 @@
 
 ---
 
-## 쓰는 법 — 네 가지
+## 쓰는 법 — 다섯 가지
 
-넷 다 같은 스킬을 뜨게 하지만 **미치는 범위와 갱신 방식이 다르다.**
+다섯 다 같은 규격을 뜨게 하지만 **미치는 범위와 갱신 방식이 다르다.**
 
 | | 어디까지 뜨나 | 최신판 유지 | 손이 가는 횟수 |
 |---|---|---|---|
+| 0. 계정 지침 | **에이전트 종류를 가리지 않는다** — Claude 전 세션 · Codex · 그 밖의 도구 | 없음 — 경로만 적혀 저절로 최신 | 계정·도구마다 한 번 |
 | 1. 플러그인 | 그 PC 의 모든 프로젝트 | `plugin marketplace update` 로 당긴다 | PC 마다 한 번 |
 | 2. 계정 스킬 | **그 계정의 모든 세션** — claude.ai · 각 PC · 원격 | 판올림마다 다시 올린다 | 계정에 한 번 |
 | 3. 클론 | 그 폴더 안에서만 | `git pull` | 쓸 때마다 |
 | 4. 복사 | 그 PC 의 모든 프로젝트 | 다시 복사한다 | PC 마다 한 번 |
 
-**1 과 2 를 같이 쓰는 것이 무난하다.** 2 로 어디서든 뜨게 해 두고, 주로 쓰는 PC 에는
-1 을 깔아 판올림을 자동으로 당긴다.
+**0 과 1 을 같이 쓰는 것이 무난하다.** 0 으로 어느 도구에서 시작하든 저장소를 가지러 오게
+해 두고, 주로 쓰는 PC 에는 1 을 깔아 미리 받아 둔다.
+
+### 0. 계정 지침 — 에이전트가 스스로 저장소를 가지러 온다
+
+GitHub 계정을 연결했다는 사실만으로 에이전트가 이 템플릿을 쓰지는 않는다. 어느 플랫폼도
+사용자의 GitHub 계정을 훑어 스킬을 찾아 오지 않기 때문이다. 에이전트는 자기가 열려 있는
+저장소만 본다.
+
+그래서 계정 지침에 **"회사 양식 요청을 받으면 이 저장소를 가져와라"** 한 문단을 심는다.
+그때부터 GitHub 권한이 실제로 쓰이고, 다른 프로젝트에서 시작한 세션도 이 규격을 따른다.
+지침에는 경로만 들어가고 색값·덱 목록은 들어가지 않으므로 판올림해도 손댈 일이 없다.
+
+붙여넣을 문단과 확인 방법은 **[`docs/AGENT_WIRING.md`](docs/AGENT_WIRING.md)** 에 있다.
+Codex 처럼 전역 지침 파일을 쓰는 도구는 설치기로 심을 수 있다.
+
+```bash
+python3 scripts/install_codex_pointer.py --check     # 상태만 본다
+python3 scripts/install_codex_pointer.py             # 설치 또는 갱신
+```
 
 
 ### 1. Claude Code — 플러그인 (권장)
@@ -298,11 +317,14 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   scripts/ensure_deps.py                 의존성 자동 확보
   pptx/                                  PowerPoint 생성기
 brand/hct/                               회사 정보와 로고
+AGENTS.md                                저장소를 연 에이전트가 자동으로 읽는 지침
 docs/CODEX_DECK_PROMPT.md                Codex 등 외부 에이전트용 작업 지시서
+docs/AGENT_WIRING.md                     다른 곳에서 시작한 에이전트를 이 저장소에 붙이는 법
 scripts/verify_repo.py                   저장소 전체 점검 — CI 가 이것을 돌린다
 scripts/check_content_sync.py            HTML 덱과 PPTX 내용 갈라짐 검사
 CHANGELOG.md                             판올림 기록. 스킬을 고치면 여기에 적는다
 scripts/install_blue_report_skill.py     오프라인 복사 설치기
+scripts/install_codex_pointer.py         전역 지침에 이 저장소를 가리키는 문단을 심는다
 .github/workflows/verify.yml             push·PR 자동 점검
 ```
 

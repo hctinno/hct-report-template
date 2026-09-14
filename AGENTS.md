@@ -2,24 +2,72 @@
 
 ## Purpose
 
-This repository is the HCT shared presentation design system, called **Blue Report**. One source produces HTML, PDF, and PowerPoint decks, and the rules are enforced by a script rather than by eye.
+This repository is the HCT shared presentation design system, called **Blue Report**. One source produces HTML, PDF, PowerPoint, and DOCX output, and the rules are enforced by a script rather than by eye.
 
-`docs/CODEX_DECK_PROMPT.md` is the full step-by-step work order, written for agents that cannot load `.claude/skills/`. Read it before starting deck work; the rules below are its summary.
+`docs/CODEX_DECK_PROMPT.md` is the full step-by-step work order, written for agents that cannot load `.claude/skills/`. **Read it before starting any deck, document, or board work** — it carries the complete asset tables with their `--deck` names. The rules below are its summary.
+
+`docs/AGENT_WIRING.md` explains how to reach this repository from an agent session that started somewhere else.
+
+## What is in here
+
+Three separate lineages. They are not interchangeable: different page size, different type scale, different checker.
+
+| Lineage | Page | Token prefix | Type floor | Checker |
+|---|---|---|---|---|
+| Slide decks | exactly 1920x1080 | `--br-fs-*` | 24px | `check_deck.py` — 17 items |
+| A4 documents | 794x1123 portrait (1123x794 landscape) | `--bd-fs-*` | 14px (10.5pt) | `check_doc.py` — 9 items |
+| Web boards | no fixed page; reflows with viewport | `--bw-fs-*` | 12.5px | `check_board.py` — 11 items |
+
+### Slide decks — 12, in `.claude/skills/blue-report/assets/`
+
+| File | `--deck` name | Purpose | Slides |
+|---|---|---|---|
+| `deck-internal-report.html` | `internal` | internal monthly reporting | 9 |
+| `deck-weekly-report.html` | `weekly` | organisation-wide weekly reporting | 7 |
+| `deck-ax-weekly.html` | `ax` | one-page report for senior management, appendix behind it | 5 |
+| `deck-team-weekly.html` | `team` | compressed team weekly, for a team lead | 2 |
+| `deck-exec-report.html` | `exec` | executive reporting, conclusion first | 6 |
+| `deck-allhands.html` | `allhands` | all-hands / townhall | 9 |
+| `deck-sales-proposal.html` | `sales` | external proposal and sales | 10 |
+| `deck-project-report.html` | `project` | project kickoff and completion | 9 |
+| `deck-training.html` | `training` | training and technical explanation | 8 |
+| `deck-strategy-report.html` | `strategy` | strategy reporting, argument form, asks for a decision | 16 |
+| `deck-report.html` | `report` | high-density reporting, diagram-led | 19 |
+| `deck-template.html` | `catalog` | catalog of all 19 layouts | 19 |
+
+### A4 documents — 4
+
+| File | `--deck` name | Purpose | Pages |
+|---|---|---|---|
+| `doc-minutes.html` | `minutes` | meeting minutes | 4 |
+| `doc-policy.html` | `policy` | company rules and regulations | 6 |
+| `doc-manual.html` | `manual` | manual and guide | 6 |
+| `doc-notice.html` | `notice` | notice, complete in one page | 2 |
+
+### Web boards — 5
+
+Use these when the artefact is something people **change on screen**, not something they read. Boards load `blue-report.css` and `blue-web.css` together. They are not PPTX or PDF targets.
+
+| File | `--deck` name | Purpose |
+|---|---|---|
+| `board-task.html` | `board` | task execution board — rail, KPI, filter table, memo (smallest sample) |
+| `board-manage.html` | `manage` | management dashboard — 12 sections, 8 tables |
+| `board-exec.html` | `execboard` | execution board — status pill per item, memo |
+| `board-team.html` | `teamboard` | team board — 4-column kanban |
+| `board-gap.html` | `gapcheck` | gap-check board — gap parent with response children |
+
+### FCC/KC certification reports — 14
+
+Separate family under the same design system. See `docs/H_INNO_FCC_KC_REPORT_TEMPLATE_SYSTEM.md` and its integration guide. `verify_repo.py` checks them with the A4 rules.
 
 ## Working rules
 
 - Work in the current checkout root. Paths here are relative to it — never assume a specific drive or directory.
 - Read `.claude/skills/blue-report/README.md` first. It is the self-contained spec: color tokens, type scale, spacing, chart rules, and writing style. `.claude/skills/blue-report/references/rules.md` is the condensed rule list.
-- Start from a finished deck in `.claude/skills/blue-report/assets/`, replacing content only. Do not invent a new visual style.
-  - `deck-internal-report.html` internal monthly reporting
-  - `deck-weekly-report.html` organisation-wide weekly reporting (no agenda slide; weekday timeline)
-  - `deck-ax-weekly.html` one-page report for senior management, with appendix slides behind it
-  - `deck-sales-proposal.html` external proposal and sales
-  - `deck-project-report.html` project kickoff and completion
-  - `deck-training.html` training and technical explanation
-  - `deck-template.html` catalog of all 12 layouts
-- Ask the user which purpose applies before choosing a deck when the request does not make it obvious.
-- Hard rules: use `--br-*` CSS custom properties only and add no raw hex; donut charts only, never pie; Korean slide copy in 개조식 (noun-ending) form — neither polite endings (`~합니다`) nor plain declaratives (`~한다`, `~없다`); speaker notes in `data-notes` are exempt; slides are exactly 1920x1080; no text below 24px; the brand mark stays in the top-right margin band and body content never intrudes there.
+- Start from a finished asset above, replacing content only. Do not invent a new visual style.
+- Ask the user which purpose applies before choosing when the request does not make it obvious. Deck, A4 document, and board are three different answers — do not guess between them.
+- Example figures, department names, and wording in the assets are usage samples, not placeholders. Replace them with real content.
+- Hard rules: use `--br-*` CSS custom properties only and add no raw hex; donut charts only, never pie, and generate them with `scripts/donut.py` rather than computing angles by hand; Korean copy in 개조식 (noun-ending) form — neither polite endings (`~합니다`) nor plain declaratives (`~한다`, `~없다`); speaker notes in `data-notes` are exempt; slides are exactly 1920x1080; no slide text below 24px; data marks keep at least 2:1 contrast against the backdrop they actually sit on; the brand mark stays in the top-right margin band and body content never intrudes there.
 - Write output to `decks-out/`, which is gitignored. Do not scatter result files in the checkout root.
 - Save Korean text as UTF-8 and treat mojibake patterns such as `???`, `濡`, `湲`, `遺`, `媛`, `李` as blocking corruption.
 - Preserve user changes. Inspect `git status` before editing.
@@ -35,20 +83,24 @@ Python and Node only — no Claude Code dependency. Use `python3` on macOS and L
 # CI runs exactly this on every push and pull request.
 python scripts/verify_repo.py
 
-# Machine-checked rules for a single deck. Required before reporting a deck complete.
-python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
+# Per-artefact checks. Required before reporting the work complete.
+python .claude/skills/blue-report/scripts/check_deck.py  decks-out/deck.html
+python .claude/skills/blue-report/scripts/check_doc.py   decks-out/doc.html
+python .claude/skills/blue-report/scripts/check_board.py decks-out/board.html
 
+# Build. --deck takes any name from the three tables above.
 python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
 python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 node   .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
 ```
 
-`check_deck.py` enforces eleven rules mechanically: banned sentence endings, pie charts, donut dasharray arithmetic, off-token hex, slide size, minimum font size, 2:1 contrast for data marks, body-region overlap between stacked siblings, brand-mark presence, mark/body overlap, and logo variant against background luminance. Its report is the completion evidence for deck work — a run with failures is not "done".
+`build_single_file.py` bundles decks and A4 documents only — it takes no board name, because boards have no viewer. Bundle a board with `apply_brand.py --single-file` instead.
 
-`verify_repo.py` builds all five decks, runs `check_deck.py` on each, builds the four PPTX
-files, re-derives `dist/` and compares it against what is committed, scans Korean text for
-mojibake, and validates the plugin manifests. It exits 1 if anything fails. `.github/workflows/verify.yml`
-runs the same single command, so local and CI results cannot diverge.
+`check_deck.py` enforces 17 rules mechanically: banned sentence endings, pie charts, donut dasharray arithmetic, off-token hex, slide size, body-region overlap between stacked siblings, minimum font size, 2:1 contrast for data marks, resolvable mark colors, body safe area, leader-line annotations, bar-length arithmetic, brand-mark presence, watermark placement, mark/body overlap, watermark asset distinctness, and logo variant against background luminance. Its report is the completion evidence — a run with failures is not "done".
+
+`check_board.py` additionally re-checks the **rendered** DOM for banned endings, because board content often lives in JavaScript data that a source scan cannot see.
+
+`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the four A4 documents with `check_doc.py`, checks the five boards with `check_board.py`, checks the FCC/KC templates with the A4 rules, builds the PPTX files, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
 
 If you change `assets/`, rebuild `dist/` and commit it: `build_single_file.py` three times —
 once with no arguments, once with `--artifact --brand brand/hct/brand.json`, and once with
@@ -57,8 +109,8 @@ fails otherwise.
 
 PPTX content lives separately in `pptx/content.js`. The HTML decks are the source of truth, so change both when content changes. Colors cannot drift because `pptx/tokens.js` parses `assets/blue-report.css`.
 
-The two content sources are deliberately not merged: hand-editing the HTML decks is how this system is used, and generating the HTML from data would remove that. Drift is caught mechanically instead — `scripts/check_content_sync.py` compares slide counts, deck titles, all 36 speaker notes, bar names and values, donut legends, and table headers and rows across both sources, and names the deck, slide, and field that diverged. `verify_repo.py` and CI run it, so changing only one side does not pass.
+The two content sources are deliberately not merged: hand-editing the HTML decks is how this system is used, and generating the HTML from data would remove that. Drift is caught mechanically instead — `scripts/check_content_sync.py` compares slide counts, deck titles, speaker notes, bar names and values, donut legends, and table headers and rows across both sources, and names the deck, slide, and field that diverged. `verify_repo.py` and CI run it, so changing only one side does not pass.
 
 ## Reporting
 
-Write reports in Korean. Include the commands you ran, the pass/warn/fail counts from `check_deck.py`, and the output paths. If you did not run the check, say so — do not write "완료" without it.
+Write reports in Korean. Include the commands you ran, the pass/warn/fail counts from the checker you used, and the output paths. If you did not run the check, say so — do not write "완료" without it.
