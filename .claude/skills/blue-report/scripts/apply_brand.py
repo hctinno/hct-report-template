@@ -62,8 +62,16 @@ BOARDS = {
     "gapcheck":  "board-gap.html",     # 점검보드 — 공백 부모 + 대응 자식. 빠진 칸을 찾을 때
 }
 
-# 세 표의 이름이 겹치면 뒤에 오는 쪽이 통째로 묻힌다. 불러오는 순간 걸리게 둔다.
-_dup = ([k for k in DOCS if k in DECKS] + [k for k in BOARDS if k in DECKS or k in DOCS])
+# 라이브 덱 — 고정 지면이 없는 발표 계통. 한 장이 100dvh 이고 치수가 전부 rem 이다.
+# 덱(1920x1080)과 목적은 같지만 규격이 달라 검사기도 check_live.py 로 따로 있다.
+LIVE = {
+    "live": "live-brief.html",         # 라이브 브리핑 — 세로 검토 · 가로 발표 (견본)
+}
+
+# 네 표의 이름이 겹치면 뒤에 오는 쪽이 통째로 묻힌다. 불러오는 순간 걸리게 둔다.
+_dup = ([k for k in DOCS if k in DECKS]
+        + [k for k in BOARDS if k in DECKS or k in DOCS]
+        + [k for k in LIVE if k in DECKS or k in DOCS or k in BOARDS])
 assert not _dup, f"덱·문서·보드 이름 충돌: {_dup}"
 
 LOGO_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
@@ -89,6 +97,8 @@ def resolve(name):
         return os.path.join(ASSETS, DOCS[name])
     if name in BOARDS:
         return os.path.join(ASSETS, BOARDS[name])
+    if name in LIVE:
+        return os.path.join(ASSETS, LIVE[name])
     return os.path.abspath(name)
 
 
@@ -265,7 +275,8 @@ def main():
     ap.add_argument("--deck", default="catalog",
                     help="덱 이름(" + " · ".join(DECKS) + ") · A4 문서 이름("
                          + " · ".join(DOCS) + ") · 웹 보드 이름("
-                         + " · ".join(BOARDS) + ") · 또는 HTML 파일 경로")
+                         + " · ".join(BOARDS) + ") · 라이브 덱 이름("
+                         + " · ".join(LIVE) + ") · 또는 HTML 파일 경로")
     a = ap.parse_args()
 
     brand = load_brand(a.brand)
@@ -285,7 +296,9 @@ def main():
     if not os.path.isfile(deck_path):
         sys.exit(f"오류: 덱·문서를 찾지 못했다 — {deck_path}\n"
                  f"덱 이름: {' · '.join(DECKS)}\n"
-                 f"문서 이름: {' · '.join(DOCS)}")
+                 f"문서 이름: {' · '.join(DOCS)}\n"
+                 f"보드 이름: {' · '.join(BOARDS)}\n"
+                 f"라이브 이름: {' · '.join(LIVE)}")
     is_doc = os.path.basename(deck_path).startswith("doc-")
     print(f"{'문서' if is_doc else '덱'}: {os.path.basename(deck_path)}")
 

@@ -3,6 +3,11 @@
  * 블루 리포트 PowerPoint 판 생성기.
  *
  *   node build.js --brand ../../../brand/hct/brand.json --out ./dist
+ *
+ * --brand 경로는 어디서 실행하느냐에 따라 다르다.
+ *   저장소 스킬 폴더에서   ../../../brand/hct/brand.json
+ *   저장소 루트에서        brand/hct/brand.json
+ *   계정 스킬 설치본에서   brand/hct/brand.json
  *   node build.js --brand brand.json --deck internal
  *
  * 색·크기는 assets/blue-report.css 에서 읽는다(tokens.js). 여기 다시 적지 않는다.

@@ -19,16 +19,21 @@ docs/CODEX_DECK_PROMPT.md 를 읽고 그대로 수행해라. 용도는 사내 �
 
 | 넘길 값 | 고르는 것 |
 |---|---|
-| 용도 | 사내 월간 · 주간 · AX 주간 · 팀 압축 주간 · 경영진 · 전직원 · 외부 제안 · 프로젝트 · 교육 · A4 문서 |
+| 용도 | 사내 월간 · 주간 · AX 주간 · 팀 압축 주간 · 경영진 · 전직원 · 외부 제안 · 프로젝트 · 교육 · 전략 · 고밀도 · A4 문서 · 웹 보드 |
 | 주제 | 덱 제목과 내용 |
-| 형식 | HTML(기본) · PDF · PPTX. 여러 개 가능 |
+| 형식 | HTML(기본) · PDF · PPTX. 여러 개 가능. 보드는 HTML 만 |
 
 저장소가 아직 없는 PC라면 먼저 받는다. 폴더 이름과 위치는 아무래도 좋다.
+**기본 브랜치가 `main` 이 아니라 `full/main` 이므로 브랜치를 적을 때 주의한다.**
 
 ```bash
-git clone https://github.com/hctinno/hct-report-template.git
+git clone -b full/main https://github.com/hctinno/hct-report-template.git
 cd hct-report-template
 ```
+
+매번 이 파일을 지목하는 것이 번거로우면 에이전트의 전역 지침에 한 번만 심어 둔다.
+그러면 어느 폴더에서 시작하든 에이전트가 스스로 저장소를 받아 온다 —
+`docs/AGENT_WIRING.md` 가 붙여넣을 문단과 설치기를 담고 있다.
 
 ---
 
@@ -38,7 +43,7 @@ cd hct-report-template
 
 **모든 경로는 저장소 루트 기준 상대 경로다.** 절대 경로를 쓰지 않는다. 저장소가 어느
 드라이브 어느 폴더에 있든 상관없어야 한다. 먼저 저장소 루트로 이동해 `git pull` 로
-최신 `main` 을 받는다.
+최신 기본 브랜치(`full/main`)를 받는다.
 
 명령 예시는 `python` 으로 적었다. macOS·Linux 에서는 `python3` 으로 바꿔 쓴다.
 경로 구분자는 `/` 로 통일했다. Windows 에서도 그대로 동작한다.
@@ -66,8 +71,8 @@ brand/hct/brand.json
 
 ### 2. 덱 고르기 — 새로 만들지 말고 골라서 내용만 바꾼다
 
-`.claude/skills/blue-report/assets/` 에 완성된 덱이 8종, 레이아웃 카탈로그 1종,
-A4 세로 문서가 4종 있다. 용도에 맞는 것을 복사해
+`.claude/skills/blue-report/assets/` 에 완성된 덱이 11종, 레이아웃 카탈로그 1종,
+A4 세로 문서가 4종, 웹 보드가 5종 있다. 용도에 맞는 것을 복사해
 **내용만** 교체한다. 레이아웃과 스타일을 새로 설계하지 않는다.
 
 | 파일 | `--deck` 이름 | 용도 | 장수 |

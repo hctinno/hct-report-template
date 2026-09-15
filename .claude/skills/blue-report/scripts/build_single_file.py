@@ -6,11 +6,21 @@ CSS를 인라인해 첨부 파일 없이 어디서나 열리는 한 장짜리 �
 
     python3 build_single_file.py                       # dist/blue-report-deck.html
     python3 build_single_file.py --artifact            # dist/blue-report-artifact.html
-    python3 build_single_file.py --artifact --brand ../../../brand/hct/brand.json
     python3 build_single_file.py --artifact --deck ax -o /tmp/ax-artifact.html
 
---deck 은 apply_brand.py 와 같은 이름을 받는다. A4 문서 이름(minutes)도 받는다.
-생략하면 카탈로그다.
+--brand 경로는 어디서 실행하느냐에 따라 다르다. 두 자리를 헷갈리면 파일을 못 찾는다.
+
+    저장소 스킬 폴더에서   --brand ../../../brand/hct/brand.json
+    저장소 루트에서        --brand brand/hct/brand.json
+    계정 스킬 설치본에서   --brand brand/hct/brand.json   (묶음 안에 brand/ 가 들어 있다)
+
+--deck 은 덱 이름과 A4 문서 이름(minutes)을 받는다. 생략하면 카탈로그다.
+
+**웹 보드는 받지 않는다.** 보드에는 뷰어가 없어서 이 스크립트가 기대하는 것
+(뷰어 JS 의 제목 표식, 뷰어 CSS 의 html,body 배경)이 둘 다 없다. 보드를 한 파일로
+묶으려면 apply_brand.py 를 쓴다.
+
+    python3 apply_brand.py --brand brand/hct/brand.json --deck manage --single-file -o 보드.html
 """
 import argparse
 import base64
@@ -25,7 +35,7 @@ DIST = os.path.join(ROOT, "dist")
 
 # 덱·문서 이름. apply_brand.py 와 같은 것을 쓴다. 한곳에서만 고치도록 거기서 읽어 온다.
 sys.path.insert(0, HERE)
-from apply_brand import DECKS, DOCS, resolve  # noqa: E402
+from apply_brand import DECKS, DOCS, BOARDS, resolve  # noqa: E402
 
 DECK = os.path.join(ASSETS, DECKS["catalog"])
 
@@ -86,8 +96,27 @@ def build(artifact=False, brand_path=None, deck="catalog", out_path=None):
     if not os.path.exists(deck_path):
         raise SystemExit(f"덱·문서를 찾지 못했다: {deck}\n"
                          f"덱 이름: {' · '.join(DECKS)}\n"
-                         f"문서 이름: {' · '.join(DOCS)}")
-    is_doc = os.path.basename(deck_path).startswith("doc-")
+                         f"문서 이름: {' · '.join(DOCS)}\n"
+                         f"웹 보드({' · '.join(BOARDS)})는 apply_brand.py --single-file 로 묶는다")
+    base = os.path.basename(deck_path)
+    # 보드는 뷰어가 없다. 그대로 진행하면 아래 두 단정문이 알 수 없는 메시지로 터진다 —
+    # 실제로 `--deck manage` 가 "뷰어 JS 인라인 실패 (data-deck-title 없음)" 로 죽었다.
+    # 무엇을 쓰라는 것인지 여기서 먼저 말한다.
+    if base.startswith("board-"):
+        raise SystemExit(
+            f"웹 보드는 이 스크립트가 묶지 않는다: {deck}\n"
+            f"        보드에는 뷰어가 없어 제목 표식과 html,body 배경이 둘 다 없다.\n"
+            f"        한 파일로 묶으려면 apply_brand.py 를 쓴다 —\n"
+            f"        python3 apply_brand.py --brand <brand.json> --deck {deck} --single-file -o 보드.html")
+    # 라이브 덱도 마찬가지다. 자기 뷰어(live-viewer.js)가 따로 있고 지면이 .br-frame 이
+    # 아니라 .bl-sl 이라 여기서 기대하는 구조가 하나도 맞지 않는다.
+    if base.startswith("live-"):
+        raise SystemExit(
+            f"라이브 덱은 이 스크립트가 묶지 않는다: {deck}\n"
+            f"        라이브 계통은 지면이 .bl-sl 이고 뷰어가 live-viewer.js 로 따로 있다.\n"
+            f"        한 파일로 묶으려면 apply_brand.py 를 쓴다 —\n"
+            f"        python3 apply_brand.py --brand <brand.json> --deck {deck} --single-file -o 라이브.html")
+    is_doc = base.startswith("doc-")
     html = open(deck_path, encoding="utf-8").read()
     if brand_path:
         # 순환 import를 피하려고 여기서 늦게 불러온다 (apply_brand 도 이 모듈을 쓴다).

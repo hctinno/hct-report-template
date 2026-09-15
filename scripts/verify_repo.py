@@ -6,10 +6,14 @@
     python3 scripts/verify_repo.py --only decks
 
 검사 항목
-  docs      A4 문서를 check_doc.py 8항목으로 판정한다.
-  decks     덱 6종을 apply_brand.py 로 만들고 check_deck.py 로 판정한다.
-            11항목 중 `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
+  docs      A4 문서 4종을 check_doc.py 9항목으로 판정한다.
+  decks     덱을 apply_brand.py 로 만들고 check_deck.py 17항목으로 판정한다.
+            목록은 apply_brand.py 의 DECKS 가 정한다 — 여기 세지 않는다.
+            `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
+  boards    웹 보드 5종을 check_board.py 11항목으로 판정한다.
+  live      라이브 덱을 check_live.py 10항목으로 판정한다. 고정 지면이 없고
+            치수가 rem 이라 px 하한이 아니라 rem 하한으로 본다.
   pptx      build.js 가 돌고 .pptx 4종이 나오는가.
   dist      dist/ 의 두 파일이 소스에서 재생성한 것과 같은가.
             assets/ 를 고치고 dist/ 를 다시 만들지 않으면 여기서 걸린다.
@@ -49,6 +53,8 @@ from apply_brand import DECKS as _DECK_FILES  # noqa: E402
 DECKS = list(_DECK_FILES)
 from apply_brand import BOARDS as _BOARD_FILES  # noqa: E402
 BOARDS = list(_BOARD_FILES.values())
+from apply_brand import LIVE as _LIVE_FILES  # noqa: E402
+LIVE = list(_LIVE_FILES.values())
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
 EXPECTED_PPTX = len(DECKS) - 1
@@ -113,7 +119,7 @@ def run(cmd, cwd=None):
     return subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True)
 
 
-# ------------------------------------------------------------------- 덱 6종
+# ---------------------------------------------------------------------- 덱
 
 def check_decks(log, out_dir, shots_dir):
     for name in DECKS:
@@ -210,6 +216,38 @@ def check_boards(log):
 
 
 # ---------------------------------------------------------------------- PPTX
+
+# ---------------------------------------------------------------------- 라이브 덱
+
+def check_live(log):
+    """라이브 덱은 슬라이드도 보드도 아니다. check_live.py 가 따로 판정한다.
+
+    보드·문서와 같이 브랜드 적용 대상이 아니라 assets 원본을 그대로 본다 —
+    blue-live.css 가 blue-report.css 의 색 토큰을 전제하므로 같은 폴더에서
+    열어야 한다."""
+    assets = os.path.join(SKILL, "assets")
+    for name in LIVE:
+        path = os.path.join(assets, name)
+        if not os.path.exists(path):
+            log.fail(f"라이브 {name}", "파일이 없다")
+            continue
+        r = run([sys.executable, os.path.join(SCRIPTS, "check_live.py"), path])
+        print(r.stdout, end="")
+        if r.stderr.strip():
+            print(r.stderr, end="", file=sys.stderr)
+        m = RESULT_RE.search(r.stdout)
+        if not m:
+            log.fail(f"라이브 {name}", "check_live.py 가 결과 줄을 내지 않았다")
+            continue
+        ok, warn, fail = (int(x) for x in m.groups())
+        detail = f"통과 {ok} · 주의 {warn} · 실패 {fail}"
+        if fail or r.returncode != 0:
+            log.fail(f"라이브 {name}", detail)
+        elif warn:
+            log.warn(f"라이브 {name}", detail)
+        else:
+            log.ok(f"라이브 {name}", detail)
+
 
 def check_pptx(log, out_dir):
     if not shutil.which("node"):
@@ -897,12 +935,12 @@ def check_version(log):
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 저장소 점검")
     ap.add_argument("--shots", metavar="폴더", help="슬라이드별 PNG 를 남길 폴더")
-    ap.add_argument("--only", choices=["decks", "docs", "boards", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
+    ap.add_argument("--only", choices=["decks", "docs", "boards", "live", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"],
                     action="append", help="일부만 돌린다. 여러 번 줄 수 있다")
     ap.add_argument("--keep", metavar="폴더", help="만든 덱·PPTX 를 여기에 남긴다")
     a = ap.parse_args()
 
-    only = set(a.only or ["decks", "docs", "boards", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
+    only = set(a.only or ["decks", "docs", "boards", "live", "fcc", "viewer", "pptx", "dist", "encoding", "plugin", "sync", "version", "palette"])
     log = Log()
 
     if a.shots:
@@ -915,7 +953,7 @@ def main():
             print("── 계열색 ──")
             check_palette(log)
         if "decks" in only:
-            print("\n── 덱 6종 ──")
+            print("\n── 덱 ──")
             check_decks(log, tmp, a.shots)
         if "docs" in only:
             print("\n── A4 문서 ──")
@@ -923,6 +961,9 @@ def main():
         if "boards" in only:
             print("\n── 웹 보드 ──")
             check_boards(log)
+        if "live" in only:
+            print("\n── 라이브 덱 ──")
+            check_live(log)
         if "fcc" in only:
             print("\n── H-INNO FCC/KC 템플릿 ──")
             check_fcc(log)

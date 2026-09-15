@@ -6,19 +6,38 @@
 
 ---
 
-## 쓰는 법 — 네 가지
+## 쓰는 법 — 다섯 가지
 
-넷 다 같은 스킬을 뜨게 하지만 **미치는 범위와 갱신 방식이 다르다.**
+다섯 다 같은 규격을 뜨게 하지만 **미치는 범위와 갱신 방식이 다르다.**
 
 | | 어디까지 뜨나 | 최신판 유지 | 손이 가는 횟수 |
 |---|---|---|---|
+| 0. 계정 지침 | **에이전트 종류를 가리지 않는다** — Claude 전 세션 · Codex · 그 밖의 도구 | 없음 — 경로만 적혀 저절로 최신 | 계정·도구마다 한 번 |
 | 1. 플러그인 | 그 PC 의 모든 프로젝트 | `plugin marketplace update` 로 당긴다 | PC 마다 한 번 |
 | 2. 계정 스킬 | **그 계정의 모든 세션** — claude.ai · 각 PC · 원격 | 판올림마다 다시 올린다 | 계정에 한 번 |
 | 3. 클론 | 그 폴더 안에서만 | `git pull` | 쓸 때마다 |
 | 4. 복사 | 그 PC 의 모든 프로젝트 | 다시 복사한다 | PC 마다 한 번 |
 
-**1 과 2 를 같이 쓰는 것이 무난하다.** 2 로 어디서든 뜨게 해 두고, 주로 쓰는 PC 에는
-1 을 깔아 판올림을 자동으로 당긴다.
+**0 과 1 을 같이 쓰는 것이 무난하다.** 0 으로 어느 도구에서 시작하든 저장소를 가지러 오게
+해 두고, 주로 쓰는 PC 에는 1 을 깔아 미리 받아 둔다.
+
+### 0. 계정 지침 — 에이전트가 스스로 저장소를 가지러 온다
+
+GitHub 계정을 연결했다는 사실만으로 에이전트가 이 템플릿을 쓰지는 않는다. 어느 플랫폼도
+사용자의 GitHub 계정을 훑어 스킬을 찾아 오지 않기 때문이다. 에이전트는 자기가 열려 있는
+저장소만 본다.
+
+그래서 계정 지침에 **"회사 양식 요청을 받으면 이 저장소를 가져와라"** 한 문단을 심는다.
+그때부터 GitHub 권한이 실제로 쓰이고, 다른 프로젝트에서 시작한 세션도 이 규격을 따른다.
+지침에는 경로만 들어가고 색값·덱 목록은 들어가지 않으므로 판올림해도 손댈 일이 없다.
+
+붙여넣을 문단과 확인 방법은 **[`docs/AGENT_WIRING.md`](docs/AGENT_WIRING.md)** 에 있다.
+Codex 처럼 전역 지침 파일을 쓰는 도구는 설치기로 심을 수 있다.
+
+```bash
+python3 scripts/install_codex_pointer.py --check     # 상태만 본다
+python3 scripts/install_codex_pointer.py             # 설치 또는 갱신
+```
 
 
 ### 1. Claude Code — 플러그인 (권장)
@@ -119,6 +138,28 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 전부 `.claude/skills/blue-report/assets/` 에 있다.
 
 ---
+
+## 라이브 덱 1종
+
+고정 지면이 없는 발표 계통이다. 한 장이 `100dvh` 이고 루트 글자 크기가 뷰포트를 따라간다.
+
+```css
+html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
+```
+
+`1.78vh` 가 16:9 다(100 / 56.25). 가로·세로 중 빡빡한 쪽을 따르므로 어느 창에서도 잘리지 않고,
+배율 계산이 이 한 줄로 끝난다. 넘김은 브라우저의 `scroll-snap` 이 하므로 **JS 없이 열어도
+세로로 스크롤하면 전부 읽힌다.** 축 하나만 바꾸면 가로 발표 모드다.
+
+| 파일 | `--deck` 이름 | 용도 |
+|---|---|---|
+| `live-brief.html` | `live` | 라이브 브리핑 — 세로 검토 · 가로 발표 (견본) |
+
+글자 하한이 **본문 1.0rem · 주석 0.78rem** 이다(슬라이드 24px). 한 장에 훨씬 많이 담는 대신
+발표 거리가 아니라 화면 거리에서 읽히는 것을 택한 계통이다. `check_live.py` 가 10항목을 판정한다.
+
+치수는 `rem` 으로만 적는다. `px` 를 섞으면 그 값만 창 크기와 무관하게 고정돼 작은 창에서
+그 요소만 커진다 — 검사기가 막는다.
 
 ## 웹 보드 5종
 
@@ -227,7 +268,7 @@ python3 scripts/verify_repo.py            # 전부
 python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 77장도 남긴다
 ```
 
-덱 12종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로, 웹 보드 5종을
+덱 12종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로, 라이브 덱을 `check_live.py` 로, 웹 보드 5종을
 `check_board.py` 로 판정하고, PPTX 11종 생성과 무결성 · `dist/` 재생성 대조 ·
 한국어 인코딩 · 배포 매니페스트 · 내용 동기화 · 버전 올림을 함께 본다.
 실패가 있으면 종료 코드가 1 이다.
@@ -288,6 +329,8 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   assets/doc-*.html · doc-viewer.*       A4 문서 4종과 그 뷰어
   assets/blue-web.css                    웹 보드 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/board-*.html                    웹 보드 5종
+  assets/blue-live.css                   라이브 계통 파운데이션 — 토큰은 위 파일 것을 쓴다
+  assets/live-*.html · live-viewer.js    라이브 덱과 그 뷰어
   scripts/check_deck.py                  슬라이드 17항목 자동 점검
   scripts/check_doc.py                   A4 문서 9항목 자동 점검
   scripts/check_board.py                 웹 보드 11항목 자동 점검
@@ -298,11 +341,14 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   scripts/ensure_deps.py                 의존성 자동 확보
   pptx/                                  PowerPoint 생성기
 brand/hct/                               회사 정보와 로고
+AGENTS.md                                저장소를 연 에이전트가 자동으로 읽는 지침
 docs/CODEX_DECK_PROMPT.md                Codex 등 외부 에이전트용 작업 지시서
+docs/AGENT_WIRING.md                     다른 곳에서 시작한 에이전트를 이 저장소에 붙이는 법
 scripts/verify_repo.py                   저장소 전체 점검 — CI 가 이것을 돌린다
 scripts/check_content_sync.py            HTML 덱과 PPTX 내용 갈라짐 검사
 CHANGELOG.md                             판올림 기록. 스킬을 고치면 여기에 적는다
 scripts/install_blue_report_skill.py     오프라인 복사 설치기
+scripts/install_codex_pointer.py         전역 지침에 이 저장소를 가리키는 문단을 심는다
 .github/workflows/verify.yml             push·PR 자동 점검
 ```
 

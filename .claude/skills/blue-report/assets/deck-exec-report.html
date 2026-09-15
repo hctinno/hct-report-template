@@ -57,17 +57,17 @@
     <!-- 다크 요약장 — 근거가 셋이라 3열로 연다(기본은 2열).
          짙은 지면에 짙은 카드를 얹지 않는다. 상단 괘선으로 구획한다. -->
     <div class="br-sumgrid" style="grid-template-columns:repeat(3,1fr);gap:var(--br-gap-card) 48px;margin:auto 0">
-      <div class="br-sumcard">
+      <div class="br-sumcard" data-f="1">
         <span class="br-sumcard-n">01</span>
         <div class="br-sumcard-t">연간 목표 대비 절감액<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">목표 4.2억 · 실적 5.4억</span></div>
         <span class="br-sumcard-v">128<span class="br-sup">%</span></span>
       </div>
-      <div class="br-sumcard">
+      <div class="br-sumcard" data-f="2">
         <span class="br-sumcard-n">02</span>
         <div class="br-sumcard-t">업무 처리 시간 단축<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">시험 의뢰 접수 기준</span></div>
         <span class="br-sumcard-v">31<span class="br-sup">%</span></span>
       </div>
-      <div class="br-sumcard">
+      <div class="br-sumcard" data-f="3">
         <span class="br-sumcard-n">03</span>
         <div class="br-sumcard-t">성과 측정 불가 부문<span style="display:block;font:400 var(--br-fs-foot)/1.6 var(--br-font-kr);color:var(--br-on-dark-2);margin-top:12px">품질본부 — 기준 데이터 부재</span></div>
         <span class="br-sumcard-v br-sumcard-v--warn">1<span class="br-sup">개</span></span>
@@ -106,8 +106,8 @@
       <div class="br-bar-val">92<span class="br-sup">%</span></div>
     </div>
 
-    <p class="br-lede" style="margin-top:34px">측정 가능한 3개 부문 — 2개 목표 초과 · 경영지원 <span class="br-key">92%</span> 근접</p>
-    <div class="br-callout" style="margin-top:auto;max-width:1400px">
+    <p class="br-lede" data-f="1" style="margin-top:34px">측정 가능한 3개 부문 — 2개 목표 초과 · 경영지원 <span class="br-key">92%</span> 근접</p>
+    <div class="br-callout" data-f="2" style="margin-top:auto;max-width:1400px">
       품질본부는 막대에 없음 — 도입 전 처리 시간 기록이 없어 비교 기준 부재.
       값이 0 이 아니라 <strong>측정 자체가 불가</strong> — 9월부터 3개월 기준선 수집 후 재측정
     </div>
@@ -252,9 +252,11 @@
   <button id="next">다음 ▶</button>
   <button id="present">발표 F</button>
   <button id="notes-btn">노트 N</button>
+  <button id="script-btn">대본 S</button>
   <button id="all">목록</button>
 </div>
 <div id="notes" hidden><b>발표자 노트</b><span id="notes-text"></span></div>
+<div id="jump" hidden aria-hidden="true"></div>
 
 <script src="deck-viewer.js"></script>
 </body>
