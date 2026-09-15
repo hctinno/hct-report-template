@@ -139,6 +139,28 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 
 ---
 
+## 라이브 덱 1종
+
+고정 지면이 없는 발표 계통이다. 한 장이 `100dvh` 이고 루트 글자 크기가 뷰포트를 따라간다.
+
+```css
+html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
+```
+
+`1.78vh` 가 16:9 다(100 / 56.25). 가로·세로 중 빡빡한 쪽을 따르므로 어느 창에서도 잘리지 않고,
+배율 계산이 이 한 줄로 끝난다. 넘김은 브라우저의 `scroll-snap` 이 하므로 **JS 없이 열어도
+세로로 스크롤하면 전부 읽힌다.** 축 하나만 바꾸면 가로 발표 모드다.
+
+| 파일 | `--deck` 이름 | 용도 |
+|---|---|---|
+| `live-brief.html` | `live` | 라이브 브리핑 — 세로 검토 · 가로 발표 (견본) |
+
+글자 하한이 **본문 1.0rem · 주석 0.78rem** 이다(슬라이드 24px). 한 장에 훨씬 많이 담는 대신
+발표 거리가 아니라 화면 거리에서 읽히는 것을 택한 계통이다. `check_live.py` 가 10항목을 판정한다.
+
+치수는 `rem` 으로만 적는다. `px` 를 섞으면 그 값만 창 크기와 무관하게 고정돼 작은 창에서
+그 요소만 커진다 — 검사기가 막는다.
+
 ## 웹 보드 5종
 
 슬라이드도 A4 도 아닌 제3의 계통이다. 지면 크기가 없고 화면 폭에 따라 흐르며,
@@ -246,7 +268,7 @@ python3 scripts/verify_repo.py            # 전부
 python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 77장도 남긴다
 ```
 
-덱 12종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로, 웹 보드 5종을
+덱 12종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로, 라이브 덱을 `check_live.py` 로, 웹 보드 5종을
 `check_board.py` 로 판정하고, PPTX 11종 생성과 무결성 · `dist/` 재생성 대조 ·
 한국어 인코딩 · 배포 매니페스트 · 내용 동기화 · 버전 올림을 함께 본다.
 실패가 있으면 종료 코드가 1 이다.
@@ -307,6 +329,8 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   assets/doc-*.html · doc-viewer.*       A4 문서 4종과 그 뷰어
   assets/blue-web.css                    웹 보드 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/board-*.html                    웹 보드 5종
+  assets/blue-live.css                   라이브 계통 파운데이션 — 토큰은 위 파일 것을 쓴다
+  assets/live-*.html · live-viewer.js    라이브 덱과 그 뷰어
   scripts/check_deck.py                  슬라이드 17항목 자동 점검
   scripts/check_doc.py                   A4 문서 9항목 자동 점검
   scripts/check_board.py                 웹 보드 11항목 자동 점검

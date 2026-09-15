@@ -108,6 +108,14 @@ def build(artifact=False, brand_path=None, deck="catalog", out_path=None):
             f"        보드에는 뷰어가 없어 제목 표식과 html,body 배경이 둘 다 없다.\n"
             f"        한 파일로 묶으려면 apply_brand.py 를 쓴다 —\n"
             f"        python3 apply_brand.py --brand <brand.json> --deck {deck} --single-file -o 보드.html")
+    # 라이브 덱도 마찬가지다. 자기 뷰어(live-viewer.js)가 따로 있고 지면이 .br-frame 이
+    # 아니라 .bl-sl 이라 여기서 기대하는 구조가 하나도 맞지 않는다.
+    if base.startswith("live-"):
+        raise SystemExit(
+            f"라이브 덱은 이 스크립트가 묶지 않는다: {deck}\n"
+            f"        라이브 계통은 지면이 .bl-sl 이고 뷰어가 live-viewer.js 로 따로 있다.\n"
+            f"        한 파일로 묶으려면 apply_brand.py 를 쓴다 —\n"
+            f"        python3 apply_brand.py --brand <brand.json> --deck {deck} --single-file -o 라이브.html")
     is_doc = base.startswith("doc-")
     html = open(deck_path, encoding="utf-8").read()
     if brand_path:

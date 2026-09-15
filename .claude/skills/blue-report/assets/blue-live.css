@@ -1,0 +1,335 @@
+/* ============================================================================
+   블루 리포트 라이브판 — 화면에서 넘겨 보는 고밀도 발표용 파운데이션
+
+   색·폰트 토큰은 blue-report.css 를 그대로 쓴다. 이 파일은 색을 선언하지 않는다.
+   두 파일을 함께 불러야 한다.
+
+     <link rel="stylesheet" href="blue-report.css">
+     <link rel="stylesheet" href="blue-live.css">
+
+   blue-doc.css · blue-web.css 와 같은 방식이다 — 규격 토큰을 덮어쓰지 않고
+   자기 이름공간(--bl-*)을 :root 에 새로 선언한다.
+
+   슬라이드(1920x1080)와 무엇이 다른가
+     슬라이드 계통은 1920x1080 지면을 그려 두고 뷰어가 transform:scale 로 줄인다.
+     확실하지만 두 가지가 따라온다 — 지면 밖을 못 쓰고, 배율을 JS 가 계산한다.
+
+     라이브 계통은 지면을 그리지 않는다. 한 장이 100dvh 이고, 루트 글자 크기가
+     뷰포트를 따라 움직이며, 안의 모든 치수가 rem 이다. 배율 계산이 CSS 한 줄로
+     끝나고 JS 가 없어도 비율이 맞는다.
+
+       html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
+
+     1.78vh 가 16:9 다(100 / 56.25 = 1.778). 가로·세로 중 빡빡한 쪽을 따르므로
+     어느 창에서도 지면이 잘리지 않는다. 위아래 한계는 너무 작아 못 읽거나
+     너무 커져 우스워지는 것을 막는다.
+
+   왜 html 의 font-size 를 건드려도 되는가
+     --br-fs-* 는 전부 px 다. 라이브 장과 슬라이드 조각을 한 문서에 섞더라도
+     슬라이드 쪽 치수는 px 라 루트를 따라가지 않는다 — 조용히 커지거나 작아지는
+     사고가 구조적으로 없다. 다만 섞어 쓸 이유가 없으므로 섞지 않는다.
+
+   글자 하한
+     본문 1.0rem · 주석 0.78rem 이다. 16:9 기준(루트 19.2px)으로 19.2px · 15px 다.
+     슬라이드 24px 보다 낮다 — 그 대신 한 장에 훨씬 많이 담는다. 발표 거리에서
+     읽히는 대신 화면에서 읽히는 것을 택한 계통이므로 기준이 다르다.
+     check_live.py 가 rem 값으로 판정한다. px 를 직접 적으면 거기서 걸린다.
+   ========================================================================= */
+
+/* ── 배율 엔진 ────────────────────────────────────────────────────────────
+   이 한 줄이 이 계통의 전부다. 나머지는 전부 rem 으로 따라간다. */
+html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
+
+/* ── 라이브 타입 척도 ──────────────────────────────────────────────────────
+   슬라이드의 px 단계를 rem 으로 나눠 옮기지 않는다. 나누면 1920 에서만 맞고
+   다른 창에서 단계 간격이 무너진다. 필요한 위계를 처음부터 rem 으로 잡는다. */
+:root {
+  --bl-fs-cover: 3.4rem;   /* 표지 제목 — 한 덱에 하나 */
+  --bl-fs-div:   2.6rem;   /* 간지 제목 */
+  --bl-fs-title: 1.9rem;   /* 장 제목 */
+  --bl-fs-lede:  1.35rem;  /* 장 머리 한 문장 */
+  --bl-fs-h3:    1.2rem;   /* 카드 제목 · 표 머리행 */
+  --bl-fs-stat:  2.4rem;   /* 수치 */
+  --bl-fs-body:  1.08rem;  /* 본문 */
+  --bl-fs-min:   1.0rem;   /* 본문 하한. 이보다 작으면 주석으로 표기한다 */
+  --bl-fs-note:  0.86rem;  /* 주석·출처·각주 */
+  --bl-fs-eyebrow: 0.82rem;/* 머리 라벨 */
+  --bl-fs-floor: 0.78rem;  /* 절대 하한. 무엇도 이보다 작게 쓰지 않는다 */
+
+  /* 간격도 rem 이다. px 로 적으면 창이 작아질 때 간격만 그대로 남아 깨진다 */
+  --bl-sp-1: 0.4rem;
+  --bl-sp-2: 0.8rem;
+  --bl-sp-3: 1.4rem;
+  --bl-sp-4: 2.2rem;
+  --bl-sp-5: 3.4rem;
+
+  --bl-pad:  3.2rem;       /* 장 안쪽 여백 */
+  --bl-rail: 4.2rem;       /* 왼쪽 여백 띠 — 그룹 표시가 앉는 자리 */
+}
+
+/* ── 덱 · 장 ──────────────────────────────────────────────────────────────
+   기본은 세로 스크롤(검토)이다. .bl-deck--present 가 가로 스냅(발표)으로 바꾼다.
+   축 하나만 바꾸면 되도록 짜 둔다 — 두 벌을 따로 만들면 반드시 갈라진다. */
+.bl-deck {
+  height: 100vh; height: 100dvh;
+  overflow-y: auto; overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  display: flex; flex-direction: column;
+  background: var(--br-page);
+  color: var(--br-text);
+  font-family: var(--br-font-kr);
+  font-size: var(--bl-fs-body);
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.bl-deck::-webkit-scrollbar { width: 0; height: 0 }
+
+.bl-deck--present {
+  flex-direction: row;
+  overflow-y: hidden; overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.bl-sl {
+  flex: 0 0 100vh; flex-basis: 100dvh;
+  width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  padding: var(--bl-pad) var(--bl-pad) var(--bl-sp-3) var(--bl-rail);
+  background: var(--br-page);
+}
+.bl-deck--present .bl-sl { flex: 0 0 100%; height: 100dvh }
+
+/* 어두운 면 — 표지·간지·마무리. 밝은 면과 잉크가 통째로 바뀐다 */
+.bl-sl--dark { background: var(--br-cover); color: var(--br-on-dark) }
+.bl-sl--dark .bl-lede,
+.bl-sl--dark .bl-note { color: var(--br-on-dark-2) }
+
+/* 간지 — 그룹 머리. 제목 하나만 크게 두고 나머지를 비운다 */
+.bl-sl--div { justify-content: center }
+.bl-sl--div .bl-title { font-size: var(--bl-fs-div) }
+
+/* ── 장 머리 · 꼬리 ──────────────────────────────────────────────────────── */
+.bl-hd { flex: 0 0 auto; margin-bottom: var(--bl-sp-3) }
+.bl-eyebrow {
+  margin: 0 0 var(--bl-sp-1);
+  font: 600 var(--bl-fs-eyebrow)/1.2 var(--br-font-num);
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--br-mark);
+}
+.bl-sl--dark .bl-eyebrow { color: var(--br-accent-on-dark) }
+.bl-title {
+  margin: 0;
+  font: 700 var(--bl-fs-title)/1.25 var(--br-font-kr);
+  letter-spacing: -.01em;
+}
+.bl-sl--cover .bl-title { font-size: var(--bl-fs-cover) }
+.bl-lede {
+  margin: var(--bl-sp-2) 0 0;
+  max-width: 76ch;
+  font: 400 var(--bl-fs-lede)/1.5 var(--br-font-kr);
+  color: var(--br-text-2);
+}
+
+/* 본문은 남는 자리를 전부 먹는다. 아래 꼬리가 바닥에 붙는다 */
+.bl-bd { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
+         gap: var(--bl-sp-3) }
+
+.bl-rf {
+  flex: 0 0 auto;
+  margin-top: var(--bl-sp-3);
+  padding-top: var(--bl-sp-2);
+  border-top: 1px solid var(--br-hairline);
+  display: flex; justify-content: space-between; align-items: baseline;
+  font: 400 var(--bl-fs-note)/1.4 var(--br-font-kr);
+  color: var(--br-text-3);
+}
+.bl-sl--dark .bl-rf { border-top-color: var(--br-dark-line); color: var(--br-on-dark-2) }
+.bl-pg { font-family: var(--br-font-num); font-variant-numeric: tabular-nums }
+
+/* 브랜드 마크 — 슬라이드 계통과 같은 계약이다. 우측 상단 여백 띠.
+   본문이 이 자리를 침범하지 않도록 장 안쪽 여백이 이미 비워 두고 있다. */
+.bl-sl .br-mark { position: absolute; top: var(--bl-sp-3); right: var(--bl-sp-3);
+                  height: 2.1rem; z-index: 2 }
+
+/* 왼쪽 여백 띠의 그룹 표시 — 세로로 세운 작은 라벨 */
+.bl-grp {
+  position: absolute; left: var(--bl-sp-2); top: 50%;
+  transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl;
+  font: 600 var(--bl-fs-floor)/1 var(--br-font-num);
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--br-text-3);
+}
+.bl-sl--dark .bl-grp { color: var(--br-on-dark-2) }
+
+/* ── 배치 ────────────────────────────────────────────────────────────────── */
+.bl-cols { display: grid; gap: var(--bl-sp-3); grid-template-columns: repeat(2, 1fr) }
+.bl-cols--3 { grid-template-columns: repeat(3, 1fr) }
+.bl-cols--4 { grid-template-columns: repeat(4, 1fr) }
+.bl-cols--sidebar { grid-template-columns: 1fr 1.9fr }
+.bl-rows { display: flex; flex-direction: column; gap: var(--bl-sp-2) }
+
+/* ── 카드 ────────────────────────────────────────────────────────────────── */
+.bl-card {
+  padding: var(--bl-sp-3);
+  background: var(--br-card);
+  border: 1px solid var(--br-hairline);
+  border-radius: .3rem;
+  display: flex; flex-direction: column; gap: var(--bl-sp-1);
+  min-width: 0;
+}
+.bl-card h3 { margin: 0; font: 700 var(--bl-fs-h3)/1.35 var(--br-font-kr) }
+.bl-card p  { margin: 0; color: var(--br-text-2) }
+.bl-sl--dark .bl-card { background: transparent; border-color: var(--br-dark-line) }
+.bl-sl--dark .bl-card p { color: var(--br-on-dark-2) }
+
+/* 강조 카드 — 왼쪽 굵은 선 하나로 구분한다. 짙은 면에 짙은 카드를 얹지 않는다 */
+.bl-card--key { border-left: .22rem solid var(--br-mark) }
+.bl-card--ok   { border-left: .22rem solid var(--br-ok-text) }
+.bl-card--risk { border-left: .22rem solid var(--br-alert-text) }
+
+/* ── 수치 ────────────────────────────────────────────────────────────────── */
+.bl-stat { display: flex; flex-direction: column; gap: var(--bl-sp-1); min-width: 0 }
+.bl-stat-v {
+  font: 700 var(--bl-fs-stat)/1 var(--br-font-num);
+  font-variant-numeric: tabular-nums;
+  color: var(--br-mark);
+}
+.bl-sl--dark .bl-stat-v { color: var(--br-accent-on-dark) }
+.bl-stat-v sup { font-size: .46em; font-weight: 600; margin-left: .1em; top: -.5em }
+.bl-stat-t { font-size: var(--bl-fs-note); color: var(--br-text-3) }
+.bl-sl--dark .bl-stat-t { color: var(--br-on-dark-2) }
+
+/* ── 표 ──────────────────────────────────────────────────────────────────
+   머리행을 고정하려면 감싸는 상자에 overflow 를 주지 않는다. overflow-x:auto 는
+   overflow-y 를 auto 로 계산해 스크롤 상자가 되고, 그 안의 sticky 가 죽는다.
+   보드 계통에서 실제로 겪은 함정이라 같은 규칙을 여기에도 적어 둔다. */
+.bl-tbl { width: 100%; border-collapse: collapse; font-size: var(--bl-fs-body) }
+.bl-tbl th, .bl-tbl td {
+  padding: var(--bl-sp-1) var(--bl-sp-2);
+  border-bottom: 1px solid var(--br-hairline);
+  text-align: left; vertical-align: top;
+}
+.bl-tbl th {
+  font: 700 var(--bl-fs-h3)/1.3 var(--br-font-kr);
+  border-bottom-color: var(--br-text-3);
+  white-space: nowrap;
+}
+.bl-tbl td.num, .bl-tbl th.num {
+  text-align: right; font-family: var(--br-font-num);
+  font-variant-numeric: tabular-nums;
+}
+.bl-sl--dark .bl-tbl th, .bl-sl--dark .bl-tbl td { border-bottom-color: var(--br-dark-line) }
+
+/* ── 막대 ────────────────────────────────────────────────────────────────
+   채널(--br-track) 위에 얹히므로 지면 대비가 아니라 **채널 대비**로 색을 고른다.
+   --br-chan-* 가 그 목적으로 잡아 둔 램프다. --br-bar-* 를 쓰면 밝은 쪽이
+   채널 안에서 2:1 아래로 떨어진다. */
+.bl-bars { display: flex; flex-direction: column; gap: var(--bl-sp-2) }
+.bl-bar-row { display: grid; grid-template-columns: 12rem 1fr 5rem; gap: var(--bl-sp-2);
+              align-items: center }
+.bl-bar-name { font-size: var(--bl-fs-body); min-width: 0 }
+.bl-bar-track { height: .9rem; background: var(--br-track); border-radius: .1rem; overflow: hidden }
+.bl-bar { height: 100%; background: var(--br-chan-1); border-radius: .1rem }
+.bl-bar-val { font: 700 var(--bl-fs-body)/1 var(--br-font-num);
+              font-variant-numeric: tabular-nums; text-align: right }
+
+/* ── 칩 · 상태 ───────────────────────────────────────────────────────────
+   색만으로 상태를 말하지 않는다. 글자가 반드시 함께 온다. */
+.bl-chip {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .16rem .55rem; border-radius: 1rem;
+  border: 1px solid var(--br-hairline);
+  font: 600 var(--bl-fs-note)/1.4 var(--br-font-kr);
+  color: var(--br-text-2); white-space: nowrap;
+}
+.bl-chip--ok   { color: var(--br-ok-text);    border-color: currentColor }
+.bl-chip--risk { color: var(--br-alert-text); border-color: currentColor;
+                 background: var(--br-alert-bg) }
+.bl-chip--wait { color: var(--br-text-3); border-style: dashed }
+
+/* ── 콜아웃 ──────────────────────────────────────────────────────────────── */
+.bl-callout {
+  padding: var(--bl-sp-2) var(--bl-sp-3);
+  border-left: .22rem solid var(--br-mark);
+  background: var(--br-tint);
+  font-size: var(--bl-fs-body);
+}
+.bl-sl--dark .bl-callout { background: transparent; border-left-color: var(--br-accent-on-dark) }
+
+/* ── 목록 ────────────────────────────────────────────────────────────────── */
+.bl-ul, .bl-ol { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column;
+                 gap: var(--bl-sp-1) }
+.bl-ul li, .bl-ol li { font-size: var(--bl-fs-body) }
+
+/* ── 주석 · 출처 ─────────────────────────────────────────────────────────── */
+.bl-note { font-size: var(--bl-fs-note); color: var(--br-text-3); margin: 0 }
+.bl-src  { font: 400 var(--bl-fs-floor)/1.4 var(--br-font-num); color: var(--br-text-3) }
+
+/* ── 단계 전개 ───────────────────────────────────────────────────────────
+   덱 계통과 **같은 규약**이다 — data-f="1" 부터 차례로. 규약을 계통마다 다르게
+   두면 쓰는 사람이 매번 확인해야 한다.
+   숨기는 일은 .bl-deck--staged 가 붙었을 때만 한다. 기본으로 숨기면 JS 없이
+   열었을 때 본문이 빈 화면이 된다. */
+.bl-deck--staged [data-f] { opacity: 0 }
+.bl-deck--staged [data-f].is-shown { opacity: 1 }
+@media (prefers-reduced-motion: no-preference) {
+  .bl-deck--staged [data-f] { transform: translateY(.3rem);
+        transition: opacity .28s ease, transform .28s ease }
+  .bl-deck--staged [data-f].is-shown { transform: none }
+}
+
+/* ── 조작판 ──────────────────────────────────────────────────────────────
+   덱 계통의 #hud 와 달리 화면 위에 떠 있는 작은 알약이다. 이 계통은 스크롤로도
+   넘어가므로 큰 띠를 상시로 둘 이유가 없다. 발표 모드에서는 숨는다. */
+.bl-hud {
+  position: fixed; right: 1rem; bottom: 1rem; z-index: 20;
+  display: flex; gap: .5rem; align-items: center;
+  padding: .4rem .6rem; border-radius: 1.4rem;
+  background: rgba(12,18,30,.82); backdrop-filter: blur(6px);
+}
+.bl-hud button {
+  background: none; border: 1px solid #48566b; color: #cfd8e3;
+  border-radius: 1rem; padding: .25rem .7rem; cursor: pointer;
+  font: 600 var(--bl-fs-floor)/1.3 var(--br-font-kr); white-space: nowrap;
+}
+.bl-hud button:hover { border-color: #8fa4bd; color: #fff }
+body.present .bl-hud { display: none }
+
+#bl-jump {
+  position: fixed; right: 1rem; bottom: 4rem; z-index: 21;
+  padding: .4rem .9rem; border-radius: .3rem;
+  background: rgba(12,18,30,.92); border: 1px solid var(--br-mark); color: #fff;
+  font: 700 1.2rem/1 var(--br-font-num); letter-spacing: .12em;
+}
+#bl-jump[hidden] { display: none }
+
+/* ── 좁은 화면 ───────────────────────────────────────────────────────────
+   루트 글자 크기가 이미 줄어들지만, 열 배치는 별도로 접어야 한다.
+   글자만 작아지고 4열이 그대로면 한 칸에 두 글자씩 들어간다. */
+@media (max-width: 1400px) {
+  .bl-cols--4 { grid-template-columns: repeat(2, 1fr) }
+  .bl-bar-row { grid-template-columns: 9rem 1fr 4rem }
+}
+@media (max-width: 900px) {
+  .bl-sl { padding: var(--bl-sp-3) var(--bl-sp-3) var(--bl-sp-2) var(--bl-sp-3) }
+  .bl-cols, .bl-cols--3, .bl-cols--4, .bl-cols--sidebar { grid-template-columns: 1fr }
+  .bl-grp { display: none }
+}
+
+/* ── 인쇄 ────────────────────────────────────────────────────────────────
+   한 장이 한 쪽이다. 스냅과 스크롤을 풀고 높이를 쪽에 맞춘다.
+   단계는 전부 펼친다 — 접힌 채로 인쇄하면 내용이 빠진 종이가 나온다. */
+@media print {
+  @page { size: 297mm 167mm; margin: 0 }
+  html { font-size: 11px }
+  .bl-deck { height: auto; overflow: visible; display: block }
+  .bl-sl { height: auto; min-height: 0; break-after: page; page-break-after: always }
+  .bl-sl:last-child { break-after: auto; page-break-after: auto }
+  [data-f] { opacity: 1 !important; transform: none !important }
+}
