@@ -73,7 +73,10 @@ DIST_BUILDS = [
 # 인코딩이 깨졌을 때 나오는 대표 글자. 스크립트 자신이 걸리지 않도록 코드포인트로 적는다.
 MOJIBAKE = ["濡", "湲", "遺", "媛", "李", "???"]
 # 이 패턴을 규칙 문장으로 인용하는 문서. 검사에서 제외한다.
-MOJIBAKE_EXEMPT = {"CLAUDE.md", "AGENTS.md", os.path.join("scripts", "verify_repo.py")}
+# 깨짐 패턴 목록 자체를 본문에 적은 파일들. 규칙을 설명하려면 그 문자를 써야 한다.
+MOJIBAKE_EXEMPT = {"CLAUDE.md", "AGENTS.md",
+                   os.path.join("scripts", "verify_repo.py"),
+                   os.path.join("public", "overlay", "CLAUDE.md")}
 SCAN_EXT = {".md", ".html", ".js", ".py", ".json", ".css", ".yml", ".yaml"}
 
 RESULT_RE = re.compile(r"결과: 통과 (\d+) · 주의 (\d+) · 실패 (\d+)")

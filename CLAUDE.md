@@ -12,6 +12,8 @@
 3. `.claude/skills/blue-report/README.md` 를 전부 읽는다. 이것이 규격서다.
 4. 압축본이 필요하면 `.claude/skills/blue-report/references/rules.md` 를 본다.
 5. Claude Code 가 아닌 에이전트에게 시킬 때는 `docs/CODEX_DECK_PROMPT.md` 를 지목한다.
+6. 공개본(`hctinno/blue-report`)을 갱신하려면 `public/README.md` 를 본다.
+   손으로 옮기지 않는다 — `scripts/build_public_release.py` 가 한다.
 
 ## 작업 방식
 
@@ -28,6 +30,8 @@
 - 템플릿·스크립트·문서를 고쳤으면 `python3 scripts/verify_repo.py` 를 돌린다. CI 가 push·PR 마다 같은 것을 돌리므로 여기서 통과하지 않으면 CI 도 빨간불이다.
 - `assets/` 를 고쳤으면 `dist/` 를 다시 만들어 함께 커밋한다. `build_single_file.py` 를 세 번 돌린다 — 인자 없이 한 번, `--artifact --brand brand/hct/brand.json` 으로 한 번, 거기에 `--deck minutes` 를 더해 한 번(A4 문서)이다.
 - 자동 점검이 못 잡는 여백과 균형은 `--shots` 로 남긴 PNG 를 눈으로 확인한다.
+- 공개본에 나갈 판올림이면 `public/VERSION` 과 `public/overlay/CHANGELOG.md` 를 함께 올린다.
+  `python3 scripts/build_public_release.py --out /tmp/pub` 로 확인한 뒤 `--commit --push` 한다.
 
 ## 어길 수 없는 규칙
 
@@ -51,6 +55,8 @@
 - 키, 토큰, 비밀번호, 쿠키를 저장소에 기록하거나 출력하지 않는다.
 - 삭제, 덮어쓰기, 강제 푸시 전 정확한 대상과 복구 방법을 확인한다.
 - 사용자가 요청하지 않은 커밋·푸시·브랜치 삭제는 하지 않는다.
+- **공개본 push 는 되돌릴 수 없다.** `build_public_release.py` 의 유출 검사가 실패하면
+  원인을 없애기 전에는 `--push` 를 쓰지 않는다. 검사를 끄는 선택지는 두지 않았다.
 
 ## 한국어 인코딩
 
