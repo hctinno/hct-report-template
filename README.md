@@ -366,6 +366,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   scripts/ensure_deps.py                 의존성 자동 확보
   pptx/                                  PowerPoint 생성기
 brand/hct/                               회사 정보와 로고
+public/                                  공개본 빌드 재료 — public/README.md 참고
 AGENTS.md                                저장소를 연 에이전트가 자동으로 읽는 지침
 docs/CODEX_DECK_PROMPT.md                Codex 등 외부 에이전트용 작업 지시서
 docs/AGENT_WIRING.md                     다른 곳에서 시작한 에이전트를 이 저장소에 붙이는 법
@@ -374,6 +375,7 @@ scripts/check_content_sync.py            HTML 덱과 PPTX 내용 갈라짐 검�
 CHANGELOG.md                             판올림 기록. 스킬을 고치면 여기에 적는다
 scripts/install_blue_report_skill.py     오프라인 복사 설치기
 scripts/install_codex_pointer.py         전역 지침에 이 저장소를 가리키는 문단을 심는다
+scripts/build_public_release.py          공개본 hctinno/blue-report 를 만든다
 .github/workflows/verify.yml             push·PR 자동 점검
 ```
 
