@@ -71,9 +71,60 @@ brand/hct/brand.json
 
 ### 2. 덱 고르기 — 새로 만들지 말고 골라서 내용만 바꾼다
 
+**그냥 「보고서」·「발표자료」를 만들라는 지시라면 답은 기준 덱 `standard` 다.**
+`assets/live-standard.html` 을 복사해 내용만 바꾼다. 회사 발표 덱의 표준 모양이
+그 파일에 다 들어 있다 — 머리띠, 꼬리띠, 로고, 워터마크, 진행선, 제목 형광 밴드.
+다른 계통은 용도가 분명할 때만 고른다(1920x1080 고정 지면이 필요하다, PPTX 로 내보내야
+한다, 인쇄용 A4 다, 화면에서 상태를 바꾸는 보드다).
+
 `.claude/skills/blue-report/assets/` 에 완성된 덱이 11종, 레이아웃 카탈로그 1종,
-A4 세로 문서가 4종, 웹 보드가 5종 있다. 용도에 맞는 것을 복사해
+A4 세로 문서가 4종, 웹 보드가 5종, 기준·라이브 덱이 2종 있다. 용도에 맞는 것을 복사해
 **내용만** 교체한다. 레이아웃과 스타일을 새로 설계하지 않는다.
+
+#### 기준 덱 · 라이브 덱 2종 — 고정 지면이 없는 계통
+
+| 파일 | `--deck` 이름 | 용도 | 장수 |
+|---|---|---|---|
+| `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 12 |
+| `live-brief.html` | `live` | 라이브 브리핑 (짧은 브리핑 견본) | 8 |
+
+한 장이 `100dvh` 이고 루트 글자 크기가 `clamp(10.5px, min(1vw, 1.78vh), 20px)` 로 창을
+따라간다. 안의 치수는 **전부 `rem`** 이다. `px` 를 적으면 그 값만 창과 무관하게 굳어
+작은 창에서 그 요소만 커진다 — `check_live.py` 가 막는다.
+
+복사할 때 다음 4개를 같은 폴더에 함께 둔다.
+
+```
+assets/blue-report.css      색·폰트 토큰
+assets/blue-live.css        배율·띠·부품
+assets/live-viewer.js       뷰어
+assets/fonts/               폰트 서브셋
+```
+
+**지면 크롬은 장식이 아니라 필수다.** 장마다 전부 있어야 하고, 하나라도 빠지면
+`check_live.py` 가 실패로 잡는다.
+
+| 부품 | 마크업 | 담는 것 |
+|---|---|---|
+| 머리띠 | `<header class="bl-hd">` | `<span class="bl-code"><b>01</b>절이름</span>` + `.bl-sp` + `.br-mark` |
+| 꼬리띠 | `<footer class="bl-rf">` | `.bl-rf-name`(문서명) + `.bl-pg`(쪽번호) |
+| 워터마크 | `<div class="br-watermark" data-on="…">` | 우하단에 옅게 깔리는 로고타입 |
+| 진행선 | `<div id="bl-prog">` | 덱에 하나 · `<main>` 앞 |
+
+`.br-mark` 와 `.br-watermark` 안의 자리표시자 마크업은 **손대지 않는다.**
+4절의 `apply_brand.py` 가 `brand.json` 의 로고로 채운다.
+
+`data-on` 이 지면과 **반대**인 점을 놓치기 쉽다. `data-on` 은 「이 마크가 어떤 배경 위에
+앉는가」인데, 머리띠 마크가 앉는 곳은 지면이 아니라 띠이고 띠 색은 지면과 반대다.
+
+| 지면 | 띠 색 | 머리띠 마크 | 워터마크 |
+|---|---|---|---|
+| 밝은 장 (기본) | 짙음 | `data-on="dark"` | `data-on="light"` |
+| 어두운 장 `bl-sl--dark` | 흼 | `data-on="light"` | `data-on="dark"` |
+
+제목의 핵심구는 `<em>` 으로 감싼다. 형광 밴드가 거기에만 걸린다.
+
+#### 슬라이드 덱 12종 — 1920x1080 고정 지면
 
 | 파일 | `--deck` 이름 | 용도 | 장수 |
 |---|---|---|---|
@@ -144,6 +195,10 @@ assets/deck-viewer.js
   그 자리(상단 여백 띠)에 본문 콘텐츠를 붙이지 않는다.
 - **예시 수치·부서명·문구는 자리표시자가 아니라 사용법 견본이다.** 실제 내용으로 바꾼다.
   바꾸지 않고 남기면 남의 회사 숫자가 그대로 발표된다.
+- **기준·라이브 덱은 치수를 `rem` 으로만 적는다.** `px` 는 1px 테두리와 blur 반경만 예외다.
+- **기준·라이브 덱은 머리띠·꼬리띠·쪽번호·로고·워터마크를 장마다 단다.** 하나라도 빼면
+  `check_live.py` 가 실패로 잡는다. 이것이 「우리 양식으로 만들었다」와 실제로 회사 문서로
+  보이는 것의 차이다.
 
 ### 4. 브랜드 적용과 출력
 
@@ -186,10 +241,18 @@ python scripts/check_content_sync.py
 ### 5. 완료 조건
 
 ```bash
-python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
+# 계통마다 검사기가 다르다. 만든 것에 맞는 것을 돌린다.
+python .claude/skills/blue-report/scripts/check_deck.py  decks-out/deck.html   # 슬라이드 덱
+python .claude/skills/blue-report/scripts/check_live.py  decks-out/deck.html   # 기준·라이브 덱
+python .claude/skills/blue-report/scripts/check_doc.py   decks-out/doc.html    # A4 문서
+python .claude/skills/blue-report/scripts/check_board.py decks-out/board.html  # 웹 보드
 ```
 
-이 스크립트가 17항목을 기계로 판정한다.
+`check_deck.py` 가 17항목, `check_live.py` 가 16항목을 기계로 판정한다.
+`check_live.py` 의 16항목 중 여섯이 지면 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
+머리띠 브랜드 마크 · 워터마크 · 마크 배경 짝.
+
+check_deck.py 가 판정하는 것:
 
 문체 · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 ·
 최소 글자 크기 · 데이터 마크 대비 · 본문 겹침 · 브랜드 마크 존재 · 마크와 본문 겹침 ·

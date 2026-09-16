@@ -42,18 +42,24 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 
 /* ── 라이브 타입 척도 ──────────────────────────────────────────────────────
    슬라이드의 px 단계를 rem 으로 나눠 옮기지 않는다. 나누면 1920 에서만 맞고
-   다른 창에서 단계 간격이 무너진다. 필요한 위계를 처음부터 rem 으로 잡는다. */
+   다른 창에서 단계 간격이 무너진다. 필요한 위계를 처음부터 rem 으로 잡는다.
+
+   값의 출처는 사내 발표 덱 58장의 실측이다. 처음 이 계통을 낼 때 짐작으로
+   잡았던 척도(제목 1.9rem)는 실물의 절반을 조금 넘는 수준이었다 — 화면에
+   띄웠을 때 "글자가 작고 허전하다"로 읽히던 원인이다. 실측값으로 맞춘다. */
 :root {
-  --bl-fs-cover: 3.4rem;   /* 표지 제목 — 한 덱에 하나 */
-  --bl-fs-div:   2.6rem;   /* 간지 제목 */
-  --bl-fs-title: 1.9rem;   /* 장 제목 */
-  --bl-fs-lede:  1.35rem;  /* 장 머리 한 문장 */
-  --bl-fs-h3:    1.2rem;   /* 카드 제목 · 표 머리행 */
-  --bl-fs-stat:  2.4rem;   /* 수치 */
-  --bl-fs-body:  1.08rem;  /* 본문 */
+  --bl-fs-cover: 5.6rem;   /* 표지 제목 — 한 덱에 하나 */
+  --bl-fs-div:   3.9rem;   /* 간지 제목 */
+  --bl-fs-title: 3.3rem;   /* 장 제목 */
+  --bl-fs-tag:   2.1rem;   /* 장 제목 옆에 붙는 성격 표시(제안·확정 따위) */
+  --bl-fs-lede:  1.62rem;  /* 장 머리 한 문장 */
+  --bl-fs-stat:  2.8rem;   /* 수치 */
+  --bl-fs-h3:    1.34rem;  /* 카드 제목 · 표 머리행 */
+  --bl-fs-body:  1.22rem;  /* 본문 */
+  --bl-fs-rail:  1.2rem;   /* 머리띠·꼬리띠 글자 */
   --bl-fs-min:   1.0rem;   /* 본문 하한. 이보다 작으면 주석으로 표기한다 */
-  --bl-fs-note:  0.86rem;  /* 주석·출처·각주 */
-  --bl-fs-eyebrow: 0.82rem;/* 머리 라벨 */
+  --bl-fs-note:  0.98rem;  /* 주석·출처·각주 */
+  --bl-fs-eyebrow: 0.9rem; /* 머리 라벨 */
   --bl-fs-floor: 0.78rem;  /* 절대 하한. 무엇도 이보다 작게 쓰지 않는다 */
 
   /* 간격도 rem 이다. px 로 적으면 창이 작아질 때 간격만 그대로 남아 깨진다 */
@@ -63,8 +69,31 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
   --bl-sp-4: 2.2rem;
   --bl-sp-5: 3.4rem;
 
-  --bl-pad:  3.2rem;       /* 장 안쪽 여백 */
-  --bl-rail: 4.2rem;       /* 왼쪽 여백 띠 — 그룹 표시가 앉는 자리 */
+  --bl-pad:  3.2rem;       /* 장 좌우 여백 — 띠와 본문이 같은 선에 선다 */
+
+  /* ── 지면 띠 ──────────────────────────────────────────────────────────
+     머리띠·꼬리띠는 장마다 붙는 고정 부품이다. 색은 새로 만들지 않는다 —
+     실측한 사내 덱의 띠 색(#071b45)이 --br-cover 와 값까지 같았다.
+     밝은 장에서는 짙은 띠, 어두운 장에서는 흰 띠로 뒤집힌다. */
+  --bl-band:         var(--br-cover);
+  --bl-band-ink:     var(--br-on-dark);
+  --bl-band-sub:     var(--br-on-dark-2);
+  --bl-band-line:    var(--br-dark-line);
+  --bl-band-inv:     var(--br-card);
+  --bl-band-inv-ink: var(--br-navy);
+  --bl-band-inv-sub: var(--br-text-2);
+
+  --bl-hd-h: 9.8%;  --bl-hd-min: 4.4rem;   /* 머리띠 */
+  --bl-rf-h: 8.1%;  --bl-rf-min: 3.6rem;   /* 꼬리띠 */
+
+  /* ── 제목 형광 밴드 ───────────────────────────────────────────────────
+     제목의 핵심구에만 칠하는 띠다. 실측 원본은 #bcd4fb 인데, 우리 램프의
+     --br-soft-2(#9dc4f2)를 그대로 쓰면 원본보다 진해 제목 글자를 먹는다.
+     지면색과 섞어 원본 자리로 옮긴다. color-mix 를 못 쓰는 곳에서는 위
+     줄이 남아 조금 진한 채로 뜬다 — 색이 사라지지는 않는다. */
+  --bl-hi:  var(--br-soft-2);
+  --bl-hi:  color-mix(in srgb, var(--br-soft-2) 62%, var(--br-page));
+  --bl-hi2: var(--br-soft-1);
 }
 
 /* ── 덱 · 장 ──────────────────────────────────────────────────────────────
@@ -92,15 +121,24 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
   scroll-snap-type: x mandatory;
 }
 
+/* 지면에 좌우 여백을 주지 않는다. 여백은 머리띠·본문·꼬리띠가 각자 갖는다.
+   띠가 화면 양끝까지 닿아야 하기 때문이다.
+
+   원본 덱은 지면에 여백을 두고 띠의 ::before 를 left:-50vw; right:-50vw;
+   z-index:-1 로 뽑아 같은 모양을 냈다. 두 가지가 걸려 쓰지 않았다 —
+   음수 z-index 는 부모가 쌓임 맥락을 만드느냐에 따라 지면 배경 뒤로 숨고
+   (이 저장소가 .br-watermark 에서 이미 겪은 함정이다), vw 는 가로 발표
+   모드에서 창 기준이라 옆 장까지 번진다. 여백을 자식으로 내리면 둘 다 없다. */
 .bl-sl {
   flex: 0 0 100vh; flex-basis: 100dvh;
   width: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   position: relative;
+  isolation: isolate;          /* 워터마크의 z-index:-1 이 지면 배경 뒤로 안 내려가게 */
   display: flex; flex-direction: column;
   overflow: hidden;
-  padding: var(--bl-pad) var(--bl-pad) var(--bl-sp-3) var(--bl-rail);
+  padding: 0;
   background: var(--br-page);
 }
 .bl-deck--present .bl-sl { flex: 0 0 100%; height: 100dvh }
@@ -110,65 +148,165 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 .bl-sl--dark .bl-lede,
 .bl-sl--dark .bl-note { color: var(--br-on-dark-2) }
 
-/* 간지 — 그룹 머리. 제목 하나만 크게 두고 나머지를 비운다 */
-.bl-sl--div { justify-content: center }
-.bl-sl--div .bl-title { font-size: var(--bl-fs-div) }
+/* ── 머리띠 ───────────────────────────────────────────────────────────────
+   장마다 붙는 고정 부품이다. 왼쪽에 「번호 + 절 이름」, 오른쪽에 브랜드 마크.
 
-/* ── 장 머리 · 꼬리 ──────────────────────────────────────────────────────── */
-.bl-hd { flex: 0 0 auto; margin-bottom: var(--bl-sp-3) }
+   마크의 data-on 이 장과 반대라는 점을 놓치기 쉽다. data-on 은 "이 마크가
+   어떤 배경 위에 앉는가"인데, 마크가 앉는 곳은 지면이 아니라 띠다. 밝은
+   장의 띠는 짙으므로 data-on="dark"(흰 로고), 어두운 장의 띠는 희므로
+   data-on="light"(원색 로고)다. check_live.py 가 이 짝을 강제한다. */
+.bl-hd {
+  flex: 0 0 auto;
+  height: var(--bl-hd-h); min-height: var(--bl-hd-min);
+  padding: 0 var(--bl-pad);
+  display: flex; align-items: center; gap: var(--bl-sp-2);
+  background: var(--bl-band);
+  color: var(--bl-band-sub);
+  border-bottom: 1px solid var(--bl-band-line);
+}
+.bl-code { font: 600 var(--bl-fs-rail)/1 var(--br-font-kr); color: var(--bl-band-ink);
+           white-space: nowrap }
+.bl-code b { font: 600 var(--bl-fs-rail)/1 var(--br-font-num); letter-spacing: .1em;
+             margin-right: var(--bl-sp-2); color: var(--bl-band-sub) }
+.bl-sp { flex: 1 }
+
+.bl-sl--dark .bl-hd { background: var(--bl-band-inv); color: var(--bl-band-inv-sub);
+                      border-bottom-color: var(--br-hairline) }
+.bl-sl--dark .bl-code   { color: var(--bl-band-inv-ink) }
+.bl-sl--dark .bl-code b { color: var(--bl-band-inv-sub) }
+
+/* 마크는 띠 안에 흐름대로 앉는다. 슬라이드 계통의 절대 위치 규칙을 끈다 */
+.bl-hd .br-mark { position: static; margin-left: auto; height: auto; z-index: auto }
+.bl-hd .br-logo { display: block; height: 2.8rem; width: auto }
+.bl-hd .br-wordmark { font: 600 var(--bl-fs-rail)/1 var(--br-font-label) !important;
+                      color: var(--bl-band-ink) !important }
+.bl-sl--dark .bl-hd .br-wordmark { color: var(--bl-band-inv-ink) !important }
+
+/* ── 본문 영역 ───────────────────────────────────────────────────────────
+   머리띠와 꼬리띠 사이를 전부 먹는다. 제목·리드·본문이 여기 들어간다. */
+.bl-bd {
+  flex: 1 1 auto; min-height: 0;
+  padding: var(--bl-sp-4) var(--bl-pad) var(--bl-sp-4);
+  display: flex; flex-direction: column; gap: var(--bl-sp-3);
+  justify-content: flex-start;
+}
+/* 왜 위 정렬이 기본인가
+   기준 덱에서 제목의 세로 위치는 장마다 같아야 한다. 가운데 정렬로 두면
+   내용이 짧은 장은 제목이 아래로 내려오고 긴 장은 위로 올라가 — 넘길 때마다
+   제목이 오르내린다. 읽는 사람은 그것을 「장이 제각각이다」로 받는다.
+   빈자리는 아래에 모아 두고, 채워야 할 블록에 .bl-fill 을 준다.
+
+   표지·간지·마무리는 예외다. 제목 하나만 있는 장이라 위에 붙이면 지면이
+   위로 쏠린다. 그 셋만 --center 를 쓴다. */
+.bl-bd--center { justify-content: center }
+
+/* 남는 세로 자리를 먹는 블록. 카드열·표·격자처럼 늘어나도 되는 것에만 준다.
+   글 한 줄짜리에 주면 줄 사이가 벌어져 오히려 읽기 나빠진다. */
+.bl-fill { flex: 1 1 auto; min-height: 0 }
+
+/* ── 제목 · 리드 ─────────────────────────────────────────────────────────── */
 .bl-eyebrow {
-  margin: 0 0 var(--bl-sp-1);
+  margin: 0;
   font: 600 var(--bl-fs-eyebrow)/1.2 var(--br-font-num);
   letter-spacing: .14em; text-transform: uppercase;
   color: var(--br-mark);
 }
 .bl-sl--dark .bl-eyebrow { color: var(--br-accent-on-dark) }
+
 .bl-title {
   margin: 0;
-  font: 700 var(--bl-fs-title)/1.25 var(--br-font-kr);
-  letter-spacing: -.01em;
+  font: 800 var(--bl-fs-title)/1.15 var(--br-font-kr);
+  letter-spacing: -.03em;
+  text-wrap: balance;
+  max-width: 84ch;
 }
-.bl-sl--cover .bl-title { font-size: var(--bl-fs-cover) }
+.bl-sl--cover .bl-title { font-size: var(--bl-fs-cover); font-weight: 900;
+                          line-height: 1.1; letter-spacing: -.035em }
+.bl-sl--div  .bl-title { font-size: var(--bl-fs-div) }
+
+/* 제목 옆 성격 표시 — 「제안」·「확정」처럼 이 장이 무엇인지 한 낱말로 */
+.bl-tag { font: 700 var(--bl-fs-tag)/1 var(--br-font-kr); color: var(--br-text-2);
+          letter-spacing: -.01em; margin-left: var(--bl-sp-2) }
+.bl-sl--dark .bl-tag { color: var(--br-on-dark-2) }
+
+/* 형광 밴드 — 제목의 핵심구에만 <em> 또는 <mark> 로 건다.
+   밑에서 46%만 칠해 글자를 덮지 않는다. 줄바꿈되어도 두 줄 모두 칠해지도록
+   box-decoration-break 를 clone 으로 둔다 — 없으면 둘째 줄이 맨살로 남는다. */
+.bl-title em, .bl-title mark, .bl-bd mark {
+  background: linear-gradient(180deg, transparent 54%, var(--bl-hi) 54%);
+  box-shadow: inset 0 -.16rem 0 var(--bl-hi2);
+  color: inherit; font-style: normal; padding: 0 .06em;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+/* 어두운 지면에서는 그라디언트가 아니라 통칠이다. 짙은 바탕에 반투명 띠를
+   깔면 글자와 띠가 같이 어두워져 강조가 사라진다. */
+.bl-sl--dark .bl-title em, .bl-sl--dark .bl-title mark, .bl-sl--dark .bl-bd mark {
+  background: var(--bl-hi); color: var(--br-text);
+  box-shadow: none; padding: .05em .35em; border-radius: .16rem;
+}
+
 .bl-lede {
-  margin: var(--bl-sp-2) 0 0;
-  max-width: 76ch;
-  font: 400 var(--bl-fs-lede)/1.5 var(--br-font-kr);
+  margin: 0;
+  max-width: 84ch;
+  font: 500 var(--bl-fs-lede)/1.5 var(--br-font-kr);
   color: var(--br-text-2);
+  display: flex; flex-wrap: wrap; gap: .3rem .5rem; align-items: center;
 }
+.bl-lede strong { color: var(--br-text); font-weight: 700 }
 
-/* 본문은 남는 자리를 전부 먹는다. 아래 꼬리가 바닥에 붙는다 */
-.bl-bd { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
-         gap: var(--bl-sp-3) }
-
+/* ── 꼬리띠 ─────────────────────────────────────────────────────────────── */
 .bl-rf {
   flex: 0 0 auto;
-  margin-top: var(--bl-sp-3);
-  padding-top: var(--bl-sp-2);
-  border-top: 1px solid var(--br-hairline);
-  display: flex; justify-content: space-between; align-items: baseline;
-  font: 400 var(--bl-fs-note)/1.4 var(--br-font-kr);
-  color: var(--br-text-3);
+  margin-top: auto;
+  height: var(--bl-rf-h); min-height: var(--bl-rf-min);
+  padding: 0 var(--bl-pad);
+  display: flex; align-items: center; justify-content: space-between;
+  font: 600 var(--bl-fs-rail)/1 var(--br-font-kr);
+  background: var(--bl-band);
+  color: var(--bl-band-sub);
+  border-top: 1px solid var(--bl-band-line);
 }
-.bl-sl--dark .bl-rf { border-top-color: var(--br-dark-line); color: var(--br-on-dark-2) }
-.bl-pg { font-family: var(--br-font-num); font-variant-numeric: tabular-nums }
+.bl-sl--dark .bl-rf { background: var(--bl-band-inv); color: var(--bl-band-inv-sub);
+                      border-top-color: var(--br-hairline) }
+.bl-pg { font: 600 var(--bl-fs-rail)/1 var(--br-font-num);
+         font-variant-numeric: tabular-nums; letter-spacing: .08em;
+         color: var(--bl-band-ink) }
+.bl-sl--dark .bl-pg { color: var(--bl-band-inv-ink) }
 
-/* 브랜드 마크 — 슬라이드 계통과 같은 계약이다. 우측 상단 여백 띠.
-   본문이 이 자리를 침범하지 않도록 장 안쪽 여백이 이미 비워 두고 있다. */
-.bl-sl .br-mark { position: absolute; top: var(--bl-sp-3); right: var(--bl-sp-3);
-                  height: 2.1rem; z-index: 2 }
+/* ── 워터마크 ────────────────────────────────────────────────────────────
+   장마다 우하단에 브랜드 로고타입을 옅게 깐다. 자리표시자 구조는 슬라이드
+   계통과 같아서 apply_brand.py 가 그대로 채운다. 위치·크기만 rem 으로 다시
+   잡는다 — 슬라이드 쪽 값(720px 고정)은 이 계통에서 창을 따라가지 않는다.
 
-/* 왼쪽 여백 띠의 그룹 표시 — 세로로 세운 작은 라벨 */
-.bl-grp {
-  position: absolute; left: var(--bl-sp-2); top: 50%;
-  transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl;
-  font: 600 var(--bl-fs-floor)/1 var(--br-font-num);
-  letter-spacing: .2em; text-transform: uppercase;
-  color: var(--br-text-3);
+   밝은 지면의 잉크가 더 진해 같은 불투명도면 더 세게 보인다. 원본 실측도
+   밝은 쪽 6.5% · 어두운 쪽 10% 로 갈라 두고 있다. */
+.bl-sl .br-watermark {
+  left: auto; top: auto; transform: none;
+  right: var(--bl-pad); bottom: calc(var(--bl-rf-min) + var(--bl-sp-3));
+  width: 42rem; max-width: 62%;
+  opacity: .065;
 }
-.bl-sl--dark .bl-grp { color: var(--br-on-dark-2) }
+.bl-sl--dark .br-watermark { opacity: .10 }
+.bl-sl .br-watermark img { width: 100%; height: auto }
+.bl-sl .br-watermark .br-wordmark { font-size: 3.4rem !important }
+
+/* ── 진행선 ──────────────────────────────────────────────────────────────
+   화면 맨 위 실선 하나. 어디쯤인지만 알려 준다. JS 가 width 를 준다. */
+#bl-prog {
+  position: fixed; left: 0; top: 0; height: .25rem; width: 0;
+  background: var(--br-soft-1); z-index: 30;
+}
+@media (prefers-reduced-motion: no-preference) {
+  #bl-prog { transition: width .5s ease }
+}
+body.present #bl-prog { opacity: 0 }
 
 /* ── 배치 ────────────────────────────────────────────────────────────────── */
-.bl-cols { display: grid; gap: var(--bl-sp-3); grid-template-columns: repeat(2, 1fr) }
+/* align-content:start 가 없으면 .bl-fill 과 만났을 때 행이 남는 높이만큼 늘어나
+   카드가 통째로 부풀고 속은 위에 붙은 채 아래가 빈다. 행은 내용 높이를 지키고
+   남는 자리는 블록 아래에 모이게 한다. 같은 행의 카드끼리는 그대로 키가 맞는다. */
+.bl-cols { display: grid; gap: var(--bl-sp-3); grid-template-columns: repeat(2, 1fr);
+           align-content: start }
 .bl-cols--3 { grid-template-columns: repeat(3, 1fr) }
 .bl-cols--4 { grid-template-columns: repeat(4, 1fr) }
 .bl-cols--sidebar { grid-template-columns: 1fr 1.9fr }
@@ -192,6 +330,48 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 .bl-card--key { border-left: .22rem solid var(--br-mark) }
 .bl-card--ok   { border-left: .22rem solid var(--br-ok-text) }
 .bl-card--risk { border-left: .22rem solid var(--br-alert-text) }
+
+/* 상단 강조선 카드 — 카드 위에 굵은 색 선을 얹어 갈래를 구분한다.
+   왼쪽 선(--key/--ok/--risk)이 「이 카드가 어떤 성격인가」라면, 위 선은
+   「몇 번째 갈래인가」다. 네 개까지 나란히 놓아도 서로 구분된다.
+   색만으로 말하지 않는다 — 카드 제목 글자가 언제나 함께 온다. */
+.bl-card--t1, .bl-card--t2, .bl-card--t3, .bl-card--t4 { border-top-width: .28rem;
+                                                         border-top-style: solid }
+.bl-card--t1 { border-top-color: var(--br-cat-1) }
+.bl-card--t2 { border-top-color: var(--br-cat-2) }
+.bl-card--t3 { border-top-color: var(--br-cat-3) }
+.bl-card--t4 { border-top-color: var(--br-cat-4) }
+
+/* 카드 안 서수 — 이름 위에 작게 얹는 번호. 읽는 차례를 지면이 말해 준다 */
+.bl-ord { font: 600 var(--bl-fs-note)/1 var(--br-font-num); color: var(--br-text-3);
+          letter-spacing: .06em }
+.bl-sl--dark .bl-ord { color: var(--br-on-dark-2) }
+
+/* 단계 흐름 — 카드와 연결자를 번갈아 놓는 격자.
+   카드 수만큼 1fr 과 auto 가 번갈아 필요하므로 열 수를 개수별로 둔다.
+   인라인 style 로 grid-template-columns 를 적지 않는다 — 덱마다 값이 갈라진다. */
+.bl-flow { display: grid; gap: var(--bl-sp-2); align-items: stretch;
+           align-content: start }
+.bl-flow--3 { grid-template-columns: 1fr auto 1fr auto 1fr }
+.bl-flow--4 { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr }
+
+/* 카드 사이 연결자 — 단계가 이어진다는 표시. 격자 사이에 끼워 넣는다 */
+.bl-conn { display: grid; place-items: center; font: 400 1.6rem/1 var(--br-font-num);
+           color: var(--br-text-3) }
+.bl-sl--dark .bl-conn { color: var(--br-on-dark-2) }
+
+/* 결론 줄 — 장 맨 아래 한 줄. 이 장에서 가져갈 것이 무엇인지 못 박는다.
+   붉은색은 경고가 아니라 「여기가 결론」이라는 표시다. 장마다 하나만 쓴다 —
+   여럿이면 어느 것도 결론이 아니게 된다. */
+.bl-concl {
+  margin: 0; padding-left: var(--bl-sp-2);
+  border-left: .22rem solid var(--br-alert-text);
+  font: 700 var(--bl-fs-body)/1.5 var(--br-font-kr);
+  color: var(--br-text);
+}
+.bl-concl b { color: var(--br-alert-text) }
+.bl-sl--dark .bl-concl { color: var(--br-on-dark); border-left-color: var(--br-amber) }
+.bl-sl--dark .bl-concl b { color: var(--br-amber) }
 
 /* ── 수치 ────────────────────────────────────────────────────────────────── */
 .bl-stat { display: flex; flex-direction: column; gap: var(--bl-sp-1); min-width: 0 }
@@ -230,7 +410,8 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
    채널(--br-track) 위에 얹히므로 지면 대비가 아니라 **채널 대비**로 색을 고른다.
    --br-chan-* 가 그 목적으로 잡아 둔 램프다. --br-bar-* 를 쓰면 밝은 쪽이
    채널 안에서 2:1 아래로 떨어진다. */
-.bl-bars { display: flex; flex-direction: column; gap: var(--bl-sp-2) }
+.bl-bars { display: flex; flex-direction: column; gap: var(--bl-sp-2);
+           max-width: 68rem }   /* 채널이 지면 끝까지 늘어나면 값과 이름이 멀어 못 읽는다 */
 .bl-bar-row { display: grid; grid-template-columns: 12rem 1fr 5rem; gap: var(--bl-sp-2);
               align-items: center }
 .bl-bar-name { font-size: var(--bl-fs-body); min-width: 0 }
@@ -287,8 +468,11 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 /* ── 조작판 ──────────────────────────────────────────────────────────────
    덱 계통의 #hud 와 달리 화면 위에 떠 있는 작은 알약이다. 이 계통은 스크롤로도
    넘어가므로 큰 띠를 상시로 둘 이유가 없다. 발표 모드에서는 숨는다. */
+/* 꼬리띠 위 가운데. 오른쪽 끝에 두면 쪽번호를 덮는다 — 실제로 덮고 있었다.
+   가운데는 꼬리띠에서 유일하게 비어 있는 자리다. */
 .bl-hud {
-  position: fixed; right: 1rem; bottom: 1rem; z-index: 20;
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: .55rem; z-index: 20;
   display: flex; gap: .5rem; align-items: center;
   padding: .4rem .6rem; border-radius: 1.4rem;
   background: rgba(12,18,30,.82); backdrop-filter: blur(6px);
@@ -302,7 +486,8 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 body.present .bl-hud { display: none }
 
 #bl-jump {
-  position: fixed; right: 1rem; bottom: 4rem; z-index: 21;
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: 4.4rem; z-index: 21;
   padding: .4rem .9rem; border-radius: .3rem;
   background: rgba(12,18,30,.92); border: 1px solid var(--br-mark); color: #fff;
   font: 700 1.2rem/1 var(--br-font-num); letter-spacing: .12em;
@@ -317,9 +502,9 @@ body.present .bl-hud { display: none }
   .bl-bar-row { grid-template-columns: 9rem 1fr 4rem }
 }
 @media (max-width: 900px) {
-  .bl-sl { padding: var(--bl-sp-3) var(--bl-sp-3) var(--bl-sp-2) var(--bl-sp-3) }
   .bl-cols, .bl-cols--3, .bl-cols--4, .bl-cols--sidebar { grid-template-columns: 1fr }
-  .bl-grp { display: none }
+  .bl-hd, .bl-rf, .bl-bd { padding-left: var(--bl-sp-3);
+                           padding-right: var(--bl-sp-3) }
 }
 
 /* ── 인쇄 ────────────────────────────────────────────────────────────────
@@ -329,7 +514,13 @@ body.present .bl-hud { display: none }
   @page { size: 297mm 167mm; margin: 0 }
   html { font-size: 11px }
   .bl-deck { height: auto; overflow: visible; display: block }
-  .bl-sl { height: auto; min-height: 0; break-after: page; page-break-after: always }
+  /* 쪽 높이를 그대로 준다. auto 로 두면 띠의 % 높이가 풀려 최소값으로 쪼그라들고,
+     꼬리띠의 margin-top:auto 가 밀 자리를 잃어 본문 바로 밑에 붙는다 —
+     종이 아래쪽 절반이 비어 나온다. */
+  .bl-sl { height: 167mm; min-height: 0; overflow: hidden;
+           break-after: page; page-break-after: always }
   .bl-sl:last-child { break-after: auto; page-break-after: auto }
   [data-f] { opacity: 1 !important; transform: none !important }
+  /* 화면 전용 부품. fixed 라 그대로 두면 쪽마다 찍힌다 */
+  #bl-prog, .bl-hud, #bl-jump { display: none !important }
 }

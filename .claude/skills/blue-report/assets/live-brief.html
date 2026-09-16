@@ -27,38 +27,52 @@
        · 단계 전개는 data-f="1" 부터. 발표 모드에서만 접힌다
      ═══════════════════════════════════════════════════════════════════ -->
 
+<div id="bl-prog"></div>
+
 <main class="bl-deck" id="deck" data-deck-title="라이브 브리핑" tabindex="0"
       aria-label="라이브 브리핑 슬라이드">
 
   <!-- 01 표지 ─────────────────────────────────────────────────────────── -->
-  <section class="bl-sl bl-sl--dark bl-sl--cover" data-grp="표지" data-notes="표지에서는 제목과 날짜만 말한다. 목차는 다음 장에서 짚는다.">
-    <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
-    <div class="bl-bd" style="justify-content:center">
+  <section class="bl-sl bl-sl--dark bl-sl--cover" data-notes="표지에서는 제목과 날짜만 말한다. 목차는 다음 장에서 짚는다.">
+        <header class="bl-hd">
+      <span class="bl-code"><b>2026-09</b>분기 운영 브리핑</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd bl-bd--center">
       <p class="bl-eyebrow">Live Brief</p>
       <h1 class="bl-title">분기 운영 브리핑</h1>
       <p class="bl-lede">3분기 실행 결과와 4분기 결정 요청 · 2026-09-15</p>
     </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="dark"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 02 간지 ─────────────────────────────────────────────────────────── -->
-  <section class="bl-sl bl-sl--dark bl-sl--div" data-grp="1" data-notes="간지는 그룹 머리다. 제목 하나만 두고 넘어간다.">
-    <span class="bl-grp">Part 1</span>
-    <div class="bl-bd" style="justify-content:center">
+  <section class="bl-sl bl-sl--dark bl-sl--div" data-notes="간지는 그룹 머리다. 제목 하나만 두고 넘어간다.">
+        <header class="bl-hd">
+      <span class="bl-code"><b>1</b>3분기 실행 결과</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd bl-bd--center">
       <p class="bl-eyebrow">Part 1</p>
       <h2 class="bl-title">3분기 실행 결과</h2>
     </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="dark"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 03 현황 — 카드 3열 ──────────────────────────────────────────────── -->
-  <section class="bl-sl" data-grp="1" data-notes="세 축을 나란히 둔다. 마지막 카드만 위험이라 왼쪽 선 색이 다르다.">
-    <span class="bl-grp">Part 1</span>
-    <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
-    <header class="bl-hd">
-      <p class="bl-eyebrow">01 현황</p>
-      <h2 class="bl-title">세 축 중 둘은 목표 도달 · 하나는 지연</h2>
-      <p class="bl-lede">실행 3축 각각의 진척과 다음 분기 이월 여부</p>
+  <section class="bl-sl" data-notes="세 축을 나란히 둔다. 마지막 카드만 위험이라 왼쪽 선 색이 다르다.">
+        <header class="bl-hd">
+      <span class="bl-code"><b>01</b>현황</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
     <div class="bl-bd">
+        <h2 class="bl-title">세 축 중 둘은 목표 도달 · 하나는 지연</h2>
+        <p class="bl-lede">실행 3축 각각의 진척과 다음 분기 이월 여부</p>
       <div class="bl-cols bl-cols--3">
         <div class="bl-card bl-card--ok">
           <h3>수집 체계 구축</h3>
@@ -79,17 +93,18 @@
       <p class="bl-note">기준일 2026-09-12 · 진척은 착수 조건 충족 여부로만 판정</p>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 04 수치 — 지표와 막대 ───────────────────────────────────────────── -->
-  <section class="bl-sl" data-grp="1" data-notes="막대는 채널 위에 얹힌다. 지면 대비가 아니라 채널 대비로 색을 고른 --br-chan-1 을 쓴다.">
-    <span class="bl-grp">Part 1</span>
-    <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
-    <header class="bl-hd">
-      <p class="bl-eyebrow">02 지표</p>
-      <h2 class="bl-title">수집 안정성은 기준선 위 · 대조 진척만 미달</h2>
+  <section class="bl-sl" data-notes="막대는 채널 위에 얹힌다. 지면 대비가 아니라 채널 대비로 색을 고른 --br-chan-1 을 쓴다.">
+        <header class="bl-hd">
+      <span class="bl-code"><b>02</b>지표</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
     <div class="bl-bd">
+        <h2 class="bl-title">수집 안정성은 기준선 위 · 대조 진척만 미달</h2>
       <div class="bl-cols bl-cols--4">
         <div class="bl-stat"><span class="bl-stat-v">6<sup>곳</sup></span><span class="bl-stat-t">설치 완료</span></div>
         <div class="bl-stat"><span class="bl-stat-v">98.4<sup>%</sup></span><span class="bl-stat-t">일일 수신률</span></div>
@@ -116,17 +131,18 @@
       <p class="bl-note">막대 길이는 값에 비례 · 눈대중 폭 금지</p>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 05 표 ──────────────────────────────────────────────────────────── -->
-  <section class="bl-sl" data-grp="1" data-notes="표는 이 계통이 슬라이드보다 나은 자리다. 글자 하한이 낮아 행이 더 들어간다.">
-    <span class="bl-grp">Part 1</span>
-    <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
-    <header class="bl-hd">
-      <p class="bl-eyebrow">03 대상별</p>
-      <h2 class="bl-title">대상 6곳 · 담당과 다음 조치</h2>
+  <section class="bl-sl" data-notes="표는 이 계통이 슬라이드보다 나은 자리다. 글자 하한이 낮아 행이 더 들어간다.">
+        <header class="bl-hd">
+      <span class="bl-code"><b>03</b>대상별</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
     <div class="bl-bd">
+        <h2 class="bl-title">대상 6곳 · 담당과 다음 조치</h2>
       <table class="bl-tbl">
         <thead><tr><th>대상</th><th>권역</th><th class="num">수신률</th><th>담당</th><th>다음 조치</th></tr></thead>
         <tbody>
@@ -141,27 +157,34 @@
       <p class="bl-src">기준 2026-09-12 · 수신률은 최근 30일 일일 확인 기록</p>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 06 간지 ─────────────────────────────────────────────────────────── -->
-  <section class="bl-sl bl-sl--dark bl-sl--div" data-grp="2" data-notes="여기서부터 결정 요청이다. 앞은 근거였고 뒤는 요청이다.">
-    <span class="bl-grp">Part 2</span>
-    <div class="bl-bd" style="justify-content:center">
+  <section class="bl-sl bl-sl--dark bl-sl--div" data-notes="여기서부터 결정 요청이다. 앞은 근거였고 뒤는 요청이다.">
+        <header class="bl-hd">
+      <span class="bl-code"><b>2</b>4분기 결정 요청</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd bl-bd--center">
       <p class="bl-eyebrow">Part 2</p>
       <h2 class="bl-title">4분기 결정 요청</h2>
     </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="dark"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 07 결정 요청 — 단계 전개 ────────────────────────────────────────── -->
-  <section class="bl-sl" data-grp="2" data-notes="요청 셋을 하나씩 연다. 발표 모드에서 → 를 세 번 누르면 차례로 나온다. 검토 모드에서는 전부 보인다.">
-    <span class="bl-grp">Part 2</span>
-    <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
-    <header class="bl-hd">
-      <p class="bl-eyebrow">04 요청</p>
-      <h2 class="bl-title">셋을 요청 — 인력 · 일정 · 판정 기준</h2>
-      <p class="bl-lede">각 항목은 미결 시 12월 판정 근거가 비는 자리</p>
+  <section class="bl-sl" data-notes="요청 셋을 하나씩 연다. 발표 모드에서 → 를 세 번 누르면 차례로 나온다. 검토 모드에서는 전부 보인다.">
+        <header class="bl-hd">
+      <span class="bl-code"><b>04</b>요청</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
     <div class="bl-bd">
+        <h2 class="bl-title">셋을 요청 — 인력 · 일정 · 판정 기준</h2>
+        <p class="bl-lede">각 항목은 미결 시 12월 판정 근거가 비는 자리</p>
       <div class="bl-rows">
         <div class="bl-card bl-card--key" data-f="1">
           <h3>1. 대조 인력 2인 배정</h3>
@@ -181,23 +204,33 @@
       </div>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 08 마무리 ──────────────────────────────────────────────────────── -->
-  <section class="bl-sl bl-sl--dark bl-sl--div" data-grp="2" data-notes="마무리는 요청 한 줄만 남긴다. 질문은 여기서 받는다.">
-    <div class="bl-bd" style="justify-content:center">
+  <section class="bl-sl bl-sl--dark bl-sl--div" data-notes="마무리는 요청 한 줄만 남긴다. 질문은 여기서 받는다.">
+        <header class="bl-hd">
+      <span class="bl-code"><b>05</b>마무리</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd bl-bd--center">
       <p class="bl-eyebrow">Close</p>
       <h2 class="bl-title">인력 2인 · 일정 승인 · 기준선 확정</h2>
       <p class="bl-lede">세 건 결정 시 12월 판정 근거 확보</p>
     </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="dark"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
 </main>
 
 <!-- 조작판 — 발표 모드에서는 숨는다. 스크롤·화살표·숫자 점프로도 넘어간다 -->
-<div class="bl-hud">
-  <button id="bl-present">발표 F</button>
-  <button id="bl-script">대본 S</button>
+<div class="bl-hud" role="toolbar" aria-label="덱 조작">
+  <button type="button" data-act="prev" aria-label="이전 장">‹</button>
+  <button type="button" data-act="next" aria-label="다음 장">›</button>
+  <button type="button" data-act="present">발표 F</button>
+  <button type="button" data-act="script">대본 S</button>
 </div>
 <div id="bl-jump" hidden aria-hidden="true"></div>
 
