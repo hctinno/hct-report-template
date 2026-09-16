@@ -17,7 +17,7 @@ Four separate lineages. They are not interchangeable: different page size, diffe
 | Slide decks | exactly 1920x1080 | `--br-fs-*` | 24px | `check_deck.py` — 17 items |
 | A4 documents | 794x1123 portrait (1123x794 landscape) | `--bd-fs-*` | 14px (10.5pt) | `check_doc.py` — 9 items |
 | Web boards | no fixed page; reflows with viewport | `--bw-fs-*` | 12.5px | `check_board.py` — 11 items |
-| Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 10 items |
+| Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 16 items |
 
 ### Slide decks — 12, in `.claude/skills/blue-report/assets/`
 
@@ -57,7 +57,11 @@ Use these when the artefact is something people **change on screen**, not someth
 | `board-team.html` | `teamboard` | team board — 4-column kanban |
 | `board-gap.html` | `gapcheck` | gap-check board — gap parent with response children |
 
-### Live decks — 1
+### Live decks — 2, one of them the house standard
+
+**Start every new report from `live-standard.html` (`--deck standard`).** It is the canonical
+starting point: copy it and replace the content. Do not compose a deck from scratch and do not
+invent chrome — the house look lives in this file and in `blue-live.css`.
 
 Same purpose as a slide deck, different mechanics. No fixed page: one slide is `100dvh`, the root
 font-size follows the viewport (`clamp(10.5px, min(1vw, 1.78vh), 20px)` — `1.78vh` is 16:9), and every
@@ -66,10 +70,34 @@ presentation. It reads fine with JavaScript disabled — just scroll.
 
 | File | `--deck` name | Purpose |
 |---|---|---|
-| `live-brief.html` | `live` | live briefing — vertical review, horizontal present (sample) |
+| `live-standard.html` | `standard` | **house standard — start here.** 12 slides of layout vocabulary |
+| `live-brief.html` | `live` | live briefing — short-form sample |
+
+**Page chrome is mandatory, not decorative.** Every slide carries all of it, and `check_live.py`
+fails the deck when any piece is missing:
+
+| Part | Markup | What it holds |
+|---|---|---|
+| Top rail | `<header class="bl-hd">` | `<span class="bl-code"><b>NN</b>section</span>` + `.bl-sp` + `.br-mark` |
+| Bottom rail | `<footer class="bl-rf">` | `.bl-rf-name` (deck title) + `.bl-pg` (page) |
+| Watermark | `<div class="br-watermark" data-on="…">` | brand logotype, bottom-right, faint |
+| Progress line | `<div id="bl-prog">` | one per deck, before `<main>` |
+
+`apply_brand.py` fills both `.br-mark` and `.br-watermark` from `brand.json`, so leave the
+placeholder markup exactly as the standard deck has it.
+
+The `data-on` value is the **opposite** of the slide for the rail mark, because the mark sits on the
+rail and the rail colour is the opposite of the page:
+
+| Slide | Rail | Rail mark | Watermark |
+|---|---|---|---|
+| light (default) | dark | `data-on="dark"` | `data-on="light"` |
+| dark (`bl-sl--dark`) | white | `data-on="light"` | `data-on="dark"` |
 
 Write dimensions in `rem`, never `px` — `check_live.py` rejects literal px in `bl-` rules. The three
 exceptions are 1px borders, the scaling engine's own `clamp`, and blur/shadow radii.
+
+Put the key phrase of a title inside `<em>` — the highlight band is drawn there and nowhere else.
 
 ### FCC/KC certification reports — 14
 
@@ -80,7 +108,7 @@ Separate family under the same design system. See `docs/H_INNO_FCC_KC_REPORT_TEM
 - Work in the current checkout root. Paths here are relative to it — never assume a specific drive or directory.
 - Read `.claude/skills/blue-report/README.md` first. It is the self-contained spec: color tokens, type scale, spacing, chart rules, and writing style. `.claude/skills/blue-report/references/rules.md` is the condensed rule list.
 - Start from a finished asset above, replacing content only. Do not invent a new visual style.
-- Ask the user which purpose applies before choosing when the request does not make it obvious. Deck, A4 document, board, and live deck are four different answers — do not guess between them.
+- Ask the user which purpose applies before choosing when the request does not make it obvious. Deck, A4 document, board, and live deck are four different answers — do not guess between them. When the request is simply "a report" or "a deck" with no further constraint, the answer is the live standard deck.
 - Example figures, department names, and wording in the assets are usage samples, not placeholders. Replace them with real content.
 - Hard rules: use `--br-*` CSS custom properties only and add no raw hex; donut charts only, never pie, and generate them with `scripts/donut.py` rather than computing angles by hand; Korean copy in 개조식 (noun-ending) form — neither polite endings (`~합니다`) nor plain declaratives (`~한다`, `~없다`); speaker notes in `data-notes` are exempt; slides are exactly 1920x1080; no slide text below 24px; data marks keep at least 2:1 contrast against the backdrop they actually sit on; the brand mark stays in the top-right margin band and body content never intrudes there.
 - Write output to `decks-out/`, which is gitignored. Do not scatter result files in the checkout root.
@@ -121,7 +149,7 @@ number-then-Enter jump, and a control bar that appears only at the very bottom e
 
 `check_board.py` additionally re-checks the **rendered** DOM for banned endings, because board content often lives in JavaScript data that a source scan cannot see.
 
-`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the four A4 documents with `check_doc.py`, checks the five boards with `check_board.py`, checks the live deck with `check_live.py`, checks the FCC/KC templates with the A4 rules, builds the PPTX files, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
+`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the four A4 documents with `check_doc.py`, checks the five boards with `check_board.py`, checks both live decks with `check_live.py`, checks the FCC/KC templates with the A4 rules, builds the PPTX files, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
 
 If you change `assets/`, rebuild `dist/` and commit it: `build_single_file.py` three times —
 once with no arguments, once with `--artifact --brand brand/hct/brand.json`, and once with

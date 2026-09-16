@@ -25,7 +25,8 @@
     var pg = s.querySelector('.bl-pg');
     if (!pg) return;
     pg.textContent = isApx ? '부록 ' + apxN + ' / ' + apxTotal
-                           : String(bodyN).padStart(2, '0');
+                           : String(bodyN).padStart(2, '0') + ' / '
+                             + String(slides.length - apxTotal).padStart(2, '0');
     var nm = s.querySelector('.bl-rf-name');
     if (nm && !nm.textContent) nm.textContent = deckTitle;
   });
@@ -40,6 +41,7 @@
   function staged() { return deck.classList.contains('bl-deck--present'); }
 
   function paint() {
+    paintProg();
     deck.classList.toggle('bl-deck--staged', staged());
     slides.forEach(function (s, k) {
       var open = !staged() || k !== i;
@@ -164,6 +166,15 @@
     if (scriptWin && !scriptWin.closed) scriptWin.close();
   });
 
+  // ── 진행선 ────────────────────────────────────────────────────────────
+  // 어디쯤인지만 알려 준다. 없으면 아무 일도 하지 않는다 — 덱이 이 줄을 안 넣어도
+  // 뷰어가 죽지 않아야 한다.
+  function paintProg() {
+    var el = document.getElementById('bl-prog');
+    if (!el) return;
+    el.style.width = ((i + 1) / slides.length * 100) + '%';
+  }
+
   // ── 조작 ──────────────────────────────────────────────────────────────
   var jump = '';
   function showJump() {
@@ -202,6 +213,19 @@
     if (!stepFwd()) goTo(i + 1);
   });
 
+  // 조작판은 data-act 로 묶는다. id 로 묶으면 덱마다 이름을 새로 지어야 하고,
+  // 한 글자만 달라도 버튼이 조용히 죽는다 — 눌러 보기 전에는 아무도 모른다.
+  var ACTS = {
+    prev:    function () { if (!stepBack()) goTo(i - 1); },
+    next:    function () { if (!stepFwd()) goTo(i + 1); },
+    present: togglePresent,
+    script:  openScript
+  };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-act]'), function (b) {
+    var fn = ACTS[b.getAttribute('data-act')];
+    if (fn) b.onclick = fn;
+  });
+  // 예전 덱의 id 방식도 받아 준다
   var pb = document.getElementById('bl-present');
   if (pb) pb.onclick = togglePresent;
   var sb = document.getElementById('bl-script');

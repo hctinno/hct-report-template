@@ -49,7 +49,8 @@ from check_deck import (  # noqa: E402
 MIN_REM = 0.78     # 절대 하한. 무엇도 이보다 작게 쓰지 않는다
 BODY_REM = 1.0     # 본문 하한. 주석 계열만 이 아래를 허용한다
 # 주석·라벨 계열. 이 클래스를 단 요소는 BODY_REM 아래여도 된다.
-NOTE_CLS = ("bl-note", "bl-src", "bl-chip", "bl-eyebrow", "bl-grp", "bl-stat-t", "bl-rf")
+NOTE_CLS = ("bl-note", "bl-src", "bl-chip", "bl-eyebrow", "bl-stat-t", "bl-rf",
+            "bl-ord", "bl-code", "bl-pg")
 # 16:9 한 벌과 좁은 폭 한 벌. 좁은 쪽은 루트가 하한(10.5px)에 걸리는 구간이다.
 VIEWS = [(1600, 900), (760, 900)]
 
@@ -147,6 +148,82 @@ def check_literal_px(html, rep, path_hint=None):
             print(f"        {b}")
     else:
         rep.o("치수 — 리터럴 px 없이 rem 만 쓴다")
+
+
+def _slices(html):
+    """장 단위로 자른다. 정규식 하나로 장 안팎을 가릴 수 없어 시작 위치로 나눈다."""
+    starts = [m for m in re.finditer(
+        r"<section[^>]*\bclass=\"[^\"]*\bbl-sl\b[^\"]*\"[^>]*>", html)]
+    out = []
+    for k, m in enumerate(starts):
+        end = starts[k + 1].start() if k + 1 < len(starts) else len(html)
+        out.append((m.group(0), html[m.start():end]))
+    return out
+
+
+def check_chrome(html, rep):
+    """지면 크롬이 장마다 붙어 있는가.
+
+    이 검사가 이 계통의 핵심이다. 앞서 라이브 덱을 냈을 때 규격서에는 띠·로고·
+    워터마크가 적혀 있었지만 강제하는 것이 없었다 — 그래서 다른 에이전트가 만든
+    덱에 로고도 워터마크도 띠도 붙지 않았고, 「우리 양식으로 만들었다」면서
+    회사 문서로 보이지 않는 결과가 나왔다. 규칙을 글로만 두면 지켜지지 않는다.
+
+    브랜드 마크의 data-on 이 지면과 반대인 것도 여기서 잡는다. 마크가 앉는 곳은
+    지면이 아니라 띠이고 띠 색은 지면과 반대이므로, 밝은 장의 머리띠 마크는
+    data-on="dark" 다. 눈으로는 틀려도 알아채기 어렵다 — 로고가 배경에 묻힐 뿐
+    사라지지는 않기 때문이다."""
+    sl = _slices(html)
+    if not sl:
+        rep.f("bl-sl 장을 찾지 못했다")
+        return
+
+    miss_hd, miss_rf, miss_pg, miss_mark, miss_wm, wrong = [], [], [], [], [], []
+    for n, (tag, body) in enumerate(sl, 1):
+        dark = "bl-sl--dark" in tag
+        if not re.search(r'class="[^"]*\bbl-hd\b', body):       miss_hd.append(n)
+        if not re.search(r'class="[^"]*\bbl-rf\b', body):       miss_rf.append(n)
+        if not re.search(r'class="[^"]*\bbl-pg\b', body):       miss_pg.append(n)
+
+        # 머리띠 안의 마크 — 띠 구간만 잘라서 본다
+        hd = re.search(r'<header[^>]*\bbl-hd\b.*?</header>', body, re.S)
+        mark = re.search(r'<div class="br-mark" data-on="(dark|light)"', hd.group(0)) if hd else None
+        if not mark:
+            miss_mark.append(n)
+        else:
+            want = "light" if dark else "dark"     # 띠 색은 지면과 반대다
+            if mark.group(1) != want:
+                wrong.append(f"{n}장 머리띠 마크 data-on=\"{mark.group(1)}\" — "
+                             f"{'어두운' if dark else '밝은'} 장이므로 \"{want}\"")
+
+        wm = re.search(r'<div class="br-watermark" data-on="(dark|light)"', body)
+        if not wm:
+            miss_wm.append(n)
+        else:
+            want = "dark" if dark else "light"     # 워터마크는 지면 위에 앉는다
+            if wm.group(1) != want:
+                wrong.append(f"{n}장 워터마크 data-on=\"{wm.group(1)}\" — "
+                             f"{'어두운' if dark else '밝은'} 장이므로 \"{want}\"")
+
+    def verdict(label, missing, total=len(sl)):
+        if missing:
+            rep.f(f"{label} 없는 장 {len(missing)}건 / 전체 {total}장 — "
+                  f"{', '.join(str(x) for x in missing[:8])}")
+        else:
+            rep.o(f"{label} — {total}장 모두 있다")
+
+    verdict("머리띠 .bl-hd", miss_hd)
+    verdict("꼬리띠 .bl-rf", miss_rf)
+    verdict("쪽번호 .bl-pg", miss_pg)
+    verdict("머리띠 브랜드 마크", miss_mark)
+    verdict("워터마크", miss_wm)
+
+    if wrong:
+        rep.f(f"마크 배경 짝 어긋남 {len(wrong)}건 — 띠 색은 지면과 반대다")
+        for w in wrong[:6]:
+            print(f"        {w}")
+    else:
+        rep.o("마크 배경 짝 — 머리띠·워터마크 모두 앉는 면과 맞다")
 
 
 def check_notes(html, rep):
@@ -306,6 +383,7 @@ def main():
     check_links(html, rep)
     check_literal_px(html, rep, a.path)
     check_notes(html, rep)
+    check_chrome(html, rep)
     check_render(a.path, rep, a.shots, seen_style=bad)
 
     sys.exit(rep.render())
