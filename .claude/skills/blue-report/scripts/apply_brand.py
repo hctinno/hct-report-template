@@ -17,6 +17,7 @@ import json
 import mimetypes
 import os
 import re
+import shutil
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -268,6 +269,46 @@ def apply(html, brand, uris, title_override=None):
     return html, n, left
 
 
+HEAD = re.compile(r"<head\b.*?</head>", re.S)
+SHEET = re.compile(r'<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"')
+
+
+def copy_assets(html, out):
+    """단일 파일이 아닐 때, HTML 이 부르는 CSS 와 폰트를 결과물 옆에 같이 둔다.
+
+    이걸 안 하면 결과물이 조용히 망가진다. `<link href="blue-report.css">` 는
+    결과물 기준 상대 경로라 decks-out/ 에는 그 파일이 없다 — 브라우저는 404 를
+    삼키고 스타일 없는 문서를 그린다. 글자는 Times New Roman 이 되고 지면도
+    띠도 사라지는데, 파일은 멀쩡히 만들어져 있어 만든 사람이 알아채지 못한다.
+    실제로 그렇게 나간 덱을 보고 「로고도 폰트도 안 들어갔다」는 말을 들었다.
+
+    경고 한 줄로는 부족했다. 경고는 스크롤 위로 사라지고 파일만 남는다.
+
+    폰트는 CSS 기준 상대 경로(fonts/...)라 CSS 와 같은 자리에 둔다."""
+    head = HEAD.search(html)
+    if not head:
+        return []
+    src_dir = os.path.join(ROOT, "assets")
+    out_dir = os.path.dirname(os.path.abspath(out)) or "."
+    done = []
+    for href in SHEET.findall(head.group(0)):
+        if "//" in href or href.startswith("data:"):
+            continue                      # 바깥에서 받아 오는 것은 건드리지 않는다
+        src = os.path.join(src_dir, href)
+        dst = os.path.join(out_dir, href)
+        if not os.path.isfile(src) or os.path.abspath(src) == os.path.abspath(dst):
+            continue
+        os.makedirs(os.path.dirname(os.path.abspath(dst)), exist_ok=True)
+        shutil.copy2(src, dst)
+        done.append(href)
+    if done:
+        fsrc, fdst = os.path.join(src_dir, "fonts"), os.path.join(out_dir, "fonts")
+        if os.path.isdir(fsrc) and os.path.abspath(fsrc) != os.path.abspath(fdst):
+            shutil.copytree(fsrc, fdst, dirs_exist_ok=True)
+            done.append("fonts/")
+    return done
+
+
 def main():
     ap = argparse.ArgumentParser(description="회사 정보·로고를 덱에 적용")
     ap.add_argument("--brand", required=True, help="brand.json 경로")
@@ -340,8 +381,10 @@ def main():
     if left:
         print(f"\n주의: 본문에 남은 자리표시자 {len(left)}건 — {', '.join(sorted(set(left)))}")
     if not a.single_file:
-        print("blue-report.css를 같은 폴더에 두어야 스타일이 적용된다. "
-              "파일 하나로 만들려면 --single-file 을 준다.")
+        copied = copy_assets(html, out)
+        if copied:
+            print(f"함께 복사: {' · '.join(copied)}")
+        print("파일 하나로 만들려면 --single-file 을 준다.")
 
 
 if __name__ == "__main__":

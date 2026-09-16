@@ -212,6 +212,101 @@ def check_raw_hex(html, rep):
 
 # ---------------------------------------------------------------- 렌더 검사
 
+PLACEHOLDER = "COMPANY NAME"   # 견본이 로고 자리에 넣어 둔 글자
+ASSETS = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets"))
+
+# 스타일·폰트가 말이 아니라 실제로 붙었는지 본다.
+# document.fonts.check() 는 쓰지 않는다 — CSS 가 404 난 문서에서도 true 를
+# 돌려준다(실측). 등록된 FontFace 의 status 를 직접 본다.
+STYLE_PROBE = r"""(names) => {
+  const rs = getComputedStyle(document.documentElement);
+  const tokens = {};
+  names.forEach(n => { tokens[n] = rs.getPropertyValue(n).trim(); });
+  const face = [...document.fonts].find(
+      f => /Pretendard/i.test(f.family) && f.status === 'loaded');
+  return {tokens, font: face ? face.family : ''};
+}"""
+
+# 계통마다 「이 CSS 가 붙었다」를 증명하는 토큰 한 개씩. 그 CSS 에만 있는 것을
+# 고른다 — blue-report.css 는 네 계통이 모두 부르므로 그것만 봐서는 얹는 쪽이
+# 빠진 것을 못 잡는다.
+SENTINEL = {
+    "blue-report.css": "--br-cobalt",
+    "blue-live.css":   "--bl-fs-body",
+    "blue-doc.css":    "--bd-fs-body",
+    "blue-web.css":    "--bw-fs-body",
+}
+
+
+def sentinels(html):
+    """이 문서가 실제로 부르는 CSS 만 고른다. 덱은 blue-report.css 한 벌이고
+    문서·보드·라이브는 그 위에 한 벌을 더 얹는다."""
+    return [(css, tok) for css, tok in SENTINEL.items() if css in html]
+
+
+def is_template(path):
+    """저장소가 싣고 나가는 견본인가.
+
+    `assets/` **아래 전부**다. 바로 아래만 보면 `assets/fcc-kc/templates/` 의
+    14종이 산출물로 잡힌다 — 실제로 한 번 잡았다."""
+    p = os.path.abspath(path)
+    return p == ASSETS or p.startswith(ASSETS + os.sep)
+
+
+def check_brand(html, rep, path):
+    """로고·워터마크 자리에 진짜 브랜드가 들어갔는가.
+
+    상자가 있는지만 세면 로고가 전부 「COMPANY NAME」인 덱도 통과한다. 실제로
+    그렇게 나간 덱을 보고 「회사 로고랑 워터마크가 안 들어갔다」는 말을 들었다.
+    견본을 복사해 내용만 바꾸고 apply_brand.py 를 안 거치면 그렇게 된다.
+
+    견본 자체(assets/)는 예외다. 누구나 자기 브랜드를 끼울 수 있게 비워 둔
+    자리이므로 자리표시자가 남아 있는 것이 맞다."""
+    if is_template(path):
+        rep.o("브랜드 자리 — 견본 파일이므로 자리표시자 유지가 맞다")
+        return
+
+    marks = re.findall(r'<div class="br-(?:mark|watermark)"[^>]*>.*?</div>', html, re.S)
+    if not marks:
+        rep.w("브랜드 마크 없음 — .br-mark · .br-watermark 를 찾지 못했다")
+        return
+    left = [m for m in marks if PLACEHOLDER in m]
+    if left:
+        rep.f(f"브랜드 자리표시자 {len(left)}건 / 마크 {len(marks)}개 — "
+              f"「{PLACEHOLDER}」가 그대로 남았다")
+        print("        apply_brand.py --brand brand/hct/brand.json "
+              "--deck <이름> --single-file -o <파일> 로 만든다")
+    else:
+        rep.o(f"브랜드 자리 — 마크 {len(marks)}개 모두 채워졌다")
+
+
+def check_style_applied(style, need, rep):
+    """CSS 와 폰트가 실제로 해석됐는가.
+
+    --single-file 없이 낸 산출물이 조용히 스타일 없는 문서가 되는 것을 막는다.
+    `<link href="blue-report.css">` 는 산출물 기준 상대 경로라 decks-out/ 에는
+    그 파일이 없다 — 브라우저는 404 를 삼키고 Times New Roman 으로 그린다.
+    파일은 멀쩡히 만들어져 있어 만든 사람이 알아채지 못한다.
+
+    document.fonts.check() 로는 못 잡는다. CSS 가 404 난 문서에서도 true 를
+    돌려준다(실측). 등록된 FontFace 의 status 를 직접 본다."""
+    dead = [css for css, tok in need if not style["tokens"].get(tok)]
+    if dead:
+        rep.f("스타일이 붙지 않았다 — " + " · ".join(dead) + " 의 토큰이 비어 있다")
+        print("        <link href> 가 가리키는 자리에 그 CSS 가 없다. "
+              "--single-file 로 만들거나 CSS 를 같은 폴더에 둔다")
+    elif need:
+        rep.o("스타일 — " + " · ".join(c for c, _ in need) + " 토큰 모두 살아 있다")
+
+    if style["font"]:
+        rep.o(f"본문 폰트 — {style['font']} 실제 적용")
+    else:
+        rep.f("본문 폰트가 붙지 않았다 — Pretendard 가 로드되지 않았다")
+        print("        @font-face 의 fonts/ 경로는 CSS 기준 상대 경로다. "
+              "CSS 만 옮기고 fonts/ 를 빠뜨리면 이렇게 된다")
+
+
 def check_render(path, rep, shots=None):
     # 없으면 여기서 알아서 받는다. 사용자가 미리 설치할 필요가 없다.
     chrome = need_browser()
@@ -227,6 +322,8 @@ def check_render(path, rep, shots=None):
         pg = br.new_page(viewport={"width": 1920, "height": 1080}, reduced_motion="reduce")
         pg.goto(url + "?all=1")
         pg.wait_for_timeout(1800)          # 폰트 로드 대기
+        need = sentinels(open(path, encoding="utf-8").read())
+        check_style_applied(pg.evaluate(STYLE_PROBE, [t for _, t in need]), need, rep)
 
         data = pg.evaluate(r"""() => {
           const out = [];
@@ -717,6 +814,7 @@ def main():
     check_pie(html, rep)
     check_donut_math(html, rep)
     check_raw_hex(html, rep)
+    check_brand(html, rep, a.deck)
     check_render(a.deck, rep, a.shots)
     print()
     sys.exit(rep.render())

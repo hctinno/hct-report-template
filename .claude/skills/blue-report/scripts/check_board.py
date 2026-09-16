@@ -44,6 +44,7 @@ from palette import contrast, MIN_DATA_CONTRAST  # noqa: E402
 from ensure_deps import need_browser  # noqa: E402
 from check_deck import (  # noqa: E402
     Report, style_violations, ALLOWED_HEX, _blank, _rgb_to_hex,
+    check_brand, check_style_applied, sentinels, STYLE_PROBE,
 )
 
 MIN_FS = 12.5          # 웹 보드 글자 하한. 슬라이드 24px · A4 10.5pt 와 다르다
@@ -184,6 +185,7 @@ PROBE = r"""() => {
 
 
 def check_render(path, rep, shots=None, seen_style=()):
+    need = None
     chrome = need_browser()
     if not chrome:
         rep.w("렌더 검사 생략 — 브라우저를 찾지 못했다")
@@ -200,6 +202,10 @@ def check_render(path, rep, shots=None, seen_style=()):
             pg.on("pageerror", lambda e, box=errs: box.append(str(e).splitlines()[0]))
             pg.goto(url)
             pg.wait_for_timeout(1200)
+            if need is None:
+                need = sentinels(open(path, encoding="utf-8").read())
+                check_style_applied(
+                    pg.evaluate(STYLE_PROBE, [t for _, t in need]), need, rep)
 
             wide = pg.evaluate("() => ({ sw: document.documentElement.scrollWidth,"
                                " cw: document.documentElement.clientWidth })")
@@ -300,6 +306,7 @@ def main():
     check_literal_fs(html, rep)
     check_links(html, rep)
     check_scroll_sticky_mix(html, rep)
+    check_brand(html, rep, a.path)
     check_render(a.path, rep, a.shots, seen_style=bad)
 
     sys.exit(rep.render())
