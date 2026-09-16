@@ -165,7 +165,11 @@ WORD = [
 ACCOUNT = [
     ("dytc880915-commits/claude-workspace", "이전 작업 저장소"),
     ("dytc880915-commits/blue-doc",         "이전 문서 저장소"),
-    ("`dytc880915-commits` 에서 `hctinno` 로", "이전 계정에서 현재 계정으로"),
+    # ("`dytc880915-commits` 에서 `hctinno` 로", "이전 계정에서 현재 계정으로")
+    #   그 문장은 CHANGELOG.md 에만 있고, CHANGELOG.md 는 OVERLAY 라 통째로
+    #   덮어쓴다. 치환이 닿을 자리가 없어 영영 0건이다. 남겨 두면 미적용
+    #   경고가 매번 하나씩 떠서 진짜 경고가 묻힌다. 아래 갈무리 규칙이
+    #   핸들 자체는 잡고, DENY 가 결과를 한 번 더 본다.
     ("`dytc880915-commits` 계정이 삭제",       "이전 계정이 삭제"),
     ("dytc880915-commits",                  "이전 계정"),
 ]
@@ -176,9 +180,7 @@ ACCOUNT = [
 BRANCH = [
     ("full/main", "main"),
     ("기본 브랜치가 `main` 이 아니라 `main`", "기본 브랜치는 `main`"),
-    ("기본 브랜치는 main 이 아니라 main 이다", "기본 브랜치는 main 이다"),
-    ("기본 브랜치가 main 이 아니라 main", "기본 브랜치는 main"),
-    ("(기본 브랜치는 main 이 아니라 main)", ""),
+    ("   (기본 브랜치는 main 이 아니라 main)", ""),
     ("branches: [main, main]", "branches: [main]"),
 ]
 
@@ -196,17 +198,43 @@ HISTORY = [
     ("# 저장소 주소와 기본 브랜치. 기본 브랜치가 main 이 아니므로 -b 를 반드시 붙인다.",
      "# 저장소 주소와 기본 브랜치."),
     ("**기본 브랜치는 `main` 이므로 브랜치를 적을 때 주의한다.**\n", ""),
-    ("| 기본 브랜치 | **`main`** | `main` 을 가정한 URL·명령은 빗나간다. 브랜치를 적을 때 주의한다 |",
-     "| 기본 브랜치 | **`main`** | 표준이다. 별도 지정 없이 clone 하면 된다 |"),
+    # docs/AGENT_WIRING.md 의 「저장소 사정」 절. 비공개본은 저장소 둘을 나란히 놓고
+    # 어느 쪽을 줄지 고르게 하지만, 공개본을 받은 사람에게는 고를 것이 없다.
+    # 아래 원문은 BRANDING·BRANCH 치환을 먹은 뒤의 모양이다 — HISTORY 가 마지막에 돈다.
+    ("""같은 규격이 저장소 둘에 있다. 규격서·검사기·브랜드(`brand/hct`, 로고 포함)가 같아
+어느 쪽을 붙여도 나오는 덱의 모양은 같다. 다른 것은 접근 권한과 견본 내용뿐이다.
+
+| 저장소 | 접근 | 기본 브랜치 | 견본 내용 |
+|---|---|---|---|
+| `hctinno/blue-report` | 비공개 · `hctinno` 인증 필요 | **`main`** | 실제 과제에서 옮겨 온 조직·인원·수치 |
+| `hctinno/blue-report` | 공개 · 인증 불필요 | `main` | 같은 규격, 가상 시나리오 |
+
+사내 인원에게는 비공개본을 준다. 비공개본을 공개로 바꾸지는 않는다 — 견본이 자리표시자가
+아니라 실제 과제에서 옮겨 온 사용법 견본이라 조직·인원·수치가 들어 있기 때문이다. 대신
+`scripts/build_public_release.py` 가 그것을 걷어낸 사본을 공개본으로 내보낸다.
+
+`hctinno` 인증이 없는 에이전트나 바깥 협력사에게는 공개본 주소를 준다. 아래 ①②의 붙여넣기
+문단에서 저장소 주소를 바꾸고 `-b main` 을 떼면 그대로 통한다.""",
+     """| 항목 | 값 | 영향 |
+|---|---|---|
+| 공개 범위 | **public** | 인증 없이 clone 한다 |
+| 기본 브랜치 | **`main`** | 표준이다. 별도 지정 없이 clone 하면 된다 |
+
+`assets/` 의 견본 내용은 전부 가상 시나리오다. 실제 조직·인물·수치가 아니다."""),
+
+    # 같은 문서의 플러그인 절. 공개본에는 인증 이야기가 필요 없다.
+    ("""이후 `claude plugin marketplace update` 가 GitHub 최신판을 당긴다. 비공개 저장소이므로 그 PC 에
+`hctinno` 에 닿는 git 인증이 있어야 한다. 인증이 없는 PC 는 마켓플레이스 주소를
+`hctinno/blue-report` 로 바꿔 건다.""",
+     "이후 `claude plugin marketplace update` 가 GitHub 최신판을 당긴다."),
     ("<code>HANDOFF.md · CHANGELOG.md · CLAUDE.md</code>",
      "<code>인수인계.md · CHANGELOG.md · CLAUDE.md</code>"),
     # 공개본에는 없는 폴더다. 구조 목록에서 지운다.
     ("public/                                  공개본 빌드 재료 — public/README.md 참고\n", ""),
     ("scripts/build_public_release.py          공개본 hctinno/blue-report 를 만든다\n", ""),
     # 공개본에는 브랜드가 둘이다. 구조 목록에 견본 쪽도 적는다.
-    ("brand/hct/                                  회사 정보와 로고",
-     "brand/hct/                                  기본 브랜드 — 회사 정보와 로고\n"
-     "brand/sample/                               중립 견본 — 자기 브랜드를 만들 때 복사할 자리"),
+    ('brand/hct/                               회사 정보와 로고',
+     'brand/hct/                               기본 브랜드 — 회사 정보와 로고\nbrand/sample/                            중립 견본 — 자기 브랜드를 만들 때 복사할 자리'),
 ]
 
 # ── README 꼬리 교체 ─────────────────────────────────────────────────────

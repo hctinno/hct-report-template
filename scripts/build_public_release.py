@@ -105,26 +105,58 @@ def substitute(root, table, label, regex=False):
     단순 치환은 다른 낱말 한가운데 우연히 들어간 자리까지 바꾼다."""
     pairs = [(re.compile(a), b) for a, b in table] if regex else table
     total = 0
+    fired = [0] * len(pairs)
     for p in walk_text(root):
         try:
             s = open(p, encoding="utf-8").read()
         except (UnicodeDecodeError, IsADirectoryError):
             continue
         out, hits = s, 0
-        for a, b in pairs:
+        for i, (a, b) in enumerate(pairs):
             if regex:
                 out, n = a.subn(b, out)
-                hits += n
             else:
                 n = out.count(a)
                 if n:
                     out = out.replace(a, b)
-                    hits += n
+            hits += n
+            fired[i] += n
         if hits:
             open(p, "w", encoding="utf-8", newline="\n").write(out)
             total += hits
-    step(f"치환 — {label}", f"{total}건")
+    idle = [i for i, n in enumerate(fired) if n == 0 and not covered(table, i)]
+    step(f"치환 — {label}", f"{total}건" + (f" · 미적용 {len(idle)}줄" if idle else ""))
+    for i in idle:
+        warn_idle(label, table[i][0])
     return total
+
+
+def covered(table, i):
+    """앞선 더 긴 규칙이 이미 먹어 치운 자리인지 본다.
+
+    치환표는 긴 문자열부터 적는다. 그래서 짧은 갈무리 규칙은 앞 규칙이 다 먹으면
+    한 번도 안 걸린다 — 「HINNO」는 「HINNO-FCC」가, 「문석호 CJ」는
+    「문석호 CJ · 조정래 GJ」가 먼저 가져간다. 이것은 빗나간 것이 아니라 제 일을
+    한 것이므로 경고하지 않는다. 앞에 자기를 품은 규칙이 하나도 없는데 0건이면
+    그때가 진짜 빗나간 것이다."""
+    pat = table[i][0]
+    return any(pat in table[j][0] for j in range(i))
+
+
+def warn_idle(label, pattern):
+    """한 번도 안 걸린 규칙을 이름까지 불러 준다.
+
+    치환 규칙은 원문이 한 글자만 바뀌어도 조용히 빗나간다. 실제로 이력 문장
+    하나가 그렇게 빗나가 계정 복구 이력이 공개본에 실릴 뻔했다. DENY 가 결과를
+    보고 막아 주지만, DENY 에 없는 문장(이를테면 안내문 다듬기)은 막아 줄 것이
+    없다 — README 구조 목록의 공백이 3칸 어긋나 두 판 동안 조용히 빗나갔다.
+
+    빌드를 세우지는 않는다. 규칙을 지우기 전에 한동안 남겨 두는 일이 있고,
+    그때마다 공개본 판올림이 막히면 곤란하다."""
+    head = pattern.splitlines()[0] if pattern else pattern
+    if len(head) > 58:
+        head = head[:58] + "…"
+    print(f"      ! {label} 규칙 미적용 — {head}")
 
 
 # ---------------------------------------------------------------- 단계
