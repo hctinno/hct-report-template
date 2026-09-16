@@ -17,13 +17,20 @@
 
 ## 저장소 사정
 
-| 항목 | 값 | 영향 |
-|---|---|---|
-| 공개 범위 | **private** | 무인증 접근은 전부 404. 에이전트마다 GitHub 인증이 있어야 한다 |
-| 기본 브랜치 | **`full/main`** | `main` 을 가정한 URL·명령은 빗나간다. 브랜치를 적을 때 주의한다 |
+같은 규격이 저장소 둘에 있다. 규격서·검사기·브랜드(`brand/hct`, 로고 포함)가 같아
+어느 쪽을 붙여도 나오는 덱의 모양은 같다. 다른 것은 접근 권한과 견본 내용뿐이다.
 
-공개 전환은 하지 않는다. `assets/` 의 견본은 자리표시자가 아니라 실제 과제에서 옮겨 온
-사용법 견본이라 조직·인원·수치가 들어 있다.
+| 저장소 | 접근 | 기본 브랜치 | 견본 내용 |
+|---|---|---|---|
+| `hctinno/hct-report-template` | 비공개 · `hctinno` 인증 필요 | **`full/main`** | 실제 과제에서 옮겨 온 조직·인원·수치 |
+| `hctinno/blue-report` | 공개 · 인증 불필요 | `main` | 같은 규격, 가상 시나리오 |
+
+사내 인원에게는 비공개본을 준다. 비공개본을 공개로 바꾸지는 않는다 — 견본이 자리표시자가
+아니라 실제 과제에서 옮겨 온 사용법 견본이라 조직·인원·수치가 들어 있기 때문이다. 대신
+`scripts/build_public_release.py` 가 그것을 걷어낸 사본을 공개본으로 내보낸다.
+
+`hctinno` 인증이 없는 에이전트나 바깥 협력사에게는 공개본 주소를 준다. 아래 ①②의 붙여넣기
+문단에서 저장소 주소를 바꾸고 `-b full/main` 을 떼면 그대로 통한다.
 
 ## 에이전트별 경로
 
@@ -96,8 +103,9 @@ claude plugin marketplace add hctinno/hct-report-template
 claude plugin install blue-report@hct-tools
 ```
 
-이후 `claude plugin marketplace update` 가 GitHub 최신판을 당긴다. private 저장소이므로 그 PC 에
-`hctinno` 에 닿는 git 인증이 있어야 한다.
+이후 `claude plugin marketplace update` 가 GitHub 최신판을 당긴다. 비공개 저장소이므로 그 PC 에
+`hctinno` 에 닿는 git 인증이 있어야 한다. 인증이 없는 PC 는 마켓플레이스 주소를
+`hctinno/blue-report` 로 바꿔 건다.
 
 ## ④ 그 PC 안에서만
 
