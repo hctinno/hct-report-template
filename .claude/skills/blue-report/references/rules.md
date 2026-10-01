@@ -100,8 +100,9 @@ d = k × √value
 
 ## 2-2. 기준 덱 · 라이브 덱 체크리스트
 
-고정 지면이 없는 계통이다. `scripts/check_live.py` 가 16항목을 판정한다.
-**새 보고서는 `assets/live-standard.html` 을 복사해 시작한다.**
+고정 지면이 없는 계통이다. `scripts/check_live.py` 가 21항목을 판정한다.
+**새 보고서는 `assets/live-standard.html` 을 복사해 시작하고, `apply_brand.py --deck standard
+--single-file` 로 산출물을 만든다.**
 
 1. 치수를 `rem` 으로만 적었는가 → `px` 는 1px 테두리, 배율 엔진의 `clamp`, blur/shadow 반경만 예외
 2. 머리띠 `.bl-hd` 가 장마다 있는가 → `.bl-code`(절 번호+이름) · `.bl-sp` · `.br-mark`
@@ -120,9 +121,32 @@ d = k × √value
 6. 본문 글자가 1.0rem 이상인가 → 주석 계열(`.bl-note` · `.bl-src` · `.bl-ord` 등)만 예외, 절대 하한 0.78rem
 7. 제목의 핵심구를 `<em>` 으로 감쌌는가 → 형광 밴드가 거기에만 걸린다
 8. `.br-mark` · `.br-watermark` 안의 자리표시자 마크업을 그대로 두었는가 → `apply_brand.py` 가 채운다
+9. 산출물에 「COMPANY NAME」이 남지 않았는가 → 견본(`assets/` 아래)만 예외. 복사해 내용만 바꾸고
+   `apply_brand.py` 를 안 거치면 로고도 워터마크도 없는 덱이 나온다
+10. 스타일과 본문 폰트가 실제로 붙었는가 → 계통 CSS 토큰과 Pretendard `FontFace` 를 렌더에서 확인.
+    `--single-file` 없이 낸 산출물에서 CSS 를 떼어 옮기면 Times New Roman 이 된다
+11. 지면이 화면 좌우 끝까지 닿는가 → body 기본 여백 8px 이 살아 있으면 띠가 끝에 안 닿는다
+12. 출처 칩 `.bl-ev` 이 근거에 이어지는가 → 키가 `#bl-evidence` JSON 에 있고, 항목마다 제목·등급·출처
+    · 등급은 A 1차 공식 자료 · B 학술·전문기관 · C 언론·2차 자료 · R 직접 조회·집계
 
 빈 공간은 아래에 모으고 억지로 늘리지 않는다. 격자에 `.bl-fill` 을 주면 블록이 남는 자리를
 먹되 행 높이는 내용에 맞춘다 — 카드가 통째로 부풀어 속이 비는 일이 없다.
+
+### 장 짜임새 — 사내 발표 덱(v97)과 같은 어휘
+
+| 장 | 부품 | 규칙 |
+|---|---|---|
+| 표지 | `.bl-cover-k` · `.bl-title` + `.bl-tag` · `.bl-cover-rule` · `.bl-cover-one` · `.bl-sig` | 눈썹은 연도(고정폭) + 무엇의 보고 · 한 줄 메시지는 뒤 절반을 `<b>` · 우하단에 발표 부서와 사람 |
+| 보고 요지 | `.bl-gist` · `.bl-ask` · `.bl-gist-row` | 왼쪽 결론 두 줄 + 결정 요청 · 오른쪽 근거 세 줄. 바쁜 사람은 이 장만 본다 |
+| 로드맵 | `.bl-road` · `.bl-road-r[data-cat]` · `.bl-road-c` · `.bl-road-out` | 과제 행 × 기간 열 + 확인할 결과. 칸은 `style="grid-column: 2 / 4"` (2열이 첫 기간) |
+| 출처 | `.bl-ev data-ev` + `#bl-evidence` | 수치 바로 옆에 단다. 근거는 문서 끝 JSON 한 벌 |
+
+세는 숫자(쪽번호·장 번호·서수·연도)는 고정폭 `--bl-font-mono`(IBM Plex Mono)다. 본문 안에서
+자릿수를 맞춰야 하는 숫자는 `.bl-mn` 을 단다. 큰 수치 `.bl-stat-v` 는 Pretendard 그대로 둔다.
+한글 눈썹은 `.bl-kicker` — `.bl-eyebrow` 는 영문·숫자용이라 자간이 한글을 흩뜨린다.
+
+**제목 짜임새** — 「주장 — <em>핵심구</em>」. 대시 앞이 무엇에 관한 장인지, 형광 밴드가 그래서
+무엇인지다. 성격 표시가 필요하면 `.bl-tag`(요청·예시·안). 리드는 「기준 · **굵은 결론**」.
 
 ---
 
