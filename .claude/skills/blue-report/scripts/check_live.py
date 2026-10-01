@@ -38,6 +38,7 @@ import json
 import os
 import re
 import sys
+from html.parser import HTMLParser
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -242,6 +243,34 @@ def check_chrome(html, rep):
 EV_GRADES = {"A", "B", "C", "R"}   # 1차 공식 · 학술·전문 · 언론·2차 · 직접 조회·집계
 
 
+class _Evidence(HTMLParser):
+    """칩과 근거 JSON 을 브라우저가 읽는 대로 찾는다.
+
+    정규식으로 원문을 훑으면 `--single-file` 산출물에서 틀린다. CSS·JS 가 문서
+    안으로 들어오면서 CSS 주석의 사용 예(`<script id="bl-evidence">{…}`)가
+    진짜 근거보다 앞에 놓이기 때문이다. 브라우저에게 `<style>`·`<script>` 속
+    글자와 주석은 태그가 아니다 — HTMLParser 도 그렇게 읽는다."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.chips, self.json, self._in = [], None, False
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if "bl-ev" in (a.get("class") or "").split():
+            self.chips.append(a.get("data-ev"))
+        if tag == "script" and a.get("id") == "bl-evidence" and self.json is None:
+            self._in, self.json = True, ""
+
+    def handle_endtag(self, tag):
+        if tag == "script":
+            self._in = False
+
+    def handle_data(self, data):
+        if self._in:
+            self.json += data
+
+
 def check_evidence(html, rep):
     """출처 칩이 실제 근거를 가리키는가.
 
@@ -251,26 +280,27 @@ def check_evidence(html, rep):
 
     근거 항목마다 제목 · 등급 · 출처는 반드시 있어야 한다. 등급은 A·B·C·R
     네 가지다(JSON 의 grades 로 늘릴 수 있다). 칩이 하나도 없는 덱은 해당 없음."""
-    chips = re.findall(r'<[^>]*class="[^"]*\bbl-ev\b[^"]*"[^>]*>', html)
+    p = _Evidence()
+    p.feed(html)
+    p.close()
+    chips = p.chips
     if not chips:
         rep.o("출처 칩 — 없음 (해당 없음)")
         return
-    keys = [re.search(r'data-ev="([^"]+)"', c) for c in chips]
-    if not all(keys):
-        rep.f(f"출처 칩 {sum(1 for k in keys if not k)}개에 data-ev 키가 없다")
+    if not all(chips):
+        rep.f(f"출처 칩 {sum(1 for k in chips if not k)}개에 data-ev 키가 없다")
         return
-    m = re.search(r'<script[^>]*id="bl-evidence"[^>]*>(.*?)</script>', html, re.S)
-    if not m:
+    if p.json is None:
         rep.f(f"출처 칩 {len(chips)}개가 있는데 #bl-evidence 근거 JSON 이 없다")
         return
     try:
-        data = json.loads(m.group(1))
+        data = json.loads(p.json)
     except ValueError as e:
         rep.f(f"근거 JSON 을 읽지 못했다 — {e}")
         return
     ev = data.get("ev", {})
     grades = EV_GRADES | set((data.get("grades") or {}).keys())
-    missing = sorted({k.group(1) for k in keys} - set(ev))
+    missing = sorted(set(chips) - set(ev))
     bad = []
     for k, e in ev.items():
         lack = [f for f in ("title", "grade", "src") if not e.get(f)]

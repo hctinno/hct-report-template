@@ -12,8 +12,9 @@
             `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
   boards    웹 보드 5종을 check_board.py 11항목으로 판정한다.
-  live      라이브 덱을 check_live.py 10항목으로 판정한다. 고정 지면이 없고
+  live      라이브 덱을 check_live.py 21항목으로 판정한다. 고정 지면이 없고
             치수가 rem 이라 px 하한이 아니라 rem 하한으로 본다.
+            견본만이 아니라 apply_brand.py 산출물(단일 파일 · 연결형)도 본다.
   pptx      build.js 가 돌고 .pptx 4종이 나오는가.
   dist      dist/ 의 두 파일이 소스에서 재생성한 것과 같은가.
             assets/ 를 고치고 dist/ 를 다시 만들지 않으면 여기서 걸린다.
@@ -54,7 +55,6 @@ DECKS = list(_DECK_FILES)
 from apply_brand import BOARDS as _BOARD_FILES  # noqa: E402
 BOARDS = list(_BOARD_FILES.values())
 from apply_brand import LIVE as _LIVE_FILES  # noqa: E402
-LIVE = list(_LIVE_FILES.values())
 
 # PPTX 는 카탈로그를 뺀 용도별 덱만 나온다. 카탈로그는 발표물이 아니라 레이아웃 견본첩이다.
 EXPECTED_PPTX = len(DECKS) - 1
@@ -222,17 +222,35 @@ def check_boards(log):
 
 # ---------------------------------------------------------------------- 라이브 덱
 
-def check_live(log):
+def check_live(log, out_dir):
     """라이브 덱은 슬라이드도 보드도 아니다. check_live.py 가 따로 판정한다.
 
-    보드·문서와 같이 브랜드 적용 대상이 아니라 assets 원본을 그대로 본다 —
-    blue-live.css 가 blue-report.css 의 색 토큰을 전제하므로 같은 폴더에서
-    열어야 한다."""
-    assets = os.path.join(SKILL, "assets")
-    for name in LIVE:
-        path = os.path.join(assets, name)
-        if not os.path.exists(path):
-            log.fail(f"라이브 {name}", "파일이 없다")
+    두 번 본다. 견본(assets 원본)은 로고 자리가 자리표시자인 것이 맞고, 사람이
+    실제로 받는 것은 apply_brand.py 를 거친 산출물이다. 견본만 보면 산출물에서만
+    나는 결함을 놓친다 — `--single-file` 이 CSS 를 문서 안으로 넣자 CSS 주석의
+    사용 예가 진짜 근거 JSON 보다 앞에 놓여 검사기가 오판한 일이 그랬다.
+
+    산출물은 두 갈래다. `--single-file`(권장)은 덱마다, CSS·`fonts/` 를 옆에
+    복사하는 연결형은 기준 덱 하나만 본다 — 복사 경로는 덱과 무관하게 같다."""
+    targets = []
+    for name, f in _LIVE_FILES.items():
+        targets.append((f"라이브 {f}", os.path.join(ASSETS, f), None))
+        targets.append((f"라이브 산출물 {name}",
+                        os.path.join(out_dir, "live", f"{name}.html"), ["--single-file"]))
+    targets.append(("라이브 연결형 standard",
+                    os.path.join(out_dir, "live-linked", "standard.html"), []))
+
+    for label, path, brand in targets:
+        if brand is not None:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            deck = os.path.splitext(os.path.basename(path))[0]
+            r = run([sys.executable, os.path.join(SCRIPTS, "apply_brand.py"),
+                     "--brand", BRAND, "--deck", deck, "-o", path] + brand)
+            if r.returncode != 0 or not os.path.exists(path):
+                log.fail(label, "apply_brand.py 실패 — " + (r.stderr.strip().splitlines() or [""])[-1])
+                continue
+        elif not os.path.exists(path):
+            log.fail(label, "파일이 없다")
             continue
         r = run([sys.executable, os.path.join(SCRIPTS, "check_live.py"), path])
         print(r.stdout, end="")
@@ -240,16 +258,16 @@ def check_live(log):
             print(r.stderr, end="", file=sys.stderr)
         m = RESULT_RE.search(r.stdout)
         if not m:
-            log.fail(f"라이브 {name}", "check_live.py 가 결과 줄을 내지 않았다")
+            log.fail(label, "check_live.py 가 결과 줄을 내지 않았다")
             continue
         ok, warn, fail = (int(x) for x in m.groups())
         detail = f"통과 {ok} · 주의 {warn} · 실패 {fail}"
         if fail or r.returncode != 0:
-            log.fail(f"라이브 {name}", detail)
+            log.fail(label, detail)
         elif warn:
-            log.warn(f"라이브 {name}", detail)
+            log.warn(label, detail)
         else:
-            log.ok(f"라이브 {name}", detail)
+            log.ok(label, detail)
 
 
 def check_pptx(log, out_dir):
@@ -966,7 +984,7 @@ def main():
             check_boards(log)
         if "live" in only:
             print("\n── 라이브 덱 ──")
-            check_live(log)
+            check_live(log, tmp)
         if "fcc" in only:
             print("\n── H-INNO FCC/KC 템플릿 ──")
             check_fcc(log)

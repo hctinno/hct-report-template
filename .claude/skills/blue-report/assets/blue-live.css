@@ -662,8 +662,10 @@ body.present .bl-hud { display: none }
    사내 발표 덱(v97)에서 가장 쓸모 있던 부품이다. 질문이 나오기 전에 근거가
    지면에 붙어 있다.
 
-     <button type="button" class="bl-ev" data-ev="E1">출처</button>
-     <script type="application/json" id="bl-evidence">{"ev":{"E1":{…}}}</script>
+     칩    button.bl-ev 에 data-ev="E1" · 글자 「출처」
+     근거  문서 끝 script#bl-evidence (type application/json) 한 벌 — {"ev":{"E1":{…}}}
+     마크업 견본은 live-standard.html 에 있다. 여기 태그째로 적지 않는다 —
+     --single-file 산출물은 이 주석까지 문서 안에 들어가 진짜 근거보다 앞에 놓인다.
 
    칩 글자는 주석 하한(0.78rem)이다. v97 은 .62rem 이었지만 이 계통의 하한
    아래라 올렸다 — 작게 두면 눌러야 할 단추가 안 보인다.
