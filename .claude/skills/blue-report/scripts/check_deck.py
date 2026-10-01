@@ -239,10 +239,26 @@ SENTINEL = {
 }
 
 
+# 계통마다 마크업이 쓰는 클래스 접두어. 이 접두어를 쓰는 문서는 그 CSS 가 붙어야 한다.
+PREFIX = {"blue-live.css": "bl-", "blue-doc.css": "bd-", "blue-web.css": "bw-"}
+_CLASS = re.compile(r'\bclass="([^"]*)"')
+_CODE = re.compile(r"<(style|script)\b.*?</\1>", re.S)
+
+
 def sentinels(html):
-    """이 문서가 실제로 부르는 CSS 만 고른다. 덱은 blue-report.css 한 벌이고
-    문서·보드·라이브는 그 위에 한 벌을 더 얹는다."""
-    return [(css, tok) for css, tok in SENTINEL.items() if css in html]
+    """이 문서가 실제로 기대는 CSS 만 고른다. 덱은 blue-report.css 한 벌이고
+    문서·보드·라이브는 그 위에 한 벌을 더 얹는다.
+
+    파일 이름으로 고르지 않는다. 단일 파일 산출물은 CSS 본문이 통째로 들어
+    있고, 그 **주석**에 다른 계통의 파일 이름이 적혀 있다 — 실제로 라이브 덱
+    단일 파일이 blue-doc.css · blue-web.css 까지 요구받아 오탐을 냈다.
+    마크업이 쓰는 클래스 접두어로 판정한다. 클래스는 낱말 단위로 보아야
+    `bl-bd--center` 의 `bd-` 같은 조각을 잘못 줍지 않는다."""
+    body = _CODE.sub("", html)
+    heads = {t[:3] for attr in _CLASS.findall(body) for t in attr.split()}
+    need = [("blue-report.css", SENTINEL["blue-report.css"])]
+    need += [(css, SENTINEL[css]) for css, pre in PREFIX.items() if pre in heads]
+    return need
 
 
 def is_template(path):

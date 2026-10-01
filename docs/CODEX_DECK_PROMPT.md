@@ -85,7 +85,7 @@ A4 세로 문서가 4종, 웹 보드가 5종, 기준·라이브 덱이 2종 있�
 
 | 파일 | `--deck` 이름 | 용도 | 장수 |
 |---|---|---|---|
-| `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 12 |
+| `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 13 |
 | `live-brief.html` | `live` | 라이브 브리핑 (짧은 브리핑 견본) | 8 |
 
 한 장이 `100dvh` 이고 루트 글자 크기가 `clamp(10.5px, min(1vw, 1.78vh), 20px)` 로 창을
@@ -199,6 +199,11 @@ assets/deck-viewer.js
 - **기준·라이브 덱은 머리띠·꼬리띠·쪽번호·로고·워터마크를 장마다 단다.** 하나라도 빼면
   `check_live.py` 가 실패로 잡는다. 이것이 「우리 양식으로 만들었다」와 실제로 회사 문서로
   보이는 것의 차이다.
+- **기준 덱 산출물은 `apply_brand.py --deck <파일> --single-file` 로 만든다.** 견본의 로고 자리는
+  「COMPANY NAME」이다. 복사해 내용만 바꾸고 끝내면 로고도 워터마크도 없다.
+- **근거가 있는 수치에는 출처 칩을 단다.** 수치 옆 `<button type="button" class="bl-ev" data-ev="E1">출처</button>`,
+  문서 끝 `<script type="application/json" id="bl-evidence">` 에 근거(제목·등급·사실·출처·날짜).
+  등급은 A 1차 공식 · B 학술·전문 · C 언론·2차 · R 직접 조회·집계. 근거 없는 칩은 실패다.
 
 ### 4. 브랜드 적용과 출력
 
@@ -248,9 +253,11 @@ python .claude/skills/blue-report/scripts/check_doc.py   decks-out/doc.html    #
 python .claude/skills/blue-report/scripts/check_board.py decks-out/board.html  # 웹 보드
 ```
 
-`check_deck.py` 가 17항목, `check_live.py` 가 16항목을 기계로 판정한다.
-`check_live.py` 의 16항목 중 여섯이 지면 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
-머리띠 브랜드 마크 · 워터마크 · 마크 배경 짝.
+`check_deck.py` 가 17항목, `check_live.py` 가 22항목을 기계로 판정한다.
+`check_live.py` 의 22항목 중 여섯이 지면 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
+머리띠 브랜드 마크 · 워터마크 · 마크 배경 짝. 넷은 산출물이 회사 문서로 나왔는지다 —
+로고 자리표시자 · 스타일 · 본문 폰트 · 지면 끝. 출처 칩이 있으면 근거에 이어지는지도 본다.
+조작판이 꼬리띠의 문서명·쪽번호를 덮는지는 1600·760·400px 세 폭에서 잰다.
 
 check_deck.py 가 판정하는 것:
 
