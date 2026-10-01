@@ -11,7 +11,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
 판정이 겹치는 것(문체·raw hex·마크 대비)은 check_deck.py 에서 불러 쓴다.
 같은 낱말을 두 스크립트가 다르게 판정하는 일이 없도록 한 곳에만 둔다.
 
-검사 항목 (10)
+검사 항목 (22)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 문체 — 존댓말·평서형 종결 없이 명사형인가 (check_deck.py 규칙 재사용)
     2. 색 — 토큰 밖 raw hex 를 본문에 직접 쓰지 않았는가
@@ -20,12 +20,20 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
        px 로 적으면 루트 글자 크기를 따라가지 않아 창이 작아질 때 그 값만 남는다.
        테두리 1px 와 미디어 질의 분기점은 예외다
     5. 장마다 data-notes 가 있는가 — 발표자 노트 없는 장은 대본 창이 빈다
+    6~10. 지면 크롬 — 머리띠 · 꼬리띠 · 쪽번호 · 머리띠 브랜드 마크 · 워터마크가 장마다 있는가
+   11. 마크 배경 짝 — data-on 이 마크가 앉는 면과 맞는가 (머리띠 마크는 지면과 반대)
+   12. 브랜드 자리 — 산출물에 「COMPANY NAME」이 남지 않았는가 (assets/ 견본만 예외)
+   13. 출처 칩 — .bl-ev 의 키가 #bl-evidence 근거에 있고 근거마다 제목·등급·출처가 있는가
   렌더 — 실제 브라우저 레이아웃. Playwright 가 필요하다.
-    6. 절대 하한(0.78rem) 미만 글자가 없는가
-    7. 본문 계열이 본문 하한(1.0rem) 이상인가 — 주석 계열만 그 아래를 허용한다
-    8. 16:9 · 좁은 폭 두 경우에서 가로로 넘치지 않는가
-    9. 데이터 마크가 실제 뒷배경 대비 2:1 이상인가 (채움 마크만)
-   10. 문체 — **그려진 뒤의** 본문까지 개조식인가
+   14. 스타일 — 계통 CSS 토큰이 렌더에서 살아 있는가
+   15. 본문 폰트 — Pretendard FontFace 가 실제로 로드됐는가
+   16. 지면 — 화면 좌우 끝까지 닿는가 (body 기본 여백 8px)
+   17. 조작판 — 1600·760·400px 에서 꼬리띠 글자(문서명·쪽번호)를 덮지 않는가
+   18. 절대 하한(0.78rem) 미만 글자가 없는가
+   19. 본문 계열이 본문 하한(1.0rem) 이상인가 — 주석 계열만 그 아래를 허용한다
+   20. 16:9 · 좁은 폭 · 휴대폰 폭 세 경우에서 가로로 넘치지 않는가
+   21. 데이터 마크가 실제 뒷배경 대비 2:1 이상인가 (채움 마크만)
+   22. 문체 — **그려진 뒤의** 본문까지 개조식인가
 
 왜 rem 으로 판정하는가
   px 로 재면 창 크기에 따라 결과가 달라져 같은 파일이 통과했다 떨어졌다 한다.
@@ -54,8 +62,9 @@ BODY_REM = 1.0     # 본문 하한. 주석 계열만 이 아래를 허용한다
 # 주석·라벨 계열. 이 클래스를 단 요소는 BODY_REM 아래여도 된다.
 NOTE_CLS = ("bl-note", "bl-src", "bl-chip", "bl-eyebrow", "bl-stat-t", "bl-rf",
             "bl-ord", "bl-code", "bl-pg", "bl-ev")
-# 16:9 한 벌과 좁은 폭 한 벌. 좁은 쪽은 루트가 하한(10.5px)에 걸리는 구간이다.
-VIEWS = [(1600, 900), (760, 900)]
+# 16:9 한 벌, 좁은 폭 한 벌, 휴대폰 폭 한 벌. 좁은 쪽 둘은 루트가 하한(10.5px)에
+# 걸리는 구간이다 — 글자는 그대로고 가로 자리만 줄어 겹침·넘침이 여기서 난다.
+VIEWS = [(1600, 900), (760, 900), (400, 800)]
 
 
 # 지면이 화면 좌우 끝까지 닿는가. 브라우저 기본 body 여백(8px)이 살아 있으면
@@ -66,6 +75,23 @@ EDGE_PROBE = r"""() => {
   const r = s.getBoundingClientRect();
   const left = Math.round(r.left), right = Math.round(innerWidth - r.right);
   return {left, right, gap: Math.max(left, right)};
+}"""
+
+
+# 떠 있는 조작판이 꼬리띠 글자(문서명 · 쪽번호)를 덮는가. 조작판 단추를 넷에서
+# 여덟로 늘리자 400px 에서 둘 다 덮었다 — 겹침은 넘침이 아니라 가로 넘침 검사가
+# 못 잡는다. 글자의 실제 폭(Range)으로 잰다. 요소 상자는 띠 폭만큼 늘어날 수 있다.
+HUD_PROBE = r"""() => {
+  const hud = document.querySelector('.bl-hud'), s = document.querySelector('.bl-sl');
+  if (!hud || !s || getComputedStyle(hud).display === 'none') return [];
+  const a = hud.getBoundingClientRect(), hit = [];
+  s.querySelectorAll('.bl-rf-name, .bl-pg').forEach(el => {
+    const r = document.createRange(); r.selectNodeContents(el);
+    const b = r.getBoundingClientRect();
+    if (b.width && a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom)
+      hit.push(el.classList.contains('bl-pg') ? '쪽번호' : '문서명');
+  });
+  return hit;
 }"""
 
 
@@ -342,7 +368,7 @@ def check_render(path, rep, shots=None, seen_style=()):
     url = "file://" + os.path.abspath(path)
     overflow, tiny, body_small, marks, drawn = [], [], [], [], ""
     style, need = None, sentinels(open(path, encoding="utf-8").read())
-    edge = None
+    edge, hud_hits = None, []
     with sync_playwright() as pw:
         br = pw.chromium.launch(executable_path=chrome)
         for w, h in VIEWS:
@@ -395,6 +421,7 @@ def check_render(path, rep, shots=None, seen_style=()):
             if w == VIEWS[0][0]:
                 style = pg.evaluate(STYLE_PROBE, [t for _, t in need])
                 edge = pg.evaluate(EDGE_PROBE)
+            hud_hits += [f"{w}px {x}" for x in pg.evaluate(HUD_PROBE)]
 
             if data["over"] > 1:
                 overflow.append(f"{w}px — {data['over']}px 넘침")
@@ -419,6 +446,11 @@ def check_render(path, rep, shots=None, seen_style=()):
                   "blue-live.css 를 불렀는지 본다")
         else:
             rep.o("지면 — 화면 좌우 끝까지 닿는다")
+
+    if hud_hits:
+        rep.f("조작판이 꼬리띠 글자를 덮는다 — " + " · ".join(hud_hits))
+    else:
+        rep.o(f"조작판 — {'·'.join(str(w) for w, _ in VIEWS)}px 모두 꼬리띠 글자를 덮지 않는다")
 
     if tiny:
         rep.f(f"절대 하한 미만 {len(tiny)}건 — {MIN_REM}rem 보다 작다")

@@ -28,7 +28,7 @@ claude plugin marketplace update blue-tools   # 최신판 받기
 - 보고 요지 장 — 결론 + 결정 요청 · 근거 세 줄
 - 로드맵 — 과제 행 × 기간 열 + 확인할 결과
 - 출처 칩과 근거 패널 — 등급 A 1차 공식 · B 학술·전문 · C 언론·2차 · R 직접 조회·집계
-- 조작판 — 펼침 E · 가로 H · 메모 N · 발표 F · 대본 S · 도움말 ?
+- 조작판 — 펼침 E · 가로 H · 메모 N · 발표 F · 대본 S · 도움말 ? (휴대폰 폭은 ‹ › 만)
 - 세는 숫자는 IBM Plex Mono(SIL OFL 1.1). 원본 파일 그대로, 라이선스는 `fonts/LICENSE-IBM-Plex.txt`
 - 지면 양옆 8px 틈 제거
 
