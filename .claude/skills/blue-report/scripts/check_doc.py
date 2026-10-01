@@ -32,6 +32,7 @@ from palette import contrast  # noqa: E402
 from ensure_deps import need_browser  # noqa: E402
 from check_deck import (  # noqa: E402
     Report, style_violations, ALLOWED_HEX, _blank, _rgb_to_hex,
+    check_brand, check_style_applied, sentinels, STYLE_PROBE,
 )
 
 PAGE_W, PAGE_H = 794, 1123        # A4 세로 210x297mm @96dpi
@@ -115,6 +116,9 @@ def check_render(path, rep, shots=None):
         pg = br.new_page(viewport={"width": 1000, "height": 1300})
         pg.goto("file://" + os.path.abspath(path))
         pg.wait_for_timeout(1800)
+        need = sentinels(open(path, encoding="utf-8").read())
+        check_style_applied(pg.evaluate(STYLE_PROBE, [t for _, t in need]),
+                            need, rep)
 
         data = pg.evaluate(r"""() => {
           const band = el => {
@@ -217,6 +221,7 @@ def main():
     check_style(html, rep)
     check_hex(html, rep)
     check_frame(html, rep)
+    check_brand(html, rep, a.doc)
     check_render(a.doc, rep, a.shots)
     return rep.render()
 

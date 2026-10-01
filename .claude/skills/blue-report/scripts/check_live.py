@@ -44,6 +44,7 @@ from palette import contrast, MIN_DATA_CONTRAST  # noqa: E402
 from ensure_deps import need_browser  # noqa: E402
 from check_deck import (  # noqa: E402
     Report, style_violations, ALLOWED_HEX, _blank, _rgb_to_hex,
+    check_brand, check_style_applied, sentinels, STYLE_PROBE,
 )
 
 MIN_REM = 0.78     # 절대 하한. 무엇도 이보다 작게 쓰지 않는다
@@ -249,6 +250,7 @@ def check_render(path, rep, shots=None, seen_style=()):
 
     url = "file://" + os.path.abspath(path)
     overflow, tiny, body_small, marks, drawn = [], [], [], [], ""
+    style, need = None, sentinels(open(path, encoding="utf-8").read())
     with sync_playwright() as pw:
         br = pw.chromium.launch(executable_path=chrome)
         for w, h in VIEWS:
@@ -298,6 +300,9 @@ def check_render(path, rep, shots=None, seen_style=()):
               return out;
             }""", list(NOTE_CLS))
 
+            if w == VIEWS[0][0]:
+                style = pg.evaluate(STYLE_PROBE, [t for _, t in need])
+
             if data["over"] > 1:
                 overflow.append(f"{w}px — {data['over']}px 넘침")
             tiny += [dict(r, view=w) for r in data["tiny"]]
@@ -310,6 +315,9 @@ def check_render(path, rep, shots=None, seen_style=()):
                     pg.screenshot(path=os.path.join(shots, "live.png"), full_page=False)
             pg.close()
         br.close()
+
+    if style is not None:
+        check_style_applied(style, need, rep)
 
     if tiny:
         rep.f(f"절대 하한 미만 {len(tiny)}건 — {MIN_REM}rem 보다 작다")
@@ -384,6 +392,7 @@ def main():
     check_literal_px(html, rep, a.path)
     check_notes(html, rep)
     check_chrome(html, rep)
+    check_brand(html, rep, a.path)
     check_render(a.path, rep, a.shots, seen_style=bad)
 
     sys.exit(rep.render())
