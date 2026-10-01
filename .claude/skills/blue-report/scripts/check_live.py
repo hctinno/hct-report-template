@@ -56,6 +56,17 @@ NOTE_CLS = ("bl-note", "bl-src", "bl-chip", "bl-eyebrow", "bl-stat-t", "bl-rf",
 VIEWS = [(1600, 900), (760, 900)]
 
 
+# 지면이 화면 좌우 끝까지 닿는가. 브라우저 기본 body 여백(8px)이 살아 있으면
+# 머리띠·꼬리띠가 끝에 닿지 않고 흰 틈이 테두리처럼 남는다 — 실제로 그랬다.
+EDGE_PROBE = r"""() => {
+  const s = document.querySelector('.bl-sl');
+  if (!s) return {left: 0, right: 0, gap: 0};
+  const r = s.getBoundingClientRect();
+  const left = Math.round(r.left), right = Math.round(innerWidth - r.right);
+  return {left, right, gap: Math.max(left, right)};
+}"""
+
+
 # ---------------------------------------------------------------- 정적 검사
 
 def check_links(html, rep):
@@ -251,6 +262,7 @@ def check_render(path, rep, shots=None, seen_style=()):
     url = "file://" + os.path.abspath(path)
     overflow, tiny, body_small, marks, drawn = [], [], [], [], ""
     style, need = None, sentinels(open(path, encoding="utf-8").read())
+    edge = None
     with sync_playwright() as pw:
         br = pw.chromium.launch(executable_path=chrome)
         for w, h in VIEWS:
@@ -302,6 +314,7 @@ def check_render(path, rep, shots=None, seen_style=()):
 
             if w == VIEWS[0][0]:
                 style = pg.evaluate(STYLE_PROBE, [t for _, t in need])
+                edge = pg.evaluate(EDGE_PROBE)
 
             if data["over"] > 1:
                 overflow.append(f"{w}px — {data['over']}px 넘침")
@@ -318,6 +331,14 @@ def check_render(path, rep, shots=None, seen_style=()):
 
     if style is not None:
         check_style_applied(style, need, rep)
+
+    if edge is not None:
+        if edge["gap"] > 0:
+            rep.f(f"지면이 화면 끝에 닿지 않는다 — 좌 {edge['left']}px · 우 {edge['right']}px 틈")
+            print("        body 기본 여백(8px)이 살아 있으면 이렇게 된다. "
+                  "blue-live.css 를 불렀는지 본다")
+        else:
+            rep.o("지면 — 화면 좌우 끝까지 닿는다")
 
     if tiny:
         rep.f(f"절대 하한 미만 {len(tiny)}건 — {MIN_REM}rem 보다 작다")
