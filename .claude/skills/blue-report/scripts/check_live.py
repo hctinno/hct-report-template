@@ -34,6 +34,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
 종료 코드는 실패가 하나라도 있으면 1, 아니면 0 이다.
 """
 import argparse
+import json
 import os
 import re
 import sys
@@ -51,7 +52,7 @@ MIN_REM = 0.78     # 절대 하한. 무엇도 이보다 작게 쓰지 않는다
 BODY_REM = 1.0     # 본문 하한. 주석 계열만 이 아래를 허용한다
 # 주석·라벨 계열. 이 클래스를 단 요소는 BODY_REM 아래여도 된다.
 NOTE_CLS = ("bl-note", "bl-src", "bl-chip", "bl-eyebrow", "bl-stat-t", "bl-rf",
-            "bl-ord", "bl-code", "bl-pg")
+            "bl-ord", "bl-code", "bl-pg", "bl-ev")
 # 16:9 한 벌과 좁은 폭 한 벌. 좁은 쪽은 루트가 하한(10.5px)에 걸리는 구간이다.
 VIEWS = [(1600, 900), (760, 900)]
 
@@ -238,6 +239,55 @@ def check_chrome(html, rep):
         rep.o("마크 배경 짝 — 머리띠·워터마크 모두 앉는 면과 맞다")
 
 
+EV_GRADES = {"A", "B", "C", "R"}   # 1차 공식 · 학술·전문 · 언론·2차 · 직접 조회·집계
+
+
+def check_evidence(html, rep):
+    """출처 칩이 실제 근거를 가리키는가.
+
+    칩(.bl-ev data-ev="E1")은 키만 들고 있고 내용은 문서 끝 #bl-evidence JSON
+    한 벌에 있다. 키가 어긋나면 누른 사람에게 「근거 없음」이 뜬다 — 근거를
+    보여 주려고 단 칩이 오히려 근거가 없다는 표시가 된다. 그래서 막는다.
+
+    근거 항목마다 제목 · 등급 · 출처는 반드시 있어야 한다. 등급은 A·B·C·R
+    네 가지다(JSON 의 grades 로 늘릴 수 있다). 칩이 하나도 없는 덱은 해당 없음."""
+    chips = re.findall(r'<[^>]*class="[^"]*\bbl-ev\b[^"]*"[^>]*>', html)
+    if not chips:
+        rep.o("출처 칩 — 없음 (해당 없음)")
+        return
+    keys = [re.search(r'data-ev="([^"]+)"', c) for c in chips]
+    if not all(keys):
+        rep.f(f"출처 칩 {sum(1 for k in keys if not k)}개에 data-ev 키가 없다")
+        return
+    m = re.search(r'<script[^>]*id="bl-evidence"[^>]*>(.*?)</script>', html, re.S)
+    if not m:
+        rep.f(f"출처 칩 {len(chips)}개가 있는데 #bl-evidence 근거 JSON 이 없다")
+        return
+    try:
+        data = json.loads(m.group(1))
+    except ValueError as e:
+        rep.f(f"근거 JSON 을 읽지 못했다 — {e}")
+        return
+    ev = data.get("ev", {})
+    grades = EV_GRADES | set((data.get("grades") or {}).keys())
+    missing = sorted({k.group(1) for k in keys} - set(ev))
+    bad = []
+    for k, e in ev.items():
+        lack = [f for f in ("title", "grade", "src") if not e.get(f)]
+        if lack:
+            bad.append(f"{k} — {'·'.join(lack)} 없음")
+        elif e["grade"] not in grades:
+            bad.append(f"{k} — 등급 {e['grade']} 은 정의되지 않음")
+    if missing:
+        rep.f(f"근거 없는 출처 칩 — {', '.join(missing)}")
+    if bad:
+        rep.f(f"근거 항목 불완전 {len(bad)}건")
+        for b in bad[:6]:
+            print(f"        {b}")
+    if not missing and not bad:
+        rep.o(f"출처 칩 — {len(chips)}개 모두 근거 {len(ev)}건에 이어짐 · 제목·등급·출처 완비")
+
+
 def check_notes(html, rep):
     """장마다 발표자 노트가 있는가. 없으면 대본 창이 그 장에서 빈칸이 된다."""
     sl = re.findall(r"<section[^>]*class=\"[^\"]*\bbl-sl\b[^\"]*\"[^>]*>", html)
@@ -414,6 +464,7 @@ def main():
     check_notes(html, rep)
     check_chrome(html, rep)
     check_brand(html, rep, a.path)
+    check_evidence(html, rep)
     check_render(a.path, rep, a.shots, seen_style=bad)
 
     sys.exit(rep.render())

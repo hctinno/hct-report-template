@@ -1,4 +1,5 @@
-// 라이브 덱 뷰어 — 축 전환(검토↔발표), 단계 전개, 쪽번호, 노트·대본.
+// 라이브 덱 뷰어 — 축 전환(검토↔발표), 단계 전개, 쪽번호, 노트·대본,
+// 펼침·가로·메모·도움말, 출처 칩의 근거 패널.
 //
 // 슬라이드 계통의 deck-viewer.js 와 역할은 같지만 하는 일이 훨씬 적다.
 // 배율과 넘김을 CSS 가 이미 한다 — 루트 글자 크기가 clamp 로 따라가고, 넘김은
@@ -38,7 +39,12 @@
       return Math.max(m, parseInt(el.getAttribute('data-f'), 10) || 0);
     }, 0);
   }
-  function staged() { return deck.classList.contains('bl-deck--present'); }
+  // 단계를 접어 두는가. 발표 모드에서는 언제나 접는다. 검토 중에도 펼침(E)을
+  // 끄면 접는다 — 발표 전에 클릭 순서를 미리 밟아 보는 용도다.
+  function staged() {
+    return deck.classList.contains('bl-deck--present') ||
+           deck.classList.contains('bl-deck--collapse');
+  }
 
   function paint() {
     paintProg();
@@ -51,6 +57,8 @@
       });
     });
     pushScript();
+    paintNotes();
+    paintToggles();
   }
 
   function stepFwd() {
@@ -166,6 +174,176 @@
     if (scriptWin && !scriptWin.closed) scriptWin.close();
   });
 
+  // ── 펼침 · 가로 ───────────────────────────────────────────────────────
+  // 사내 발표 덱(v97)의 조작을 그대로 따른다. 펼침(E)은 단계를 모두 보인
+  // 채로 검토하는 기본 상태이고, 끄면 발표처럼 한 단계씩 나온다. 가로(H)는
+  // 전체화면 없이 축만 옆으로 돌린다.
+  function setCollapse(on) {
+    deck.classList.toggle('bl-deck--collapse', on);
+    step = on ? 0 : step;
+    paint();
+  }
+  function toggleExpand() { setCollapse(!deck.classList.contains('bl-deck--collapse')); }
+  function toggleHoriz() {
+    deck.classList.toggle('bl-deck--horiz');
+    requestAnimationFrame(function () {
+      slides[i].scrollIntoView({ block: 'start', inline: 'start' });
+    });
+    paintToggles();
+  }
+
+  // ── 메모 ──────────────────────────────────────────────────────────────
+  // 지금 장의 발표자 노트를 지면 아래에 띄운다. 대본 창(S)은 팝업이라 막히는
+  // 환경이 있다 — 메모는 같은 창 안이라 언제나 열린다.
+  var notesEl = null;
+  function notesOn() { return !!(notesEl && !notesEl.hidden); }
+  function toggleNotes() {
+    if (!notesEl) {
+      notesEl = document.createElement('aside');
+      notesEl.id = 'bl-notes';
+      notesEl.setAttribute('aria-live', 'polite');
+      notesEl.hidden = true;
+      document.body.appendChild(notesEl);
+    }
+    notesEl.hidden = !notesEl.hidden;
+    paintNotes(); paintToggles();
+  }
+  function paintNotes() {
+    if (!notesOn()) return;
+    notesEl.textContent = '';
+    var h = document.createElement('b');
+    h.textContent = '메모 · ' + (i + 1) + ' / ' + slides.length;
+    notesEl.appendChild(h);
+    notesEl.appendChild(document.createTextNode(noteOf(i) || '(노트 없음)'));
+  }
+
+  // ── 도움말 ────────────────────────────────────────────────────────────
+  var KEYS = [
+    ['← →', '이전 · 다음 (단계 포함)'], ['숫자 Enter', '그 장으로 이동'],
+    ['Home End', '처음 · 끝'], ['E', '펼침 — 단계를 모두 보이기 · 끄면 한 단계씩'],
+    ['H', '가로 보기'], ['N', '메모 — 이 장의 발표자 노트'], ['F', '발표 — 전체화면'],
+    ['S', '대본 창'], ['?', '이 도움말'], ['Esc', '닫기 · 발표 끝내기']
+  ];
+  var helpEl = null;
+  function helpOn() { return !!(helpEl && !helpEl.hidden); }
+  function toggleHelp() {
+    if (!helpEl) {
+      helpEl = document.createElement('div');
+      helpEl.id = 'bl-help';
+      helpEl.setAttribute('role', 'dialog');
+      helpEl.setAttribute('aria-label', '단축키');
+      var dl = document.createElement('dl');
+      KEYS.forEach(function (k) {
+        var dt = document.createElement('dt'), dd = document.createElement('dd');
+        dt.textContent = k[0]; dd.textContent = k[1];
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      helpEl.appendChild(dl);
+      helpEl.hidden = true;
+      helpEl.addEventListener('click', function () { helpEl.hidden = true; });
+      document.body.appendChild(helpEl);
+    }
+    helpEl.hidden = !helpEl.hidden;
+  }
+
+  // ── 출처 칩 · 근거 패널 ───────────────────────────────────────────────
+  // 근거는 덱 안의 JSON 한 벌에 모은다. 칩은 키만 들고 있다 — 같은 근거를
+  // 여러 장에서 가리켜도 내용은 한 곳에서 고친다.
+  var GRADES = { A: '1차 공식 자료', B: '학술·전문기관', C: '언론·2차 자료', R: '직접 조회·집계' };
+  var EV = {};
+  (function () {
+    var el = document.getElementById('bl-evidence');
+    if (!el) return;
+    try {
+      var d = JSON.parse(el.textContent);
+      EV = d.ev || {};
+      if (d.grades) Object.keys(d.grades).forEach(function (g) { GRADES[g] = d.grades[g]; });
+    } catch (err) { if (window.console) console.warn('bl-evidence JSON 을 읽지 못했다', err); }
+  })();
+
+  var evEl = null, evFrom = null;
+  function evOn() { return !!(evEl && !evEl.hidden); }
+  function mk(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function openEvidence(chip) {
+    var key = chip.getAttribute('data-ev'), e = EV[key];
+    if (!evEl) {
+      evEl = mk('div'); evEl.id = 'bl-ev-panel';
+      evEl.setAttribute('role', 'dialog'); evEl.setAttribute('aria-modal', 'true');
+      evEl.setAttribute('aria-labelledby', 'bl-ev-title');
+      evEl.hidden = true;
+      evEl.addEventListener('click', function (ev) { if (ev.target === evEl) closeEvidence(); });
+      document.body.appendChild(evEl);
+    }
+    evEl.textContent = '';
+    var box = mk('div', 'bl-ev-box'), head = mk('div', 'bl-ev-head');
+    head.appendChild(mk('span', 'bl-ev-id', key));
+    if (e && e.grade) {
+      var g = mk('span', 'bl-ev-grade');
+      g.setAttribute('data-g', e.grade);
+      g.appendChild(mk('b', null, e.grade));
+      g.appendChild(document.createTextNode(GRADES[e.grade] || ''));
+      head.appendChild(g);
+    }
+    var x = mk('button', 'bl-ev-x', '×');
+    x.type = 'button'; x.setAttribute('aria-label', '근거 닫기');
+    x.onclick = closeEvidence;
+    head.appendChild(x);
+    box.appendChild(head);
+    var t = mk('h3', 'bl-ev-title', e ? e.title : '근거 없음 — ' + key);
+    t.id = 'bl-ev-title';
+    box.appendChild(t);
+    var claim = chip.getAttribute('data-claim');
+    if (claim) box.appendChild(mk('p', 'bl-ev-claim', claim));
+    if (e && e.facts && e.facts.length) {
+      var ul = mk('ul', 'bl-ev-facts');
+      e.facts.forEach(function (f) { ul.appendChild(mk('li', null, f)); });
+      box.appendChild(ul);
+    }
+    if (e && (e.src || e.date)) {
+      var src = mk('p', 'bl-ev-src', [e.src, e.date].filter(Boolean).join(' · '));
+      if (e.url && /^https?:\/\//.test(e.url)) {
+        src.appendChild(document.createTextNode(' · '));
+        var a = mk('a', null, '원문');
+        a.href = e.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        src.appendChild(a);
+      }
+      box.appendChild(src);
+    }
+    if (e && e.note) box.appendChild(mk('p', 'bl-ev-note', e.note));
+    evEl.appendChild(box);
+    evFrom = chip;
+    evEl.hidden = false;
+    x.focus();
+  }
+  function closeEvidence() {
+    if (!evEl) return;
+    evEl.hidden = true;
+    if (evFrom) { evFrom.focus(); evFrom = null; }
+  }
+  document.addEventListener('click', function (ev) {
+    var chip = ev.target.closest && ev.target.closest('.bl-ev[data-ev]');
+    if (!chip) return;
+    ev.preventDefault(); ev.stopPropagation();
+    openEvidence(chip);
+  }, true);
+
+  // 상태가 있는 단추에 눌림을 표시한다
+  function paintToggles() {
+    function set(act, on) {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-act="' + act + '"]'), function (b) {
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    set('expand', !staged());
+    set('horiz', deck.classList.contains('bl-deck--horiz'));
+    set('notes', notesOn());
+  }
+
   // ── 진행선 ────────────────────────────────────────────────────────────
   // 어디쯤인지만 알려 준다. 없으면 아무 일도 하지 않는다 — 덱이 이 줄을 안 넣어도
   // 뷰어가 죽지 않아야 한다.
@@ -185,6 +363,8 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (evOn()) { if (e.key === 'Escape') { closeEvidence(); e.preventDefault(); } return; }
+    if (helpOn() && (e.key === 'Escape' || e.key === '?')) { toggleHelp(); e.preventDefault(); return; }
     if (e.key >= '0' && e.key <= '9') { jump += e.key; showJump(); e.preventDefault(); return; }
     if (e.key === 'Enter' && jump) {
       var n = parseInt(jump, 10); jump = ''; showJump();
@@ -204,12 +384,17 @@
     if (e.key === 'Home') goTo(0);
     if (e.key === 'End') goTo(slides.length - 1);
     if (e.key === 's' || e.key === 'S') openScript();
+    if (e.key === 'e' || e.key === 'E') { toggleExpand(); e.preventDefault(); }
+    if (e.key === 'h' || e.key === 'H') { toggleHoriz(); e.preventDefault(); }
+    if (e.key === 'n' || e.key === 'N') { toggleNotes(); e.preventDefault(); }
+    if (e.key === '?') { toggleHelp(); e.preventDefault(); }
     if (e.key === 'f' || e.key === 'F') { togglePresent(); e.preventDefault(); }
     if (e.key === 'Escape' && deck.classList.contains('bl-deck--present')) exitPresent();
   });
 
-  deck.addEventListener('click', function () {
+  deck.addEventListener('click', function (e) {
     if (!deck.classList.contains('bl-deck--present')) return;
+    if (e.target.closest && e.target.closest('button, a, .bl-ev, [data-int]')) return;
     if (!stepFwd()) goTo(i + 1);
   });
 
@@ -219,7 +404,11 @@
     prev:    function () { if (!stepBack()) goTo(i - 1); },
     next:    function () { if (!stepFwd()) goTo(i + 1); },
     present: togglePresent,
-    script:  openScript
+    script:  openScript,
+    expand:  toggleExpand,
+    horiz:   toggleHoriz,
+    notes:   toggleNotes,
+    help:    toggleHelp
   };
   Array.prototype.forEach.call(document.querySelectorAll('[data-act]'), function (b) {
     var fn = ACTS[b.getAttribute('data-act')];
