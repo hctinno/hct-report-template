@@ -29,7 +29,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
    14. 스타일 — 계통 CSS 토큰이 렌더에서 살아 있는가
    15. 본문 폰트 — Pretendard FontFace 가 실제로 로드됐는가
    16. 지면 — 화면 좌우 끝까지 닿는가 (body 기본 여백 8px)
-   17. 조작판 — 1600·760·400px 에서 꼬리띠 글자(문서명·쪽번호)를 덮지 않는가
+   17. 조작판 — 1600·760·400px 에서 장마다 꼬리띠 글자(문서명·쪽번호)를 덮지 않는가
    18. 절대 하한(0.78rem) 미만 글자가 없는가
    19. 본문 계열이 본문 하한(1.0rem) 이상인가 — 주석 계열만 그 아래를 허용한다
    20. 16:9 · 좁은 폭 · 휴대폰 폭 세 경우에서 가로로 넘치지 않는가
@@ -101,20 +101,27 @@ EDGE_PROBE = r"""() => {
 # 떠 있는 조작판이 꼬리띠 글자(문서명 · 쪽번호)를 덮는가. 조작판 단추를 넷에서
 # 여덟로 늘리자 400px 에서 둘 다 덮었다 — 겹침은 넘침이 아니라 가로 넘침 검사가
 # 못 잡는다. 글자의 실제 폭(Range)으로 잰다. 요소 상자는 띠 폭만큼 늘어날 수 있다.
+# 장마다 잰다 — 쪽번호 폭과 꼬리띠는 장마다 다를 수 있다. 조작판은 화면 아래에 붙어
+# 있고 꼬리띠는 장 아래 끝에 있으니, 장의 아래 끝을 화면 아래 끝에 맞춘 자리로 옮겨
+# 잰다(좁은 폭에서 화면보다 긴 장도 끝까지 내리면 그 자리에서 만난다).
 HUD_PROBE = r"""() => {
-  const hud = document.querySelector('.bl-hud'), s = document.querySelector('.bl-sl');
-  if (!hud || !s || getComputedStyle(hud).display === 'none') return [];
+  const hud = document.querySelector('.bl-hud');
+  if (!hud || getComputedStyle(hud).display === 'none') return [];
   const a = hud.getBoundingClientRect(), hit = [];
-  s.querySelectorAll('.bl-rf-name, .bl-pg').forEach(el => {
-    const r = document.createRange(); r.selectNodeContents(el);
-    const b = r.getBoundingClientRect();
-    // 말줄임으로 잘린 글자는 글자 폭(Range)이 상자 밖까지 잡힌다. 보이는 부분만 잰다
-    let L = b.left, R = b.right;
-    if (getComputedStyle(el).overflowX !== 'visible') {
-      const e = el.getBoundingClientRect(); L = Math.max(L, e.left); R = Math.min(R, e.right);
-    }
-    if (R - L > 0 && a.left < R && L < a.right && a.top < b.bottom && b.top < a.bottom)
-      hit.push(el.classList.contains('bl-pg') ? '쪽번호' : '문서명');
+  document.querySelectorAll('.bl-sl').forEach((s, i) => {
+    const dy = innerHeight - s.getBoundingClientRect().bottom;
+    s.querySelectorAll('.bl-rf-name, .bl-pg').forEach(el => {
+      const r = document.createRange(); r.selectNodeContents(el);
+      const b = r.getBoundingClientRect();
+      // 말줄임으로 잘린 글자는 글자 폭(Range)이 상자 밖까지 잡힌다. 보이는 부분만 잰다
+      let L = b.left, R = b.right;
+      if (getComputedStyle(el).overflowX !== 'visible') {
+        const e = el.getBoundingClientRect(); L = Math.max(L, e.left); R = Math.min(R, e.right);
+      }
+      const T = b.top + dy, B = b.bottom + dy;
+      if (R - L > 0 && a.left < R && L < a.right && a.top < B && T < a.bottom)
+        hit.push([el.classList.contains('bl-pg') ? '쪽번호' : '문서명', i + 1]);
+    });
   });
   return hit;
 }"""
@@ -667,7 +674,12 @@ def check_render(path, rep, shots=None, seen_style=()):
             if w == VIEWS[0][0]:
                 style = pg.evaluate(STYLE_PROBE, [t for _, t in need])
                 edge = pg.evaluate(EDGE_PROBE)
-            hud_hits += [f"{w}px {x}" for x in pg.evaluate(HUD_PROBE)]
+            by_what = {}
+            for what, n in pg.evaluate(HUD_PROBE):
+                by_what.setdefault(what, []).append(n)
+            for what, ns in by_what.items():
+                at = ",".join(map(str, ns[:6])) + ("…" if len(ns) > 6 else "")
+                hud_hits.append(f"{w}px {what} {len(ns)}장({at})")
 
             if data["over"] > 1:
                 overflow.append(f"{w}px — {data['over']}px 넘침")
