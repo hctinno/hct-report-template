@@ -9,6 +9,11 @@
       "name": "blue-report",
       "source": "./.claude/skills/blue-report",
       "description": "블루 리포트 사내 공용 보고서 템플릿. 새 보고서의 출발점인 기준 덱 1종, 라이브 덱 1종, 용도별 발표 덱 12종, A4 문서 4종, 웹 보드 5종, FCC/KC 보고서 14종, 레이아웃 카탈로그 19종. 머리띠·꼬리띠·로고·워터마크를 검사기가 강제한다. HTML·PDF·PPTX·DOCX 출력."
+    },
+    {
+      "name": "ax-blue-report",
+      "source": "./.claude/skills/ax-blue-report",
+      "description": "AX_BLUE_REPORT_V1 — 경영진 보고용 인터랙티브 HTML 발표 덱. 견본 장 56종(표지·보고 요지·시장 카드·연표·벤치마킹·1:1 비교·조직도·간트·결정 요청·Q&A·부록 도해)을 골라 글자만 바꿔 쓴다. 남색 머리띠·로고·워터마크·형광 밴드, 클릭 단계·등장 애니메이션·출처 핀과 근거 창·지금 원문 보기·발표 모드·레이저·대본 창. 한 파일 HTML·발표 전용·Artifact·링크 PDF·PDF 뷰어·대본 출력. 견본 내용은 전부 가상."
     }
   ]
 }
