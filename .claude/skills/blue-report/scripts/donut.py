@@ -12,6 +12,12 @@
     python3 donut.py 41.9 34.9 23.2
     python3 donut.py --labels 중소기업,중견기업,대기업 41.9 34.9 23.2
     python3 donut.py --r 78 --w 36 --gap 1.5 41.9 34.9 23.2
+
+라이브 덱(--live) — rem 으로 크기가 정해지는 .bl-donut-box 한 벌을 낸다. 인라인 px 가
+없고, 조각 · 범례에 data-k 가 붙어 손을 대면 가운데에 그 항목이 뜬다. 장에 들어올 때
+조각이 차례로 그려진다(--dash). 가운데 합계 · 단위 · 설명을 줄 수 있다.
+    python3 donut.py --live --labels 가,나,다 --total 46 --unit 개 --caption "전체 계정" 50 30 20
+    python3 donut.py --live --raw --labels 가,나,다 27 12 7      # 값이 건수 — 비율은 스크립트가 낸다
 """
 import argparse
 import math
@@ -110,6 +116,56 @@ def build(values, labels=None, r=78, width=36, gap=1.5, dark=False, delay_start=
     return svg, leg
 
 
+def build_live(values, labels=None, r=110, width=48, gap=1.5, raw=False, total=None, unit="",
+               caption="", aria="비율 분포"):
+    """라이브 덱용 .bl-donut-box. 각도 계산은 build() 와 같은 식이다.
+
+    raw 면 값을 건수로 읽고 비율은 합계로 낸다 — 범례에는 건수, 풍선에는 비율이 뜬다.
+    raw 가 아니면 값이 퍼센트라 합이 100 근처여야 한다(아니면 경고)."""
+    s = sum(values)
+    if s <= 0:
+        raise SystemExit("오류: 값의 합이 0이다.")
+    if not raw and abs(s - 100) > 0.5:
+        print(f"# 경고: 값의 합이 {s:.1f}%다. 건수라면 --raw 를 준다.", file=sys.stderr)
+    ramp = _ramp("data")
+    if len(values) > len(ramp):
+        raise SystemExit(f"오류: 구간 {len(values)}개는 램프 {len(ramp)}색을 넘는다. 구간을 묶거나 막대로 바꾼다.")
+    C = 2 * math.pi * r
+    gap_len = C * gap / 360
+    order = sorted(range(len(values)), key=lambda k: -values[k])
+    color = {idx: ramp[rank] for rank, idx in enumerate(order)}
+    size = (r + width / 2) * 2 + 4
+    segs, legs, cum = [], [], 0.0
+
+    def num(v):
+        return f"{v:,.0f}" if raw or float(v).is_integer() else f"{v:.1f}"
+
+    for k, v in enumerate(values):
+        pct = v / s * 100
+        dash = max(C * pct / 100 - gap_len, 1)
+        rot = cum * 3.6 - 90
+        segs.append(f'      <circle class="bl-donut-s" data-k="{k}" r="{r:g}" stroke="{color[k]}" '
+                    f'stroke-width="{width:g}" stroke-dasharray="{dash:.1f} {C:.1f}" '
+                    f'transform="rotate({rot:.2f})" style="--i:{k};--dash:{dash:.1f}"></circle>')
+        name = labels[k] if labels and k < len(labels) else f"구간 {k + 1}"
+        shown = num(v) + (unit if raw else "%")
+        legs.append(f'    <li data-k="{k}" data-p="{pct:.1f}%"><i style="background:{color[k]}"></i>'
+                    f'<span>{name}</span><b>{shown}</b></li>')
+        cum += pct
+    tot = total if total is not None else (num(s) if raw else "100")
+    cap = f'<span class="bl-cap">{caption}</span>' if caption else ""
+    out = ('<div class="bl-donut-box">\n'
+           f'  <figure class="bl-donut" role="img" aria-label="{aria}">\n'
+           f'    <svg viewBox="0 0 {size:.0f} {size:.0f}" aria-hidden="true"><g transform="translate({size / 2:.0f},{size / 2:.0f})">\n'
+           + "\n".join(segs) + "\n    </g></svg>\n"
+           f'    <figcaption class="bl-donut-c"><b>{tot}<small>{unit}</small></b>{cap}</figcaption>\n'
+           '  </figure>\n'
+           '  <ul class="bl-donut-leg">\n' + "\n".join(legs) + "\n  </ul>\n</div>")
+    print(f"# C = 2*pi*{r:g} = {C:.1f} · 간격 {gap}도 · 램프 --br-data-* · 라이브 덱용")
+    print(out)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 도넛 SVG 생성기")
     ap.add_argument("values", nargs="+", type=float, help="구간 퍼센트 값")
@@ -118,9 +174,18 @@ def main():
     ap.add_argument("--w", type=float, default=36, help="선 두께 (기본 36)")
     ap.add_argument("--gap", type=float, default=1.5, help="구간 간격 각도 (기본 1.5)")
     ap.add_argument("--dark", action="store_true", help="다크면용 램프 사용")
+    ap.add_argument("--live", action="store_true", help="라이브 덱용 .bl-donut-box 로 낸다 (rem · 손대면 강조)")
+    ap.add_argument("--raw", action="store_true", help="--live 에서 값을 건수로 읽는다")
+    ap.add_argument("--total", help="--live 가운데 큰 숫자 (기본: 합계)")
+    ap.add_argument("--unit", default="", help="--live 가운데 숫자 · 범례 값의 단위")
+    ap.add_argument("--caption", default="", help="--live 가운데 숫자 밑 설명")
     a = ap.parse_args()
-    build(a.values, a.labels.split(",") if a.labels else None,
-          r=a.r, width=a.w, gap=a.gap, dark=a.dark)
+    labels = a.labels.split(",") if a.labels else None
+    if a.live:
+        build_live(a.values, labels, r=a.r if a.r != 78 else 110, width=a.w if a.w != 36 else 48,
+                   gap=a.gap, raw=a.raw, total=a.total, unit=a.unit, caption=a.caption)
+        return
+    build(a.values, labels, r=a.r, width=a.w, gap=a.gap, dark=a.dark)
 
 
 if __name__ == "__main__":

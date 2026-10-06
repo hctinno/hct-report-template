@@ -11,7 +11,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
 판정이 겹치는 것(문체·raw hex·마크 대비)은 check_deck.py 에서 불러 쓴다.
 같은 낱말을 두 스크립트가 다르게 판정하는 일이 없도록 한 곳에만 둔다.
 
-검사 항목 (22)
+검사 항목 (23)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 문체 — 존댓말·평서형 종결 없이 명사형인가 (check_deck.py 규칙 재사용)
     2. 색 — 토큰 밖 raw hex 를 본문에 직접 쓰지 않았는가
@@ -23,7 +23,8 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
     6~10. 지면 크롬 — 머리띠 · 꼬리띠 · 쪽번호 · 머리띠 브랜드 마크 · 워터마크가 장마다 있는가
    11. 마크 배경 짝 — data-on 이 마크가 앉는 면과 맞는가 (머리띠 마크는 지면과 반대)
    12. 브랜드 자리 — 산출물에 「COMPANY NAME」이 남지 않았는가 (assets/ 견본만 예외)
-   13. 출처 칩 — .bl-ev 의 키가 #bl-evidence 근거에 있고 근거마다 제목·등급·출처가 있는가
+   13. 출처 칩 — .bl-ev 의 키(쉼표로 여럿)가 #bl-evidence 근거에 있고 근거마다 제목·등급·출처가
+       있는가. 캡처(imgs)·하이라이트 상자(hl)·원문(doc)이 가리키는 것도 실제로 있는가
   렌더 — 실제 브라우저 레이아웃. Playwright 가 필요하다.
    14. 스타일 — 계통 CSS 토큰이 렌더에서 살아 있는가
    15. 본문 폰트 — Pretendard FontFace 가 실제로 로드됐는가
@@ -34,6 +35,9 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
    20. 16:9 · 좁은 폭 · 휴대폰 폭 세 경우에서 가로로 넘치지 않는가
    21. 데이터 마크가 실제 뒷배경 대비 2:1 이상인가 (채움 마크만)
    22. 문체 — **그려진 뒤의** 본문까지 개조식인가
+   23. 스크립트 — 뷰어 엔진이 떠 있고 부품이 예외 없이 시작하는가 (세 폭 모두)
+       live-viewer.js 를 부르는 덱인데 window.blDeck 이 없으면 실패다. 연결형 산출물에서
+       JS 를 옆에 복사하지 않으면 지면은 멀쩡히 그려지고 넘김·발표·근거가 전부 죽는다
 
 왜 rem 으로 판정하는가
   px 로 재면 창 크기에 따라 결과가 달라져 같은 파일이 통과했다 떨어졌다 한다.
@@ -61,7 +65,12 @@ MIN_REM = 0.78     # 절대 하한. 무엇도 이보다 작게 쓰지 않는다
 BODY_REM = 1.0     # 본문 하한. 주석 계열만 이 아래를 허용한다
 # 주석·라벨 계열. 이 클래스를 단 요소는 BODY_REM 아래여도 된다.
 NOTE_CLS = ("bl-note", "bl-src", "bl-chip", "bl-eyebrow", "bl-stat-t", "bl-rf",
-            "bl-ord", "bl-code", "bl-pg", "bl-ev")
+            "bl-ord", "bl-code", "bl-pg", "bl-ev",
+            # 라이브 부품(1.44.0) — 라벨 · 칩 · 축 · 칸 안 값처럼 본문이 아닌 글자만.
+            # 본문을 담는 그릇(카드 · 행)은 넣지 않는다 — 넣으면 그 안 본문까지 하한이 풀린다.
+            "bl-lbl", "bl-cap", "bl-mini", "bl-axis", "bl-dl", "bl-leg", "bl-num", "bl-pill",
+            "bl-badge", "bl-delta", "bl-asof", "bl-pgref", "bl-stamp", "bl-conf", "bl-seg",
+            "bl-fig-ab", "bl-replay", "bl-shot-open", "bl-route-st", "bl-sc-pick")
 # 16:9 한 벌, 좁은 폭 한 벌, 휴대폰 폭 한 벌. 좁은 쪽 둘은 루트가 하한(10.5px)에
 # 걸리는 구간이다 — 글자는 그대로고 가로 자리만 줄어 겹침·넘침이 여기서 난다.
 VIEWS = [(1600, 900), (760, 900), (400, 800)]
@@ -303,9 +312,14 @@ def check_evidence(html, rep):
     칩(.bl-ev data-ev="E1")은 키만 들고 있고 내용은 문서 끝 #bl-evidence JSON
     한 벌에 있다. 키가 어긋나면 누른 사람에게 「근거 없음」이 뜬다 — 근거를
     보여 주려고 단 칩이 오히려 근거가 없다는 표시가 된다. 그래서 막는다.
+    칩 하나가 근거 여럿을 가리킬 수 있다(data-ev="E1,E2" — 패널에 탭으로 뜬다).
 
     근거 항목마다 제목 · 등급 · 출처는 반드시 있어야 한다. 등급은 A·B·C·R
-    네 가지다(JSON 의 grades 로 늘릴 수 있다). 칩이 하나도 없는 덱은 해당 없음."""
+    네 가지다(JSON 의 grades 로 늘릴 수 있다). 칩이 하나도 없는 덱은 해당 없음.
+
+    캡처를 붙인 근거는 셋을 더 본다 — 캡처 id 가 img 표에 있는가, 하이라이트
+    상자(hl)가 있는 캡처를 가리키고 값이 0~1 사각형인가, 원문(doc)이 문서 안
+    <script id> 로 있는가. 하나라도 어긋나면 패널이 빈 뷰어나 빈 원문을 연다."""
     p = _Evidence()
     p.feed(html)
     p.close()
@@ -325,8 +339,11 @@ def check_evidence(html, rep):
         rep.f(f"근거 JSON 을 읽지 못했다 — {e}")
         return
     ev = data.get("ev", {})
-    grades = EV_GRADES | set((data.get("grades") or {}).keys())
-    missing = sorted(set(chips) - set(ev))
+    imgs = data.get("img") or {}
+    rects = data.get("hl") or {}
+    grades = EV_GRADES | set((data.get("grades") or data.get("gr") or {}).keys())
+    keys = [k.strip() for c in chips for k in c.split(",") if k.strip()]
+    missing = sorted(set(keys) - set(ev))
     bad = []
     for k, e in ev.items():
         lack = [f for f in ("title", "grade", "src") if not e.get(f)]
@@ -334,6 +351,22 @@ def check_evidence(html, rep):
             bad.append(f"{k} — {'·'.join(lack)} 없음")
         elif e["grade"] not in grades:
             bad.append(f"{k} — 등급 {e['grade']} 은 정의되지 않음")
+        for it in e.get("imgs") or []:
+            iid = it[0] if isinstance(it, (list, tuple)) and it else None
+            if not iid or iid not in imgs:
+                bad.append(f"{k} — 캡처 {iid} 가 img 표에 없음")
+        doc = e.get("doc")
+        if doc and not re.search(r'<script[^>]*\sid="' + re.escape(doc) + r'"', html):
+            bad.append(f"{k} — 원문 {doc} 의 <script id> 가 없음")
+    for iid, rs in rects.items():
+        if iid not in imgs:
+            bad.append(f"하이라이트 상자 {iid} — 그런 캡처가 없음")
+            continue
+        for r in rs:
+            ok = (isinstance(r, (list, tuple)) and len(r) == 4 and all(isinstance(v, (int, float)) for v in r)
+                  and 0 <= r[0] <= 1 and 0 <= r[1] <= 1 and 0 < r[2] <= 1 and 0 < r[3] <= 1)
+            if not ok:
+                bad.append(f"하이라이트 상자 {iid} — 0~1 사각형 [x, y, w, h] 가 아님: {r}")
     if missing:
         rep.f(f"근거 없는 출처 칩 — {', '.join(missing)}")
     if bad:
@@ -341,7 +374,8 @@ def check_evidence(html, rep):
         for b in bad[:6]:
             print(f"        {b}")
     if not missing and not bad:
-        rep.o(f"출처 칩 — {len(chips)}개 모두 근거 {len(ev)}건에 이어짐 · 제목·등급·출처 완비")
+        extra = f" · 캡처 {len(imgs)}장" if imgs else ""
+        rep.o(f"출처 칩 — {len(chips)}개 모두 근거 {len(ev)}건에 이어짐 · 제목·등급·출처 완비{extra}")
 
 
 def check_notes(html, rep):
@@ -368,11 +402,13 @@ def check_render(path, rep, shots=None, seen_style=()):
     url = "file://" + os.path.abspath(path)
     overflow, tiny, body_small, marks, drawn = [], [], [], [], ""
     style, need = None, sentinels(open(path, encoding="utf-8").read())
-    edge, hud_hits = None, []
+    edge, hud_hits, errors, dead = None, [], [], []
+    wants_engine = "live-viewer.js" in open(path, encoding="utf-8").read()
     with sync_playwright() as pw:
         br = pw.chromium.launch(executable_path=chrome)
         for w, h in VIEWS:
             pg = br.new_page(viewport={"width": w, "height": h}, reduced_motion="reduce")
+            pg.on("pageerror", lambda e, w=w: errors.append(f"{w}px {str(e).splitlines()[0]}"))
             pg.goto(url)
             pg.wait_for_timeout(1200)
 
@@ -382,6 +418,7 @@ def check_render(path, rep, shots=None, seen_style=()):
               out.over = Math.max(0, document.documentElement.scrollWidth
                                    - document.documentElement.clientWidth);
               out.html = document.body.innerText;
+              out.engine = !!(window.blDeck && window.blDeck.slides && window.blDeck.slides.length);
 
               // 글자 크기 — 직접 글자를 가진 요소만 본다. 부모까지 세면 같은
               // 문장을 여러 번 센다.
@@ -425,6 +462,8 @@ def check_render(path, rep, shots=None, seen_style=()):
 
             if data["over"] > 1:
                 overflow.append(f"{w}px — {data['over']}px 넘침")
+            if wants_engine and not data["engine"]:
+                dead.append(f"{w}px")
             tiny += [dict(r, view=w) for r in data["tiny"]]
             body_small += [dict(r, view=w) for r in data["body"]]
             if w == VIEWS[0][0]:
@@ -487,6 +526,16 @@ def check_render(path, rep, shots=None, seen_style=()):
         rep.o(f"데이터 마크 — {len(marks)}개 모두 뒷배경 대비 {MIN_DATA_CONTRAST}:1 이상")
     else:
         rep.w("채움 데이터 마크 없음 — 막대를 쓰면 검산 대상이 생긴다")
+
+    if errors:
+        rep.f(f"스크립트 예외 {len(errors)}건 — 뷰어나 부품이 시작하다 멈췄다")
+        for e in errors[:5]:
+            print(f"        {e}")
+    elif dead:
+        rep.f(f"뷰어 엔진이 뜨지 않았다 ({' · '.join(dead)}) — live-viewer.js 를 찾지 못했다. "
+              "연결형이면 JS 를 덱 옆에 두고, 아니면 --single-file 로 묶는다")
+    else:
+        rep.o("스크립트 — 세 폭 모두 엔진이 뜨고 예외 없이 시작한다")
 
     # 원문 검사가 못 본 글자(JS 로 그린 것)를 한 번 더 본다.
     def _key(b):

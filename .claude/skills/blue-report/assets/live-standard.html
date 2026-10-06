@@ -40,9 +40,17 @@
 
      이 덱에 들어 있는 장 짜임새 (사내 발표 덱과 같은 어휘)
        · 표지      눈썹 .bl-cover-k · 제목 + .bl-tag · 구분선 · 한 줄 메시지 · 발표자 .bl-sig
+       · 목차      .bl-agenda — 번호 · 장 제목 · 부제 한 줄씩. 마지막 행 + 부록
        · 보고 요지  .bl-gist — 왼쪽 결론 + 결정 요청 .bl-ask · 오른쪽 근거 세 줄
+       · 장 간지    .bl-sl--chapter — Chapter 라벨 · 큰 제목 · 진행 표시 .bl-chapter-nav
        · 로드맵    .bl-road — 과제 행 × 기간 열 + 확인할 결과. 행 색은 data-cat
        · 출처 칩   수치 옆 .bl-ev → 문서 끝 #bl-evidence JSON 의 근거로 열린다
+       · 마무리    .bl-fin — 전제 한 줄 · 핵심 문장(형광 막대) · 질의응답
+       · 부록      간지 .bl-sl--apxdiv(쪽번호 「부록」) · 이후 장마다 data-apx
+       · 예상 질문  .bl-qa — 왼쪽 질문 · 오른쪽 답(A 표지)
+     본문 덩어리는 .bl-mid 로 남는 높이의 가운데에 둔다 — 제목은 위에 고정된다.
+     여기 없는 부품(간트 · 조직도 · 도넛 · 누적 막대 · 흐름도 · 목업 · 노선도 · 탭 …)은
+     live-catalog.html 에서 장째 복사해 온다.
      ═══════════════════════════════════════════════════════════════════ -->
 
 <div id="bl-prog"></div>
@@ -77,24 +85,12 @@
     </header>
     <div class="bl-bd">
       <h2 class="bl-title">보고 순서 — <em>현황 · 실행 · 결정</em></h2>
-      <p class="bl-lede">현황 세 절 → 실행 두 절 → 결정 요청 한 절</p>
-      <div class="bl-cols--3 bl-cols">
-        <div class="bl-card bl-card--t1">
-          <span class="bl-ord">01 — 02</span>
-          <h3>현황</h3>
-          <p>반복 업무 실태 · 시간 분포 · 대상 업무 목록</p>
-        </div>
-        <div class="bl-card bl-card--t2">
-          <span class="bl-ord">03 — 04</span>
-          <h3>실행</h3>
-          <p>지금과 바꾼 뒤의 차이 · 넉 달 일정과 담당</p>
-        </div>
-        <div class="bl-card bl-card--t3">
-          <span class="bl-ord">05 — 06</span>
-          <h3>결정</h3>
-          <p>필요한 지원 세 가지 · 판정 기준</p>
-        </div>
-      </div>
+      <ol class="bl-agenda">
+        <li><b>1</b><h3>현황</h3><span>반복 업무 실태 · 시간 분포 · 대상 업무 목록</span></li>
+        <li><b>2</b><h3>실행</h3><span>지금과 바꾼 뒤의 차이 · 넉 달 일정과 담당</span></li>
+        <li><b>3</b><h3>결정</h3><span>필요한 지원 세 가지 · 판정 기준</span></li>
+        <li class="is-apx"><b>+</b><h3>부록</h3><span>예상 질문 · 용어</span></li>
+      </ol>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
     <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
@@ -130,19 +126,20 @@
   </section>
 
   <!-- 03 간지 ─────────────────────────────────────────────────────────── -->
-  <section class="bl-sl bl-sl--dark bl-sl--div" data-notes="간지는 그룹 머리다. 제목 하나만 두고 바로 넘어간다.">
+  <section class="bl-sl bl-sl--chapter" data-notes="장 간지는 제목만 읽고 넘어간다. 아래 칸이 지금 몇째 장인지 알려 준다.">
     <header class="bl-hd">
-      <span class="bl-code"><b>1</b>현황</span>
+      <span class="bl-code"><b>CH 01</b>현황</span>
       <span class="bl-sp"></span>
-      <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
-    <div class="bl-bd bl-bd--center">
-      <p class="bl-eyebrow">Part 1</p>
-      <h2 class="bl-title">반복 업무의 <em>실태</em></h2>
+    <div class="bl-bd bl-chapter">
+      <p class="bl-chapter-k">Chapter 01</p>
+      <h2 class="bl-title">반복 업무의 실태</h2>
       <p class="bl-lede">어느 일이 얼마나 되풀이되는가</p>
+      <ol class="bl-chapter-nav" aria-label="장 진행"><li class="is-on">01</li><li>02</li><li>03</li></ol>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
-    <div class="br-watermark" data-on="dark"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 04 카드 4열 + 연결자 + 결론 줄 ──────────────────────────────────── -->
@@ -155,7 +152,7 @@
     <div class="bl-bd">
       <h2 class="bl-title">반복 업무의 네 단계 — <em>수집 · 정리 · 작성 · 회람</em></h2>
       <p class="bl-lede">수집 → 정리 → 작성 → 회람 · 네 단계 모두 사람 손을 거치는 구조</p>
-      <div class="bl-flow bl-flow--4">
+      <div class="bl-flow bl-flow--4 bl-mid">
         <div class="bl-card bl-card--t1">
           <span class="bl-ord">1</span><h3>수집</h3>
           <p>설비·시스템 4곳에서 값을 내려받음</p>
@@ -192,8 +189,8 @@
     <div class="bl-bd">
       <h2 class="bl-title">월 <em>168시간</em>이 네 단계에 묶임</h2>
       <p class="bl-lede">3개 팀 · 9명 · 8주 기록 기준 <strong>정리 단계가 절반 이상</strong><button type="button" class="bl-ev" data-ev="E1" data-claim="월 168시간 · 정리 단계 62%">출처</button></p>
-      <div class="bl-cols--4 bl-cols">
-        <div class="bl-stat"><span class="bl-stat-v">168</span><span class="bl-stat-t">월 소요 시간</span></div>
+      <div class="bl-cols--4 bl-cols bl-mid">
+        <div class="bl-stat"><span class="bl-stat-v" data-count>168</span><span class="bl-stat-t">월 소요 시간</span></div>
         <div class="bl-stat"><span class="bl-stat-v">9</span><span class="bl-stat-t">관여 인원</span></div>
         <div class="bl-stat"><span class="bl-stat-v">4</span><span class="bl-stat-t">대상 단계</span></div>
         <div class="bl-stat"><span class="bl-stat-v">62<sup>%</sup></span><span class="bl-stat-t">정리 단계 비중</span></div>
@@ -225,7 +222,7 @@
     <div class="bl-bd">
       <h2 class="bl-title">대상 업무 <em>6건</em>과 착수 순서</h2>
       <p class="bl-lede">월 소요 시간이 큰 순서 · 착수 난도와 함께 배치</p>
-      <table class="bl-tbl">
+      <table class="bl-tbl bl-mid">
         <thead><tr><th>순서</th><th>업무</th><th>담당</th><th class="num">월 소요</th><th>난도</th><th>상태</th></tr></thead>
         <tbody>
           <tr><td>01</td><td>측정값 수집 자동화</td><td>기술1팀</td><td class="num">48h</td><td>중</td><td><span class="bl-chip bl-chip--ok">진행 중</span></td></tr>
@@ -243,19 +240,20 @@
   </section>
 
   <!-- 07 간지 ─────────────────────────────────────────────────────────── -->
-  <section class="bl-sl bl-sl--dark bl-sl--div" data-notes="두 번째 그룹으로 넘어간다. 여기부터는 실행 이야기다.">
+  <section class="bl-sl bl-sl--chapter" data-notes="두 번째 장으로 넘어간다. 여기부터는 실행 이야기다.">
     <header class="bl-hd">
-      <span class="bl-code"><b>2</b>실행</span>
+      <span class="bl-code"><b>CH 02</b>실행</span>
       <span class="bl-sp"></span>
-      <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
-    <div class="bl-bd bl-bd--center">
-      <p class="bl-eyebrow">Part 2</p>
-      <h2 class="bl-title">넉 달 동안 <em>무엇을 하는가</em></h2>
-      <p class="bl-lede">지금과 바꾼 뒤의 차이 · 일정과 담당</p>
+    <div class="bl-bd bl-chapter">
+      <p class="bl-chapter-k">Chapter 02</p>
+      <h2 class="bl-title">넉 달 동안 무엇을 하는가</h2>
+      <p class="bl-lede">지금과 바꾼 뒤의 차이 · 일정과 담당 · 결정 요청</p>
+      <ol class="bl-chapter-nav" aria-label="장 진행"><li>01</li><li class="is-on">02</li><li>03</li></ol>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
-    <div class="br-watermark" data-on="dark"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
   <!-- 08 비교 — 사이드바 배치 ────────────────────────────────────────── -->
@@ -268,7 +266,7 @@
     <div class="bl-bd">
       <h2 class="bl-title">바뀌는 것은 사람이 아니라 <em>단계</em></h2>
       <p class="bl-lede">사람이 판단하는 자리는 그대로 · 규칙으로 정해진 자리만 도구로 이관</p>
-      <div class="bl-cols--sidebar bl-cols">
+      <div class="bl-cols--sidebar bl-cols bl-mid">
         <div class="bl-card bl-card--risk">
           <h3>지금</h3>
           <ul class="bl-ul">
@@ -325,7 +323,7 @@
     <div class="bl-bd">
       <h2 class="bl-title">넉 달 로드맵 — <em>동시에 진행할 5가지 과제</em></h2>
       <p class="bl-lede">9월 조사 → 10~11월 실행 → 12월 판정 · <strong>협조 2건은 부서 응답이 일정의 전제</strong></p>
-      <div class="bl-road">
+      <div class="bl-road bl-mid">
         <div class="bl-road-h"><span>과제 · 담당</span><span class="bl-mn">9월</span><span class="bl-mn">10월</span><span class="bl-mn">11월</span><span class="bl-mn">12월</span><span>확인할 결과</span></div>
         <div class="bl-road-r" data-cat="1">
           <div class="bl-road-k"><span class="bl-mn">01</span><div><h3>대상 업무 조사</h3><small>전 부서 · 운영지원팀</small></div></div>
@@ -374,7 +372,7 @@
     <div class="bl-bd">
       <h2 class="bl-title">실행에 필요한 <em>세 가지</em><span class="bl-tag">요청</span></h2>
       <p class="bl-lede">조사 협조 · 도구 계정 · 판정 기준 합의</p>
-      <div class="bl-rows">
+      <div class="bl-rows bl-mid">
         <div class="bl-card bl-card--key" data-f="1">
           <span class="bl-ord">요청 1</span>
           <h3>전 부서 조사 협조</h3>
@@ -397,22 +395,60 @@
     <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
-  <!-- 11 마무리 ───────────────────────────────────────────────────────── -->
-  <section class="bl-sl bl-sl--dark" data-notes="마지막 한 문장만 남기고 끝낸다. 질문을 받는다.">
+  <!-- 11 마무리 — 전제 한 줄 · 핵심 문장 · 질의응답 ───────────────────── -->
+  <section class="bl-sl" data-notes="마지막 한 문장만 남기고 끝낸다. 노란 막대가 그려지는 동안 잠깐 멈추고 질문을 받는다.">
     <header class="bl-hd">
       <span class="bl-code"><b>07</b>마무리</span>
       <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd bl-fin">
+      <p class="bl-fin-l1">사람이 판단하는 자리는 지키고</p>
+      <h2 class="bl-fin-l2"><span class="bl-fin-w">되풀이되는 자리만</span> <mark class="bl-fin-mk">도구로</mark></h2>
+      <hr class="bl-fin-rule">
+      <p class="bl-fin-ty">질의응답</p>
+      <p class="bl-fin-sig">9월 조사 · 10월 착수 · 12월 판정 · 운영지원팀 · 기술1팀</p>
+    </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+  </section>
+
+  <!-- 12 부록 간지 — 쪽번호 자리에 「부록」. 이후 장은 부록 쪽번호 ──────────── -->
+  <section class="bl-sl bl-sl--dark bl-sl--apxdiv" data-notes="여기부터 부록이다. 질문이 나올 때만 연다. a 를 누르고 부록 쪽번호를 치면 바로 간다.">
+    <header class="bl-hd">
+      <span class="bl-code"><b>부록</b>예상 질문 · 용어</span>
+      <span class="bl-sp"></span>
       <div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
-    <div class="bl-bd bl-bd--center">
-      <h2 class="bl-title">사람이 판단하는 자리를 지키고<br><em>되풀이되는 자리만 도구로</em></h2>
-      <p class="bl-lede">9월 조사 · 10월 착수 · 12월 판정</p>
+    <div class="bl-bd bl-apxdiv">
+      <b aria-hidden="true">+</b>
+      <div><h2 class="bl-title">부록</h2><p class="bl-lede">예상 질문 · 용어</p></div>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
     <div class="br-watermark" data-on="dark"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
-  <!-- 12 부록 — 쪽번호 체계가 바뀐다 ─────────────────────────────────── -->
+  <!-- 13 예상 질문 ──────────────────────────────────────────────────────── -->
+  <section class="bl-sl" data-apx data-notes="가장 많이 나올 질문 셋이다. 답의 첫 줄만 읽어도 답이 되게 썼다. 그 밖의 질문은 대본 창 메모에 적어 둔다.">
+    <header class="bl-hd">
+      <span class="bl-code"><b>부록</b>예상 질문</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd">
+      <h2 class="bl-title">예상 질문 — <em>범위와 부담</em></h2>
+      <p class="bl-lede">가장 많이 나올 질문 셋 · 그 밖은 발표자 메모</p>
+      <div class="bl-qa">
+        <div class="bl-qa-i"><p class="bl-qa-q"><b>1</b>다섯 건을 넉 달에 다 끝내는가?</p><div class="bl-qa-a"><b>A</b><p><strong>약속하지 않음</strong><span>9월 조사로 우선순위를 정해 순차 착수 · 미달 과제는 중단 후 보고</span></p></div></div>
+        <div class="bl-qa-i"><p class="bl-qa-q"><b>2</b>부서별 조사 담당의 부담은 얼마인가?</p><div class="bl-qa-a"><b>A</b><p><strong>1인 · 20분 내외</strong><span>9월 2주 한 번 · 서식 한 장 작성</span></p></div></div>
+        <div class="bl-qa-i"><p class="bl-qa-q"><b>3</b>도구 계정 12석은 언제 회수하는가?</p><div class="bl-qa-a"><b>A</b><p><strong>분기마다 사용 실적 재검토</strong><span>미사용 계정 회수 · 지침 개정안 제4조</span></p></div></div>
+      </div>
+    </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+  </section>
+
+  <!-- 14 부록 — 용어 ────────────────────────────────────────────────────── -->
   <section class="bl-sl" data-apx data-notes="부록은 질문이 나올 때만 연다. 쪽번호 체계가 바뀌는 것이 부록으로 넘어왔다는 신호다.">
     <header class="bl-hd">
       <span class="bl-code"><b>부록</b>용어</span>
@@ -422,7 +458,7 @@
     <div class="bl-bd">
       <h2 class="bl-title">이 보고에서 쓰는 <em>용어 4개</em></h2>
       <p class="bl-lede">처음 나오는 자리에도 괄호로 풀어 둔 것들</p>
-      <table class="bl-tbl">
+      <table class="bl-tbl bl-mid">
         <thead><tr><th>용어</th><th>이 보고에서의 뜻</th><th>혼동하기 쉬운 것</th></tr></thead>
         <tbody>
           <tr><td>대상 업무</td><td>규칙으로 정해져 되풀이되는 일 · 판단이 필요 없는 구간</td><td>업무 전체가 아니라 그중 한 구간</td></tr>
@@ -442,10 +478,13 @@
 <!-- 조작판 — JS 가 꺼져 있어도 세로로 스크롤하면 전부 읽힌다 -->
 <div class="bl-hud" role="toolbar" aria-label="덱 조작">
   <button type="button" data-act="prev" aria-label="이전 장">‹</button>
+  <span data-pg aria-live="polite"></span>
   <button type="button" data-act="next" aria-label="다음 장">›</button>
+  <span class="bl-hud-sep" aria-hidden="true"></span>
   <button type="button" data-act="expand" aria-pressed="true">펼침<kbd>E</kbd></button>
   <button type="button" data-act="horiz" aria-pressed="false">가로<kbd>H</kbd></button>
   <button type="button" data-act="notes" aria-pressed="false">메모<kbd>N</kbd></button>
+  <button type="button" data-act="laser" aria-pressed="false">레이저<kbd>L</kbd></button>
   <button type="button" data-act="present">발표<kbd>F</kbd></button>
   <button type="button" data-act="script">대본<kbd>S</kbd></button>
   <button type="button" data-act="help" aria-label="단축키 도움말">?</button>

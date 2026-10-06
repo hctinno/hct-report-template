@@ -30,8 +30,10 @@
 - **산출물은 반드시 `apply_brand.py` 를 거친다.** `assets/` 의 견본은 로고 자리가
   「COMPANY NAME」으로 비어 있다 — 복사해 내용만 바꾸고 끝내면 회사 로고도 워터마크도
   없는 덱이 나온다. `--single-file` 을 붙이면 CSS·폰트·로고가 한 파일에 박힌다.
-  안 붙이면 스크립트가 CSS 와 `fonts/` 를 결과물 옆에 같이 복사한다 — 그 둘을 떼어
-  옮기면 지면이 통째로 Times New Roman 이 된다.
+  안 붙이면 스크립트가 CSS · 뷰어 JS · `fonts/` 를 결과물 옆에 같이 복사한다 — CSS 를 떼어
+  옮기면 지면이 통째로 Times New Roman 이 되고, JS 를 떼어 옮기면 넘김 · 발표 기능이 죽는다.
+- 기준 덱에 없는 부품은 `assets/live-catalog.html`(`--deck livecatalog`)에서 장째 복사한다.
+  클래스를 지어내지 않는다. 색인은 `.claude/skills/blue-report/README.md` 「6-3. 라이브 덱」.
 - 완료라고 말하기 전에 `check_deck.py` 를 돌리고 결과를 제시한다. 실패가 0 이 아니면 완료가 아니다.
 - 템플릿·스크립트·문서를 고쳤으면 `python3 scripts/verify_repo.py` 를 돌린다. CI 가 push·PR 마다 같은 것을 돌리므로 여기서 통과하지 않으면 CI 도 빨간불이다.
 - `assets/` 를 고쳤으면 `dist/` 를 다시 만들어 함께 커밋한다. `build_single_file.py` 를 세 번 돌린다 — 인자 없이 한 번, `--artifact --brand brand/hct/brand.json` 으로 한 번, 거기에 `--deck minutes` 를 더해 한 번(A4 문서)이다.

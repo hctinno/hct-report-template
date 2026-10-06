@@ -70,6 +70,9 @@ LIVE = {
     # 머리띠·꼬리띠·로고·워터마크가 전부 달려 있다.
     "standard": "live-standard.html",  # 기준 덱 — 새 보고서의 출발점
     "live": "live-brief.html",         # 라이브 브리핑 — 짧은 브리핑용 (견본)
+    # 부품 견본첩. 기준 덱에 없는 부품·위젯·애니메이션을 장 단위로 복사해 쓴다.
+    # 발표물이 아니라 견본이지만 검사는 똑같이 받는다 — 복사해 간 장이 그대로 통과해야 한다.
+    "livecatalog": "live-catalog.html",  # 라이브 부품 카탈로그 (51장)
 }
 
 # 네 표의 이름이 겹치면 뒤에 오는 쪽이 통째로 묻힌다. 불러오는 순간 걸리게 둔다.
@@ -271,10 +274,12 @@ def apply(html, brand, uris, title_override=None):
 
 HEAD = re.compile(r"<head\b.*?</head>", re.S)
 SHEET = re.compile(r'<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"')
+# 뷰어 JS 는 본문 끝에서 부른다. 머리만 보면 놓친다.
+SCRIPT = re.compile(r'<script[^>]+src="([^"]+)"')
 
 
 def copy_assets(html, out):
-    """단일 파일이 아닐 때, HTML 이 부르는 CSS 와 폰트를 결과물 옆에 같이 둔다.
+    """단일 파일이 아닐 때, HTML 이 부르는 CSS · 뷰어 JS · 폰트를 결과물 옆에 같이 둔다.
 
     이걸 안 하면 결과물이 조용히 망가진다. `<link href="blue-report.css">` 는
     결과물 기준 상대 경로라 decks-out/ 에는 그 파일이 없다 — 브라우저는 404 를
@@ -284,14 +289,18 @@ def copy_assets(html, out):
 
     경고 한 줄로는 부족했다. 경고는 스크롤 위로 사라지고 파일만 남는다.
 
-    폰트는 CSS 기준 상대 경로(fonts/...)라 CSS 와 같은 자리에 둔다."""
+    폰트는 CSS 기준 상대 경로(fonts/...)라 CSS 와 같은 자리에 둔다.
+
+    뷰어 JS(`<script src="deck-viewer.js">` · `live-viewer.js` …)도 같은 처지다.
+    빠지면 지면은 그려지지만 넘김·발표·노트·근거 패널이 전부 죽는다. 라이브 덱은
+    엔진이 곧 발표 기능이라 CSS 만 옮긴 결과물은 쓸 수 없다."""
     head = HEAD.search(html)
     if not head:
         return []
     src_dir = os.path.join(ROOT, "assets")
     out_dir = os.path.dirname(os.path.abspath(out)) or "."
     done = []
-    for href in SHEET.findall(head.group(0)):
+    for href in SHEET.findall(head.group(0)) + SCRIPT.findall(html):
         if "//" in href or href.startswith("data:"):
             continue                      # 바깥에서 받아 오는 것은 건드리지 않는다
         src = os.path.join(src_dir, href)

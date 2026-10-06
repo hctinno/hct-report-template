@@ -36,6 +36,12 @@ blue-report/
 │  ├─ doc-policy.html            사규·규정 A4 3쪽
 │  ├─ doc-manual.html            매뉴얼·가이드 A4 3쪽
 │  ├─ doc-notice.html            공지 A4 1쪽
+│  ├─ blue-live.css            라이브 계통 — 배율 · 띠 · 부품 38종 · 움직임 12계열 · 아이콘 135종
+│  ├─ live-viewer.js           라이브 엔진 — 넘김 · 단계 · 쪽 이동 · 발표 · 레이저 · 대본 창 · 겹창 · 위젯
+│  ├─ live-standard.html       기준 덱 15장 — 새 보고서의 출발점
+│  ├─ live-catalog.html        라이브 부품 카탈로그 51장 — 필요한 장을 통째로 복사
+│  ├─ live-brief.html          라이브 브리핑 견본 8장
+│  ├─ LICENSE-Lucide.txt       아이콘 저작권 고지 (ISC · MIT)
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
 ├─ references/
 │  ├─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
@@ -47,10 +53,13 @@ blue-report/
 │  ├─ content.js               용도별 덱 11종의 내용
 │  └─ build.js                 실행 진입점
 └─ scripts/
-   ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지)
+   ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지 · --live 는 라이브 덱용)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
    ├─ check_deck.py            덱 자동 점검 17항목 + 슬라이드별 PNG
    ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
+   ├─ check_live.py            라이브 덱 점검 23항목 (엔진 기동 · 근거 JSON 포함)
+   ├─ make_icons.py            Lucide 아이콘 → blue-live.css 마스크 (--check 는 오프라인)
+   ├─ make_font_subset.py      Pretendard 서브셋 (한글 · 라틴 · 기호)
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
    ├─ apply_brand.py           회사 정보·로고를 덱에 일괄 적용
    ├─ to_pdf.py                덱 HTML → 발표용 PDF (슬라이드 1장 = 1페이지)
@@ -982,6 +991,391 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 인용 원문 예외 표시(`원문` · `설문 문항`)도 **주석 안에** 있어야 한다. 낱말만 보면
 본문에 "원문"이 들어간 줄이 통째로 검사 밖으로 나간다 — JS 로 그린 표는 한 줄이라
 셀 하나에 "원문"이 있으면 표 전체가 빠졌다.
+
+---
+
+## 6-3. 라이브 덱 — 기준 덱 · 부품 카탈로그 · 발표 엔진
+
+고정 지면이 없는 발표 계통이다. 한 장이 화면 한 면(`100dvh`)이고 치수가 전부 `rem` 이다.
+루트 글자 크기가 창을 따라가므로(`clamp(10.5px, min(1vw, 1.78vh), 20px)`) 1366×768
+노트북과 1920×1080 화면의 짜임이 같다. 사내 발표 덱 56장을 렌더해 장 짜임새 · 부품 38종 ·
+애니메이션 12계열 · 발표 기능을 뽑아 이 계통으로 옮겼다. 원본의 수치 · 조직 · 인물 · 원문은
+옮기지 않았다 — 견본은 전부 가상 시나리오다.
+
+**새 보고서는 새로 그리지 않는다. 아래 세 파일에서 복사한다.**
+
+| 파일 | `--deck` | 장 | 쓰는 법 |
+|---|---|---|---|
+| `assets/live-standard.html` | `standard` | 15 | **출발점.** 표지 · 목차 · 보고 요지 · 장 간지 · 본문 · 로드맵 · 결정 요청 · 마무리 · 부록 간지 · 예상 질문 · 용어 |
+| `assets/live-catalog.html` | `livecatalog` | 51 | 부품 견본첩. 필요한 장을 **통째로** 복사해 기준 덱 사이에 끼우고 내용만 바꾼다 |
+| `assets/live-brief.html` | `live` | 8 | 짧은 브리핑 견본 |
+
+```bash
+# 1. 기준 덱을 복사해 내용만 바꾼다. 없는 부품은 카탈로그에서 장째 가져온다
+cp assets/live-standard.html 작업/보고서.html
+# 2. 회사 정보 · 로고를 넣고 CSS · 뷰어 JS · 폰트까지 한 파일로 묶는다 (권장)
+python3 scripts/apply_brand.py --brand brand.json --deck 작업/보고서.html --single-file -o 보고서.html
+# 3. 23항목 검사. 실패 0 이어야 완료다. 실패 0 이어도 화면을 눈으로 넘겨 본다
+python3 scripts/check_live.py 보고서.html
+```
+
+`--single-file` 없이 내면 `blue-report.css` · `blue-live.css` · `live-viewer.js` · `fonts/` 가
+결과물 옆에 복사된다. 그중 하나라도 떼어 옮기면 지면이 깨지거나(CSS) 발표 기능이 전부
+죽는다(JS). 검사기 23번 항목이 엔진이 떴는지까지 본다.
+
+### 문서 뼈대
+
+```html
+<link rel="stylesheet" href="blue-report.css">   <!-- 색 · 폰트 토큰. 먼저 부른다 -->
+<link rel="stylesheet" href="blue-live.css">     <!-- 배율 · 띠 · 부품 · 움직임 · 아이콘 -->
+
+<div id="bl-prog"></div>                          <!-- 맨 위 진행선 -->
+<main class="bl-deck" id="deck" data-deck-title="문서명" tabindex="0">
+  <section class="bl-sl" id="kpi" data-notes="발표자 노트 — ~한다 형">
+    <header class="bl-hd">
+      <span class="bl-code"><b>02</b>절 이름</span><span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd">
+      <h2 class="bl-title">주장 — <em>핵심구</em></h2>
+      <p class="bl-lede">기준 · <strong>굵은 결론</strong><button type="button" class="bl-ev" data-ev="E1">출처</button></p>
+      <div class="bl-mid"> … 본문 덩어리 하나 … </div>
+    </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리 --><span class="br-wordmark">COMPANY NAME</span></div>
+  </section>
+</main>
+
+<div class="bl-hud" role="toolbar" aria-label="덱 조작">
+  <button type="button" data-act="prev" aria-label="이전 장">‹</button>
+  <span data-pg aria-live="polite"></span>
+  <button type="button" data-act="next" aria-label="다음 장">›</button>
+  <span class="bl-hud-sep" aria-hidden="true"></span>
+  <button type="button" data-act="expand" aria-pressed="true">펼침<kbd>E</kbd></button>
+  <button type="button" data-act="horiz" aria-pressed="false">가로<kbd>H</kbd></button>
+  <button type="button" data-act="notes" aria-pressed="false">메모<kbd>N</kbd></button>
+  <button type="button" data-act="laser" aria-pressed="false">레이저<kbd>L</kbd></button>
+  <button type="button" data-act="present">발표<kbd>F</kbd></button>
+  <button type="button" data-act="script">대본<kbd>S</kbd></button>
+  <button type="button" data-act="help" aria-label="단축키 도움말">?</button>
+</div>
+<div id="bl-jump" hidden aria-hidden="true"></div>
+<script type="application/json" id="bl-evidence">{"ev": { … }}</script>
+<script src="live-viewer.js"></script>
+<!-- 장 전용 스크립트는 여기, 뷰어 뒤에 둔다 -->
+```
+
+- 쪽번호와 문서명은 엔진이 채운다. `.bl-pg` · `.bl-rf-name` 은 비워 둔다.
+- 조작판은 `data-act` 로 묶는다. `<span data-pg>` 에 쪽번호와 단계(` · 2/3`)가 뜬다.
+  600px 이하에서는 ‹ › 만 남는다.
+- 브랜드 마크와 워터마크 안의 자리표시자는 그대로 둔다. `apply_brand.py` 가 채운다.
+- JS 가 없어도 세로로 스크롤하면 전부 읽힌다. 숨김(등장 전 모습)은 엔진이 `html.bl-anim`
+  을 달았을 때만 걸린다.
+
+### 장 종류와 쪽번호
+
+| 장 | 클래스 · 속성 | 쪽번호 | 머리띠 마크 · 워터마크 `data-on` |
+|---|---|---|---|
+| 표지 | `bl-sl bl-sl--dark bl-sl--cover` | 없음 · 숫자 `0` 으로 이동 | `light` · `dark` |
+| 목차 | 본문 장 + `.bl-agenda` | `01 / NN` | `dark` · `light` |
+| 장 간지 | `bl-sl bl-sl--chapter` + `.bl-chapter` | 본문과 같이 센다 · 배정 5초 | `dark` · `light` |
+| 본문 | `bl-sl` | `NN / 전체` | `dark` · `light` |
+| 어두운 본문 | `bl-sl bl-sl--dark` | 본문과 같다 | `light` · `dark` |
+| 마무리 | 본문 장 + `.bl-bd.bl-fin` | 본문과 같다 | `dark` · `light` |
+| 부록 간지 | `bl-sl bl-sl--dark bl-sl--apxdiv` + `.bl-apxdiv` | 「부록」 · 배정 0초 | `light` · `dark` |
+| 부록 장 | 장에 `data-apx` | `부록 NN / MM` · 배정 0초 | 장 밝기를 따른다 |
+| 빽빽한 장 | `bl-sl--dense` 추가 | — | 글자를 한 단 줄인다(본문 하한은 지킴) |
+
+숫자 이동(숫자 + Enter)은 **화면에 찍힌 쪽번호**로 간다. `a` 를 먼저 누르면 부록 쪽번호다.
+마무리 문장은 「질의응답」으로 닫는다 — 지면 본문은 존댓말 종결(감사합니다 등)을 쓰지 않는다.
+
+### 배치 — 92rem 판 · 세로 가운데
+
+- 본문은 가운데 `--bl-max: 92rem` 판에 모인다. 좌우 여백 `--bl-gut` 은 띠 · 본문 · 꼬리띠가
+  함께 쓴다. 띠의 바탕은 화면 끝까지 닿는다.
+- **`.bl-mid`** — 제목 · 리드는 위에 고정하고 본문 덩어리를 남는 높이의 가운데에 둔다.
+  사내 발표 덱의 짜임새다. 덩어리가 여럿이면 하나로 감싸고 거기에 단다.
+- **`.bl-fill`** — 남는 높이를 먹는다. 그 안 격자 행까지 늘리려면 **`.bl-grow`** 를 함께 준다.
+- 비율 격자 — `.bl-split`(1:1) · `--wide`(1.35:1) · `--main`(1.72:1) · `--side`(1:1.72) ·
+  `--3`(1:2:1.2) · `.bl-cols--3` · `--4` · `--5` · `.bl-flow--2` · `--3w` · `--4` · `--5`
+  (카드 사이 `.bl-conn` 연결자) · `.bl-stack-v`(세로 묶음) · `.bl-row`(가로 줄) · `.bl-push`(아래로 밀기).
+  비율을 인라인 style 로 적지 않는다.
+- 새 부품의 열은 **900px 에서만** 접는다. 1050~2000px 창은 rem 으로 잰 지면 폭이 늘 100rem
+  이라 1400px 에서 접으면 줄만 늘어 고정 높이 지면 아래가 잘린다.
+
+### 색 — `data-c`
+
+색은 인라인 style 에 적지 않는다. 부품에 `data-c` 를 주면 그 요소에서 `--c`(선 · 채움) ·
+`--cl`(옅은 바탕) · `--cm`(중간 바탕)이 다시 계산된다.
+
+| `data-c` | 토큰 | 쓰는 자리 |
+|---|---|---|
+| `1` ~ `6` | `--br-cat-N` (어두운 장은 `--br-cat-dark-N`) | 범주 · 부서 · 단계 |
+| `navy` | `--br-navy` | 기준 · 본사 |
+| `ok` · `warn` · `alert` | 완료 · 협의 · 지연 텍스트색 | 상태 |
+| `mute` | `--br-mark-mute` | 참고 · 계획 |
+
+### 글자 — 본문 1.0rem · 라벨 계열만 그 아래
+
+본문은 1.0rem 이상, 절대 하한 0.78rem. 1.0rem 아래 글자는 라벨 계열 클래스에만 준다 —
+`.bl-lbl` · `.bl-cap` · `.bl-mini` · `.bl-axis` · `.bl-dl`(막대 안 값) · `.bl-leg`(범례) ·
+`.bl-num`(번호 원) · `.bl-pill` · `.bl-badge` · `.bl-delta` · `.bl-asof` · `.bl-pgref` ·
+`.bl-stamp` · `.bl-conf` · `.bl-seg`. 검사기가 렌더한 화면에서 잰다.
+
+표기 부품 — 확신도 `.bl-conf--fixed|plan|open|none`(넷으로 고정) · 번호 원
+`.bl-num--solid|ring|gold|sq|sm|lg` · 알약 `.bl-pill--solid|tint|dash` · 배지 `.bl-badge(--line)` ·
+증감 `.bl-delta(--down|--flat)` · 기준일 `.bl-asof` · 쪽 링크 `.bl-pgref` · 도장 `.bl-stamp`.
+
+### 부품 색인 — 카탈로그의 어느 장을 복사하나
+
+장 id 는 `live-catalog.html` 의 `<section id>` 다. 주소 끝에 `#장id` 를 붙여 열면 그 장에서
+시작한다. 머리띠 왼쪽의 코드(C01 · T03 …)가 같은 장을 가리킨다.
+
+| 분류 | 부품 | 주 클래스 | 장 id · 코드 |
+|---|---|---|---|
+| 장 짜임새 | 목차 | `.bl-agenda` | `agenda` · 00 |
+| | 장 간지 | `.bl-sl--chapter` · `.bl-chapter` · `.bl-chapter-nav` | `ch1` ~ `ch5` |
+| | 마무리 | `.bl-fin` · `.bl-fin-l1` · `.bl-fin-l2` · `.bl-fin-mk` · `.bl-fin-ty` | `fin` |
+| | 부록 간지 | `.bl-sl--apxdiv` · `.bl-apxdiv` | `apx` |
+| | 예상 질문 | `.bl-qa` | `qa` |
+| 카드 | 상단 색띠 카드 · 연결자 · 결론 띠 | `.bl-tc` · `.bl-conn--tri` · `.bl-tc-out` | `tcard` · C01 |
+| | 좌측 색띠 행 · 초점 행 | `.bl-lc` · `.bl-focusset` | `focusrow` · C02 |
+| | 색 머리 열 카드 · 준비도 눈금 | `.bl-hc` · `.bl-meter` | `hcard` · C03 |
+| | 표기 모음 | `.bl-chip` · `.bl-num` · `.bl-pill` · `.bl-badge` · `.bl-stamp` · `.bl-conf` | `marks` · C04 |
+| 시간 · 조직 | 이중 레인 연표 | `.bl-lanes` | `lanes` · T01 |
+| | 단계 연혁 · 기간 브래킷 · 점 타임라인 | `.bl-span` · `.bl-dots` | `history` · T02 |
+| | 간트 (오늘 선 · 빗금 계획) | `.bl-gantt` · `.bl-gantt-bar[data-s]` · `.bl-gantt-today` | `gantt` · T03 |
+| | 조직도 (위임 화살 · TF 열) | `.bl-org` · `.bl-org-units` | `org` · T04 |
+| | 역할 매트릭스 | `.bl-matrix` | `matrix` · T05 |
+| | 작은 조직 · 개념 곡선 | `.bl-orgtree` · `.bl-avatar` · `.bl-svgbox` | `team` · T06 |
+| | 역할 분담표 (RACI) | `.bl-raci` | `raci` |
+| | 월별 실행 표 | `.bl-road` | `monthly` |
+| 수치 · 차트 | 수치 타일 · 도넛 · 강조 막대 | `.bl-kpis` · `.bl-donut-box` · `.bl-bar--key` | `kpi` · N01 |
+| | 100% 누적 가로 막대 · 워터폴 | `.bl-stack` · `.bl-wf` | `stack` · N02 |
+| | 조작형 누적 막대 (비율/금액 · 보기 · 대상) | `.bl-sc` | `sc` · N03 |
+| | 랙형 100% 세로 막대 · 세그먼트 | `.bl-rack` · `.bl-seg` · `data-when` | `rack` · N04 |
+| | 체크 목록 · 와플 · 카드 고르기 | `.bl-checks` · `.bl-waffle` · `.bl-pickset` | `waffle` · N05 |
+| | 격자 히트맵 · 검색 결과 목업 | `.bl-heat` · `.bl-mock` | `heat` · N06 |
+| | 계단형 상승 열 | `.bl-stair` | `stair` · N07 |
+| | 쉐브론 띠 · 그룹 표 | `.bl-chev` · `.bl-tbl` | `chev` · N08 |
+| | 히어로 띠 · 비용 막대 | `.bl-hero` | `hero` · N09 |
+| 흐름 · 결정 | 좌우 대비 (지양 · 지향) | `.bl-vs` | `vs` · F01 |
+| | 두 해 나란히 (확정 실선 · 검토 점선) | `.bl-vs--years` | `years` · F02 |
+| | 대기열 시뮬레이션 | `.bl-simq` | `simq` · F03 |
+| | 결정 요청 판 · 도장 · 실행 길 | `.bl-decide` · `.bl-road2` | `decide` · F04 |
+| | 파이프라인 열 · 되먹임 호 | `.bl-pipe` | `pipe` · F05 |
+| | SVG 흐름도 (곡선 연결 · 움직이는 점) | `.bl-flowbox` · `.bl-fl` · `.bl-fl-dot` · `.bl-node` | `flow` · F06 |
+| | 구성도 (경계 · 차단선) · 성숙도 카드 | `.bl-fl-zone` · `.bl-fl--cut` | `net` · F07 |
+| | 바통 흐름 · 고스트 번호 열 | `.bl-baton` · `.bl-ghost` | `baton` · F08 |
+| 화면 · 시연 | 탭 (단계와 묶기) | `.bl-tabset` · `data-at` | `tabs` · S01 |
+| | 코치 마크 장면 | `.bl-scenebox` · `.bl-scene` | `coach` · S02 |
+| | 화면 데모 (목업 행 · 커서 · 캡션 바) | `.bl-mock` · `.bl-cursor` · `.bl-capbar` · `.bl-replay` | `explorer` · S03 |
+| | 포털 목업 · 시안 탭 | `.bl-mock-app` | `portal` · S04 |
+| | 캡처 + 주석 열 | `.bl-shot` | `shot` · S05 |
+| | 시안 토글 그림 | `.bl-fig` · `.bl-fig-ab` | `fig` · S06 |
+| | 노선도 (역 자동 순환) | `.bl-route` | `route` · S07 |
+| | 상태 격자 시뮬레이션 | `.bl-simg` | `simg` · S08 |
+| | 근거 패널 · 원문 · 영상 | `.bl-ev` · `[data-doc]` · `[data-video]` | `media` · S09 |
+| 참고 | 아이콘 135종 · 움직임 견본 · 조작 요약 | `.bl-i` · `.bl-a` | `icons` · `motion` · `keys` |
+
+기준 덱에 이미 있는 어휘 — 표지 `.bl-cover-k` · `.bl-sig` · 보고 요지 `.bl-gist` · `.bl-ask` ·
+로드맵 `.bl-road` · 카드 `.bl-card` · 수치 `.bl-stat` · 막대 `.bl-bars` · 표 `.bl-tbl` ·
+결론 줄 `.bl-concl` — 은 `live-standard.html` 에서 가져온다.
+
+### 움직임 — `.bl-a` 12계열 · 내장 움직임 · 단계
+
+장이 처음 화면의 55% 를 넘을 때 엔진이 장에 `.in` 을 단다. 한 번 달면 떼지 않는다 —
+돌아와도 다시 재생하지 않는다. 다시 보이려면 장 안에 `.bl-replay` 단추를 둔다.
+
+```html
+<div class="bl-tc bl-a bl-a--up" style="--i: 2">…</div>   <!-- --i 순번 · 80ms 씩 늦게 -->
+<b class="bl-stamp bl-a bl-a--stamp" style="--d: .6s">결정</b>   <!-- --d 추가 지연 -->
+```
+
+| 계열 | 클래스 | 쓰는 자리 |
+|---|---|---|
+| 등장 | `--up` · `--left` · `--fade` · `--pop` · `--drop` | 카드 · 행 · 마디 |
+| 강조 | `--stamp` · `--pulse` · `--ripple` · `--glow` · `--blink` · `--shake` | 결정 도장 · 현재 단계 · 경고 |
+| 성장 | `--gx` · `--gy` | 막대 · 면 |
+| 선 | `--draw` · `--flow` | SVG 경로 그리기 · 흐르는 점선 |
+| 이동 | `--run` · `--spin` | 경로 위 이동 · 회전 |
+| 글자 | `--type` · `--strike` · `--tint` | 타자 · 취소선 · 흑백→컬러 |
+
+- **내장 움직임** — 막대 · 간트 막대 · 누적 막대 성장, 도넛 그리기, 도장, 마무리 형광 막대,
+  노선도 열차, 흐름선 점, 커서 이동은 클래스 없이 저절로 돈다.
+- **숫자** — `data-count` 를 단 숫자는 장에 들어올 때 0 에서 제 값까지 오른다(1.1초).
+  `data-count="roll"` 은 자리마다 굴러 멈춘다. 소수 자리는 `data-dec`.
+- **차례** — `data-stagger` 를 단 부모는 자식마다 `--i` 를 달아 준다(값을 주면 그 선택자로 센다).
+- **단계 전개** — 요소에 `data-f="1"` · `"2"` … 같은 번호는 함께 열린다. 발표 모드나 펼침(E)을
+  끈 상태에서만 접힌다. → 가 장보다 단계를 먼저 연다. 발표자 노트의 `[클릭]` 과 맞춘다.
+- JS 가 없거나 감속 모드(`prefers-reduced-motion`) · 인쇄면 처음부터 최종 모습이다.
+  **애니메이션에 정보를 싣지 않는다.**
+
+### 위젯 — 속성만 달면 엔진이 움직인다
+
+| 위젯 | 마크업 | 동작 |
+|---|---|---|
+| 탭 | `.bl-tabset` > `.bl-tabs > button[data-v]` + `.bl-pane[data-v]` | 누르면 그 판. 단추에 `data-at="단계"` 를 주면 발표 중 그 단계에서 넘어간다 |
+| 세그먼트 | `.bl-seg[data-key="view"] > button[data-v]` · `[data-when="view=plan"]` | 고른 값이 가장 가까운 `[data-scope]`(없으면 장)에 붙고 맞는 요소만 보인다. `&` 로 조건을 잇는다 |
+| 시안 토글 | `.bl-fig > [data-v]` + `.bl-fig-ab > button[data-v]` | 시안 전환 · 그림을 누르면 크게 보기 |
+| 노선도 | `.bl-route-st[data-i]` + `.bl-route-card[data-i]` | 역이 2.6초마다 돈다. 누르면 고정 · 다시 누르면 풀림 |
+| 장면 | `.bl-scenebox` > `.bl-scene[data-sc]` + `.bl-scene-nav button[data-k]` | 열린 단계 수만큼 장면이 넘어간다. 목록을 누르면 5.6초마다 끝까지 |
+| 초점 행 | `.bl-focusset` > 행 `[data-i]` + `.bl-focus-cards > [data-i]` | 열린 단계 번호의 행을 밝히고 짝 카드를 연다. 행을 누르면 고정 |
+| 카드 고르기 | `.bl-pickset` > `[data-pick]` · `[data-when-pick]` | 고른 카드만 남기고 흐림 · 짝 설명이 열린다 |
+| 도넛 | `scripts/donut.py --live` 출력 | 조각 · 범례에 손을 대면 그 항목이 가운데로 올라온다 |
+| 와플 | `.bl-waffle[data-total][data-on]` (`data-alt` · `data-cols` · `data-icon`) | 칸을 깔아 준다 |
+| 조작형 누적 막대 | `.bl-sc` 안 `<script type="application/json" class="bl-sc-data">` | 비율/금액 · 보기 · 대상 고르기 · 값 풍선 |
+| 시뮬레이션 | `.bl-simq` · `.bl-simg` | 장이 화면에 있을 때만 돈다. 난수 고정 — 매번 같은 장면 |
+
+조작형 누적 막대 데이터:
+
+```json
+{"unit": "백만원",
+ "cats":   [{"k": "lab", "name": "인건비", "c": "1"}],
+ "groups": {"h": "본사", "b": "지사"},
+ "views":  {"nat": "성격별", "fn": "단계별"},
+ "rows":   [{"id": "h1", "name": "본사 고객지원", "sub": "전화 · 메일", "grp": "h",
+             "total": 420, "rate": -6.2, "key": true,
+             "nat": [["lab", 260], ["out", 80, true]], "fn": [["ans", 180]],
+             "note": "…", "src": "…"}]}
+```
+
+`views` 가 없으면 행마다 `parts` 배열을 쓴다. 항목의 셋째 값 `true` 는 추정치(빗금)다.
+`"pick": false` 인 행은 대상 고르기에서 처음에 빠져 있다.
+
+### 겹창 — 근거 · 부록 겹쳐 보기 · 원문 · 영상 · 크게 보기
+
+겹창이 열려 있는 동안 키는 겹창 것이다. → 를 눌러도 뒤의 장이 넘어가지 않는다. Esc 로 닫는다.
+
+**근거 패널** — 수치 옆 출처 칩 `<button class="bl-ev" data-ev="E1">출처</button>` 이 문서 끝
+JSON 한 벌을 연다. `data-ev="E1,E2"` 는 탭으로 뜬다. `data-claim` 은 패널 위 「주장」 줄이다.
+
+```json
+{"ev": {
+   "E1": {"title": "주간 문의 접수 기록 — 4주 집계", "grade": "R", "key": "접수 대장 · 2026-09",
+          "facts": ["주간 평균 360건 · 휴일 제외 20일 기준", "같은 고객 7일 안 재문의 18%"],
+          "hl": ["주간 평균 360건"],
+          "src": "고객지원팀 접수 대장", "date": "2026-10-02", "url": "https://…",
+          "note": "…", "gnote": "등급 근거", "use": "이 근거를 쓴 곳",
+          "doc": "doc-guide", "dochl": 1,
+          "imgs": [["cap-log", "접수 대장 화면 — 강조 줄 둘"]]}},
+ "img": {"cap-log": "data:image/…"},
+ "hl":  {"cap-log": [[0.05, 0.376, 0.9, 0.061]]},
+ "grades": {"S": "사내 규정"}}
+```
+
+- 필수는 `title` · `grade` · `src`. 등급은 A 1차 공식 자료 · B 학술·전문기관 · C 언론·2차 자료 ·
+  R 직접 조회·집계. `grades` 로 늘릴 수 있다.
+- `facts` 는 배열이거나 ` / ` 로 나눈 문자열이다. `hl` 문구는 형광으로 칠한다.
+- `imgs` 의 id 는 `img` 표에 있어야 하고, `hl` 상자는 캡처 위 0~1 사각형 `[x, y, w, h]` 다.
+  캡처가 있으면 확대 · 끌기 · 맞춤 · 하이라이트 상자로 바로 가는 뷰어가 붙는다.
+- `doc` 은 원문 보기 단추를 붙인다. 원문을 닫으면 근거 패널로 돌아온다.
+- 검사기가 칩 키 · 필수 항목 · 캡처 id · 상자 값 · 원문 id 를 전부 맞춰 본다.
+
+**부록 겹쳐 보기** — `<button data-peek="raci">` 는 그 장을 지금 장 위에 겹쳐 연다.
+발표 중 `data-peek-seq` 를 단 단추들은 화면 클릭마다 차례로 열고 닫는다.
+
+**원문** — `<button data-doc="doc-guide">` · 같은 id 의 `<script type="application/json">` 에
+`{"title", "html", "file": {"name", "type", "b64"}}`. `html` 안의 `.bl-hl` 단락(`data-label`)이
+강조이고 단추마다 그 강조로 바로 간다. `file` 을 주면 원본 내려받기가 생긴다.
+
+**영상** — `<button data-video="vid-demo">` · 같은 id 의 `<script type="text/plain"
+data-type="video/webm">` 에 base64. 처음 열 때 한 번만 풀어 둔다. 파일 경로를 줘도 된다.
+
+**크게 보기** — `.bl-fig` 안의 그림 · `.bl-shot` 의 캡처(`.bl-shot-open`) · `[data-zoom]` 을
+누르면 화면 가득 띄운다. 시안이 여럿이면 ← → 로 넘긴다.
+
+### 발표 — 키 · 모드 · 대본 창
+
+| 조작 | 키 | 비고 |
+|---|---|---|
+| 넘김 | ← → ↑ ↓ · PgUp PgDn · Space | 단계가 있으면 단계부터. 발표 중 화면 클릭도 다음 |
+| 쪽 이동 | 숫자 Enter · `0` 표지 · `a` 숫자 Enter | 세 자리까지 · 3초 안에 · Backspace 지움 · 없는 쪽은 「없음」 |
+| 처음 · 끝 | Home End | |
+| 펼침 | E | 단계 전부 보기 ↔ 한 단계씩 |
+| 가로 보기 | H | 휠 한 칸 = 한 장 |
+| 메모 | N | 지금 장의 발표자 노트를 지면 아래에 |
+| 발표 | F · F11 | 전체화면 · 조작판 · 진행선 · 커서 숨김 · 레이저 저절로 켜짐 |
+| 레이저 | L | |
+| 대본 창 | S · P | 두 번째 화면용. 팝업이 막히면 같은 창 오른쪽에 |
+| 도움말 · 닫기 | ? · Esc | 겹창 → 숫자 입력 → 도움말 → 발표 순으로 닫는다 |
+
+- 글자 키는 물리 위치로 읽는다 — 한글 입력 상태에서도 E · H · N · F · L · P · S 가 그대로 듣는다.
+- 발표 중 화면 아래 끝에 마우스를 대면 조작판이 잠깐 보인다. 창을 화면 크기로 키우거나
+  F11 을 눌러도 발표 모드로 들어간다.
+- 발표 중 화면 클릭은 「다음」이다. 단추 · 칩 · 탭 · 고르기 카드 같은 조작 요소는 빠진다.
+  장 전용 스크립트가 장 안 요소에 클릭 처리기를 달면 엔진이 그 요소를 저절로 뺀다.
+- 가로 보기에서는 휠 한 칸이 한 장이다. 세로 보기에서는 옆으로 60px 넘게 밀면 넘긴다(단계 포함).
+
+**발표자 노트** `data-notes` — 여는 태그와 같은 줄에 적는다. 문체는 `~한다` 형(지면 문체 규칙의
+예외). 빈 줄로 문단을 나눈다.
+
+| 문법 | 대본 창 표시 |
+|---|---|
+| `[클릭]` | 「클릭 n」 배지. 지금 단계와 맞춰 지난 것 · 다음 것을 칠한다 |
+| `[넘김]` · `[임의]` | 회색 배지 |
+| `**굵게**` | 강조 |
+| `→ 전환: …` | 다음 장으로 넘어가는 말. 따로 상자 |
+| `※ …` | 읽지 않는 메모. 배정 시간에서 뺀다 |
+
+**대본 창** — 지금 · 다음 장 노트, 경과 시간, 장별 배정 시간과 누적. 배정은 읽는 글자 수를
+분당 300자로 나눠 5초 단위로 올린다(최소 20초 · 간지 5초 · 부록 0초). 경과 시간이 지금 장의
+예정 구간보다 45초 넘게 늦거나 이르면 시계 색이 바뀐다. 노트는 대본 창에서 고칠 수 있고 이 브라우저에 저장된다
+(`localStorage` 키 `bl-script:문서명`). 「수정분 내보내기 · 수정분 복사 · 전체 대본 · 전부 원복」
+단추가 있다. 고친 내용은 HTML 에 반영되지 않으므로 내보낸 뒤 `data-notes` 에 옮긴다.
+
+### 아이콘 · 기호
+
+```html
+<i class="bl-i bl-i--server" aria-hidden="true"></i>        <!-- 글자색 · 글자 크기를 따른다 -->
+<span class="bl-itile" data-c="2"><i class="bl-i bl-i--users"></i></span>   <!-- 색 타일 -->
+```
+
+Lucide 1.52.0 의 135종을 CSS 마스크로 `blue-live.css` 에 심었다(ISC · 고지는
+`assets/LICENSE-Lucide.txt`). 목록에 없는 이름은 그려지지 않는다 — 늘리려면
+`scripts/make_icons.py` 의 `ICONS` 에 더하고 다시 돌린다.
+
+| 묶음 | 이름 |
+|---|---|
+| 사람 · 조직 | user users user-check user-round user-cog building-2 building briefcase landmark handshake graduation-cap hand store |
+| 문서 | file-text files file-search file-check file-spreadsheet folder folder-open clipboard-check clipboard-list book-open notebook-pen pen-line stamp presentation receipt inbox ticket tag image video play |
+| 수치 | chart-column chart-bar chart-line chart-area chart-spline chart-no-axes-combined trending-up trending-down activity gauge sigma coins wallet scale |
+| 기술 | server database hard-drive cpu circuit-board cloud monitor laptop smartphone globe network cable radio-tower plug bot brain sparkles scan-search |
+| 보안 | lock lock-open shield-check shield-alert key-round eye gavel |
+| 흐름 | workflow git-branch git-merge waypoints route map repeat refresh-cw arrow-right arrow-up-right send upload download share-2 link layers boxes blocks package layout-grid |
+| 판단 | check circle-check x circle-x triangle-alert info circle-help lightbulb target flag badge-check award trophy list-checks list-todo search filter star circle-alert |
+| 도구 · 현장 | settings cog wrench rocket zap factory flask-conical microscope thermometer mouse-pointer-click megaphone mail message-square messages-square phone headset bell map-pin |
+| 시간 | clock calendar calendar-check timer hourglass |
+
+본문 폰트(Pretendard 서브셋)에 기호를 넣어 두었다 — 로마 숫자 Ⅰ~Ⅹ · 원 숫자 ①~⑫ ·
+화살표 ↑ ↓ ↔ ↕ ↗ ↘ ↵ ↻ ⇒ · 수식 ∑ − √ ≈ ≠ ≤ ≥ · 도형 □ ▪ △ ▶ ▷ ▽ ◀ ◆ ◇ ○ ◦ ✗ ·
+괄호 〈 〉 《 》 「 」 『 』 【 】. 다른 기호는 시스템 글꼴로 떨어져 모양이 갈라진다 —
+필요하면 `scripts/make_font_subset.py` 의 `SYMBOLS` 에 더해 다시 만든다.
+
+### 스크립트
+
+```bash
+# 도넛 — 각도를 손으로 적지 않는다. --raw 는 건수, 가운데 숫자 · 단위 · 설명을 준다
+python3 scripts/donut.py --live --raw --total 360 --unit 건 --caption "주간 문의" \
+        --labels "전화,메일,채팅,방문" 182 96 64 18
+python3 scripts/make_icons.py --check         # 아이콘 CSS 가 목록과 맞는가 (오프라인)
+python3 scripts/make_font_subset.py --check   # 폰트 서브셋이 글자 목록과 맞는가
+python3 scripts/check_live.py 보고서.html --shots out/   # 23항목 + 화면 PNG
+```
+
+### 엔진 API · 이벤트
+
+장 전용 스크립트는 `live-viewer.js` **뒤에** 둔다.
+
+```js
+blDeck.go(3); blDeck.next(); blDeck.prev();       // 장 이동 (0 이 첫 장)
+blDeck.present(); blDeck.laser(true); blDeck.presenter();
+blDeck.index; blDeck.step; blDeck.slides;         // 지금 장 · 단계 · 장 목록
+document.addEventListener('deck:sync', e => { /* e.detail: el · cur · list · step · steps · staged */ });
+// deck:present {on} · deck:presenter {open} · deck:laser {on}
+```
+
+점검 순서는 `references/rules.md` §2-2 에 있다.
 
 ---
 
