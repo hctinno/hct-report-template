@@ -221,9 +221,16 @@
     $$('[data-count]', s).forEach(countUp);
   }
   if (W.IntersectionObserver) {
+    // 좁은 창에서는 장이 내용만큼 늘어나 화면보다 길 수 있다. 그런 장은 자기 높이의 55% 가
+    // 한 번에 보이지 않으므로 「화면의 55% 를 덮었는가」도 함께 본다. 문턱을 촘촘히 둬야
+    // 긴 장을 스크롤하는 동안에도 판정이 다시 돈다.
+    var TH = [];
+    for (var t = 0; t <= 20; t++) TH.push(t / 20);
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
-        if (!e.isIntersecting || e.intersectionRatio < .55) return;
+        if (!e.isIntersecting) return;
+        var rb = e.rootBounds, cover = rb && rb.height ? e.intersectionRect.height / rb.height : 0;
+        if (e.intersectionRatio < .55 && cover < .55) return;
         var k = slides.indexOf(e.target);
         if (k < 0) return;
         markIn(e.target);
@@ -232,7 +239,7 @@
         pending = null;
         stepAt[k] = 0; i = k; sync();
       });
-    }, { root: deck, threshold: [0, .55, 1] });
+    }, { root: deck, threshold: TH });
     slides.forEach(function (s) { io.observe(s); });
   } else {
     slides.forEach(markIn);

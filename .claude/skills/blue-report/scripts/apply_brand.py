@@ -356,7 +356,15 @@ def main():
     print(f"{'문서' if is_doc else '덱'}: {os.path.basename(deck_path)}")
 
     html = open(deck_path, encoding="utf-8").read()
+    m_title = re.search(r'data-deck-title="([^"]*)"', html)
+    own_title = m_title.group(1) if m_title else ""
     html, n, left = apply(html, brand, uris, a.title)
+    # brand.json 의 docTitle 은 덱 제목을 덮는다. 직접 만든 덱이면 꼬리띠 문서명이 장마다
+    # 회사 기본 문서명으로 바뀐다 — 검사기는 통과하므로 여기서 말한다.
+    if (not a.title and brand.get("docTitle") and own_title
+            and own_title != brand["docTitle"] and not deck_path.startswith(ASSETS)):
+        print(f"주의: 덱 제목 「{own_title}」을 brand.json docTitle 「{brand['docTitle']}」로 바꿨다. "
+              f"꼬리띠 문서명을 지키려면 --title \"{own_title}\" 를 준다.", file=sys.stderr)
 
     if a.single_file:
         from build_single_file import inline_assets

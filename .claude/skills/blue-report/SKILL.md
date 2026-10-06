@@ -10,13 +10,20 @@ description: "사내 보고서·발표 덱·A4 문서·웹 보드를 회사 공�
 
 ## 1. 먼저 읽을 것
 
-- `assets/blue-report.css` — 색·타입·간격 토큰과 파운데이션 클래스. **색은 여기 토큰으로만 쓴다.**
-- `assets/deck-template.html` — 슬라이드 10종 완성본. 새 덱은 이 파일을 복사해서 시작한다.
 - `references/rules.md` — 차트·문체·레이아웃 규칙 전문. 차트를 그리기 전에 반드시 읽는다.
+- `assets/blue-report.css` — 색·타입·간격 토큰과 파운데이션 클래스. **색은 여기 토큰으로만 쓴다.**
+- **새 보고서(기본)** — `assets/live-standard.html` 기준 덱 · `assets/live-catalog.html` 부품 카탈로그 ·
+  `README.md` 「6-3. 라이브 덱」. 순서는 §2-2.
+- 1920x1080 고정 지면 덱 — `assets/deck-template.html` 레이아웃 19종 카탈로그. 순서는 §2.
 
 ## 2. 새 덱 만들기
 
-**먼저 용도를 정한다.** `deck-template.html`은 레이아웃 카탈로그이지 완성 덱이 아니다.
+**먼저 계통을 정한다.** PowerPoint 로 내야 하거나 1920x1080 고정 지면이어야 하면 아래 용도별
+덱, 인쇄해 철할 문서면 A4 문서, 고쳐 가며 쓰는 화면이면 웹 보드다. **그 밖의 발표 · 보고는
+기준 덱(§2-2)이 기본이다** — 대안 비교 · 결정 요청 · 예상 질문 · 부록도 기준 덱과 부품
+카탈로그에 다 있다. 아래 낱말 표는 고정 지면 덱 안에서 용도를 고를 때 쓴다.
+
+**그다음 용도를 정한다.** `deck-template.html`은 레이아웃 카탈로그이지 완성 덱이 아니다.
 아무거나 골라 쓰면 슬라이드 순서가 목적에 맞지 않는다.
 
 판단 기준은 하나다 — **요청에서 용도가 읽히면 묻지 말고 고른다. 읽히지 않을 때만 묻는다.**
@@ -113,7 +120,7 @@ cp assets/blue-report.css assets/deck-viewer.css assets/deck-viewer.js <작업�
 ```
 
 템플릿의 `<div class="br-frame">` 블록이 슬라이드 1장이다. 필요한 종류만 남기고 지우거나,
-같은 블록을 복사해 늘린다. 12종은 다음과 같다.
+같은 블록을 복사해 늘린다. 19종은 다음과 같다.
 
 | # | 슬라이드 | 배경 | 쓰는 자리 |
 |---|---|---|---|
@@ -166,8 +173,14 @@ cp assets/blue-report.css assets/deck-viewer.css assets/deck-viewer.js <작업�
    `#bl-evidence` JSON 한 벌에 적는다(제목 · 등급 · 출처 필수).
 5. 장마다 발표자 노트 `data-notes` 를 적는다 — `~한다` 형 · `[클릭]` · `**굵게**` · `→ 전환:` · `※ 메모`.
    단계 전개는 요소에 `data-f="1"` 부터 주고 노트의 `[클릭]` 과 맞춘다.
-6. `python3 scripts/apply_brand.py --brand <brand.json> --deck <파일> --single-file -o <결과>.html`
-   로 로고 · CSS · 엔진을 한 파일에 묶고 `python3 scripts/check_live.py <결과>.html` 실패 0 을 확인한다.
+6. `python3 scripts/apply_brand.py --brand <brand.json> --deck <파일> --title "문서명" --single-file -o <결과>.html`
+   로 로고 · CSS · 엔진을 한 파일에 묶는다. **`--title` 을 빼면 brand.json 의 `docTitle` 이 덱 제목을
+   덮어 장마다 꼬리띠 문서명이 회사 기본값으로 바뀐다.**
+7. `python3 scripts/check_live.py <결과>.html --shots out/` 27항목 실패 0 을 확인하고, `out/` 에
+   장마다 남는 PNG 를 눈으로 넘겨 본다(여백 · 균형 · 겹침은 검사기가 못 본다).
+
+작업본을 브라우저로 바로 보려면 `assets/` 의 `blue-report.css` · `blue-live.css` · `live-viewer.js` ·
+`fonts/` 를 작업 파일 옆에 같이 둔다.
 
 지킬 것 — 치수는 `rem` · 색은 `data-c` 와 `--br-*` 토큰(hex 금지) · 본문 1.0rem 이상(라벨 계열만
 그 아래) · 제목은 「주장 — `<em>`핵심구`</em>`」 · 본문 덩어리는 `.bl-mid` 로 세로 가운데 ·
@@ -262,8 +275,9 @@ python3 scripts/check_deck.py <작업경로>/deck.html --shots out/
 데이터 대비 2:1, 본문 영역 겹침, 브랜드 마크 존재, 마크와 본문 겹침, 로고 변형과 배경 밝기,
 도넛 검산)을 검사하고 슬라이드별 PNG를 남긴다.
 
-라이브 덱(기준 덱 포함)은 `python3 scripts/check_live.py <파일> --shots out/` 이 23항목을 본다 —
-문체 · rem · 토큰 · 띠 · 마크 짝 · 근거 JSON · 글자 하한 · 넘침 · 조작판 겹침 · 엔진 기동.
+라이브 덱(기준 덱 포함)은 `python3 scripts/check_live.py <파일> --shots out/` 이 27항목을 본다 —
+문체 · rem · 토큰 · 띠 · 마크 짝 · 근거 JSON · 글자 하한 · 가로 · 세로 넘침 · 조작판 겹침 ·
+엔진 기동 · 단계와 [클릭] · 정의 없는 클래스 · 보이지 않는 글자. `--shots` 는 장마다 PNG 를 남긴다.
 
 **`실패`가 0이 아니면 완료가 아니다.** `주의`는 허용된다 — 도넛을 쓰지 않은 덱에서
 도넛 검산 항목이 `주의`로 나오는 것이 정상이다.

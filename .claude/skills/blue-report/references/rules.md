@@ -60,7 +60,7 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
   맥락은 `--mute` 클래스(`.br-bar-v--mute` · `.br-bar-h--mute` · `.br-col-name--mute`).
   마크업에 `background` 를 직접 적지 않는다. 몇 개를 주인공으로 둘지는 제목이 정한다.
 - 단조 램프는 **순서가 있는 구간**에만 쓴다. 부서·제품처럼 순서 없는 항목에 쓰지 않는다.
-- 밝은 지면용 5색: `--br-data-1` ~ `--br-data-5` (12.44 / 7.11 / 3.58 / 2.73 / 2.10 : 1).
+- 밝은 지면용 5색: `--br-data-1` ~ `--br-data-5` (12.44 / 7.51 / 3.58 / 2.73 / 2.10 : 1).
 - 구간 6개 이상이면 `python3 scripts/palette.py --steps N`으로 보간 램프를 만든다.
   7단계는 `--br-bar-1` ~ `--br-bar-7`로 이미 토큰에 있다.
 - `--br-soft-1~3`(`#7fb6f5 #9dc4f2 #a4c4e5`)은 밝은 지면에서 1.67~1.96:1로 **2:1에 미달한다.**
@@ -100,9 +100,11 @@ d = k × √value
 
 ## 2-2. 기준 덱 · 라이브 덱 체크리스트
 
-고정 지면이 없는 계통이다. `scripts/check_live.py` 가 23항목을 판정한다.
-**새 보고서는 `assets/live-standard.html` 을 복사해 시작하고, `apply_brand.py --deck standard
---single-file` 로 산출물을 만든다.**
+고정 지면이 없는 계통이다. `scripts/check_live.py` 가 27항목을 판정한다. 아래 목록 중 7(`<em>`) ·
+17(장 종류 표시)은 눈으로 본다 — 나머지는 검사기가 실패로 잡는다(20 「질의응답」은 문체 검사의
+존댓말 종결로, 19 의 아이콘 이름은 정의 없는 클래스로 잡힌다).
+**새 보고서는 `assets/live-standard.html` 을 복사해 시작하고, `apply_brand.py --deck <파일>
+--title "문서명" --single-file` 로 산출물을 만든다.** `--title` 을 빼면 brand.json 의 `docTitle` 이 덱 제목을 덮는다.
 
 1. 치수를 `rem` 으로만 적었는가 → `px` 는 1px 테두리, 배율 엔진의 `clamp`, blur/shadow 반경만 예외
 2. 머리띠 `.bl-hd` 가 장마다 있는가 → `.bl-code`(절 번호+이름) · `.bl-sp` · `.br-mark`
@@ -132,9 +134,12 @@ d = k × √value
     600px 이하(휴대폰)는 조작판에 ‹ › 만 남는다 — 나머지는 발표자 화면의 조작이다
 14. 엔진이 떴는가 → `live-viewer.js` 를 부르는 덱인데 `window.blDeck` 이 없으면 실패다.
     연결형 산출물은 JS 를 덱 옆에 두고, 아니면 `--single-file` 로 묶는다
-15. 1.0rem 아래 글자를 라벨 계열에만 주었는가 → `.bl-lbl` · `.bl-cap` · `.bl-mini` · `.bl-axis` ·
-    `.bl-dl` · `.bl-leg` · `.bl-num` · `.bl-pill` · `.bl-badge` · `.bl-delta` · `.bl-asof` ·
-    `.bl-pgref` · `.bl-stamp` · `.bl-conf` · `.bl-seg`
+15. 1.0rem 아래 글자를 주석 · 라벨 계열에만 주었는가 → 목록은 `check_live.py` 의 `NOTE_CLS` 한 곳이 정본이다
+    (주석 · 띠 `.bl-note` · `.bl-src` · `.bl-chip` · `.bl-eyebrow` · `.bl-stat-t` · `.bl-rf` · `.bl-ord` ·
+    `.bl-code` · `.bl-pg` · `.bl-ev` / 라벨 `.bl-lbl` · `.bl-cap` · `.bl-mini` · `.bl-axis` · `.bl-dl` ·
+    `.bl-leg` · `.bl-num` · `.bl-pill` · `.bl-badge` · `.bl-delta` · `.bl-asof` · `.bl-pgref` · `.bl-stamp` ·
+    `.bl-conf` · `.bl-seg` / 조작 단추 `.bl-fig-ab` · `.bl-replay` · `.bl-shot-open` · `.bl-route-st` ·
+    `.bl-sc-pick`)
 16. 색을 `data-c` 로 골랐는가 → `1`~`6` · `navy` · `ok` · `warn` · `alert` · `mute`. 인라인 style 에 색 금지
 17. 장 종류 표시가 맞는가 → 표지 `bl-sl--cover` · 장 간지 `bl-sl--chapter` · 부록 간지
     `bl-sl--apxdiv` · 부록 장 `data-apx`. 쪽번호(「부록 NN / MM」)와 숫자 이동이 여기서 갈린다

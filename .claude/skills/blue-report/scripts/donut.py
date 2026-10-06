@@ -152,16 +152,32 @@ def build_live(values, labels=None, r=110, width=48, gap=1.5, raw=False, total=N
         legs.append(f'    <li data-k="{k}" data-p="{pct:.1f}%"><i style="background:{color[k]}"></i>'
                     f'<span>{name}</span><b>{shown}</b></li>')
         cum += pct
-    tot = total if total is not None else (num(s) if raw else "100")
+    if total is None:
+        tot = num(s) if raw else "100"
+    else:
+        # 쉼표 없이 준 수도 범례와 같은 표기로 — 「2140」과 「1,070」이 한 그림에 섞이지 않게
+        try:
+            tot = num(float(str(total).replace(",", "")))
+        except ValueError:
+            tot = str(total)
     cap = f'<span class="bl-cap">{caption}</span>' if caption else ""
+    # 가운데 숫자 폭(em). 구멍보다 넓으면 CSS 가 글자를 줄인다(.bl-donut-c b 의 --w).
+    # 「2,140시간」처럼 길면 고리를 덮었다 — 단위는 짧게(h · 건 · %) 두는 편이 낫다
+    def _em(t):
+        w = 0.0
+        for ch in t:
+            w += .58 if ch.isdigit() else .28 if ch in ",." else 1.0 if ord(ch) >= 0x1100 else .6
+        return w
+    wem = _em(tot) + .42 * _em(unit) + .1
     out = ('<div class="bl-donut-box">\n'
            f'  <figure class="bl-donut" role="img" aria-label="{aria}">\n'
            f'    <svg viewBox="0 0 {size:.0f} {size:.0f}" aria-hidden="true"><g transform="translate({size / 2:.0f},{size / 2:.0f})">\n'
            + "\n".join(segs) + "\n    </g></svg>\n"
-           f'    <figcaption class="bl-donut-c"><b>{tot}<small>{unit}</small></b>{cap}</figcaption>\n'
+           f'    <figcaption class="bl-donut-c"><b style="--w: {wem:.2f}">{tot}<small>{unit}</small></b>{cap}</figcaption>\n'
            '  </figure>\n'
            '  <ul class="bl-donut-leg">\n' + "\n".join(legs) + "\n  </ul>\n</div>")
-    print(f"# C = 2*pi*{r:g} = {C:.1f} · 간격 {gap}도 · 램프 --br-data-* · 라이브 덱용")
+    # 출력을 통째로 붙여도 지면에 글자가 찍히지 않게 설명 줄은 HTML 주석으로 낸다
+    print(f"<!-- donut.py 라이브 출력 · 둘레 2πr = {C:.1f} · 간격 {gap}도 · 램프 br-data -->")
     print(out)
     return out
 

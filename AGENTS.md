@@ -17,7 +17,7 @@ Four separate lineages. They are not interchangeable: different page size, diffe
 | Slide decks | exactly 1920x1080 | `--br-fs-*` | 24px | `check_deck.py` — 17 items |
 | A4 documents | 794x1123 portrait (1123x794 landscape) | `--bd-fs-*` | 14px (10.5pt) | `check_doc.py` — 9 items |
 | Web boards | no fixed page; reflows with viewport | `--bw-fs-*` | 12.5px | `check_board.py` — 11 items |
-| Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 23 items |
+| Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 27 items |
 
 ### Slide decks — 12, in `.claude/skills/blue-report/assets/`
 
@@ -88,6 +88,12 @@ Text below 1.0rem is allowed only on the label classes (`.bl-lbl`, `.bl-cap`, `.
 `.bl-dl`, `.bl-leg`, `.bl-num`, `.bl-pill`, `.bl-badge`, `.bl-delta`, `.bl-asof`, `.bl-pgref`,
 `.bl-stamp`, `.bl-conf`, `.bl-seg`). Build donuts with `scripts/donut.py --live`. Icons are
 `<i class="bl-i bl-i--name">` from the 135 names in `scripts/make_icons.py`.
+
+Bundle the finished deck with `apply_brand.py --brand <brand.json> --deck <file> --title "Deck title" --single-file -o out.html`.
+Without `--title`, the `docTitle` in brand.json replaces the deck title in every footer. Then run
+`check_live.py out.html --shots out/` (27 items) and page through the per-slide PNGs. To preview a working
+copy before bundling, put `blue-report.css`, `blue-live.css`, `live-viewer.js` and `fonts/` next to it.
+Every slide must fit one 16:9 screen — check item 27 fails a slide whose body runs under the footer.
 
 **Page chrome is mandatory, not decorative.** Every slide carries all of it, and `check_live.py`
 fails the deck when any piece is missing:

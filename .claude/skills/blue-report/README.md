@@ -28,7 +28,7 @@ blue-report/
 │  ├─ deck-ax-weekly.html         AX 조직 1장 보고 + 부록 5장
 │  ├─ deck-team-weekly.html       팀 압축 주간보고 2장
 │  ├─ deck-exec-report.html       경영진 보고 (결론 먼저) 6장
-│  ├─ deck-allhands.html          전직원 보고 (타운홀) 8장
+│  ├─ deck-allhands.html          전직원 보고 (타운홀) 9장
 │  ├─ deck-sales-proposal.html    외부 제안·영업 10장
 │  ├─ deck-project-report.html    프로젝트 착수·완료 9장
 │  ├─ deck-training.html          교육·기술 설명 8장
@@ -57,7 +57,7 @@ blue-report/
    ├─ palette.py               N단계 램프 생성 + 대비 검증
    ├─ check_deck.py            덱 자동 점검 17항목 + 슬라이드별 PNG
    ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
-   ├─ check_live.py            라이브 덱 점검 23항목 (엔진 기동 · 근거 JSON 포함)
+   ├─ check_live.py            라이브 덱 점검 27항목 (엔진 기동 · 근거 JSON · 단계 · 클래스 · 세로 넘침)
    ├─ make_icons.py            Lucide 아이콘 → blue-live.css 마스크 (--check 는 오프라인)
    ├─ make_font_subset.py      Pretendard 서브셋 (한글 · 라틴 · 기호)
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
@@ -142,7 +142,8 @@ python3 scripts/check_deck.py ./deck.html --shots ./out/
 
 ```bash
 python3 scripts/apply_brand.py --brand ./brand.json --deck internal --single-file -o ./보고서.html
-# --deck: catalog · internal · weekly · ax · sales · project · training, 또는 HTML 파일 경로
+# --deck: 덱 12 · 기준·라이브 3(standard · livecatalog · live) · A4 4 · 보드 5 의 이름, 또는 HTML 파일 경로
+#         전체 목록은 python3 scripts/apply_brand.py --help
 ```
 
 ### PowerPoint(.pptx)로 만들기
@@ -1014,10 +1015,17 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 # 1. 기준 덱을 복사해 내용만 바꾼다. 없는 부품은 카탈로그에서 장째 가져온다
 cp assets/live-standard.html 작업/보고서.html
 # 2. 회사 정보 · 로고를 넣고 CSS · 뷰어 JS · 폰트까지 한 파일로 묶는다 (권장)
-python3 scripts/apply_brand.py --brand brand.json --deck 작업/보고서.html --single-file -o 보고서.html
-# 3. 23항목 검사. 실패 0 이어야 완료다. 실패 0 이어도 화면을 눈으로 넘겨 본다
-python3 scripts/check_live.py 보고서.html
+#    --title 을 빼면 brand.json 의 docTitle 이 덱 제목을 덮는다 — 장마다 꼬리띠 문서명이 바뀐다
+python3 scripts/apply_brand.py --brand brand.json --deck 작업/보고서.html --title "문서명" --single-file -o 보고서.html
+# 3. 27항목 검사. 실패 0 이어야 완료다. 장마다 남는 PNG 를 눈으로 넘겨 본다
+python3 scripts/check_live.py 보고서.html --shots out/
 ```
+
+**작업본 미리 보기** — 작업 폴더의 HTML 을 바로 열면 CSS · 엔진이 없어 맨 글자만 보인다.
+`assets/` 의 `blue-report.css` · `blue-live.css` · `live-viewer.js` · `fonts/` 를 작업 파일 옆에 같이 둔다.
+
+**문서명 길이** — 꼬리띠 문서명은 조작판 왼쪽 끝에서 말줄임(…)으로 잘린다. 16:9 화면에서 24자,
+좁은 창(600~900px)에서 12자 안팎까지 다 보인다. 긴 제목은 표지에 두고 문서명은 짧게 쓴다.
 
 `--single-file` 없이 내면 `blue-report.css` · `blue-live.css` · `live-viewer.js` · `fonts/` 가
 결과물 옆에 복사된다. 그중 하나라도 떼어 옮기면 지면이 깨지거나(CSS) 발표 기능이 전부
@@ -1087,6 +1095,7 @@ python3 scripts/check_live.py 보고서.html
 | 빽빽한 장 | `bl-sl--dense` 추가 | — | 글자를 한 단 줄인다(본문 하한은 지킴) |
 
 숫자 이동(숫자 + Enter)은 **화면에 찍힌 쪽번호**로 간다. `a` 를 먼저 누르면 부록 쪽번호다.
+워터마크는 표지에도 깐다 — 표지는 크게 · 진하게(고정 지면 덱은 표지에서 뺀다. 계통이 다르다).
 마무리 문장은 「질의응답」으로 닫는다 — 지면 본문은 존댓말 종결(감사합니다 등)을 쓰지 않는다.
 
 ### 배치 — 92rem 판 · 세로 가운데
@@ -1102,6 +1111,11 @@ python3 scripts/check_live.py 보고서.html
   비율을 인라인 style 로 적지 않는다.
 - 새 부품의 열은 **900px 에서만** 접는다. 1050~2000px 창은 rem 으로 잰 지면 폭이 늘 100rem
   이라 1400px 에서 접으면 줄만 늘어 고정 높이 지면 아래가 잘린다.
+- **900px 이하는 읽는 폭이다.** 열이 한 줄로 접히고 장이 내용만큼 늘어나 세로 스크롤로 전부
+  읽힌다. 조작판에서 가로 · 레이저 · 대본이 빠진다. 발표 · 가로 보기는 그대로 한 화면 한 장이다.
+- **16:9 한 화면에 다 들어가야 한다.** 지면은 한 화면 높이에 `overflow: hidden` 이라 넘친 줄은
+  잘려 사라진다. 검사기 27번 항목이 장마다 잰다. 넘치면 행 · 카드를 줄이거나 장을 둘로 나누고,
+  부록 표처럼 꼭 빽빽해야 하는 장만 `bl-sl--dense` 를 준다.
 
 ### 색 — `data-c`
 
@@ -1117,10 +1131,17 @@ python3 scripts/check_live.py 보고서.html
 
 ### 글자 — 본문 1.0rem · 라벨 계열만 그 아래
 
-본문은 1.0rem 이상, 절대 하한 0.78rem. 1.0rem 아래 글자는 라벨 계열 클래스에만 준다 —
-`.bl-lbl` · `.bl-cap` · `.bl-mini` · `.bl-axis` · `.bl-dl`(막대 안 값) · `.bl-leg`(범례) ·
-`.bl-num`(번호 원) · `.bl-pill` · `.bl-badge` · `.bl-delta` · `.bl-asof` · `.bl-pgref` ·
-`.bl-stamp` · `.bl-conf` · `.bl-seg`. 검사기가 렌더한 화면에서 잰다.
+본문은 1.0rem 이상, 절대 하한 0.78rem. 1.0rem 아래 글자는 아래 클래스(또는 그 안)에만 준다.
+검사기(`check_live.py` 의 `NOTE_CLS`)가 렌더한 화면에서 잰다.
+
+- 주석 · 띠 — `.bl-note` · `.bl-src` · `.bl-chip` · `.bl-eyebrow` · `.bl-stat-t` · `.bl-rf` · `.bl-ord` ·
+  `.bl-code` · `.bl-pg` · `.bl-ev`
+- 라벨 — `.bl-lbl` · `.bl-cap` · `.bl-mini` · `.bl-axis` · `.bl-dl`(막대 안 값) · `.bl-leg`(범례) ·
+  `.bl-num`(번호 원) · `.bl-pill` · `.bl-badge` · `.bl-delta` · `.bl-asof` · `.bl-pgref` · `.bl-stamp` ·
+  `.bl-conf` · `.bl-seg`
+- 조작 단추 — `.bl-fig-ab` · `.bl-replay` · `.bl-shot-open` · `.bl-route-st` · `.bl-sc-pick`
+
+본문을 담는 그릇(카드 · 행)은 여기 없다. 카드 문장에 라벨 클래스를 덧씌워 하한을 피하지 않는다.
 
 표기 부품 — 확신도 `.bl-conf--fixed|plan|open|none`(넷으로 고정) · 번호 원
 `.bl-num--solid|ring|gold|sq|sm|lg` · 알약 `.bl-pill--solid|tint|dash` · 배지 `.bl-badge(--line)` ·
@@ -1178,6 +1199,33 @@ python3 scripts/check_live.py 보고서.html
 | | 근거 패널 · 원문 · 영상 | `.bl-ev` · `[data-doc]` · `[data-video]` | `media` · S09 |
 | 참고 | 아이콘 135종 · 움직임 견본 · 조작 요약 | `.bl-i` · `.bl-a` | `icons` · `motion` · `keys` |
 
+### 부품 속성 — 값으로 모양을 바꾸는 자리
+
+장째 복사한 뒤 숫자만 바꿀 때 본다. 값은 전부 마크업의 `data-*` 또는 `style="--변수: 값"` 이다.
+
+| 부품 | 자리 | 뜻 |
+|---|---|---|
+| 간트 `.bl-gantt` | `style="--bl-gantt-n: 12"` | 기간 열 수. 1열은 과제 이름 |
+| | 막대 `<i class="bl-gantt-bar" data-s="now" style="grid-column: 2 / 4">` | 칸 자리 — 2열이 첫 기간, `2 / 4` 는 2·3열(끝 번호 앞까지). `data-s` 는 `done` 완료 · `now` 진행 · `plan` 계획(빗금) · `hold` 협의 · `risk` 지연 · `mute` 참고 |
+| | `<i class="bl-gantt-today" style="--at: .37">` | 오늘 선. 시간 영역에서의 비율 0~1 (이름 열 제외) |
+| | 행 `.bl-gantt-r.is-focus` · 묶음 `.bl-gantt-g` | 강조 행 · 묶음 머리 행 |
+| 숨은 단계 표식 | `<i class="bl-mk" data-f="1"></i>` | 크기 없는 단계. 탭 · 장면 · 초점 행이 열린 표식 수를 세어 상태를 바꾼다 |
+| 탭 `.bl-tabset` | 단추 `data-at="2"` | 발표 중 단계 2 가 열리면 그 탭으로 넘어간다. 장 안에 `.bl-mk` 표식을 함께 둔다 |
+| 100% 누적 가로 막대 `.bl-stack` | 칸 `style="--v: 42"` · `.is-est` | 칸 폭(비율 숫자 · 합이 100 이 아니어도 된다) · 추정치 빗금. 끝 값은 `.bl-stack-val` |
+| 랙 `.bl-rack` | 칸 `style="--v: 40"` · 열 수 `style="--n: 8"` | 칸 높이 비율 |
+| 세로 막대 · 워터폴 | `.bl-vbar` 의 `--v` · `.bl-wf` 칸의 `--lo` · `--hi` | 최댓값 100 기준 높이 · 시작과 끝 |
+| 막대 기준선 · 게이지 · 진행 | `.bl-bar-ref` 의 `--at` · `.bl-gauge` · `.bl-prog` 의 `--v` | 0~1 비율 |
+| 준비도 눈금 `.bl-meter` | `data-v="3"` | 다섯 칸 중 채울 칸 수 |
+| 계단 `.bl-stair` | 칸 `style="--lv: 2"` · 열 수 `--n` | 높이 단 |
+| 와플 `.bl-waffle` | `data-total` · `data-on` · `data-alt` · `data-cols` · `data-icon` | 칸 수 · 켠 칸 · 다른 색 칸 · 열 수 · 아이콘 칸(`user` 등) |
+| RACI `.bl-raci` | `<td data-r="A">` (`A` · `R` · `C` · `I`) | 책임 표시 칸 |
+| 흐름도 `.bl-flowbox` | `style="--ar: 3.4"` · 마디 `.bl-node` 의 `--x` · `--y` · `--w` | 상자 가로세로비 · 마디 가운데 자리와 폭(상자 기준 %) |
+| 개념 곡선 `.bl-svgbox` | `--ar` · 라벨 `.bl-svgbox-l` 의 `--x` · `--y` · `data-a="l"` 또는 `"r"` | 상자 비율 · 라벨 자리(%) · 정렬 |
+| 커서 데모 `.bl-cursor` | `--x0` · `--y0` · `--x1` · `--y1` · `--x2` · `--y2` | 시작 · 누를 곳 · 끝 자리(%) |
+| 캡션 바 `.bl-capbar` | 문구마다 `style="--i: 0"` … | 차례로 바뀌고 마지막 문구가 남는다 |
+| 상태 격자 `.bl-simg` | 칸 `data-s` (`a` · `m` · `w` · `i`) | 녹 · 황토 · 회 · 적 |
+| 등장 · 차례 | `.bl-a` 의 `--i` · `--d` | 순번(80ms 씩) · 추가 지연(초) |
+
 기준 덱에 이미 있는 어휘 — 표지 `.bl-cover-k` · `.bl-sig` · 보고 요지 `.bl-gist` · `.bl-ask` ·
 로드맵 `.bl-road` · 카드 `.bl-card` · 수치 `.bl-stat` · 막대 `.bl-bars` · 표 `.bl-tbl` ·
 결론 줄 `.bl-concl` — 은 `live-standard.html` 에서 가져온다.
@@ -1215,7 +1263,7 @@ python3 scripts/check_live.py 보고서.html
 
 | 위젯 | 마크업 | 동작 |
 |---|---|---|
-| 탭 | `.bl-tabset` > `.bl-tabs > button[data-v]` + `.bl-pane[data-v]` | 누르면 그 판. 단추에 `data-at="단계"` 를 주면 발표 중 그 단계에서 넘어간다 |
+| 탭 | `.bl-tabset` > `.bl-tabs > button[data-v]` + `.bl-pane[data-v]` | 누르면 그 판. 단추에 `data-at="단계"` 를 주면 발표 중 그 단계에서 넘어간다 — 단계는 장 안의 `<i class="bl-mk" data-f="n">` 표식이 만든다 |
 | 세그먼트 | `.bl-seg[data-key="view"] > button[data-v]` · `[data-when="view=plan"]` | 고른 값이 가장 가까운 `[data-scope]`(없으면 장)에 붙고 맞는 요소만 보인다. `&` 로 조건을 잇는다 |
 | 시안 토글 | `.bl-fig > [data-v]` + `.bl-fig-ab > button[data-v]` | 시안 전환 · 그림을 누르면 크게 보기 |
 | 노선도 | `.bl-route-st[data-i]` + `.bl-route-card[data-i]` | 역이 2.6초마다 돈다. 누르면 고정 · 다시 누르면 풀림 |
@@ -1358,10 +1406,22 @@ Lucide 1.52.0 의 135종을 CSS 마스크로 `blue-live.css` 에 심었다(ISC �
 # 도넛 — 각도를 손으로 적지 않는다. --raw 는 건수, 가운데 숫자 · 단위 · 설명을 준다
 python3 scripts/donut.py --live --raw --total 360 --unit 건 --caption "주간 문의" \
         --labels "전화,메일,채팅,방문" 182 96 64 18
+# 출력 첫 줄은 HTML 주석이라 통째로 붙여도 된다. --total 은 범례처럼 천 단위 쉼표로 찍힌다.
+# 가운데 숫자는 구멍에 맞춰 저절로 줄지만, 단위는 짧게(h · 건 · %) 두는 편이 읽기 좋다
 python3 scripts/make_icons.py --check         # 아이콘 CSS 가 목록과 맞는가 (오프라인)
 python3 scripts/make_font_subset.py --check   # 폰트 서브셋이 글자 목록과 맞는가
-python3 scripts/check_live.py 보고서.html --shots out/   # 23항목 + 화면 PNG
+python3 scripts/check_live.py 보고서.html --shots out/   # 27항목 + 장마다 화면 PNG
 ```
+
+### 검사기가 보는 것 · 눈으로 볼 것
+
+`check_live.py` 27항목 — 문체(원문 · 그려진 글자) · 토큰 밖 hex · 두 CSS · rem · 노트 · 머리띠 ·
+꼬리띠 · 쪽번호 · 마크 · 워터마크 · 마크 짝 · 브랜드 자리 · 근거 JSON · 스타일 · 폰트 · 지면 끝 ·
+조작판 겹침 · 글자 하한 둘 · 가로 넘침 · 데이터 마크 대비 · 엔진 기동 · 단계와 `[클릭]` ·
+정의 없는 클래스 · 보이지 않는 글자 · 16:9 세로 넘침.
+
+검사기가 못 보는 것 — 제목 핵심구 `<em>` · 여백과 균형 · 내용의 맞고 틀림 · 고르지 않은 탭 판
+안의 넘침. `--shots` 로 남긴 장별 PNG 를 넘겨 보고, 탭 · 세그먼트가 있는 장은 판마다 눌러 본다.
 
 ### 엔진 API · 이벤트
 
