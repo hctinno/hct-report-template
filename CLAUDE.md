@@ -24,6 +24,11 @@
   사내 발표 덱 짜임새인 표지 발표자 블록·보고 요지·로드맵·출처 칩과 근거 패널.
   다른 계통은 용도가 분명할 때만 고른다(1920x1080 고정 지면·PPTX 출력·인쇄용 A4·상태를 바꾸는 보드).
 - 새 스타일을 만들지 않는다. `assets/` 의 견본 중 용도에 맞는 것을 복사해 내용만 바꾼다.
+- **AX_BLUE_REPORT_V1(`.claude/skills/ax-blue-report/`)은 블루 리포트와 별개 계통이다.** 사용자가
+  「AX_BLUE_REPORT_V1」 · 「AX 블루 리포트」로 부를 때만 쓴다. 그 폴더의 `SKILL.md` · `README.md` 를 따르고
+  `scripts/check_ax.py` 실패 0 을 완료 조건으로 한다. 아래 「어길 수 없는 규칙」(`--br-*` · 24px · `check_deck.py`)은
+  블루 리포트 계통의 규칙이며 이 플러그인에는 적용하지 않는다. 두 계통의 CSS · 부품을 한 덱에 섞지 않는다.
+  이 폴더를 고치면 그 안의 `.claude-plugin/plugin.json` version 과 `CHANGELOG.md` 를 함께 올린다.
 - 덱 내용은 `assets/deck-*.html` 과 `pptx/content.js` 두 곳에 있다. HTML 이 기준이며 고칠 때 두 곳을 함께 고친다. 합치지 않기로 했고, 갈라짐은 `scripts/check_content_sync.py` 가 잡는다.
 - 용도가 분명하지 않으면 임의로 고르지 말고 사용자에게 먼저 묻는다.
 - 예시 수치·부서명·문구는 자리표시자가 아니라 사용법 견본이다. 실제 내용으로 바꾼다.

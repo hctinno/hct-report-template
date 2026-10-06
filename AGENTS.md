@@ -103,6 +103,16 @@ Put the key phrase of a title inside `<em>` — the highlight band is drawn ther
 
 Separate family under the same design system. See `docs/H_INNO_FCC_KC_REPORT_TEMPLATE_SYSTEM.md` and its integration guide. `verify_repo.py` checks them with the A4 rules.
 
+### AX_BLUE_REPORT_V1 — separate plugin `ax-blue-report`
+
+A different system from Blue Report: an interactive HTML executive-briefing deck carried over from the in-house final deck — its design, motion and presenter features — as 56 sample slides whose content is entirely fictional (company 「샘플테크」). It lives in `.claude/skills/ax-blue-report/` and installs as `ax-blue-report@hct-tools`. Use it only when the user asks for "AX_BLUE_REPORT_V1", "AX 블루 리포트 V1" or "AX 블루 리포트"; every other report request stays with Blue Report.
+
+- Spec and slide catalog: `.claude/skills/ax-blue-report/README.md`. Workflow: `SKILL.md` in the same folder.
+- Its own rules and checker apply: `python3 .claude/skills/ax-blue-report/scripts/check_ax.py <deck.html>` must report 0 failures. The Blue Report hard rules below (`--br-*` tokens, 24px floor, `check_deck.py`) do not apply to it. Do not mix the two systems' CSS or parts in one deck.
+- Build: `scripts/build_deck.py` (single-file HTML, `--present`, `--artifact`). PDF: `scripts/make_pdf.py`. PDF viewer: `scripts/make_pdf_viewer.py`. Script export: `scripts/export_script.py`.
+- Slide styles are bound to each section `id`; change text only, keep ids, classes and `data-f` steps. Speaker notes need one `[클릭]` per step.
+- If you change that folder, bump `version` in its `.claude-plugin/plugin.json` and add an entry to its own `CHANGELOG.md`.
+
 ## Working rules
 
 - Work in the current checkout root. Paths here are relative to it — never assume a specific drive or directory.
