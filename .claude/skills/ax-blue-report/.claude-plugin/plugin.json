@@ -1,0 +1,9 @@
+{
+  "name": "ax-blue-report",
+  "description": "AX_BLUE_REPORT_V1 — 경영진 보고용 인터랙티브 HTML 발표 덱. 견본 장 56종(표지 · 보고 요지 · 시장 카드 · 연표 · 벤치마킹 · 1:1 비교 · 조직도 · 간트 · 결정 요청 · Q&A · 부록 도해)을 골라 글자만 바꿔 쓴다. 남색 머리띠 · 로고 · 워터마크 · 형광 밴드 · Pretendard, 클릭 단계 · 등장 애니메이션 · 출처 핀과 근거 창 · 지금 원문 보기 · 영상 창 · 탭 전환 · 발표 모드 · 레이저 · 대본 창. 한 파일 HTML · 발표 전용 · Artifact · 링크 PDF · PDF 뷰어 · 대본 출력.",
+  "version": "1.0.0",
+  "author": {
+    "name": "주식회사 에이치시티"
+  },
+  "homepage": "https://github.com/hctinno/hct-report-template"
+}
