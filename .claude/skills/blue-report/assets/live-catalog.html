@@ -1133,7 +1133,7 @@
     <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
-  <section class="bl-sl" id="tabs" data-notes="두 화면을 탭으로 갈아 본다. 발표 중에는 클릭 단계에 맞춰 탭이 저절로 넘어간다.&#10;&#10;[클릭] 첫째 탭 — 주간 수치를 읽는다.&#10;&#10;[클릭] 둘째 탭 — 일정 점을 읽는다. 탭을 직접 누르면 다음 단계 전까지 그 탭에 머문다.">
+  <section class="bl-sl" id="tabs" data-notes="두 화면을 탭으로 갈아 본다. 장에 들어오면 첫째 탭 — 주간 수치를 먼저 읽는다.&#10;&#10;[클릭] 둘째 탭으로 저절로 넘어간다 — 일정 점을 읽는다. 탭을 직접 누르면 다음 단계 전까지 그 탭에 머문다.&#10;&#10;※ 첫 탭에는 data-at 을 주지 않는다. 둘째 탭부터 data-at=&quot;1&quot; · &quot;2&quot; … 와 같은 수의 숨은 표식 .bl-mk 를 둔다.">
     <header class="bl-hd">
       <span class="bl-code"><b>S01</b>탭 .bl-tabset — 단계와 묶기 data-at</span>
       <span class="bl-sp"></span>
@@ -1142,8 +1142,8 @@
     <div class="bl-bd">
       <h2 class="bl-title">시범 현황 — <em>수치와 일정을 탭으로</em></h2>
       <div class="bl-tabset bl-fill">
-        <i class="bl-mk" data-f="1"></i><i class="bl-mk" data-f="2"></i>
-        <div class="bl-tabs"><button type="button" data-v="a" data-at="1"><span class="bl-num">1</span>주간 수치</button><button type="button" data-v="b" data-at="2"><span class="bl-num">2</span>남은 일정</button></div>
+        <i class="bl-mk" data-f="1"></i>
+        <div class="bl-tabs"><button type="button" data-v="a"><span class="bl-num">1</span>주간 수치</button><button type="button" data-v="b" data-at="1"><span class="bl-num">2</span>남은 일정</button></div>
         <div class="bl-pane" data-v="a">
           <div class="bl-mid bl-stack-v">
           <div class="bl-kpis bl-kpis--cards" style="--n: 4">

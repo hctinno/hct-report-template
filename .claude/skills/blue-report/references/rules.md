@@ -2,6 +2,9 @@
 
 `SKILL.md`가 요약본이다. 차트를 그리거나 새 레이아웃을 만들기 전에 이 문서를 읽는다.
 
+px 로 적힌 치수(24px 하한 · 1920x1080 좌표)는 **고정 지면 덱** 것이다. 라이브 덱(기준 덱 포함)은
+§2-2 와 README 「6-3」을 따른다 — 치수는 rem, 본문 하한 1.0rem · 절대 하한 0.78rem.
+
 ---
 
 ## 1. 차트
@@ -140,7 +143,8 @@ d = k × √value
     `.bl-leg` · `.bl-num` · `.bl-pill` · `.bl-badge` · `.bl-delta` · `.bl-asof` · `.bl-pgref` · `.bl-stamp` ·
     `.bl-conf` · `.bl-seg` / 조작 단추 `.bl-fig-ab` · `.bl-replay` · `.bl-shot-open` · `.bl-route-st` ·
     `.bl-sc-pick`)
-16. 색을 `data-c` 로 골랐는가 → `1`~`6` · `navy` · `ok` · `warn` · `alert` · `mute`. 인라인 style 에 색 금지
+16. 색을 `data-c` 로 골랐는가 → `1`~`6` · `navy` · `ok` · `warn` · `alert` · `mute`. 손으로 적은 인라인 색 금지
+    (`donut.py` 처럼 생성기가 토큰을 `var(--br-*)` 로 넣은 출력만 예외)
 17. 장 종류 표시가 맞는가 → 표지 `bl-sl--cover` · 장 간지 `bl-sl--chapter` · 부록 간지
     `bl-sl--apxdiv` · 부록 장 `data-apx`. 쪽번호(「부록 NN / MM」)와 숫자 이동이 여기서 갈린다
 18. 단계 `data-f` 와 노트의 `[클릭]` 수가 맞는가 → 대본 창 배지가 단계와 어긋나면 발표자가 길을 잃는다

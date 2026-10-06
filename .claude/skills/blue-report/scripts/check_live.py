@@ -47,8 +47,8 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
    26. 보이지 않는 글자 — 글자색과 실제 뒷배경 대비가 1.25:1 미만인 글자가 없는가.
        카드형 수치 타일 안의 강조 칸이 흰 바탕 흰 글자로 사라진 일이 있었다
    27. 세로 넘침 — 16:9 화면에서 장마다 본문이 꼬리띠 위에서 끝나는가. 지면은 한 화면
-       높이에 overflow:hidden 이라 넘친 줄은 잘려 사라진다. 900px 이하 읽기 폭은 장이
-       내용만큼 늘어나므로 16:9 만 본다
+       높이에 overflow:hidden 이라 넘친 줄은 잘려 사라진다. 900px 이하 읽기 폭(장이 내용만큼
+       늘어난다)에서는 꼬리띠가 장 안에 있고 본문이 그 위에서 끝나는가
 
 왜 rem 으로 판정하는가
   px 로 재면 창 크기에 따라 결과가 달라져 같은 파일이 통과했다 떨어졌다 한다.
@@ -189,6 +189,30 @@ FIT_PROBE = r"""() => {
       if (!b.width || !b.height) return;
       const o = Math.max(b.bottom - bot, top - b.top, b.right - r.right, r.left - b.left);
       if (o > worst) { worst = o; who = (el.className && el.className.baseVal === undefined ? el.className : el.tagName) || el.tagName; }
+    });
+    if (worst > 1.5) out.push({k: k + 1, sl: s.id || '', px: Math.round(worst), cls: String(who).slice(0, 40)});
+  });
+  return out;
+}"""
+
+
+# 좁은 폭(900px 이하)은 장이 내용만큼 늘어나는 읽기 폭이다. 그래도 꼬리띠는 장 안에 있어야
+# 하고 본문은 꼬리띠 위에서 끝나야 한다 — 띠 높이가 장 높이의 % 라 장이 늘면 꼬리띠가
+# 장 밖으로 밀려 다음 장에 가려진 일이 있었다. 가로는 보지 않는다(넓은 부품은 옆으로 스크롤한다).
+NARROW_PROBE = r"""() => {
+  const out = [];
+  document.querySelectorAll('#deck > .bl-sl, main > .bl-sl').forEach((s, k) => {
+    const R = s.getBoundingClientRect(), rf = s.querySelector('.bl-rf');
+    if (!rf) return;
+    const F = rf.getBoundingClientRect();
+    let worst = F.bottom - R.bottom, who = 'bl-rf';
+    s.querySelectorAll('.bl-bd *').forEach(el => {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.position === 'fixed') return;
+      if (el.closest('.bl-scene:not(.is-cur)')) return;
+      const b = el.getBoundingClientRect();
+      if (!b.width || !b.height) return;
+      if (b.bottom - F.top > worst) { worst = b.bottom - F.top; who = (el.className && el.className.baseVal === undefined ? el.className : el.tagName) || el.tagName; }
     });
     if (worst > 1.5) out.push({k: k + 1, sl: s.id || '', px: Math.round(worst), cls: String(who).slice(0, 40)});
   });
@@ -587,7 +611,7 @@ def check_render(path, rep, shots=None, seen_style=()):
     overflow, tiny, body_small, marks, drawn = [], [], [], [], ""
     style, need = None, sentinels(open(path, encoding="utf-8").read())
     edge, hud_hits, errors, dead = None, [], [], []
-    ink, fit = [], []
+    ink, fit, narrow = [], [], []
     wants_engine = "live-viewer.js" in open(path, encoding="utf-8").read()
     with sync_playwright() as pw:
         br = pw.chromium.launch(executable_path=chrome)
@@ -651,6 +675,8 @@ def check_render(path, rep, shots=None, seen_style=()):
                 dead.append(f"{w}px")
             tiny += [dict(r, view=w) for r in data["tiny"]]
             body_small += [dict(r, view=w) for r in data["body"]]
+            if w != VIEWS[0][0]:
+                narrow += [dict(r, view=w) for r in pg.evaluate(NARROW_PROBE)]
             if w == VIEWS[0][0]:
                 marks = data["marks"]
                 drawn = data["html"]
@@ -728,12 +754,14 @@ def check_render(path, rep, shots=None, seen_style=()):
     else:
         rep.o("보이지 않는 글자 — 글자색과 뒷배경이 같은 색인 글자 없음 (1.25:1 미만 0)")
 
-    if fit:
-        rep.f(f"세로 넘침 {len(fit)}장 — 16:9 에서 본문이 꼬리띠 밑 · 지면 밖으로 나간다(잘려 안 보인다)")
-        for t in fit[:8]:
-            print(f"        {t['k']:02d}장 {t['sl']}  {t['px']}px  .{t['cls']}")
+    if fit or narrow:
+        rep.f(f"세로 넘침 — 16:9 {len(fit)}장 · 좁은 폭 {len(narrow)}건 — 본문이 꼬리띠 밑으로 · 꼬리띠가 장 밖으로 나간다")
+        for t in fit[:6]:
+            print(f"        16:9   {t['k']:02d}장 {t['sl']}  {t['px']}px  .{t['cls']}")
+        for t in narrow[:6]:
+            print(f"        {t['view']}px  {t['k']:02d}장 {t['sl']}  {t['px']}px  .{t['cls']}")
     else:
-        rep.o("세로 넘침 — 16:9 에서 모든 장의 본문이 꼬리띠 위에서 끝난다")
+        rep.o("세로 넘침 — 16:9 는 한 화면 안, 좁은 폭은 꼬리띠가 장 안에서 본문 아래")
 
     if errors:
         rep.f(f"스크립트 예외 {len(errors)}건 — 뷰어나 부품이 시작하다 멈췄다")

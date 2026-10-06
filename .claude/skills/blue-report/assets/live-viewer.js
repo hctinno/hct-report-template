@@ -1537,6 +1537,9 @@
   });
 
   // 탭 — 단추를 누르면 그 판. 단추에 data-at="단계 값" 을 주면 발표 중 그 단계에서 넘어간다.
+  // 첫 탭에는 data-at 을 주지 않는다 — 0단계(장에 들어온 직후)의 기본 판이다. 첫 탭에도
+  // data-at="1" 을 주면 첫 클릭에 화면이 그대로인 헛클릭이 생긴다.
+  // 검토(펼침)에서는 단계와 무관하게 첫 판을 보인다 — 보통 탭처럼 읽는다.
   // 손으로 고른 판은 단계가 바뀔 때까지 그대로 둔다.
   $$('.bl-tabset').forEach(function (set) {
     var btns = $$(':scope > .bl-tabs > button[data-v]', set), panes = $$(':scope > .bl-pane[data-v]', set);
@@ -1560,7 +1563,7 @@
     var linked = btns.some(function (b) { return b.hasAttribute('data-at'); });
     if (!linked) return;
     addWidget(set, function (active, ctx) {
-      var k = slides.indexOf(slideOf(set)), th = ctx.staged ? threshold(k) : Infinity;
+      var k = slides.indexOf(slideOf(set)), th = ctx.staged ? threshold(k) : 0;
       if (lastLv !== th) { manual = null; lastLv = th; }
       if (manual) return;
       var best = null;
@@ -1746,6 +1749,15 @@
   });
 
   // 도넛 — 조각이나 범례에 손을 대면 그 항목이 가운데로 올라온다. 떼면 합계로 돌아간다
+  // 글자 폭(em) 어림 — donut.py 와 같은 셈. 숫자 .58 · 쉼표 .28 · 한글 1 · 그 밖 .6
+  function emOf(t) {
+    var w = 0;
+    for (var q = 0; q < t.length; q++) {
+      var ch = t.charAt(q);
+      w += /\d/.test(ch) ? .58 : /[,.]/.test(ch) ? .28 : t.charCodeAt(q) >= 0x1100 ? 1 : .6;
+    }
+    return w;
+  }
   $$('.bl-donut-box').forEach(function (box) {
     var dn = box.querySelector('.bl-donut');
     if (!dn) return;
@@ -1759,7 +1771,12 @@
       if (c && li) {
         c.textContent = '';
         var v = li.querySelector('b'), n = li.querySelector('span');
-        c.appendChild(mk('b', null, li.getAttribute('data-v') || (v ? v.textContent : '')));
+        // 숫자와 단위를 갈라 합계와 같은 모양으로 — 폭(--w)을 줘야 「1,150시간」이 구멍 안에 든다
+        var t = (li.getAttribute('data-v') || (v ? v.textContent : '')).trim();
+        var m = t.match(/^([-+−]?[\d.,]*\d)(.*)$/), b = mk('b', null, m ? m[1] : t);
+        if (m && m[2]) b.appendChild(mk('small', null, m[2]));
+        b.style.setProperty('--w', (emOf(m ? m[1] : t) + .5 * emOf(m ? m[2] : '') + .1).toFixed(2));
+        c.appendChild(b);
         c.appendChild(mk('span', 'bl-cap', (n ? n.textContent : '') + (li.getAttribute('data-p') ? ' · ' + li.getAttribute('data-p') : '')));
       }
     }

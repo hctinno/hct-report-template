@@ -168,7 +168,7 @@ def build_live(values, labels=None, r=110, width=48, gap=1.5, raw=False, total=N
         for ch in t:
             w += .58 if ch.isdigit() else .28 if ch in ",." else 1.0 if ord(ch) >= 0x1100 else .6
         return w
-    wem = _em(tot) + .42 * _em(unit) + .1
+    wem = _em(tot) + .5 * _em(unit) + .1   # 단위는 .42em 이지만 1rem 아래로 내려가지 않는다 — 넉넉히 .5
     out = ('<div class="bl-donut-box">\n'
            f'  <figure class="bl-donut" role="img" aria-label="{aria}">\n'
            f'    <svg viewBox="0 0 {size:.0f} {size:.0f}" aria-hidden="true"><g transform="translate({size / 2:.0f},{size / 2:.0f})">\n'
