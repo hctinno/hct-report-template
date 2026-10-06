@@ -249,6 +249,36 @@ python .claude/skills/blue-report/scripts/check_doc.py decks-out/회의록.html
 
 ---
 
+## AX_BLUE_REPORT_V1 — 경영진 보고 인터랙티브 덱 (별도 플러그인)
+
+블루 리포트와 **별개 계통**이다. 사내 경영진 보고 덱 최종본의 디자인 · 움직임 · 발표 기능을
+견본 장 56종으로 옮긴 스킬이고, 견본 내용(회사 · 기관 · 인물 · 수치 · 근거)은 전부 가상 시나리오(「샘플테크」)다.
+
+```bash
+claude plugin install ax-blue-report@hct-tools
+```
+
+「AX_BLUE_REPORT_V1」 · 「AX 블루 리포트 V1」 · 「AX 블루 리포트」 로 부른다. 규격서와 장 목록은
+`.claude/skills/ax-blue-report/README.md`, 작업 순서는 같은 폴더의 `SKILL.md` 다.
+
+| 무엇 | 내용 |
+|---|---|
+| 장 | 56종 — 표지 · INDEX · 보고 요지 · 장 표지 · 본문 도해 · 결정 요청 · Q&A · 부록 도해 |
+| 기능 | 클릭 단계 · 등장 애니메이션 · 출처 핀과 근거 창 · 지금 원문 보기 · 영상 창 · 탭 전환 · 발표 모드 · 레이저 · 대본 창 · 숫자 점프 |
+| 출력 | 한 파일 HTML · 발표 전용 HTML · Artifact 판 · 링크와 책갈피가 붙은 PDF · PDF 뷰어 · 대본 txt |
+| 점검 | `scripts/check_ax.py` — 블루 리포트의 `check_deck.py` · `check_live.py` 규칙(`--br-*` · 24px)은 적용하지 않는다 |
+
+```bash
+S=.claude/skills/ax-blue-report
+python3 $S/scripts/new_deck.py decks-out/q3/src --pick cover index exec-summary chapter-1 market-cards decision-request closing
+python3 $S/scripts/build_deck.py --list decks-out/q3/src/list.txt --title "3분기 AX 추진계획(안)" -o decks-out/q3/deck.html
+python3 $S/scripts/check_ax.py decks-out/q3/deck.html
+```
+
+견본 완성본은 `.claude/skills/ax-blue-report/dist/` 에 있다(대본 포함판 · 발표 전용판). 두 계통의 CSS · 부품을 한 덱에 섞지 않는다.
+
+---
+
 ## 만들기
 
 저장소 루트에서 실행한다. 산출물은 `decks-out/` 에 넣는다(gitignore 처리돼 있다).
@@ -381,6 +411,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   scripts/donut.py · palette.py          도넛 SVG · 대비 검증
   scripts/ensure_deps.py                 의존성 자동 확보
   pptx/                                  PowerPoint 생성기
+.claude/skills/ax-blue-report/           AX_BLUE_REPORT_V1 별도 플러그인 — SKILL.md · README.md · slides/ 56종 · scripts/check_ax.py
 brand/hct/                               회사 정보와 로고
 public/                                  공개본 빌드 재료 — public/README.md 참고
 AGENTS.md                                저장소를 연 에이전트가 자동으로 읽는 지침
