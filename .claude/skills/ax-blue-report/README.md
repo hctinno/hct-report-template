@@ -98,6 +98,7 @@ ax-blue-report/
 | `data-notes` | 발표 대본. `[클릭]` 수 = 단계 수 |
 | `.fr[data-f="N"]` | 클릭 단계. 같은 N 은 함께 열린다. 검토(펼침) 모드에서는 모두 보인다 |
 | `id="appendix"` | 부록 간지. 이 앞이 본문(쪽번호 01…), 뒤가 부록(부록 01…) |
+| `data-pdf-detail="off"` | PDF 에서 이 장 뒤에 「NN-k」 상세 쪽을 끼우지 않는다(화면 덱에는 영향 없음) |
 | 첫 장 | 표지 — 쪽번호 없음 |
 
 ### 대본 형식
@@ -239,13 +240,15 @@ python3 scripts/build_deck.py --gallery -o decks-out/gallery.html          # 견
 
 ```bash
 # PDF — 본문 장 뒤에 그 장이 부르는 부록을 「NN-k」 상세 쪽으로 끼우고, 두 화면 장은 「NN②」 로 한 쪽 더
-python3 scripts/make_pdf.py decks-out/q3/deck.html -o decks-out/q3/deck.pdf [--keep-order] [--no-appendix]
+python3 scripts/make_pdf.py decks-out/q3/deck.html -o decks-out/q3/deck.pdf [--keep-order] [--no-appendix] [--no-detail 08,11]
 # PDF 뷰어(쪽 그림 + 누르는 링크 + 책갈피 이동) — 메신저 미리보기 · Artifact 용
 python3 scripts/make_pdf_viewer.py decks-out/q3/deck.pdf -o decks-out/q3/deck-pdf.html [--artifact] [--dpi 80]
 # 대본
 python3 scripts/export_script.py decks-out/q3/deck.html -o decks-out/q3/script.txt [--md]
 ```
 
+상세 쪽을 끼우지 않을 장은 `--no-detail 08`(쪽 번호 또는 장 id) 또는 장에 `data-pdf-detail="off"` 로 정한다 —
+그 장이 부르던 부록은 뒤쪽 부록 묶음(부록 NN)에 남고, `--no-appendix` 면 빠진다. 견본 08장은 `data-pdf-detail="off"` 다.
 PDF 는 「부록 NN」 글자 · 지금 원문 보기 버튼 · INDEX 줄 · 상세 쪽의 「↩ NN」 이 쪽 링크가 되고,
 책갈피는 표지 · INDEX · 요지 / 장 → 쪽 → 상세 / 부록으로 묶인다. 쪽 이름은 뷰어 쪽 번호 칸에 「07-1」 처럼 보인다.
 가변 폰트는 Chromium PDF 에서 그림 글자(Type 3)가 되어 크고 검색이 안 되므로, 덱에 쓰인 굵기마다 고정 굵기 폰트를 만들어 찍는다.
