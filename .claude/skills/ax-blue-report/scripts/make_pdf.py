@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 """AX_BLUE_REPORT_V1 PDF — 덱 HTML → 링크 · 책갈피 · 쪽 이름이 붙은 PDF.
 
-  python3 scripts/make_pdf.py decks-out/deck.html -o decks-out/deck.pdf [--keep-order] [--no-appendix] [--no-qpdf] [--variable-font]
+  python3 scripts/make_pdf.py decks-out/deck.html -o decks-out/deck.pdf [--keep-order] [--no-appendix] [--no-detail 08,11] [--no-qpdf] [--variable-font]
 
   · 화면은 scripts/pdf_render.js(Playwright · Chromium)가 1920×1080 으로 찍는다.
   · 본문 장 뒤에 그 장이 부르는 부록을 「NN-k」 상세 쪽으로 끼워 넣는다(--keep-order 면 덱 순서 그대로).
+    특정 장만 끼우지 않으려면 --no-detail 08 (쪽 번호 또는 장 id, 쉼표로 여럿) 또는 장에 data-pdf-detail="off".
+    끼우지 않은 부록은 부록 묶음(부록 NN)으로 뒤에 남고, --no-appendix 면 빠진다.
   · 두 화면 장은 화면마다 한 쪽(「NN②」).
   · 「부록 NN」 글자 · 지금 원문 보기 버튼 · INDEX 줄 · 상세 쪽의 「↩ NN」 은 PDF 안 링크가 된다.
   · 책갈피: 표지 · INDEX · 요약 / 장별 묶음(장 → 쪽 → 상세) / 부록.
@@ -49,6 +51,7 @@ def main():
     ap = argparse.ArgumentParser(description='AX_BLUE_REPORT_V1 PDF')
     ap.add_argument('deck'); ap.add_argument('-o', required=True)
     ap.add_argument('--keep-order', action='store_true'); ap.add_argument('--no-appendix', action='store_true')
+    ap.add_argument('--no-detail', help='상세 쪽을 끼우지 않을 본문 장 — 쪽 번호 또는 id, 쉼표로 여럿(예: 08,11)')
     ap.add_argument('--no-qpdf', action='store_true'); ap.add_argument('--keep-manifest', action='store_true')
     ap.add_argument('--variable-font', action='store_true', help='고정 굵기 폰트로 바꾸지 않는다(빠르지만 PDF 가 크다)')
     a = ap.parse_args()
@@ -59,7 +62,7 @@ def main():
         sys.exit('pypdf 가 없다 — pip install pypdf')
     tmp = tempfile.mkdtemp(prefix='axbr-pdf-')
     raw, man = os.path.join(tmp, 'raw.pdf'), os.path.join(tmp, 'manifest.json')
-    cmd = ['node', os.path.join(HERE, 'pdf_render.js'), a.deck, raw, man] + (['--keep-order'] if a.keep_order else []) + (['--no-appendix'] if a.no_appendix else [])
+    cmd = ['node', os.path.join(HERE, 'pdf_render.js'), a.deck, raw, man] + (['--keep-order'] if a.keep_order else []) + (['--no-appendix'] if a.no_appendix else []) + (['--no-detail', a.no_detail] if a.no_detail else [])
     fc = None if a.variable_font else static_fonts(a.deck, tmp)
     if fc: cmd += ['--font-css', fc]
     r = subprocess.run(cmd, capture_output=True, text=True)

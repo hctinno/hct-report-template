@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // AX_BLUE_REPORT_V1 — 덱 HTML 을 인쇄용 PDF 한 벌로 찍는다(목차 · 링크 · 쪽 이름은 make_pdf.py 가 붙인다).
-//   node scripts/pdf_render.js <deck.html> <out.pdf> <manifest.json> [--keep-order] [--no-appendix] [--font-css <css>]
+//   node scripts/pdf_render.js <deck.html> <out.pdf> <manifest.json> [--keep-order] [--no-appendix] [--no-detail 08,<id>] [--font-css <css>]
 // 기본: 본문 장 뒤에 그 장이 부르는 부록(지금 원문 보기 · data-now-source)을 「NN-k」 상세 쪽으로 끼워 넣는다.
 //       두 화면 장([role=tab][data-v])은 화면마다 한 쪽씩 「NN②」.
 // --keep-order   부록을 끼워 넣지 않고 덱 순서 그대로
 // --no-appendix  본문에 끼워 넣지 않은 부록(간지 · Q&A 등)은 빼고 INDEX 의 「+ 부록」 줄도 숨긴다
+// --no-detail    이 본문 장(쪽 번호 또는 id, 쉼표로 여럿) 뒤에는 상세 쪽을 끼우지 않는다. 장에 data-pdf-detail="off" 를 적어도 같다
 const path = require('path'), fs = require('fs');
 
 function loadPlaywright() {
@@ -19,7 +20,7 @@ function loadPlaywright() {
   process.exit(2);
 }
 
-const PLAN = ({ keepOrder, noAppendix }) => {
+const PLAN = ({ keepOrder, noAppendix, noDetail }) => {
   const d = document, all = [...d.querySelectorAll('#deck > section.sl')];
   const div = d.getElementById('appendix');
   const cut = div ? all.indexOf(div) : all.findIndex(s => s.classList.contains('apx'));
@@ -44,7 +45,7 @@ const PLAN = ({ keepOrder, noAppendix }) => {
   body.forEach((s, k) => {
     const lab = two(k + 1);
     push(s, { label: lab, kind: s.classList.contains('v41-chapter') ? 'chapter' : 'body' });
-    if (keepOrder) return;
+    if (keepOrder || s.getAttribute('data-pdf-detail') === 'off' || noDetail.includes(lab) || noDetail.includes(String(k + 1)) || noDetail.includes(s.id)) return;
     let n = 0;
     s.querySelectorAll('[data-now-source]').forEach(b => {
       const t = target(b.getAttribute('data-now-source'));
@@ -141,7 +142,8 @@ const ASSEMBLE = () => {
 };
 
 (async () => {
-  const a = process.argv.slice(2), fcI = a.indexOf('--font-css'), [F, OUT, MAN] = a.filter((x, i) => !x.startsWith('--') && !(fcI >= 0 && i === fcI + 1));
+  const a = process.argv.slice(2), fcI = a.indexOf('--font-css'), ndI = a.indexOf('--no-detail'), [F, OUT, MAN] = a.filter((x, i) => !x.startsWith('--') && !(fcI >= 0 && i === fcI + 1) && !(ndI >= 0 && i === ndI + 1));
+  const noDetail = ndI >= 0 ? String(a[ndI + 1] || '').split(',').map(x => x.trim()).filter(Boolean) : [];
   if (!F || !OUT || !MAN) { console.error('사용: node pdf_render.js <deck.html> <out.pdf> <manifest.json> [--keep-order] [--no-appendix]'); process.exit(1); }
   const pw = loadPlaywright();
   const b = await pw.chromium.launch();
@@ -170,7 +172,7 @@ const ASSEMBLE = () => {
     await p.waitForTimeout(400);
     if (!n) console.error('· 덱에서 Pretendard @font-face 를 못 찾았다 — 고정 굵기 폰트를 덧붙이기만 했다');
   }
-  const plan = await p.evaluate(PLAN, { keepOrder: a.includes('--keep-order'), noAppendix: a.includes('--no-appendix') });
+  const plan = await p.evaluate(PLAN, { keepOrder: a.includes('--keep-order'), noAppendix: a.includes('--no-appendix'), noDetail });
   const pages = [];
   for (const it of plan.items) {
     await p.evaluate(PREP, it);
