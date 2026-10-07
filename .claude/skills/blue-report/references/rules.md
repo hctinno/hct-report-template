@@ -2,6 +2,9 @@
 
 `SKILL.md`가 요약본이다. 차트를 그리거나 새 레이아웃을 만들기 전에 이 문서를 읽는다.
 
+px 로 적힌 치수(24px 하한 · 1920x1080 좌표)는 **고정 지면 덱** 것이다. 라이브 덱(기준 덱 포함)은
+§2-2 와 README 「6-3」을 따른다 — 치수는 rem, 본문 하한 1.0rem · 절대 하한 0.78rem.
+
 ---
 
 ## 1. 차트
@@ -60,7 +63,7 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
   맥락은 `--mute` 클래스(`.br-bar-v--mute` · `.br-bar-h--mute` · `.br-col-name--mute`).
   마크업에 `background` 를 직접 적지 않는다. 몇 개를 주인공으로 둘지는 제목이 정한다.
 - 단조 램프는 **순서가 있는 구간**에만 쓴다. 부서·제품처럼 순서 없는 항목에 쓰지 않는다.
-- 밝은 지면용 5색: `--br-data-1` ~ `--br-data-5` (12.44 / 7.11 / 3.58 / 2.73 / 2.10 : 1).
+- 밝은 지면용 5색: `--br-data-1` ~ `--br-data-5` (12.44 / 7.51 / 3.58 / 2.73 / 2.10 : 1).
 - 구간 6개 이상이면 `python3 scripts/palette.py --steps N`으로 보간 램프를 만든다.
   7단계는 `--br-bar-1` ~ `--br-bar-7`로 이미 토큰에 있다.
 - `--br-soft-1~3`(`#7fb6f5 #9dc4f2 #a4c4e5`)은 밝은 지면에서 1.67~1.96:1로 **2:1에 미달한다.**
@@ -100,9 +103,11 @@ d = k × √value
 
 ## 2-2. 기준 덱 · 라이브 덱 체크리스트
 
-고정 지면이 없는 계통이다. `scripts/check_live.py` 가 22항목을 판정한다.
-**새 보고서는 `assets/live-standard.html` 을 복사해 시작하고, `apply_brand.py --deck standard
---single-file` 로 산출물을 만든다.**
+고정 지면이 없는 계통이다. `scripts/check_live.py` 가 27항목을 판정한다. 아래 목록 중 7(`<em>`) ·
+17(장 종류 표시)은 눈으로 본다 — 나머지는 검사기가 실패로 잡는다(20 「질의응답」은 문체 검사의
+존댓말 종결로, 19 의 아이콘 이름은 정의 없는 클래스로 잡힌다).
+**새 보고서는 `assets/live-standard.html` 을 복사해 시작하고, `apply_brand.py --deck <파일>
+--title "문서명" --single-file` 로 산출물을 만든다.** `--title` 을 빼면 brand.json 의 `docTitle` 이 덱 제목을 덮는다.
 
 1. 치수를 `rem` 으로만 적었는가 → `px` 는 1px 테두리, 배율 엔진의 `clamp`, blur/shadow 반경만 예외
 2. 머리띠 `.bl-hd` 가 장마다 있는가 → `.bl-code`(절 번호+이름) · `.bl-sp` · `.br-mark`
@@ -128,8 +133,24 @@ d = k × √value
 11. 지면이 화면 좌우 끝까지 닿는가 → body 기본 여백 8px 이 살아 있으면 띠가 끝에 안 닿는다
 12. 출처 칩 `.bl-ev` 이 근거에 이어지는가 → 키가 `#bl-evidence` JSON 에 있고, 항목마다 제목·등급·출처
     · 등급은 A 1차 공식 자료 · B 학술·전문기관 · C 언론·2차 자료 · R 직접 조회·집계
-13. 떠 있는 조작판이 꼬리띠 글자(문서명·쪽번호)를 덮지 않는가 → 1600·760·400px 에서 잰다.
+13. 떠 있는 조작판이 꼬리띠 글자(문서명·쪽번호)를 덮지 않는가 → 1600·760·400px 에서 장마다 잰다.
     600px 이하(휴대폰)는 조작판에 ‹ › 만 남는다 — 나머지는 발표자 화면의 조작이다
+14. 엔진이 떴는가 → `live-viewer.js` 를 부르는 덱인데 `window.blDeck` 이 없으면 실패다.
+    연결형 산출물은 JS 를 덱 옆에 두고, 아니면 `--single-file` 로 묶는다
+15. 1.0rem 아래 글자를 주석 · 라벨 계열에만 주었는가 → 목록은 `check_live.py` 의 `NOTE_CLS` 한 곳이 정본이다
+    (주석 · 띠 `.bl-note` · `.bl-src` · `.bl-chip` · `.bl-eyebrow` · `.bl-stat-t` · `.bl-rf` · `.bl-ord` ·
+    `.bl-code` · `.bl-pg` · `.bl-ev` / 라벨 `.bl-lbl` · `.bl-cap` · `.bl-mini` · `.bl-axis` · `.bl-dl` ·
+    `.bl-leg` · `.bl-num` · `.bl-pill` · `.bl-badge` · `.bl-delta` · `.bl-asof` · `.bl-pgref` · `.bl-stamp` ·
+    `.bl-conf` · `.bl-seg` / 조작 단추 `.bl-fig-ab` · `.bl-replay` · `.bl-shot-open` · `.bl-route-st` ·
+    `.bl-sc-pick`)
+16. 색을 `data-c` 로 골랐는가 → `1`~`6` · `navy` · `ok` · `warn` · `alert` · `mute`. 손으로 적은 인라인 색 금지
+    (`donut.py` 처럼 생성기가 토큰을 `var(--br-*)` 로 넣은 출력만 예외)
+17. 장 종류 표시가 맞는가 → 표지 `bl-sl--cover` · 장 간지 `bl-sl--chapter` · 부록 간지
+    `bl-sl--apxdiv` · 부록 장 `data-apx`. 쪽번호(「부록 NN / MM」)와 숫자 이동이 여기서 갈린다
+18. 단계 `data-f` 와 노트의 `[클릭]` 수가 맞는가 → 대본 창 배지가 단계와 어긋나면 발표자가 길을 잃는다
+19. 부품을 카탈로그에서 장째 복사했는가 → 클래스를 지어내지 않는다. CSS 에 없는 클래스는 아무 일도
+    하지 않는다. 아이콘은 `make_icons.py` 목록 135종 안에서만
+20. 마무리를 「질의응답」으로 닫았는가 → 지면 본문은 존댓말 종결(감사합니다)을 쓰지 않는다
 
 빈 공간은 아래에 모으고 억지로 늘리지 않는다. 격자에 `.bl-fill` 을 주면 블록이 남는 자리를
 먹되 행 높이는 내용에 맞춘다 — 카드가 통째로 부풀어 속이 비는 일이 없다.
@@ -141,7 +162,15 @@ d = k × √value
 | 표지 | `.bl-cover-k` · `.bl-title` + `.bl-tag` · `.bl-cover-rule` · `.bl-cover-one` · `.bl-sig` | 눈썹은 연도(고정폭) + 무엇의 보고 · 한 줄 메시지는 뒤 절반을 `<b>` · 우하단에 발표 부서와 사람 |
 | 보고 요지 | `.bl-gist` · `.bl-ask` · `.bl-gist-row` | 왼쪽 결론 두 줄 + 결정 요청 · 오른쪽 근거 세 줄. 바쁜 사람은 이 장만 본다 |
 | 로드맵 | `.bl-road` · `.bl-road-r[data-cat]` · `.bl-road-c` · `.bl-road-out` | 과제 행 × 기간 열 + 확인할 결과. 칸은 `style="grid-column: 2 / 4"` (2열이 첫 기간) |
-| 출처 | `.bl-ev data-ev` + `#bl-evidence` | 수치 바로 옆에 단다. 근거는 문서 끝 JSON 한 벌 |
+| 출처 | `.bl-ev data-ev` + `#bl-evidence` | 수치 바로 옆에 단다. 근거는 문서 끝 JSON 한 벌. `data-ev="E1,E2"` 는 탭 |
+| 목차 | `.bl-agenda` | 번호 · 장 제목 · 부제 한 줄씩. 마지막 행 + 부록 |
+| 장 간지 | `.bl-sl--chapter` · `.bl-chapter-k` · `.bl-chapter-nav` | Chapter 라벨 · 큰 제목 · 진행 표시(지금 장 `.is-on`) |
+| 마무리 | `.bl-fin` · `.bl-fin-l1` · `.bl-fin-l2` · `.bl-fin-mk` · `.bl-fin-ty` | 전제 한 줄 · 핵심 문장(형광 막대) · 「질의응답」 |
+| 부록 | `.bl-sl--apxdiv` · 이후 장 `data-apx` | 간지 쪽번호는 「부록」, 부록 장은 「부록 NN / MM」 |
+| 예상 질문 | `.bl-qa` | 왼쪽 질문(~가?) · 오른쪽 답(A 표지 · 개조식) |
+
+부품 38종(카드 · 시간 · 조직 · 차트 · 흐름 · 화면 목업 · 위젯)은 `assets/live-catalog.html` 에 장마다
+하나씩 있다. 색인과 위젯 속성 · 데이터 형식은 `README.md` 「6-3. 라이브 덱」.
 
 세는 숫자(쪽번호·장 번호·서수·연도)는 고정폭 `--bl-font-mono`(IBM Plex Mono)다. 본문 안에서
 자릿수를 맞춰야 하는 숫자는 `.bl-mn` 을 단다. 큰 수치 `.bl-stat-v` 는 Pretendard 그대로 둔다.

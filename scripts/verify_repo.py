@@ -12,9 +12,12 @@
             `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
   boards    웹 보드 5종을 check_board.py 11항목으로 판정한다.
-  live      라이브 덱을 check_live.py 22항목으로 판정한다. 고정 지면이 없고
+  live      라이브 덱을 check_live.py 27항목으로 판정한다. 고정 지면이 없고
             치수가 rem 이라 px 하한이 아니라 rem 하한으로 본다.
             견본만이 아니라 apply_brand.py 산출물(단일 파일 · 연결형)도 본다.
+            엔진 기능(넘김 · 단계 · 쪽번호 이동 · 발표 · 레이저 · 겹창 · 근거 ·
+            원문 · 영상 · 탭 · 대본 창과 팝업 차단 대체)은 카탈로그 덱을 눌러 본다.
+            견본과 단일 파일 산출물 둘 다. 아이콘 CSS 가 목록과 맞는지도 본다.
   pptx      build.js 가 돌고 .pptx 4종이 나오는가.
   dist      dist/ 의 두 파일이 소스에서 재생성한 것과 같은가.
             assets/ 를 고치고 dist/ 를 다시 만들지 않으면 여기서 걸린다.
@@ -230,7 +233,7 @@ def check_live(log, out_dir):
     나는 결함을 놓친다 — `--single-file` 이 CSS 를 문서 안으로 넣자 CSS 주석의
     사용 예가 진짜 근거 JSON 보다 앞에 놓여 검사기가 오판한 일이 그랬다.
 
-    산출물은 두 갈래다. `--single-file`(권장)은 덱마다, CSS·`fonts/` 를 옆에
+    산출물은 두 갈래다. `--single-file`(권장)은 덱마다, CSS·뷰어 JS·`fonts/` 를 옆에
     복사하는 연결형은 기준 덱 하나만 본다 — 복사 경로는 덱과 무관하게 같다."""
     targets = []
     for name, f in _LIVE_FILES.items():
@@ -623,6 +626,236 @@ def check_fcc(log):
         log.ok("FCC/KC 안전", "비밀값·로컬 경로·개인정보 패턴 없음")
 
 
+# ------------------------------------------------------------- 라이브 엔진 기능
+
+# 부품이 가장 많은 덱으로 본다. 엔진(live-viewer.js)은 덱마다 같은 파일이다.
+ENGINE_DECK = "live-catalog.html"
+
+ENGINE_JS = """
+  window.__t = {
+    cur: () => blDeck.index,
+    idx: (id) => blDeck.slides.indexOf(document.getElementById(id)),
+    pg: () => ((blDeck.slides[blDeck.index].querySelector('.bl-pg') || {}).textContent || '').trim(),
+    on: (sel) => { const e = document.querySelector(sel);
+                   return !!(e && !e.hidden && getComputedStyle(e).display !== 'none'); },
+    shown: (id) => { const s = document.getElementById(id);
+                     const f = s ? [...s.querySelectorAll('[data-f]')] : [];
+                     return [f.filter(x => x.classList.contains('is-shown')).length, f.length]; },
+  };
+"""
+
+
+def check_icons(log):
+    """라이브 계통 아이콘 CSS 가 make_icons.py 의 목록 · 판과 맞는가 (오프라인).
+
+    아이콘은 blue-live.css 안에 마스크로 심겨 있다. 블록을 손으로 고치거나 목록만 늘리고
+    다시 돌리지 않으면 견본의 이름이 그려지지 않는다 — 빈 칸이라 눈으로 놓치기 쉽다."""
+    r = run([sys.executable, os.path.join(SCRIPTS, "make_icons.py"), "--check"])
+    out = (r.stdout.strip() or r.stderr.strip()).splitlines()
+    if r.returncode != 0:
+        log.fail("라이브 아이콘", (out or ["make_icons.py --check 실패"])[-1].strip())
+    else:
+        log.ok("라이브 아이콘", (out or [""])[-1].strip())
+
+
+def check_live_engine(log, out_dir):
+    """라이브 덱 엔진이 발표 기능을 실제로 해내는가 — 카탈로그 덱을 띄워 눌러 본다.
+
+    check_live.py 는 지면을 본다. 엔진의 결함은 키와 단추를 눌러야 드러난다 —
+    쪽번호 이동이 엉뚱한 장으로 가거나, 겹창이 열린 채 → 가 뒤의 장을 넘기거나,
+    팝업이 막힌 창에서 대본이 아예 안 뜨는 일은 지면 검사로는 보이지 않는다.
+    클릭은 사람처럼 화면 위의 요소를 누른다. 다른 것에 가려 눌리지 않으면 그것도 결함이다.
+
+    견본과 `--single-file` 산출물을 둘 다 본다. 사람이 받는 것은 산출물이고, 엔진을
+    문서 안에 넣는 순간에만 나는 결함이 있다 — 주석 속 script 닫는 태그가 그랬다."""
+    path = os.path.join(out_dir, "live", "livecatalog.html")
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        run([sys.executable, os.path.join(SCRIPTS, "apply_brand.py"), "--brand", BRAND,
+             "--deck", "livecatalog", "--single-file", "-o", path])
+    for label, p in (("라이브 엔진 기능 — 견본", os.path.join(ASSETS, ENGINE_DECK)),
+                     ("라이브 엔진 기능 — 단일 파일", path)):
+        if not os.path.exists(p):
+            log.fail(label, "파일이 없다")
+            continue
+        _engine_once(log, label, p)
+
+
+def _engine_once(log, label, path):
+    sys.path.insert(0, SCRIPTS)
+    from ensure_deps import need_browser
+    chrome = need_browser()
+    from playwright.sync_api import sync_playwright
+
+    url = "file://" + os.path.abspath(path)
+    bad, errs, n_ok = [], [], [0]
+
+    def expect(cond, what):
+        if cond:
+            n_ok[0] += 1
+        else:
+            bad.append(what)
+
+    with sync_playwright() as pw:
+        br = pw.chromium.launch(executable_path=chrome)
+        ctx = br.new_context(viewport={"width": 1600, "height": 900}, reduced_motion="reduce")
+        pg = ctx.new_page()
+        pg.on("pageerror", lambda e: errs.append(str(e).splitlines()[0]))
+        pg.goto(url)
+        pg.wait_for_timeout(900)
+        J, key = pg.evaluate, pg.keyboard.press
+
+        def wait(ms=300):
+            pg.wait_for_timeout(ms)
+
+        def go(sid):
+            J(f"blDeck.go(__t.idx('{sid}'))")
+            wait(450)
+
+        def click(sel, what):
+            try:
+                pg.locator(sel).first.click(timeout=4000)
+                wait(350)
+                return True
+            except Exception as e:  # noqa: BLE001 — 무엇이 가렸는지까지 남긴다
+                bad.append(f"{what} — 누르지 못함 ({str(e).splitlines()[0][:90]})")
+                return False
+
+        n = J("document.querySelectorAll('#deck > .bl-sl').length")
+        if not J("!!(window.blDeck && blDeck.slides.length)"):
+            log.fail(label, "엔진이 뜨지 않았다" + (f" — {errs[0]}" if errs else ""))
+            br.close()
+            return
+        J(ENGINE_JS)
+        expect(J("blDeck.slides.length") == n, f"장 수 — 엔진 {J('blDeck.slides.length')} · 문서 {n}")
+
+        # 넘김 · 쪽번호 이동
+        key("ArrowRight"); wait()
+        expect(J("__t.cur()") == 1, "→ 키로 다음 장")
+        for k in ("1", "2", "Enter"):
+            key(k)
+        wait(450)
+        expect(J("__t.pg()").startswith("12"), f"숫자 12 Enter → 12쪽 (지금 {J('__t.pg()')!r})")
+        for k in ("a", "2", "Enter"):
+            key(k)
+        wait(450)
+        expect(J("__t.pg()").startswith("부록 02"), f"a 2 Enter → 부록 02쪽 (지금 {J('__t.pg()')!r})")
+        here = J("__t.cur()")
+        for k in ("9", "9", "9", "Enter"):
+            key(k)
+        wait()
+        expect(J("__t.cur()") == here and J("__t.on('#bl-jump.is-bad')"), "없는 쪽 999 → 제자리 · 「없음」 표시")
+
+        # 메모 · 도움말 (발표 밖에서)
+        key("n"); wait()
+        expect(J("__t.on('#bl-notes') && document.getElementById('bl-notes').innerText.trim().length > 10"),
+               "N — 발표자 노트 띠")
+        key("n"); wait()
+        key("Shift+Slash"); wait()
+        expect(J("__t.on('#bl-help')"), "? — 단축키 도움말")
+        key("Escape"); wait()
+        expect(not J("__t.on('#bl-help')"), "Esc — 도움말 닫힘")
+
+        # 발표 · 단계 · 레이저
+        go("gantt")
+        g = J("__t.idx('gantt')")
+        key("f"); wait(600)
+        expect(J("document.getElementById('deck').classList.contains('bl-deck--present')"), "F — 발표 모드")
+        expect(J("getComputedStyle(document.querySelector('.bl-hud')).display") == "none", "발표 중 조작판 숨김")
+        expect(J("document.body.classList.contains('laser')"), "발표 모드에서 레이저 저절로 켜짐")
+        s0, tot = J("__t.shown('gantt')")
+        expect(tot > 0 and s0 == 0, f"발표 중 단계 접힘 ({s0}/{tot})")
+        key("ArrowRight"); wait()
+        s1, _ = J("__t.shown('gantt')")
+        expect(J("__t.cur()") == g and s1 == tot, f"→ 가 장보다 단계를 먼저 연다 ({s1}/{tot})")
+        key("ArrowRight"); wait(450)
+        expect(J("__t.cur()") == g + 1, "단계를 다 연 뒤 → 는 다음 장")
+        key("ArrowLeft"); wait(450)
+        expect(J("__t.cur()") == g and J("__t.shown('gantt')")[0] == tot, "← 로 돌아오면 단계가 다 열린 채")
+        key("l"); wait()
+        expect(not J("document.body.classList.contains('laser')"), "L — 레이저 끔")
+        key("l"); wait()
+        key("Escape"); wait(600)
+        expect(not J("document.getElementById('deck').classList.contains('bl-deck--present')"), "Esc — 발표 끝")
+
+        # 겹창 — 열려 있는 동안 키가 뒤의 덱으로 새지 않는다
+        go("hcard")
+        h = J("__t.cur()")
+        if click('[data-peek="raci"]', "부록 겹쳐 보기"):
+            expect(J("__t.on('#bl-peek') && !!document.querySelector('#bl-peek .bl-sl')"), "부록 겹쳐 보기 열림")
+            key("ArrowRight"); wait()
+            expect(J("__t.cur()") == h, "겹창이 열린 동안 → 가 덱을 넘기지 않음")
+            key("Escape"); wait()
+            expect(not J("__t.on('#bl-peek')"), "Esc — 겹쳐 보기 닫힘")
+
+        # 근거 패널 — 여러 키는 탭 · 형광 문구 · 캡처 뷰어 · 원문으로 이어짐
+        go("media")
+        if click('.bl-ev[data-ev="E1,E2,E3"]', "근거 칩 E1,E2,E3"):
+            expect(J("__t.on('#bl-ev-panel')"), "근거 패널 열림")
+            expect(J("document.querySelectorAll('#bl-ev-panel .bl-ev-tabs [role=tab]').length") == 3, "근거 탭 3개")
+            expect(J("!!document.querySelector('#bl-ev-panel .bl-ev-facts li.is-hl')"), "근거 형광 문구")
+            expect(J("!!document.querySelector('#bl-ev-panel .bl-ev-view')"), "캡처 뷰어")
+            if click('#bl-ev-panel .bl-ev-tabs [role=tab]:nth-child(3)', "근거 탭 E3"):
+                expect("제7조" in J("document.getElementById('bl-ev-title').textContent"), "탭이 근거를 바꿈")
+                if click('#bl-ev-panel .bl-pgref', "근거 → 원문 보기"):
+                    expect(J("__t.on('#bl-doc')"), "근거에서 원문 열림")
+                    key("Escape"); wait()
+                    expect(not J("__t.on('#bl-doc')") and J("__t.on('#bl-ev-panel')"), "원문 닫으면 근거로 돌아옴")
+            key("Escape"); wait()
+            expect(not J("__t.on('#bl-ev-panel')"), "Esc — 근거 닫힘")
+
+        # 원문 · 영상
+        if click('.bl-sl#media [data-doc="doc-guide"]', "원문 단추"):
+            expect(J("__t.on('#bl-doc')"), "원문 겹창 열림")
+            key("Escape"); wait()
+            expect(not J("__t.on('#bl-doc')"), "Esc — 원문 닫힘")
+        if click('.bl-sl#media [data-video="vid-demo"]', "영상 단추"):
+            wait(300)
+            expect(J("__t.on('#bl-vid')"), "영상 겹창 열림")
+            expect(J("(document.querySelector('#bl-vid video') || {}).src || ''").startswith("blob:"),
+                   "base64 영상을 풀어 재생 준비")
+            key("Escape"); wait()
+            expect(not J("__t.on('#bl-vid')"), "Esc — 영상 닫힘")
+
+        # 그림 크게 보기 · 탭
+        go("fig")
+        if click('.bl-sl#fig .bl-fig > img, .bl-sl#fig .bl-fig > svg', "시안 그림"):
+            expect(J("__t.on('#bl-lb')"), "그림 크게 보기 열림")
+            key("Escape"); wait()
+            expect(not J("__t.on('#bl-lb')"), "Esc — 크게 보기 닫힘")
+        go("tabs")
+        if click('.bl-sl#tabs .bl-tabs > button[data-v="b"]', "탭 B"):
+            expect(J("!!document.querySelector('.bl-sl#tabs .bl-pane[data-v=\"b\"].is-on')"), "탭 B 의 판이 열림")
+
+        # 대본 창 — 팝업 · 팝업이 막힌 창의 같은 창 패널
+        try:
+            with pg.expect_popup(timeout=4000) as pop:
+                key("p")
+            pw_ = pop.value
+            pw_.wait_for_timeout(500)
+            expect(len(pw_.evaluate("document.getElementById('root').innerText")) > 20, "P — 대본 팝업에 노트")
+            key("p"); wait(400)
+            expect(pw_.is_closed(), "P 다시 — 대본 팝업 닫힘")
+        except Exception as e:  # noqa: BLE001
+            bad.append(f"P — 대본 팝업이 열리지 않음 ({str(e).splitlines()[0][:80]})")
+        J("window.open = () => null")
+        key("p"); wait(400)
+        expect(J("__t.on('#bl-scr') && document.documentElement.classList.contains('bl-scr')"),
+               "팝업이 막히면 같은 창 오른쪽에 대본")
+        key("p"); wait()
+        expect(not J("__t.on('#bl-scr')"), "P 다시 — 대본 패널 닫힘")
+        br.close()
+
+    if errs:
+        bad.append(f"콘솔 예외 {len(errs)}건 — {errs[0]}")
+    if bad:
+        log.fail(label, f"{len(bad)}건 실패 · 통과 {n_ok[0]}건")
+        for t in bad[:12]:
+            print(f"    · {t}")
+    else:
+        log.ok(label, f"{n_ok[0]}건 모두 동작 · 콘솔 예외 없음")
+
+
 # ------------------------------------------------------------------ 뷰어 축척
 
 # 실제로 쓰이는 화면들. 16:9 정배수만 보면 이 검사가 하는 일이 없다 —
@@ -985,6 +1218,8 @@ def main():
         if "live" in only:
             print("\n── 라이브 덱 ──")
             check_live(log, tmp)
+            check_icons(log)
+            check_live_engine(log, tmp)
         if "fcc" in only:
             print("\n── H-INNO FCC/KC 템플릿 ──")
             check_fcc(log)

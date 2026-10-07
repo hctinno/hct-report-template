@@ -176,7 +176,7 @@
   </section>
 
   <!-- 07 결정 요청 — 단계 전개 ────────────────────────────────────────── -->
-  <section class="bl-sl" data-notes="요청 셋을 하나씩 연다. 발표 모드에서 → 를 세 번 누르면 차례로 나온다. 검토 모드에서는 전부 보인다.">
+  <section class="bl-sl" data-notes="요청 셋을 하나씩 연다. 발표 모드에서 → 를 세 번 누르면 차례로 나온다. 검토 모드에서는 전부 보인다.&#10;&#10;[클릭] 첫째 — 대조 인력 2인 배정.&#10;&#10;[클릭] 둘째 — 대조 일정 우선순위 승인.&#10;&#10;[클릭] 셋째 — 확대 판정 기준선 확정. 셋 중 하나라도 미결이면 판정이 조건부가 된다는 점을 함께 짚는다.">
         <header class="bl-hd">
       <span class="bl-code"><b>04</b>요청</span>
       <span class="bl-sp"></span>
@@ -228,10 +228,13 @@
 <!-- 조작판 — 발표 모드에서는 숨는다. 스크롤·화살표·숫자 점프로도 넘어간다 -->
 <div class="bl-hud" role="toolbar" aria-label="덱 조작">
   <button type="button" data-act="prev" aria-label="이전 장">‹</button>
+  <span data-pg aria-live="polite"></span>
   <button type="button" data-act="next" aria-label="다음 장">›</button>
+  <span class="bl-hud-sep" aria-hidden="true"></span>
   <button type="button" data-act="expand" aria-pressed="true">펼침<kbd>E</kbd></button>
   <button type="button" data-act="horiz" aria-pressed="false">가로<kbd>H</kbd></button>
   <button type="button" data-act="notes" aria-pressed="false">메모<kbd>N</kbd></button>
+  <button type="button" data-act="laser" aria-pressed="false">레이저<kbd>L</kbd></button>
   <button type="button" data-act="present">발표<kbd>F</kbd></button>
   <button type="button" data-act="script">대본<kbd>S</kbd></button>
   <button type="button" data-act="help" aria-label="단축키 도움말">?</button>

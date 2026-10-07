@@ -78,15 +78,22 @@ brand/hct/brand.json
 한다, 인쇄용 A4 다, 화면에서 상태를 바꾸는 보드다).
 
 `.claude/skills/blue-report/assets/` 에 완성된 덱이 11종, 레이아웃 카탈로그 1종,
-A4 세로 문서가 4종, 웹 보드가 5종, 기준·라이브 덱이 2종 있다. 용도에 맞는 것을 복사해
+A4 세로 문서가 4종, 웹 보드가 5종, 기준·라이브 덱이 3종(기준 · 부품 카탈로그 · 브리핑) 있다. 용도에 맞는 것을 복사해
 **내용만** 교체한다. 레이아웃과 스타일을 새로 설계하지 않는다.
 
-#### 기준 덱 · 라이브 덱 2종 — 고정 지면이 없는 계통
+#### 기준 덱 · 라이브 덱 3종 — 고정 지면이 없는 계통
 
 | 파일 | `--deck` 이름 | 용도 | 장수 |
 |---|---|---|---|
-| `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 13 |
+| `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 15 |
+| `live-catalog.html` | `livecatalog` | **부품 카탈로그** — 기준 덱에 없는 부품을 장째 복사해 온다 | 51 |
 | `live-brief.html` | `live` | 라이브 브리핑 (짧은 브리핑 견본) | 8 |
+
+기준 덱에 없는 부품(간트 · 조직도 · 역할 매트릭스 · 도넛 · 누적 막대 · 워터폴 · 히트맵 ·
+흐름도 · 파이프라인 · 화면 목업 · 탭 · 장면 · 노선도 · 시뮬레이션 · 근거 · 원문 · 영상 겹창)은
+**`live-catalog.html` 에서 그 장을 통째로 복사해 끼우고 내용만 바꾼다.** 클래스를 지어내지 않는다 —
+CSS 에 없는 클래스는 아무 일도 하지 않는다. 장마다 머리띠 왼쪽에 부품 이름과 코드가 적혀 있고,
+색인 · 위젯 속성 · 근거 JSON · 발표 키는 스킬 `README.md` 「6-3. 라이브 덱」에 있다.
 
 한 장이 `100dvh` 이고 루트 글자 크기가 `clamp(10.5px, min(1vw, 1.78vh), 20px)` 로 창을
 따라간다. 안의 치수는 **전부 `rem`** 이다. `px` 를 적으면 그 값만 창과 무관하게 굳어
@@ -97,7 +104,7 @@ A4 세로 문서가 4종, 웹 보드가 5종, 기준·라이브 덱이 2종 있�
 ```
 assets/blue-report.css      색·폰트 토큰
 assets/blue-live.css        배율·띠·부품
-assets/live-viewer.js       뷰어
+assets/live-viewer.js       엔진 — 넘김 · 단계 · 발표 · 레이저 · 대본 창 · 겹창 · 위젯
 assets/fonts/               폰트 서브셋
 ```
 
@@ -199,7 +206,8 @@ assets/deck-viewer.js
 - **기준·라이브 덱은 머리띠·꼬리띠·쪽번호·로고·워터마크를 장마다 단다.** 하나라도 빼면
   `check_live.py` 가 실패로 잡는다. 이것이 「우리 양식으로 만들었다」와 실제로 회사 문서로
   보이는 것의 차이다.
-- **기준 덱 산출물은 `apply_brand.py --deck <파일> --single-file` 로 만든다.** 견본의 로고 자리는
+- **기준 덱 산출물은 `apply_brand.py --deck <파일> --title "문서명" --single-file` 로 만든다.** `--title` 을
+  빼면 brand.json 의 `docTitle` 이 덱 제목을 덮어 꼬리띠 문서명이 장마다 바뀐다. 견본의 로고 자리는
   「COMPANY NAME」이다. 복사해 내용만 바꾸고 끝내면 로고도 워터마크도 없다.
 - **근거가 있는 수치에는 출처 칩을 단다.** 수치 옆 `<button type="button" class="bl-ev" data-ev="E1">출처</button>`,
   문서 끝 `<script type="application/json" id="bl-evidence">` 에 근거(제목·등급·사실·출처·날짜).
@@ -253,11 +261,11 @@ python .claude/skills/blue-report/scripts/check_doc.py   decks-out/doc.html    #
 python .claude/skills/blue-report/scripts/check_board.py decks-out/board.html  # 웹 보드
 ```
 
-`check_deck.py` 가 17항목, `check_live.py` 가 22항목을 기계로 판정한다.
-`check_live.py` 의 22항목 중 여섯이 지면 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
+`check_deck.py` 가 17항목, `check_live.py` 가 27항목을 기계로 판정한다.
+`check_live.py` 의 27항목 중 여섯이 지면 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
 머리띠 브랜드 마크 · 워터마크 · 마크 배경 짝. 넷은 산출물이 회사 문서로 나왔는지다 —
 로고 자리표시자 · 스타일 · 본문 폰트 · 지면 끝. 출처 칩이 있으면 근거에 이어지는지도 본다.
-조작판이 꼬리띠의 문서명·쪽번호를 덮는지는 1600·760·400px 세 폭에서 잰다.
+조작판이 꼬리띠의 문서명·쪽번호를 덮는지는 1600·760·400px 세 폭에서 장마다 잰다.
 
 check_deck.py 가 판정하는 것:
 

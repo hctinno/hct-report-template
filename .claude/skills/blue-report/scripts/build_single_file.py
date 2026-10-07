@@ -84,6 +84,12 @@ def inline_assets(html, assets_dir=None):
         text = open(path, encoding="utf-8").read()
         if is_css:
             text = inline_fonts(text, d)
+        else:
+            # 파일로 부를 때는 무해한 글자가 본문에 들어오면 태그가 된다. JS 안의
+            # 「</script」(주석이든 문자열이든)는 HTML 파서가 거기서 스크립트를 닫아
+            # 나머지 코드가 화면에 글자로 쏟아진다. 라이브 뷰어 주석 두 줄이 실제로
+            # 그렇게 단일 파일 3종을 깨뜨렸다. JS 에서 <\/ 는 </ 와 같은 뜻이다.
+            text = re.sub(r"</(script)", r"<\\/\1", text, flags=re.I)
         return wrap[0] + text + wrap[1]
 
     html = LOCAL_CSS_RE.sub(lambda m: one(m, ("<style>\n", "\n</style>"), True), html)

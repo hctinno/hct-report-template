@@ -17,7 +17,7 @@ Four separate lineages. They are not interchangeable: different page size, diffe
 | Slide decks | exactly 1920x1080 | `--br-fs-*` | 24px | `check_deck.py` — 17 items |
 | A4 documents | 794x1123 portrait (1123x794 landscape) | `--bd-fs-*` | 14px (10.5pt) | `check_doc.py` — 9 items |
 | Web boards | no fixed page; reflows with viewport | `--bw-fs-*` | 12.5px | `check_board.py` — 11 items |
-| Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 16 items |
+| Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 27 items |
 
 ### Slide decks — 12, in `.claude/skills/blue-report/assets/`
 
@@ -57,7 +57,7 @@ Use these when the artefact is something people **change on screen**, not someth
 | `board-team.html` | `teamboard` | team board — 4-column kanban |
 | `board-gap.html` | `gapcheck` | gap-check board — gap parent with response children |
 
-### Live decks — 2, one of them the house standard
+### Live decks — 3: the house standard, the parts catalog, a short briefing
 
 **Start every new report from `live-standard.html` (`--deck standard`).** It is the canonical
 starting point: copy it and replace the content. Do not compose a deck from scratch and do not
@@ -70,8 +70,30 @@ presentation. It reads fine with JavaScript disabled — just scroll.
 
 | File | `--deck` name | Purpose |
 |---|---|---|
-| `live-standard.html` | `standard` | **house standard — start here.** 12 slides of layout vocabulary |
+| `live-standard.html` | `standard` | **house standard — start here.** 15 slides: cover, agenda, gist, chapter dividers, body, roadmap, decision, closing, appendix divider, Q&A, glossary |
+| `live-catalog.html` | `livecatalog` | **parts catalog, 51 slides.** 38 components, 12 animation families, widgets, evidence/document/video overlays, 135 icons — one slide per component |
 | `live-brief.html` | `live` | live briefing — short-form sample |
+
+**Need a component the standard deck does not have** (Gantt, org chart, role matrix, donut, stacked
+or waterfall bars, heat map, flow diagram, pipeline, screen mock-up, tabs, scenes, route map,
+simulation, evidence/document/video overlay)? Copy **the whole slide** from `live-catalog.html` into
+your deck and replace its content. Each catalog slide names its component and code in the top rail
+(C01, T03, …). Do not invent class names — a class that is not in `blue-live.css` does nothing.
+The component index, widget attributes, data formats (evidence JSON, stacked-bar JSON, document,
+video), speaker-note syntax and keyboard map are in `.claude/skills/blue-report/README.md`, chapter
+「6-3. 라이브 덱」.
+
+Colour comes from `data-c="1"…"6" | navy | ok | warn | alert | mute`, never an inline colour.
+Text below 1.0rem is allowed only on the label classes (`.bl-lbl`, `.bl-cap`, `.bl-mini`, `.bl-axis`,
+`.bl-dl`, `.bl-leg`, `.bl-num`, `.bl-pill`, `.bl-badge`, `.bl-delta`, `.bl-asof`, `.bl-pgref`,
+`.bl-stamp`, `.bl-conf`, `.bl-seg`). Build donuts with `scripts/donut.py --live`. Icons are
+`<i class="bl-i bl-i--name">` from the 135 names in `scripts/make_icons.py`.
+
+Bundle the finished deck with `apply_brand.py --brand <brand.json> --deck <file> --title "Deck title" --single-file -o out.html`.
+Without `--title`, the `docTitle` in brand.json replaces the deck title in every footer. Then run
+`check_live.py out.html --shots out/` (27 items) and page through the per-slide PNGs. To preview a working
+copy before bundling, put `blue-report.css`, `blue-live.css`, `live-viewer.js` and `fonts/` next to it.
+Every slide must fit one 16:9 screen — check item 27 fails a slide whose body runs under the footer.
 
 **Page chrome is mandatory, not decorative.** Every slide carries all of it, and `check_live.py`
 fails the deck when any piece is missing:
@@ -149,7 +171,7 @@ number-then-Enter jump, and a control bar that appears only at the very bottom e
 
 `check_board.py` additionally re-checks the **rendered** DOM for banned endings, because board content often lives in JavaScript data that a source scan cannot see.
 
-`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the four A4 documents with `check_doc.py`, checks the five boards with `check_board.py`, checks both live decks with `check_live.py`, checks the FCC/KC templates with the A4 rules, builds the PPTX files, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
+`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the four A4 documents with `check_doc.py`, checks the five boards with `check_board.py`, checks the three live decks and their branded outputs with `check_live.py`, presses through the live engine (paging, steps, page-number jump, present mode, laser, overlays, evidence tabs, document, video, tabs, presenter popup and its in-page fallback — 40 checks on the catalog source and its single-file output), checks the FCC/KC templates with the A4 rules, builds the PPTX files, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
 
 If you change `assets/`, rebuild `dist/` and commit it: `build_single_file.py` three times —
 once with no arguments, once with `--artifact --brand brand/hct/brand.json`, and once with

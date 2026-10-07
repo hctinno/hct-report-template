@@ -11,7 +11,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
 판정이 겹치는 것(문체·raw hex·마크 대비)은 check_deck.py 에서 불러 쓴다.
 같은 낱말을 두 스크립트가 다르게 판정하는 일이 없도록 한 곳에만 둔다.
 
-검사 항목 (22)
+검사 항목 (27)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 문체 — 존댓말·평서형 종결 없이 명사형인가 (check_deck.py 규칙 재사용)
     2. 색 — 토큰 밖 raw hex 를 본문에 직접 쓰지 않았는가
@@ -23,17 +23,32 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
     6~10. 지면 크롬 — 머리띠 · 꼬리띠 · 쪽번호 · 머리띠 브랜드 마크 · 워터마크가 장마다 있는가
    11. 마크 배경 짝 — data-on 이 마크가 앉는 면과 맞는가 (머리띠 마크는 지면과 반대)
    12. 브랜드 자리 — 산출물에 「COMPANY NAME」이 남지 않았는가 (assets/ 견본만 예외)
-   13. 출처 칩 — .bl-ev 의 키가 #bl-evidence 근거에 있고 근거마다 제목·등급·출처가 있는가
+   13. 출처 칩 — .bl-ev 의 키(쉼표로 여럿)가 #bl-evidence 근거에 있고 근거마다 제목·등급·출처가
+       있는가. 캡처(imgs)·하이라이트 상자(hl)·원문(doc)이 가리키는 것도 실제로 있는가
   렌더 — 실제 브라우저 레이아웃. Playwright 가 필요하다.
    14. 스타일 — 계통 CSS 토큰이 렌더에서 살아 있는가
    15. 본문 폰트 — Pretendard FontFace 가 실제로 로드됐는가
    16. 지면 — 화면 좌우 끝까지 닿는가 (body 기본 여백 8px)
-   17. 조작판 — 1600·760·400px 에서 꼬리띠 글자(문서명·쪽번호)를 덮지 않는가
+   17. 조작판 — 1600·760·400px 에서 장마다 꼬리띠 글자(문서명·쪽번호)를 덮지 않는가
    18. 절대 하한(0.78rem) 미만 글자가 없는가
    19. 본문 계열이 본문 하한(1.0rem) 이상인가 — 주석 계열만 그 아래를 허용한다
    20. 16:9 · 좁은 폭 · 휴대폰 폭 세 경우에서 가로로 넘치지 않는가
    21. 데이터 마크가 실제 뒷배경 대비 2:1 이상인가 (채움 마크만)
    22. 문체 — **그려진 뒤의** 본문까지 개조식인가
+   23. 스크립트 — 뷰어 엔진이 떠 있고 부품이 예외 없이 시작하는가 (세 폭 모두)
+       live-viewer.js 를 부르는 덱인데 window.blDeck 이 없으면 실패다. 연결형 산출물에서
+       JS 를 옆에 복사하지 않으면 지면은 멀쩡히 그려지고 넘김·발표·근거가 전부 죽는다
+  정적 — 블라인드 제작 시험(스킬 문서만 받은 에이전트)이 검사기 밖에서 찾은 결함들
+   24. 단계 — 장마다 노트의 [클릭] 이 단계(data-f 값 가짓수)보다 적지 않은가.
+       적으면 대본 창 배지가 단계와 어긋나 발표자가 지금 몇 번째인지 잃는다
+   25. 클래스 — bl-·br- 클래스가 전부 CSS 나 뷰어에 있는가. 지어낸 클래스는 아무
+       일도 하지 않는다 — 화면은 멀쩡해 보여 눈으로는 모른다
+  렌더
+   26. 보이지 않는 글자 — 글자색과 실제 뒷배경 대비가 1.25:1 미만인 글자가 없는가.
+       카드형 수치 타일 안의 강조 칸이 흰 바탕 흰 글자로 사라진 일이 있었다
+   27. 세로 넘침 — 16:9 화면에서 장마다 본문이 꼬리띠 위에서 끝나는가. 지면은 한 화면
+       높이에 overflow:hidden 이라 넘친 줄은 잘려 사라진다. 900px 이하 읽기 폭(장이 내용만큼
+       늘어난다)에서는 꼬리띠가 장 안에 있고 본문이 그 위에서 끝나는가
 
 왜 rem 으로 판정하는가
   px 로 재면 창 크기에 따라 결과가 달라져 같은 파일이 통과했다 떨어졌다 한다.
@@ -61,7 +76,12 @@ MIN_REM = 0.78     # 절대 하한. 무엇도 이보다 작게 쓰지 않는다
 BODY_REM = 1.0     # 본문 하한. 주석 계열만 이 아래를 허용한다
 # 주석·라벨 계열. 이 클래스를 단 요소는 BODY_REM 아래여도 된다.
 NOTE_CLS = ("bl-note", "bl-src", "bl-chip", "bl-eyebrow", "bl-stat-t", "bl-rf",
-            "bl-ord", "bl-code", "bl-pg", "bl-ev")
+            "bl-ord", "bl-code", "bl-pg", "bl-ev",
+            # 라이브 부품(1.44.0) — 라벨 · 칩 · 축 · 칸 안 값처럼 본문이 아닌 글자만.
+            # 본문을 담는 그릇(카드 · 행)은 넣지 않는다 — 넣으면 그 안 본문까지 하한이 풀린다.
+            "bl-lbl", "bl-cap", "bl-mini", "bl-axis", "bl-dl", "bl-leg", "bl-num", "bl-pill",
+            "bl-badge", "bl-delta", "bl-asof", "bl-pgref", "bl-stamp", "bl-conf", "bl-seg",
+            "bl-fig-ab", "bl-replay", "bl-shot-open", "bl-route-st", "bl-sc-pick")
 # 16:9 한 벌, 좁은 폭 한 벌, 휴대폰 폭 한 벌. 좁은 쪽 둘은 루트가 하한(10.5px)에
 # 걸리는 구간이다 — 글자는 그대로고 가로 자리만 줄어 겹침·넘침이 여기서 난다.
 VIEWS = [(1600, 900), (760, 900), (400, 800)]
@@ -81,17 +101,129 @@ EDGE_PROBE = r"""() => {
 # 떠 있는 조작판이 꼬리띠 글자(문서명 · 쪽번호)를 덮는가. 조작판 단추를 넷에서
 # 여덟로 늘리자 400px 에서 둘 다 덮었다 — 겹침은 넘침이 아니라 가로 넘침 검사가
 # 못 잡는다. 글자의 실제 폭(Range)으로 잰다. 요소 상자는 띠 폭만큼 늘어날 수 있다.
+# 장마다 잰다 — 쪽번호 폭과 꼬리띠는 장마다 다를 수 있다. 조작판은 화면 아래에 붙어
+# 있고 꼬리띠는 장 아래 끝에 있으니, 장의 아래 끝을 화면 아래 끝에 맞춘 자리로 옮겨
+# 잰다(좁은 폭에서 화면보다 긴 장도 끝까지 내리면 그 자리에서 만난다).
 HUD_PROBE = r"""() => {
-  const hud = document.querySelector('.bl-hud'), s = document.querySelector('.bl-sl');
-  if (!hud || !s || getComputedStyle(hud).display === 'none') return [];
+  const hud = document.querySelector('.bl-hud');
+  if (!hud || getComputedStyle(hud).display === 'none') return [];
   const a = hud.getBoundingClientRect(), hit = [];
-  s.querySelectorAll('.bl-rf-name, .bl-pg').forEach(el => {
-    const r = document.createRange(); r.selectNodeContents(el);
-    const b = r.getBoundingClientRect();
-    if (b.width && a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom)
-      hit.push(el.classList.contains('bl-pg') ? '쪽번호' : '문서명');
+  document.querySelectorAll('.bl-sl').forEach((s, i) => {
+    const dy = innerHeight - s.getBoundingClientRect().bottom;
+    s.querySelectorAll('.bl-rf-name, .bl-pg').forEach(el => {
+      const r = document.createRange(); r.selectNodeContents(el);
+      const b = r.getBoundingClientRect();
+      // 말줄임으로 잘린 글자는 글자 폭(Range)이 상자 밖까지 잡힌다. 보이는 부분만 잰다
+      let L = b.left, R = b.right;
+      if (getComputedStyle(el).overflowX !== 'visible') {
+        const e = el.getBoundingClientRect(); L = Math.max(L, e.left); R = Math.min(R, e.right);
+      }
+      const T = b.top + dy, B = b.bottom + dy;
+      if (R - L > 0 && a.left < R && L < a.right && a.top < B && T < a.bottom)
+        hit.push([el.classList.contains('bl-pg') ? '쪽번호' : '문서명', i + 1]);
+    });
   });
   return hit;
+}"""
+
+
+# 글자색과 실제 뒷배경. 뒷배경은 위로 올라가며 처음 만나는 칠한 바탕이다. 도중에
+# 그림 · 그라데이션 바탕을 만나면 판정하지 않는다(색 하나로 대비를 말할 수 없다).
+# 1.25:1 미만이면 글자와 바탕이 사실상 같은 색이다 — 흐린 글자(고스트 번호처럼 일부러
+# 옅게 깐 장식)를 잡는 검사가 아니라 사라진 글자를 잡는다.
+INK_PROBE = r"""() => {
+  const lum = c => { const v = c.map(x => { x /= 255; return x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4); });
+                     return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]; };
+  // color-mix() 로 만든 색은 color(srgb r g b / a) 로 나온다(0~1). 못 읽는 형식이면 판정하지 않는다
+  const rgba = t => {
+    let m = t.match(/rgba?\(([^)]+)\)/);
+    if (m) { const p = m[1].split(/[,\s/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; }
+    m = t.match(/color\(srgb\s+([^)]+)\)/);
+    if (m) { const p = m[1].split(/[\s/]+/).filter(Boolean).map(Number); return [p[0] * 255, p[1] * 255, p[2] * 255, p.length > 3 ? p[3] : 1]; }
+    return null;
+  };
+  const out = [], INK_MIN = 1.25;
+  document.querySelectorAll('.bl-sl *').forEach(el => {
+    const txt = Array.from(el.childNodes).filter(n => n.nodeType === 3 && n.textContent.trim())
+      .map(n => n.textContent.trim()).join(' ');
+    if (!txt) return;
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility !== 'visible' || parseFloat(cs.fontSize) < 2) return;
+    if (el.closest('svg, .br-watermark')) return;   // 워터마크는 일부러 흐린 장식이다
+    for (let p = el; p; p = p.parentElement) if (parseFloat(getComputedStyle(p).opacity) === 0) return;
+    const fg = rgba(cs.color); if (!fg || fg[3] < .2) return;
+    // 뒷배경은 글자가 실제로 그 위에 놓인 상자다. 막대 위로 띄운 값 라벨처럼 부모 상자
+    // 밖에 놓인 글자는 부모 색이 아니라 그 바깥 바탕 위에 있다 — 가운데 점으로 가린다
+    const er = el.getBoundingClientRect(), cx = er.left + er.width / 2, cy = er.top + er.height / 2;
+    if (!er.width || !er.height) return;   // 조상이 숨긴 글자(고르지 않은 보기 · 탭)
+    let bg = null;
+    for (let p = el; p; p = p.parentElement) {
+      const ps = getComputedStyle(p);
+      const pr = p.getBoundingClientRect();
+      const over = cx >= pr.left && cx <= pr.right && cy >= pr.top && cy <= pr.bottom;
+      if (!over) continue;
+      if (ps.backgroundImage && ps.backgroundImage !== 'none') return;
+      const c = rgba(ps.backgroundColor);
+      if (!c) return;
+      if (c[3] >= .5) { bg = c; break; }
+    }
+    if (!bg) return;
+    const a = lum(fg), b = lum(bg), r = (Math.max(a, b) + .05) / (Math.min(a, b) + .05);
+    if (r < INK_MIN) {
+      const s = el.closest('.bl-sl');
+      out.push({sl: s && s.id || '', cls: (el.className && el.className.baseVal === undefined ? el.className : el.tagName) || el.tagName,
+                txt: txt.slice(0, 30), r: +r.toFixed(2)});
+    }
+  });
+  return out;
+}"""
+
+# 장마다 본문 요소가 머리띠 아래 · 꼬리띠 위 · 지면 안에 있는가. 세로 보기(펼침)라 단계가
+# 전부 열린 최대 모습을 잰다. 고르지 않은 장면(.bl-scene)은 겹쳐 놓인 판이라 뺀다.
+FIT_PROBE = r"""() => {
+  const out = [];
+  document.querySelectorAll('#deck > .bl-sl, main > .bl-sl').forEach((s, k) => {
+    const r = s.getBoundingClientRect(), bd = s.querySelector('.bl-bd');
+    const hd = s.querySelector('.bl-hd'), rf = s.querySelector('.bl-rf');
+    if (!bd) return;
+    const top = hd ? hd.getBoundingClientRect().bottom : r.top, bot = rf ? rf.getBoundingClientRect().top : r.bottom;
+    let worst = 0, who = '';
+    bd.querySelectorAll('*').forEach(el => {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.position === 'fixed') return;
+      if (el.closest('.bl-scene:not(.is-cur)')) return;
+      const b = el.getBoundingClientRect();
+      if (!b.width || !b.height) return;
+      const o = Math.max(b.bottom - bot, top - b.top, b.right - r.right, r.left - b.left);
+      if (o > worst) { worst = o; who = (el.className && el.className.baseVal === undefined ? el.className : el.tagName) || el.tagName; }
+    });
+    if (worst > 1.5) out.push({k: k + 1, sl: s.id || '', px: Math.round(worst), cls: String(who).slice(0, 40)});
+  });
+  return out;
+}"""
+
+
+# 좁은 폭(900px 이하)은 장이 내용만큼 늘어나는 읽기 폭이다. 그래도 꼬리띠는 장 안에 있어야
+# 하고 본문은 꼬리띠 위에서 끝나야 한다 — 띠 높이가 장 높이의 % 라 장이 늘면 꼬리띠가
+# 장 밖으로 밀려 다음 장에 가려진 일이 있었다. 가로는 보지 않는다(넓은 부품은 옆으로 스크롤한다).
+NARROW_PROBE = r"""() => {
+  const out = [];
+  document.querySelectorAll('#deck > .bl-sl, main > .bl-sl').forEach((s, k) => {
+    const R = s.getBoundingClientRect(), rf = s.querySelector('.bl-rf');
+    if (!rf) return;
+    const F = rf.getBoundingClientRect();
+    let worst = F.bottom - R.bottom, who = 'bl-rf';
+    s.querySelectorAll('.bl-bd *').forEach(el => {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.position === 'fixed') return;
+      if (el.closest('.bl-scene:not(.is-cur)')) return;
+      const b = el.getBoundingClientRect();
+      if (!b.width || !b.height) return;
+      if (b.bottom - F.top > worst) { worst = b.bottom - F.top; who = (el.className && el.className.baseVal === undefined ? el.className : el.tagName) || el.tagName; }
+    });
+    if (worst > 1.5) out.push({k: k + 1, sl: s.id || '', px: Math.round(worst), cls: String(who).slice(0, 40)});
+  });
+  return out;
 }"""
 
 
@@ -303,9 +435,14 @@ def check_evidence(html, rep):
     칩(.bl-ev data-ev="E1")은 키만 들고 있고 내용은 문서 끝 #bl-evidence JSON
     한 벌에 있다. 키가 어긋나면 누른 사람에게 「근거 없음」이 뜬다 — 근거를
     보여 주려고 단 칩이 오히려 근거가 없다는 표시가 된다. 그래서 막는다.
+    칩 하나가 근거 여럿을 가리킬 수 있다(data-ev="E1,E2" — 패널에 탭으로 뜬다).
 
     근거 항목마다 제목 · 등급 · 출처는 반드시 있어야 한다. 등급은 A·B·C·R
-    네 가지다(JSON 의 grades 로 늘릴 수 있다). 칩이 하나도 없는 덱은 해당 없음."""
+    네 가지다(JSON 의 grades 로 늘릴 수 있다). 칩이 하나도 없는 덱은 해당 없음.
+
+    캡처를 붙인 근거는 셋을 더 본다 — 캡처 id 가 img 표에 있는가, 하이라이트
+    상자(hl)가 있는 캡처를 가리키고 값이 0~1 사각형인가, 원문(doc)이 문서 안
+    <script id> 로 있는가. 하나라도 어긋나면 패널이 빈 뷰어나 빈 원문을 연다."""
     p = _Evidence()
     p.feed(html)
     p.close()
@@ -325,8 +462,11 @@ def check_evidence(html, rep):
         rep.f(f"근거 JSON 을 읽지 못했다 — {e}")
         return
     ev = data.get("ev", {})
-    grades = EV_GRADES | set((data.get("grades") or {}).keys())
-    missing = sorted(set(chips) - set(ev))
+    imgs = data.get("img") or {}
+    rects = data.get("hl") or {}
+    grades = EV_GRADES | set((data.get("grades") or data.get("gr") or {}).keys())
+    keys = [k.strip() for c in chips for k in c.split(",") if k.strip()]
+    missing = sorted(set(keys) - set(ev))
     bad = []
     for k, e in ev.items():
         lack = [f for f in ("title", "grade", "src") if not e.get(f)]
@@ -334,6 +474,22 @@ def check_evidence(html, rep):
             bad.append(f"{k} — {'·'.join(lack)} 없음")
         elif e["grade"] not in grades:
             bad.append(f"{k} — 등급 {e['grade']} 은 정의되지 않음")
+        for it in e.get("imgs") or []:
+            iid = it[0] if isinstance(it, (list, tuple)) and it else None
+            if not iid or iid not in imgs:
+                bad.append(f"{k} — 캡처 {iid} 가 img 표에 없음")
+        doc = e.get("doc")
+        if doc and not re.search(r'<script[^>]*\sid="' + re.escape(doc) + r'"', html):
+            bad.append(f"{k} — 원문 {doc} 의 <script id> 가 없음")
+    for iid, rs in rects.items():
+        if iid not in imgs:
+            bad.append(f"하이라이트 상자 {iid} — 그런 캡처가 없음")
+            continue
+        for r in rs:
+            ok = (isinstance(r, (list, tuple)) and len(r) == 4 and all(isinstance(v, (int, float)) for v in r)
+                  and 0 <= r[0] <= 1 and 0 <= r[1] <= 1 and 0 < r[2] <= 1 and 0 < r[3] <= 1)
+            if not ok:
+                bad.append(f"하이라이트 상자 {iid} — 0~1 사각형 [x, y, w, h] 가 아님: {r}")
     if missing:
         rep.f(f"근거 없는 출처 칩 — {', '.join(missing)}")
     if bad:
@@ -341,7 +497,8 @@ def check_evidence(html, rep):
         for b in bad[:6]:
             print(f"        {b}")
     if not missing and not bad:
-        rep.o(f"출처 칩 — {len(chips)}개 모두 근거 {len(ev)}건에 이어짐 · 제목·등급·출처 완비")
+        extra = f" · 캡처 {len(imgs)}장" if imgs else ""
+        rep.o(f"출처 칩 — {len(chips)}개 모두 근거 {len(ev)}건에 이어짐 · 제목·등급·출처 완비{extra}")
 
 
 def check_notes(html, rep):
@@ -356,6 +513,98 @@ def check_notes(html, rep):
         rep.o(f"발표자 노트 — {len(sl)}장 모두 있다")
 
 
+class _Slides(HTMLParser):
+    """장마다 id · 노트 · 단계 값, 그리고 문서 전체의 클래스를 모은다.
+
+    정규식으로 원문을 훑으면 화면에 글자로 적힌 마크업 견본(&lt;i class=…&gt;)까지
+    클래스로 센다. 브라우저처럼 태그만 읽는다 — script · style 속은 태그가 아니다."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.slides, self.classes, self.links = [], set(), []
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        cls = (a.get("class") or "").split()
+        self.classes.update(c for c in cls if c.startswith(("bl-", "br-")))
+        if tag == "link" and "stylesheet" in (a.get("rel") or "") and a.get("href"):
+            self.links.append(("css", a["href"]))
+        if tag == "script" and a.get("src"):
+            self.links.append(("js", a["src"]))
+        if tag == "section" and "bl-sl" in cls:
+            self.slides.append({"id": a.get("id") or "", "notes": a.get("data-notes") or "", "f": set()})
+        elif self.slides and "data-f" in a:
+            self.slides[-1]["f"].add((a.get("data-f") or "").strip())
+
+
+def check_steps(html, rep):
+    """노트의 [클릭] 이 단계 수보다 적은 장이 없는가.
+
+    대본 창은 [클릭] 을 「클릭 n」 배지로 그리고 지금 단계와 맞춰 지난 것 · 다음 것을
+    칠한다. 단계가 셋인데 [클릭] 이 없으면 발표자는 몇 번 눌러야 다음 장인지 모른다.
+    [클릭] 이 단계보다 많은 것은 허용한다 — 발표 중 클릭으로 여는 겹쳐 보기(data-peek-seq)도
+    [클릭] 으로 적는다."""
+    p = _Slides()
+    p.feed(html)
+    p.close()
+    bad, staged = [], 0
+    for k, sl in enumerate(p.slides, 1):
+        lv = len(sl["f"])
+        if not lv:
+            continue
+        staged += 1
+        n = len(re.findall(r"\[클릭\]", sl["notes"]))
+        if n < lv:
+            bad.append(f"{k:02d}장 {sl['id'] or ''} — 단계 {lv} · [클릭] {n}")
+    if bad:
+        rep.f(f"노트의 [클릭] 이 단계보다 적은 장 {len(bad)}개 — 대본 창 배지가 단계와 어긋난다")
+        for b in bad[:8]:
+            print(f"        {b}")
+    elif staged:
+        rep.o(f"단계 — 단계가 있는 {staged}장 모두 노트의 [클릭] 이 단계 수 이상")
+    else:
+        rep.o("단계 — 단계 전개 없음 (해당 없음)")
+
+
+def _read_near(path, ref):
+    """덱이 부르는 CSS · JS 를 덱 옆에서, 없으면 스킬 assets/ 에서 읽는다."""
+    if "//" in ref or ref.startswith("data:"):
+        return ""
+    for base in (os.path.dirname(os.path.abspath(path)), os.path.join(os.path.dirname(HERE), "assets")):
+        f = os.path.join(base, ref)
+        if os.path.isfile(f):
+            return open(f, encoding="utf-8").read()
+    return ""
+
+
+def check_classes(html, rep, path):
+    """bl- · br- 클래스가 전부 정의돼 있는가.
+
+    CSS(덱이 부르는 것 + 문서 안 <style>)의 클래스 선택자와 뷰어 JS 가 쓰는 이름이
+    「아는 클래스」다. 그 밖의 이름은 지어낸 것이다 — 아무 모양도 동작도 붙지 않는다."""
+    p = _Slides()
+    p.feed(html)
+    p.close()
+    css = "\n".join(re.findall(r"<style[^>]*>(.*?)</style>", html, re.S))
+    js = "\n".join(re.findall(r"<script(?![^>]*\btype=\"application/json\")(?![^>]*\btype=\"text/plain\")[^>]*>(.*?)</script>",
+                              html, re.S))
+    for kind, ref in p.links:
+        text = _read_near(path, ref)
+        if kind == "css":
+            css += "\n" + text
+        else:
+            js += "\n" + text
+    known = set(re.findall(r"\.(b[lr]-[\w-]+)", css)) | set(re.findall(r"\b(b[lr]-[\w-]+)", js))
+    unknown = sorted(c for c in p.classes if c not in known)
+    if not css.strip():
+        rep.w("클래스 검사 생략 — 덱이 부르는 CSS 를 찾지 못했다")
+    elif unknown:
+        rep.f(f"정의 없는 클래스 {len(unknown)}개 — CSS · 뷰어 어디에도 없다: {' '.join(unknown[:12])}")
+        print("        부품은 live-catalog.html 에서 장째 복사한다. 클래스를 지어내지 않는다")
+    else:
+        rep.o(f"클래스 — bl-·br- {len(p.classes)}개 모두 CSS · 뷰어에 있다")
+
+
 # ---------------------------------------------------------------- 렌더 검사
 
 def check_render(path, rep, shots=None, seen_style=()):
@@ -368,11 +617,14 @@ def check_render(path, rep, shots=None, seen_style=()):
     url = "file://" + os.path.abspath(path)
     overflow, tiny, body_small, marks, drawn = [], [], [], [], ""
     style, need = None, sentinels(open(path, encoding="utf-8").read())
-    edge, hud_hits = None, []
+    edge, hud_hits, errors, dead = None, [], [], []
+    ink, fit, narrow = [], [], []
+    wants_engine = "live-viewer.js" in open(path, encoding="utf-8").read()
     with sync_playwright() as pw:
         br = pw.chromium.launch(executable_path=chrome)
         for w, h in VIEWS:
             pg = br.new_page(viewport={"width": w, "height": h}, reduced_motion="reduce")
+            pg.on("pageerror", lambda e, w=w: errors.append(f"{w}px {str(e).splitlines()[0]}"))
             pg.goto(url)
             pg.wait_for_timeout(1200)
 
@@ -382,6 +634,7 @@ def check_render(path, rep, shots=None, seen_style=()):
               out.over = Math.max(0, document.documentElement.scrollWidth
                                    - document.documentElement.clientWidth);
               out.html = document.body.innerText;
+              out.engine = !!(window.blDeck && window.blDeck.slides && window.blDeck.slides.length);
 
               // 글자 크기 — 직접 글자를 가진 요소만 본다. 부모까지 세면 같은
               // 문장을 여러 번 센다.
@@ -421,18 +674,36 @@ def check_render(path, rep, shots=None, seen_style=()):
             if w == VIEWS[0][0]:
                 style = pg.evaluate(STYLE_PROBE, [t for _, t in need])
                 edge = pg.evaluate(EDGE_PROBE)
-            hud_hits += [f"{w}px {x}" for x in pg.evaluate(HUD_PROBE)]
+            by_what = {}
+            for what, n in pg.evaluate(HUD_PROBE):
+                by_what.setdefault(what, []).append(n)
+            for what, ns in by_what.items():
+                at = ",".join(map(str, ns[:6])) + ("…" if len(ns) > 6 else "")
+                hud_hits.append(f"{w}px {what} {len(ns)}장({at})")
 
             if data["over"] > 1:
                 overflow.append(f"{w}px — {data['over']}px 넘침")
+            if wants_engine and not data["engine"]:
+                dead.append(f"{w}px")
             tiny += [dict(r, view=w) for r in data["tiny"]]
             body_small += [dict(r, view=w) for r in data["body"]]
+            if w != VIEWS[0][0]:
+                narrow += [dict(r, view=w) for r in pg.evaluate(NARROW_PROBE)]
             if w == VIEWS[0][0]:
                 marks = data["marks"]
                 drawn = data["html"]
+                ink = pg.evaluate(INK_PROBE)
+                fit = pg.evaluate(FIT_PROBE)
                 if shots:
+                    # 장마다 한 장씩. 눈으로 볼 것(여백 · 균형 · 겹침)은 장 단위로 나온다
                     os.makedirs(shots, exist_ok=True)
-                    pg.screenshot(path=os.path.join(shots, "live.png"), full_page=False)
+                    ids = pg.evaluate("() => [...document.querySelectorAll('.bl-sl')].map(s => s.id || '')")
+                    for k, sid in enumerate(ids):
+                        pg.evaluate("(k) => { const s = document.querySelectorAll('.bl-sl')[k];"
+                                    " if (window.blDeck) blDeck.go(k); else s.scrollIntoView(); }", k)
+                        pg.wait_for_timeout(160)
+                        name = f"{k + 1:02d}" + (f"-{sid}" if sid else "") + ".png"
+                        pg.screenshot(path=os.path.join(shots, name), full_page=False)
             pg.close()
         br.close()
 
@@ -488,6 +759,32 @@ def check_render(path, rep, shots=None, seen_style=()):
     else:
         rep.w("채움 데이터 마크 없음 — 막대를 쓰면 검산 대상이 생긴다")
 
+    if ink:
+        rep.f(f"보이지 않는 글자 {len(ink)}건 — 글자색과 뒷배경 대비 1.25:1 미만")
+        for t in ink[:6]:
+            print(f"        {t['sl']}  .{t['cls']}  {t['r']}:1  {t['txt']}")
+    else:
+        rep.o("보이지 않는 글자 — 글자색과 뒷배경이 같은 색인 글자 없음 (1.25:1 미만 0)")
+
+    if fit or narrow:
+        rep.f(f"세로 넘침 — 16:9 {len(fit)}장 · 좁은 폭 {len(narrow)}건 — 본문이 꼬리띠 밑으로 · 꼬리띠가 장 밖으로 나간다")
+        for t in fit[:6]:
+            print(f"        16:9   {t['k']:02d}장 {t['sl']}  {t['px']}px  .{t['cls']}")
+        for t in narrow[:6]:
+            print(f"        {t['view']}px  {t['k']:02d}장 {t['sl']}  {t['px']}px  .{t['cls']}")
+    else:
+        rep.o("세로 넘침 — 16:9 는 한 화면 안, 좁은 폭은 꼬리띠가 장 안에서 본문 아래")
+
+    if errors:
+        rep.f(f"스크립트 예외 {len(errors)}건 — 뷰어나 부품이 시작하다 멈췄다")
+        for e in errors[:5]:
+            print(f"        {e}")
+    elif dead:
+        rep.f(f"뷰어 엔진이 뜨지 않았다 ({' · '.join(dead)}) — live-viewer.js 를 찾지 못했다. "
+              "연결형이면 JS 를 덱 옆에 두고, 아니면 --single-file 로 묶는다")
+    else:
+        rep.o("스크립트 — 세 폭 모두 엔진이 뜨고 예외 없이 시작한다")
+
     # 원문 검사가 못 본 글자(JS 로 그린 것)를 한 번 더 본다.
     def _key(b):
         return b.split("행 ", 1)[-1]
@@ -504,7 +801,7 @@ def check_render(path, rep, shots=None, seen_style=()):
 def main():
     ap = argparse.ArgumentParser(description="블루 리포트 라이브 덱 점검기")
     ap.add_argument("path")
-    ap.add_argument("--shots", help="화면 PNG 를 저장할 폴더")
+    ap.add_argument("--shots", help="장마다 화면 PNG(1600x900)를 저장할 폴더")
     a = ap.parse_args()
 
     if not os.path.isfile(a.path):
@@ -527,6 +824,8 @@ def main():
     check_chrome(html, rep)
     check_brand(html, rep, a.path)
     check_evidence(html, rep)
+    check_steps(html, rep)
+    check_classes(html, rep, a.path)
     check_render(a.path, rep, a.shots, seen_style=bad)
 
     sys.exit(rep.render())
