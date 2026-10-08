@@ -29,7 +29,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
-FCC = os.path.join(SKILL, "assets", "fcc-kc")
+FCC = os.path.join(SKILL, "assets", "archive", "fcc-kc")
 OUT = os.path.join(FCC, "templates")
 FIXTURE = os.path.join(FCC, "fixtures", "fixture-baseline.json")
 
@@ -61,7 +61,8 @@ def doc(spec, pages):
     orient = ' data-orientation="landscape"' if spec.get("land") else ""
     # 특수 템플릿은 templates/special/ 아래에 있어 한 단 더 올라가야 한다.
     # 깊이를 파일 경로에서 세어 링크를 만든다 — 손으로 적으면 한쪽만 고쳐 놓는다.
-    up = "../" * (spec["file"].count("/") + 2)
+    # assets/archive/fcc-kc/templates/ 에서 assets/ 까지 세 단이다(보관 폴더 한 단 포함).
+    up = "../" * (spec["file"].count("/") + 3)
     links = "\n".join(f'<link rel="stylesheet" href="{h}">' for h in (
         up + "blue-report.css", up + "blue-doc.css", up + "doc-viewer.css",
         "../" * (spec["file"].count("/") + 1) + "fcc-kc.css"))

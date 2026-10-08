@@ -116,30 +116,22 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 
 ---
 
-## 덱 12종
+## 고르는 양식 4종
 
-같은 레이아웃을 쓰되 배치 순서와 장수가 용도에 맞게 다르다. 조직 주간보고는 매주 반복하므로 목차를 두지 않고 타임라인이 요일 단위다. 사내 보고는 다크 요약이 3번째에 있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤 정리한다).
-
-| 파일 | 용도 | 장수 |
+| 무엇을 만드나 | `--deck` | 파일 |
 |---|---|---|
-| `deck-internal-report.html` | 사내 보고 (월간) | 9 |
-| `deck-weekly-report.html` | 조직 주간보고 | 7 |
-| `deck-ax-weekly.html` | AX 조직 1장 보고 + 부록 | 5 |
-| `deck-team-weekly.html` | 팀 압축 주간보고 | 2 |
-| `deck-exec-report.html` | 경영진 보고 (결론 먼저) | 6 |
-| `deck-allhands.html` | 전직원 보고 (타운홀) | 9 |
-| `deck-sales-proposal.html` | 외부 제안·영업 | 10 |
-| `deck-project-report.html` | 프로젝트 착수·완료 | 9 |
-| `deck-training.html` | 교육·기술 설명 | 8 |
-| `deck-strategy-report.html` | 전략 보고 (논증형 결정 요청) | 16 |
-| `deck-report.html` | 고밀도 보고 (본문 14 + 부록 5 · 도해 중심) | 19 |
-| `deck-template.html` | 레이아웃 19종 카탈로그 | 19 |
+| 보고서 · 발표 덱 (기본) | `standard` | `live-standard.html` — 기준 덱 15장 |
+| 기준 덱에 없는 부품 | `livecatalog` | `live-catalog.html` — 부품 카탈로그 51장, 장째 복사 |
+| 회의록 (A4 인쇄) | `minutes` | `doc-minutes.html` |
+| 고쳐 가며 쓰는 현황판 | `manage` | `board-manage.html` — 관리보드 |
 
-전부 `.claude/skills/blue-report/assets/` 에 있다.
+경영진 보고 · 주간보고 · 전략 보고처럼 용도가 달라도 발표·보고는 전부 기준 덱으로 만든다.
+그 장들(결정 요청 · 예상 질문 · 부록 · 로드맵 …)은 기준 덱과 부품 카탈로그에 다 있다.
+전부 `.claude/skills/blue-report/assets/` 에 있다. 나머지 양식은 [보관 양식](#보관-양식)에 있다.
 
 ---
 
-## 기준 덱 · 라이브 부품 카탈로그 · 브리핑
+## 기준 덱 · 라이브 부품 카탈로그
 
 **새 보고서는 기준 덱 `standard` 에서 시작한다.** 회사 발표 덱의 표준 모양이 여기 다 들어 있다 —
 머리띠(절 번호 + 절 이름 + 로고), 꼬리띠(문서명 + 쪽번호), 진행선, 우하단 워터마크, 제목 형광 밴드,
@@ -159,7 +151,6 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 |---|---|---|
 | `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점.** 15장 · 표지 · 목차 · 장 간지 · 마무리 · 부록 간지 · 예상 질문까지 사내 발표 덱 짜임새 |
 | `live-catalog.html` | `livecatalog` | **라이브 부품 카탈로그 51장.** 부품 38종 · 애니메이션 12계열 · 위젯 · 근거 · 원문 · 영상 겹창 · 아이콘 135종. 필요한 장을 통째로 복사해 기준 덱에 끼운다 |
-| `live-brief.html` | `live` | 라이브 브리핑 — 짧은 브리핑용 (견본) |
 
 카탈로그는 사내 발표 덱 56장을 렌더해 뽑은 장 짜임새 · 부품 · 움직임 · 발표 기능을 옮긴 것이다.
 실내용(수치 · 조직 · 인물 · 원문)은 옮기지 않았고 견본은 가상 시나리오로 채웠다. 부품 색인 · 위젯 속성 ·
@@ -208,7 +199,7 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 치수는 `rem` 으로만 적는다. `px` 를 섞으면 그 값만 창 크기와 무관하게 고정돼 작은 창에서
 그 요소만 커진다 — 검사기가 막는다.
 
-## 웹 보드 5종
+## 웹 보드 — 관리보드
 
 슬라이드도 A4 도 아닌 제3의 계통이다. 지면 크기가 없고 화면 폭에 따라 흐르며,
 **읽는 물건이 아니라 상태를 바꾸는 화면**이다. 회차 중간에 값이 바뀌고 다음 사람이
@@ -216,11 +207,7 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 
 | 파일 | 용도 | 특징 |
 |---|---|---|
-| `board-task.html` | 과제 실행보드 (가장 작은 견본) | 레일 내비 · KPI 스트립 · 필터 표 · 메모 |
 | `board-manage.html` | 관리보드 (대시보드형) | 절 12 · 표 8 · 일정 격자 · 가로 막대 |
-| `board-exec.html` | 실행보드 (항목 상태 · 메모) | 상태 알약 4단 순환 · 설비 진행판 · 주차 막대 |
-| `board-team.html` | 팀보드 (칸반) | 칸반 4열 · 주차 격자 · 상세 겹칩 |
-| `board-gap.html` | 점검보드 (공백 대조) | 공백 부모 + 대응 자식 · 비율 띠 · 대조표 |
 
 보드는 `blue-report.css` + `blue-web.css` 두 파일을 함께 부른다. 글자 하한이
 12.5px 이고 `check_board.py` 가 11항목을 판정한다.
@@ -229,15 +216,12 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 
 ## A4 문서
 
-회의록 · 사규 · 매뉴얼 · 공지는 발표 슬라이드가 아니라 A4 세로 문서다.
+회의록은 발표 슬라이드가 아니라 A4 세로 문서다.
 지면 794×1123px(210×297mm @96dpi)이고 인쇄하면 그대로 A4 한 장이다.
 
 | 파일 | 용도 | 쪽 |
 |---|---|---|
 | `doc-minutes.html` | 회의록 | 2 |
-| `doc-policy.html` | 사규·규정 (조·항·호 · 개정 이력 · 결재란) | 3 |
-| `doc-manual.html` | 매뉴얼·가이드 (목차 · 절차 단계 · 캡처 자리) | 3 |
-| `doc-notice.html` | 공지 (1쪽 완결) | 1 |
 
 색·타입·간격 토큰은 슬라이드와 같다. `blue-doc.css` 는 토큰을 선언하지 않고
 `blue-report.css` 를 전제하므로 두 파일을 함께 불러야 한다. 그래서 슬라이드와
@@ -256,6 +240,24 @@ python .claude/skills/blue-report/scripts/check_doc.py decks-out/회의록.html
 
 ---
 
+## 보관 양식
+
+아래는 `assets/archive/` 에 보관한 양식이다. 안내 목록에서는 뺐지만 이름으로 부르면 그대로
+만들어지고 검사도 똑같이 받는다. 사용자가 이름을 짚거나 PowerPoint 파일이 꼭 필요할 때만 쓴다.
+
+| 묶음 | `--deck` 이름 | 비고 |
+|---|---|---|
+| 고정 지면 덱 1920x1080 · 12종 | `internal` 사내 보고 · `weekly` 주간보고 · `ax` 1장 보고 · `team` 팀 주간 · `exec` 경영진 · `allhands` 전직원 · `sales` 제안 · `project` 프로젝트 · `training` 교육 · `strategy` 전략 · `report` 고밀도 · `catalog` 레이아웃 19종 | PPTX 빌드(`pptx/`)의 원본 |
+| A4 문서 3종 | `policy` 사규 · `manual` 매뉴얼 · `notice` 공지 | |
+| 웹 보드 4종 | `board` 과제 · `execboard` 실행 · `teamboard` 팀 칸반 · `gapcheck` 점검 | |
+| 라이브 브리핑 | `live` | 기준 덱의 축소판 |
+| FCC/KC 보고서 14종 | `assets/archive/fcc-kc/` | 인증 시험 보고서 전용 |
+
+보관 파일은 CSS·뷰어를 `../` 로 부른다. 손으로 복사하지 말고 `apply_brand.py` 로 만든다 —
+산출물에서는 경로를 알아서 맞춘다.
+
+---
+
 ## 만들기
 
 저장소 루트에서 실행한다. 산출물은 `decks-out/` 에 넣는다(gitignore 처리돼 있다).
@@ -263,22 +265,22 @@ macOS·Linux 는 `python` 대신 `python3`.
 
 ```bash
 # HTML — 회사명·로고·저작권을 넣어 한 파일로
-python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
+python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck standard --title "문서명" --single-file -o decks-out/deck.html
 
 # PDF — --notes 를 주면 발표자 노트를 마지막 장에 붙인다
 python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 
-# PowerPoint
+# PowerPoint — 보관 고정 지면 덱 내용으로 만든다
 node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
 ```
 
-`--deck` 은 덱 이름(`catalog` · `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy`), A4 문서 이름(`minutes` · `policy` · `manual` · `notice`), 또는 HTML 파일 경로를 받는다.
+`--deck` 은 양식 이름(`standard` · `livecatalog` · `minutes` · `manage`), 보관 양식 이름, 또는 HTML 파일 경로를 받는다. 기본값은 `standard` 다.
 
 덱을 웹페이지로 올려 링크로 공유하려면 Artifact 발행용 단일 파일을 만든다. `<html>` 껍데기를 뺀 판이다.
 
 ```bash
 python .claude/skills/blue-report/scripts/build_single_file.py \
-       --artifact --deck ax --brand brand/hct/brand.json -o decks-out/ax-artifact.html
+       --artifact --deck internal --brand brand/hct/brand.json -o decks-out/ax-artifact.html
 
 python .claude/skills/blue-report/scripts/build_single_file.py \
        --artifact --deck minutes --brand brand/hct/brand.json -o decks-out/회의록.html
@@ -295,10 +297,13 @@ python .claude/skills/blue-report/scripts/build_single_file.py \
 ## 완료 조건
 
 ```bash
-python .claude/skills/blue-report/scripts/check_deck.py decks-out/deck.html
+python .claude/skills/blue-report/scripts/check_live.py  decks-out/deck.html --shots out/   # 기준 덱 · 카탈로그
+python .claude/skills/blue-report/scripts/check_doc.py   decks-out/회의록.html             # 회의록
+python .claude/skills/blue-report/scripts/check_board.py decks-out/관리보드.html           # 관리보드
+python .claude/skills/blue-report/scripts/check_deck.py  decks-out/fixed.html              # 보관 고정 지면 덱
 ```
 
-17항목을 기계로 판정한다.
+보관 고정 지면 덱의 `check_deck.py` 는 17항목을 기계로 판정한다.
 
 문체(금지 어미) · 파이 차트 금지 · 도넛 dasharray 검산 · 토큰 밖 raw hex · 슬라이드 크기 1920x1080 · 최소 글자 24px · 데이터 마크 대비 2:1 · **본문 영역 겹침** · 브랜드 마크 존재 · 마크와 본문 겹침 · 배경 밝기와 로고 변형 일치.
 
@@ -315,8 +320,8 @@ python3 scripts/verify_repo.py            # 전부
 python3 scripts/verify_repo.py --shots out  # 슬라이드 PNG 77장도 남긴다
 ```
 
-덱 12종을 만들어 `check_deck.py` 로, A4 문서 4종을 `check_doc.py` 로, 라이브 덱을 `check_live.py` 로, 웹 보드 5종을
-`check_board.py` 로 판정하고, PPTX 11종 생성과 무결성 · `dist/` 재생성 대조 ·
+고르는 양식 4종과 보관 양식 전부를 각자의 검사기(`check_live.py` · `check_doc.py` · `check_board.py` · `check_deck.py`)로
+판정하고, PPTX 11종 생성과 무결성 · `dist/` 재생성 대조 ·
 한국어 인코딩 · 배포 매니페스트 · 내용 동기화 · 버전 올림을 함께 본다.
 실패가 있으면 종료 코드가 1 이다.
 
@@ -371,15 +376,15 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   references/rules.md                    압축 규칙
   references/decisions/                  규격을 바꾼 근거(실측·대조) 원본 — README.md 가 색인
   assets/blue-report.css                 토큰 77개 — 단일 소스
-  assets/deck-*.html                     완성 덱 11종 + 레이아웃 카탈로그 19종
   assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다
-  assets/doc-*.html · doc-viewer.*       A4 문서 4종과 그 뷰어
+  assets/doc-minutes.html · doc-viewer.* 회의록과 A4 뷰어
   assets/blue-web.css                    웹 보드 파운데이션 — 토큰은 위 파일 것을 쓴다
-  assets/board-*.html                    웹 보드 5종
+  assets/board-manage.html               관리보드
   assets/blue-live.css                   라이브 계통 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/live-standard.html              기준 덱 — 새 보고서의 출발점
   assets/live-catalog.html               라이브 부품 카탈로그 51장 — 장째 복사
-  assets/live-brief.html · live-viewer.js 라이브 브리핑 견본과 라이브 엔진
+  assets/live-viewer.js                  라이브 엔진
+  assets/archive/                        보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
   scripts/check_deck.py                  슬라이드 17항목 자동 점검
   scripts/check_doc.py                   A4 문서 9항목 자동 점검
   scripts/check_board.py                 웹 보드 11항목 자동 점검

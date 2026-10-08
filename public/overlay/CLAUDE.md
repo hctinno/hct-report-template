@@ -31,9 +31,11 @@
 - 서브에이전트를 실행할 때는 프롬프트에 "보고는 한국어로 작성한다"를 명시한다.
 - **새 보고서는 기준 덱 `assets/live-standard.html`(`--deck standard`)에서 시작한다.** 표준 지면 모양이
   그 파일에 다 들어 있다 — 머리띠·꼬리띠·로고·워터마크·진행선·제목 형광 밴드.
-  다른 계통은 용도가 분명할 때만 고른다(1920x1080 고정 지면·PPTX 출력·인쇄용 A4·상태를 바꾸는 보드).
+  고르는 양식은 넷이다 — 기준 덱(`standard`) · 부품 카탈로그(`livecatalog`, 장째 복사) ·
+  회의록(`minutes`) · 관리보드(`manage`). 그 밖은 `assets/archive/` 에 보관했다 — 사용자가 이름을
+  짚거나 PowerPoint 파일이 꼭 필요할 때만 쓴다.
 - 새 스타일을 만들지 않는다. `assets/` 의 견본 중 용도에 맞는 것을 복사해 내용만 바꾼다.
-- 덱 내용은 `assets/deck-*.html` 과 `pptx/content.js` 두 곳에 있다. HTML 이 기준이며 고칠 때 두 곳을 함께 고친다. 합치지 않기로 했고, 갈라짐은 `scripts/check_content_sync.py` 가 잡는다.
+- 덱 내용은 `assets/archive/deck-*.html` 과 `pptx/content.js` 두 곳에 있다. HTML 이 기준이며 고칠 때 두 곳을 함께 고친다. 합치지 않기로 했고, 갈라짐은 `scripts/check_content_sync.py` 가 잡는다.
 - 용도가 분명하지 않으면 임의로 고르지 말고 사용자에게 먼저 묻는다. 덱·A4 문서·웹 보드는 지면도 글자 하한도 검사기도 서로 달라 바꿔 쓸 수 없다.
 - **산출물은 반드시 `apply_brand.py` 를 거친다.** `assets/` 의 견본은 로고 자리가
   「COMPANY NAME」으로 비어 있다 — 복사해 내용만 바꾸고 끝내면 로고도 워터마크도

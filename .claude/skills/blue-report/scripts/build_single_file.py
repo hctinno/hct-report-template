@@ -41,8 +41,9 @@ DECK = os.path.join(ASSETS, DECKS["catalog"])
 
 # 로컬 자원 참조. 이름을 목록으로 박아 두지 않는다 — 덱은 deck-viewer,
 # A4 문서는 doc-viewer 를 쓰므로 목록으로 두면 종류가 늘 때마다 여기를 고쳐야 한다.
-LOCAL_CSS_RE = re.compile(r'<link rel="stylesheet" href="([^":/]+\.css)">')
-LOCAL_JS_RE = re.compile(r'<script src="([^":/]+\.js)"></script>')
+# 보관 견본(assets/archive/)은 ../ 를 붙여 부른다. 이름은 언제나 assets/ 기준이다.
+LOCAL_CSS_RE = re.compile(r'<link rel="stylesheet" href="(?:\.\./)*([^":/]+\.css)">')
+LOCAL_JS_RE = re.compile(r'<script src="(?:\.\./)*([^":/]+\.js)"></script>')
 
 # @font-face 의 url(...). 인라인한 CSS 안에 남으면 상대 경로라 단일 파일에서 깨진다.
 FONT_URL_RE = re.compile(r"url\(\s*['\"]?(fonts/[^'\")]+\.woff2)['\"]?\s*\)")

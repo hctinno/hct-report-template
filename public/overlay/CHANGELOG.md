@@ -14,6 +14,17 @@ claude plugin marketplace update blue-tools   # 최신판 받기
 
 ---
 
+## 1.6.0 — 2026-10-08
+
+**고르는 양식을 넷으로 줄였다** — 기준 덱(`standard`) · 라이브 부품 카탈로그(`livecatalog`) ·
+회의록(`minutes`) · 관리보드(`manage`). 발표·보고는 전부 기준 덱으로 만든다.
+
+나머지(고정 지면 덱 12종 · A4 3종 · 보드 4종 · 라이브 브리핑 · FCC/KC 보고서)는
+`assets/archive/` 로 옮겼다. 이름으로 부르면 그대로 만들어지고, PowerPoint 빌드도 그대로다.
+`apply_brand.py --deck` 기본값은 `standard` 다.
+
+---
+
 ## 1.5.0 — 2026-10-07
 
 **라이브 덱에 부품 카탈로그와 발표 기능을 더한다.** 기준 덱에 없는 부품을 지어내지 않고

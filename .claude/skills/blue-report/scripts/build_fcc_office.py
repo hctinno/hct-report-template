@@ -32,7 +32,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(SKILL)))
-FCC = os.path.join(SKILL, "assets", "fcc-kc")
+FCC = os.path.join(SKILL, "assets", "archive", "fcc-kc")
 OUT = os.path.join(ROOT, "decks-out", "fcc-kc")
 
 sys.path.insert(0, HERE)

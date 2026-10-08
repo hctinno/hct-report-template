@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """HTML 덱과 PPTX 내용이 갈라졌는지 본다.
 
-같은 내용이 `assets/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다.
+같은 내용이 `assets/archive/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다.
 HTML 이 기준이고 PPTX 는 그 내용을 데이터로 옮긴 것이라, 한쪽만 고치면
 같은 덱인데 형식에 따라 내용이 달라진다. 사람 눈으로는 잘 보이지 않는다.
 
 두 곳을 합치지 않는 이유 — HTML 덱은 손으로 고치는 것이 이 시스템의 사용법이다
-(`assets/deck-*.html` 을 복사해 내용만 바꾼다). HTML 을 생성물로 만들면 그 사용법이
+(`assets/archive/deck-*.html` 을 복사해 내용만 바꾼다). HTML 을 생성물로 만들면 그 사용법이
 사라진다. 그래서 원본을 둘로 두고, 갈라짐을 사람이 아니라 이 스크립트가 잡는다.
 
     python3 scripts/check_content_sync.py
@@ -30,7 +30,8 @@ import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILL = os.path.join(ROOT, ".claude", "skills", "blue-report")
-ASSETS = os.path.join(SKILL, "assets")
+# 고정 지면 덱은 보관 폴더에 있다. PPTX 가 내용을 맞춰 보는 원본이라 지우지 않았다.
+ASSETS = os.path.join(SKILL, "assets", "archive")
 CONTENT_JS = os.path.join(SKILL, "pptx", "content.js")
 
 # content.js 의 덱 키 → HTML 덱 파일. deck-template.html 은 카탈로그라 PPTX 판이 없다.
