@@ -19,45 +19,37 @@ Four separate lineages. They are not interchangeable: different page size, diffe
 | Web boards | no fixed page; reflows with viewport | `--bw-fs-*` | 12.5px | `check_board.py` — 11 items |
 | Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 27 items |
 
-### Slide decks — 12, in `.claude/skills/blue-report/assets/`
+### Templates to choose from — 4, in `.claude/skills/blue-report/assets/`
 
-| File | `--deck` name | Purpose | Slides |
+| What you are making | `--deck` name | File | Lineage |
 |---|---|---|---|
-| `deck-internal-report.html` | `internal` | internal monthly reporting | 9 |
-| `deck-weekly-report.html` | `weekly` | organisation-wide weekly reporting | 7 |
-| `deck-ax-weekly.html` | `ax` | one-page report for senior management, appendix behind it | 5 |
-| `deck-team-weekly.html` | `team` | compressed team weekly, for a team lead | 2 |
-| `deck-exec-report.html` | `exec` | executive reporting, conclusion first | 6 |
-| `deck-allhands.html` | `allhands` | all-hands / townhall | 9 |
-| `deck-sales-proposal.html` | `sales` | external proposal and sales | 10 |
-| `deck-project-report.html` | `project` | project kickoff and completion | 9 |
-| `deck-training.html` | `training` | training and technical explanation | 8 |
-| `deck-strategy-report.html` | `strategy` | strategy reporting, argument form, asks for a decision | 16 |
-| `deck-report.html` | `report` | high-density reporting, diagram-led | 19 |
-| `deck-template.html` | `catalog` | catalog of all 19 layouts | 19 |
+| any report or presentation (default) | `standard` | `live-standard.html` | live deck |
+| a component the standard deck lacks — copy the whole slide | `livecatalog` | `live-catalog.html` | live deck parts catalog (51 slides) |
+| meeting minutes (printed A4) | `minutes` | `doc-minutes.html` | A4 document |
+| a dashboard people change on screen | `manage` | `board-manage.html` | web board |
 
-### A4 documents — 4
+**Every report or presentation is built from the standard deck** — executive reports, weekly
+reports, strategy reports, decision requests, Q&A and appendices included. Those slide types are all
+in the standard deck and the parts catalog. Pick from the request without asking: minutes → `minutes`,
+dashboard / status board → `manage`, everything else → `standard`.
 
-| File | `--deck` name | Purpose | Pages |
-|---|---|---|---|
-| `doc-minutes.html` | `minutes` | meeting minutes | 4 |
-| `doc-policy.html` | `policy` | company rules and regulations | 6 |
-| `doc-manual.html` | `manual` | manual and guide | 6 |
-| `doc-notice.html` | `notice` | notice, complete in one page | 2 |
+### Archived templates — `assets/archive/`
 
-### Web boards — 5
+Removed from the menu, still buildable by name and still checked. **Use one only when the user names
+it, or when a `.pptx` file is required.** Never pick one on your own.
 
-Use these when the artefact is something people **change on screen**, not something they read. Boards load `blue-report.css` and `blue-web.css` together. They are not PPTX or PDF targets.
-
-| File | `--deck` name | Purpose |
+| Group | `--deck` names | Note |
 |---|---|---|
-| `board-task.html` | `board` | task execution board — rail, KPI, filter table, memo (smallest sample) |
-| `board-manage.html` | `manage` | management dashboard — 12 sections, 8 tables |
-| `board-exec.html` | `execboard` | execution board — status pill per item, memo |
-| `board-team.html` | `teamboard` | team board — 4-column kanban |
-| `board-gap.html` | `gapcheck` | gap-check board — gap parent with response children |
+| fixed-page decks 1920x1080 — 12 | `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy` · `report` · `catalog` (19 layouts) | source for the PPTX build (`pptx/`) |
+| A4 documents — 3 | `policy` · `manual` · `notice` | |
+| web boards — 4 | `board` · `execboard` · `teamboard` · `gapcheck` | |
+| live briefing | `live` | a smaller standard deck |
+| FCC/KC reports — 14 | `assets/archive/fcc-kc/` | certification test reports only |
 
-### Live decks — 3: the house standard, the parts catalog, a short briefing
+Archived files load their CSS and viewer as `../`. Do not copy them by hand — build with `apply_brand.py`,
+which fixes the paths in the output.
+
+### Live decks — the house standard and the parts catalog
 
 **Start every new report from `live-standard.html` (`--deck standard`).** It is the canonical
 starting point: copy it and replace the content. Do not compose a deck from scratch and do not
@@ -72,7 +64,6 @@ presentation. It reads fine with JavaScript disabled — just scroll.
 |---|---|---|
 | `live-standard.html` | `standard` | **house standard — start here.** 15 slides: cover, agenda, gist, chapter dividers, body, roadmap, decision, closing, appendix divider, Q&A, glossary |
 | `live-catalog.html` | `livecatalog` | **parts catalog, 51 slides.** 38 components, 12 animation families, widgets, evidence/document/video overlays, 135 icons — one slide per component |
-| `live-brief.html` | `live` | live briefing — short-form sample |
 
 **Need a component the standard deck does not have** (Gantt, org chart, role matrix, donut, stacked
 or waterfall bars, heat map, flow diagram, pipeline, screen mock-up, tabs, scenes, route map,
@@ -171,7 +162,7 @@ number-then-Enter jump, and a control bar that appears only at the very bottom e
 
 `check_board.py` additionally re-checks the **rendered** DOM for banned endings, because board content often lives in JavaScript data that a source scan cannot see.
 
-`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the four A4 documents with `check_doc.py`, checks the five boards with `check_board.py`, checks the three live decks and their branded outputs with `check_live.py`, presses through the live engine (paging, steps, page-number jump, present mode, laser, overlays, evidence tabs, document, video, tabs, presenter popup and its in-page fallback — 40 checks on the catalog source and its single-file output), checks the FCC/KC templates with the A4 rules, builds the PPTX files, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
+`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the A4 documents with `check_doc.py` and the boards with `check_board.py` (archived ones included), checks the three live decks and their branded outputs with `check_live.py`, presses through the live engine (paging, steps, page-number jump, present mode, laser, overlays, evidence tabs, document, video, tabs, presenter popup and its in-page fallback — 40 checks on the catalog source and its single-file output), checks the FCC/KC templates with the A4 rules, builds the PPTX files, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
 
 If you change `assets/`, rebuild `dist/` and commit it: `build_single_file.py` three times —
 once with no arguments, once with `--artifact --brand brand/hct/brand.json`, and once with

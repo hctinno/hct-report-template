@@ -54,8 +54,8 @@ cd hct-report-template
 ```
 .claude/skills/blue-report/README.md
 .claude/skills/blue-report/references/rules.md
-.claude/skills/blue-report/assets/deck-template.html
-.claude/skills/blue-report/scripts/check_deck.py
+.claude/skills/blue-report/assets/live-standard.html
+.claude/skills/blue-report/scripts/check_live.py
 brand/hct/brand.json
 ```
 
@@ -74,20 +74,28 @@ brand/hct/brand.json
 **그냥 「보고서」·「발표자료」를 만들라는 지시라면 답은 기준 덱 `standard` 다.**
 `assets/live-standard.html` 을 복사해 내용만 바꾼다. 회사 발표 덱의 표준 모양이
 그 파일에 다 들어 있다 — 머리띠, 꼬리띠, 로고, 워터마크, 진행선, 제목 형광 밴드.
-다른 계통은 용도가 분명할 때만 고른다(1920x1080 고정 지면이 필요하다, PPTX 로 내보내야
-한다, 인쇄용 A4 다, 화면에서 상태를 바꾸는 보드다).
+고르는 양식은 넷이다. 용도에 맞는 것을 복사해 **내용만** 교체한다. 레이아웃과 스타일을 새로
+설계하지 않는다.
 
-`.claude/skills/blue-report/assets/` 에 완성된 덱이 11종, 레이아웃 카탈로그 1종,
-A4 세로 문서가 4종, 웹 보드가 5종, 기준·라이브 덱이 3종(기준 · 부품 카탈로그 · 브리핑) 있다. 용도에 맞는 것을 복사해
-**내용만** 교체한다. 레이아웃과 스타일을 새로 설계하지 않는다.
+| 무엇을 만드나 | `--deck` 이름 | 파일 |
+|---|---|---|
+| 보고서 · 발표 덱 (기본) | `standard` | `live-standard.html` |
+| 기준 덱에 없는 부품 — 장째 복사 | `livecatalog` | `live-catalog.html` |
+| 회의록 (A4 인쇄) | `minutes` | `doc-minutes.html` |
+| 고쳐 가며 쓰는 현황판 | `manage` | `board-manage.html` |
 
-#### 기준 덱 · 라이브 덱 3종 — 고정 지면이 없는 계통
+경영진 보고 · 주간보고 · 전략 보고처럼 용도가 달라도 발표·보고는 전부 기준 덱이다.
+「회의록」이면 `minutes`, 「관리보드 · 대시보드 · 현황판」이면 `manage`, 그 밖은 `standard`.
+
+나머지 양식은 `assets/archive/` 에 보관했다(아래 「보관 양식」). **사람이 이름을 짚거나
+PowerPoint 파일이 꼭 필요할 때만 쓴다.**
+
+#### 기준 덱 · 부품 카탈로그 — 고정 지면이 없는 계통
 
 | 파일 | `--deck` 이름 | 용도 | 장수 |
 |---|---|---|---|
 | `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 15 |
 | `live-catalog.html` | `livecatalog` | **부품 카탈로그** — 기준 덱에 없는 부품을 장째 복사해 온다 | 51 |
-| `live-brief.html` | `live` | 라이브 브리핑 (짧은 브리핑 견본) | 8 |
 
 기준 덱에 없는 부품(간트 · 조직도 · 역할 매트릭스 · 도넛 · 누적 막대 · 워터폴 · 히트맵 ·
 흐름도 · 파이프라인 · 화면 목업 · 탭 · 장면 · 노선도 · 시뮬레이션 · 근거 · 원문 · 영상 겹창)은
@@ -131,51 +139,35 @@ assets/fonts/               폰트 서브셋
 
 제목의 핵심구는 `<em>` 으로 감싼다. 형광 밴드가 거기에만 걸린다.
 
-#### 슬라이드 덱 12종 — 1920x1080 고정 지면
+#### 회의록 — A4 세로 문서
 
-| 파일 | `--deck` 이름 | 용도 | 장수 |
-|---|---|---|---|
-| `deck-internal-report.html` | `internal` | 사내 보고 (월간) | 9 |
-| `deck-weekly-report.html` | `weekly` | 조직 주간보고 | 7 |
-| `deck-ax-weekly.html` | `ax` | AX 조직 1장 보고 + 부록 | 5 |
-| `deck-team-weekly.html` | `team` | 팀 압축 주간보고 (2장 · 팀장 보고용) | 2 |
-| `deck-exec-report.html` | `exec` | 경영진 보고 (결론 먼저) | 6 |
-| `deck-allhands.html` | `allhands` | 전직원 보고 (타운홀) | 9 |
-| `deck-sales-proposal.html` | `sales` | 외부 제안·영업 | 10 |
-| `deck-project-report.html` | `project` | 프로젝트 착수·완료 | 9 |
-| `deck-training.html` | `training` | 교육·기술 설명 | 8 |
-| `deck-strategy-report.html` | `strategy` | 전략 보고 (논증형 결정 요청 · 16장) | 16 |
-| `deck-report.html` | `report` | 고밀도 보고 (본문 14 + 부록 5 · 도해 중심) | 19 |
-| `deck-template.html` | `catalog` | 레이아웃 19종 카탈로그 | 19 |
-
-발표 덱이 아니라 **A4 세로 문서**가 필요하면 아래 이름을 같은 `--deck` 에 준다.
 1920x1080 이 아니라 794x1123 지면이고, 검사기도 `check_doc.py` 로 다르다.
 
 | 파일 | `--deck` 이름 | 용도 | 쪽수 |
 |---|---|---|---|
 | `doc-minutes.html` | `minutes` | 회의록 | 4 |
-| `doc-policy.html` | `policy` | 사규·규정 | 6 |
-| `doc-manual.html` | `manual` | 매뉴얼·가이드 | 6 |
-| `doc-notice.html` | `notice` | 공지 (1쪽 완결) | 2 |
 
-읽는 물건이 아니라 **화면에서 상태를 바꾸는 것**이면 웹 보드를 쓴다. 지면 크기가 없고
-화면 폭에 따라 흐른다. 글자 하한이 12.5px 로 다르고 검사기도 `check_board.py` 다.
-PPTX·PDF 대상이 아니다.
+#### 관리보드 — 웹 보드
 
-| 파일 | `--deck` 이름 | 용도 | 특징 |
-|---|---|---|---|
-| `board-task.html` | `board` | 과제 실행보드 (가장 작은 견본) | 레일 · KPI · 필터 표 · 메모 |
-| `board-manage.html` | `manage` | 관리보드 (대시보드형) | 절 12 · 표 8 · 일정 격자 |
-| `board-exec.html` | `execboard` | 실행보드 (항목 상태 · 메모) | 상태 알약 4단 순환 · 진행판 |
-| `board-team.html` | `teamboard` | 팀보드 (칸반) | 칸반 4열 · 주차 격자 · 겹칩 |
-| `board-gap.html` | `gapcheck` | 점검보드 (공백 대조) | 공백 부모 + 대응 자식 · 대조표 |
+읽는 물건이 아니라 **화면에서 상태를 바꾸는 것**이다. 지면 크기가 없고 화면 폭에 따라
+흐른다. 글자 하한이 12.5px 로 다르고 검사기도 `check_board.py` 다. PPTX·PDF 대상이 아니다.
+`blue-report.css` 와 `blue-web.css` 두 벌을 함께 부른다.
 
-보드는 `blue-report.css` 와 `blue-web.css` 두 벌을 함께 부른다. 복사할 때 덱용 3개가
-아니라 이 둘을 옮긴다.
+| 파일 | `--deck` 이름 | 용도 |
+|---|---|---|
+| `board-manage.html` | `manage` | 관리보드 (대시보드형 · 절 12 · 표 8 · 일정 격자) |
 
-같은 레이아웃을 쓰되 배치 순서가 용도에 맞게 다르다. 사내 보고는 다크 요약이 3번째에
-있고(경영진이 앞부분만 보고 넘어간다), 외부 제안은 9번째에 있다(문제 제기부터 설득한 뒤
-정리한다). 그러므로 용도가 다르면 파일도 달라야 한다.
+#### 보관 양식 — `assets/archive/`
+
+| 묶음 | `--deck` 이름 | 비고 |
+|---|---|---|
+| 고정 지면 덱 1920x1080 · 12종 | `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy` · `report` · `catalog` | PPTX 빌드의 원본 · 검사기 `check_deck.py` |
+| A4 문서 3종 | `policy` · `manual` · `notice` | |
+| 웹 보드 4종 | `board` · `execboard` · `teamboard` · `gapcheck` | |
+| 라이브 브리핑 | `live` | |
+| FCC/KC 보고서 14종 | `assets/archive/fcc-kc/` | 인증 시험 보고서 전용 |
+
+보관 파일은 CSS·뷰어를 `../` 로 부른다. 손으로 복사하지 말고 `apply_brand.py --deck <이름>` 으로 만든다.
 
 **용도를 지시받지 못했으면 임의로 고르지 말고 사람에게 먼저 묻는다.**
 
@@ -220,7 +212,7 @@ assets/deck-viewer.js
 
 ```bash
 # HTML — 회사명·로고·저작권을 넣어 한 파일로 만든다
-python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck internal --single-file -o decks-out/deck.html
+python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck standard --title "문서명" --single-file -o decks-out/deck.html
 
 # --deck 은 위 표의 이름 또는 HTML 파일 경로. A4 문서와 웹 보드도 같은 --deck 으로 준다
 #   --deck minutes   A4 회의록      --deck manage   관리보드
@@ -230,12 +222,12 @@ python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand
 # PDF — 발표용. --notes 를 주면 발표자 노트를 마지막 장에 붙인다
 python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 
-# PowerPoint — 내용은 pptx/content.js 에 있다
+# PowerPoint — 보관 고정 지면 덱 내용(pptx/content.js)으로 만든다
 node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
 ```
 
 PPTX 는 HTML 덱과 내용을 따로 들고 있다. **HTML 쪽이 기준이므로 내용을 바꿀 때는
-`assets/deck-*.html` 과 `pptx/content.js` 두 곳을 함께 고친다.** 색은 두 판이
+`assets/archive/deck-*.html` 과 `pptx/content.js` 두 곳을 함께 고친다.** 색은 두 판이
 `assets/blue-report.css` 의 토큰을 같이 읽으므로 갈라지지 않는다.
 
 한쪽만 고쳤는지는 스크립트가 잡는다. 템플릿 자체를 고쳤다면 돌린다.

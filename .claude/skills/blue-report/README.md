@@ -22,25 +22,12 @@ blue-report/
 │  ├─ doc-minutes.html         회의록 2쪽
 │  ├─ deck-viewer.css          뷰어 껍데기 (디자인 시스템 아님)
 │  ├─ deck-viewer.js           넘김 · 축척 · 전체화면 발표 · 쪽번호 자동 · 노트
-│  ├─ deck-template.html       레이아웃 19종 카탈로그
-│  ├─ deck-internal-report.html   사내 보고 (월간) 9장
-│  ├─ deck-weekly-report.html     조직 주간보고 7장
-│  ├─ deck-ax-weekly.html         AX 조직 1장 보고 + 부록 5장
-│  ├─ deck-team-weekly.html       팀 압축 주간보고 2장
-│  ├─ deck-exec-report.html       경영진 보고 (결론 먼저) 6장
-│  ├─ deck-allhands.html          전직원 보고 (타운홀) 9장
-│  ├─ deck-sales-proposal.html    외부 제안·영업 10장
-│  ├─ deck-project-report.html    프로젝트 착수·완료 9장
-│  ├─ deck-training.html          교육·기술 설명 8장
-│  ├─ doc-minutes.html           회의록 A4 2쪽
-│  ├─ doc-policy.html            사규·규정 A4 3쪽
-│  ├─ doc-manual.html            매뉴얼·가이드 A4 3쪽
-│  ├─ doc-notice.html            공지 A4 1쪽
+│  ├─ board-manage.html        관리보드 (웹 보드)
 │  ├─ blue-live.css            라이브 계통 — 배율 · 띠 · 부품 38종 · 움직임 12계열 · 아이콘 135종
 │  ├─ live-viewer.js           라이브 엔진 — 넘김 · 단계 · 쪽 이동 · 발표 · 레이저 · 대본 창 · 겹창 · 위젯
 │  ├─ live-standard.html       기준 덱 15장 — 새 보고서의 출발점
 │  ├─ live-catalog.html        라이브 부품 카탈로그 51장 — 필요한 장을 통째로 복사
-│  ├─ live-brief.html          라이브 브리핑 견본 8장
+│  ├─ archive/                 보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
 │  ├─ LICENSE-Lucide.txt       아이콘 저작권 고지 (ISC · MIT)
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
 ├─ references/
@@ -69,10 +56,24 @@ blue-report/
 
 설치기 `install_blue_report_skill.py`는 이 저장소의 `scripts/`에 있다.
 
-### 용도별 덱 고르기
+### 고르는 양식 — 넷
 
-`deck-template.html`은 레이아웃 19종을 모아 둔 **카탈로그**다. 실제 문서를 만들 때는
-용도에 맞는 덱에서 시작한다. 각 덱은 슬라이드 순서와 내용 골격이 그 용도에 맞춰져 있다.
+| 무엇을 만드나 | `--deck` | 파일 |
+|---|---|---|
+| 보고서 · 발표 덱 (기본) | `standard` | `assets/live-standard.html` — 「6-3」 |
+| 기준 덱에 없는 부품 — 장째 복사 | `livecatalog` | `assets/live-catalog.html` — 「6-3」 |
+| 회의록 (A4) | `minutes` | `assets/doc-minutes.html` |
+| 고쳐 가며 쓰는 현황판 | `manage` | `assets/board-manage.html` |
+
+발표·보고는 용도가 달라도 전부 기준 덱이다. 아래 고정 지면 덱 표와 A4·보드의 나머지는
+`assets/archive/` 에 **보관**했다 — 이름으로 부르면 그대로 만들어지고 검사도 같지만, 사용자가
+이름을 짚거나 PowerPoint 파일이 꼭 필요할 때만 쓴다. 보관 파일은 CSS·뷰어를 `../` 로 부르므로
+손으로 복사하지 말고 `apply_brand.py` 로 만든다.
+
+### 보관 고정 지면 덱 (`assets/archive/`)
+
+`archive/deck-template.html`은 레이아웃 19종을 모아 둔 **카탈로그**다. 각 덱은 슬라이드 순서와
+내용 골격이 그 용도에 맞춰져 있다. PPTX 빌드(`pptx/content.js`)가 이 덱들과 내용을 맞춘다.
 
 | 용도 | 파일 | 장수 | 구성 |
 |---|---|---|---|
@@ -131,9 +132,8 @@ blue-report/
 ### 빠른 시작
 
 ```bash
-# 용도별 덱 + 공용 자원 3개를 같은 폴더로 복사
-cp assets/deck-internal-report.html ./deck.html
-cp assets/blue-report.css assets/deck-viewer.css assets/deck-viewer.js ./
+# 보관 고정 지면 덱 — apply_brand 가 경로·로고를 맞춘 단일 파일을 만든다
+python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file -o ./deck.html
 # 슬라이드 편집 후
 python3 scripts/check_deck.py ./deck.html --shots ./out/
 ```
@@ -176,7 +176,7 @@ PPTX 는 PC 에 설치된 폰트만 쓴다. 프리텐다드를 사내 배포하�
 
 #### 내용이 두 곳에 있다 — 합치지 않고 갈라짐을 검사한다
 
-덱 내용은 `assets/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다.
+덱 내용은 `assets/archive/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다.
 **HTML 이 기준이므로 내용을 고칠 때는 두 곳을 함께 고친다.**
 
 합치지 않기로 했다. HTML 덱을 손으로 고치는 것이 이 시스템의 사용법이고
@@ -230,9 +230,9 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | `blue-doc.css` | 문서 파운데이션. raw hex 0, `--br-*` 토큰만 참조 |
 | `doc-viewer.css` · `doc-viewer.js` | 껍데기 — 회색 바탕 · 조작 막대 · 인쇄 · 쪽번호 자동 |
 | `doc-minutes.html` | 회의록 2쪽 |
-| `doc-policy.html` | 사규·규정 3쪽 — 조·항·호 · 부칙 · 개정 이력 · 결재란 |
-| `doc-manual.html` | 매뉴얼·가이드 3쪽 — 목차 · 절차 단계 · 화면 캡처 자리 |
-| `doc-notice.html` | 공지 1쪽 — 게시판용. 한 쪽을 넘기지 않는다 |
+| `archive/doc-policy.html` | 사규·규정 3쪽 — 조·항·호 · 부칙 · 개정 이력 · 결재란 |
+| `archive/doc-manual.html` | 매뉴얼·가이드 3쪽 — 목차 · 절차 단계 · 화면 캡처 자리 |
+| `archive/doc-notice.html` | 공지 1쪽 — 게시판용. 한 쪽을 넘기지 않는다 |
 
 **쪽번호와 문서명은 뷰어가 채운다.** `.bd-foot` 을 비워 두고 숫자를 적지 않는다.
 쪽을 넣거나 빼도 번호가 어긋나지 않으며, 손으로 적으면 `check_doc.py` 가 실패시킨다.
@@ -286,7 +286,7 @@ python3 scripts/build_single_file.py --artifact --deck minutes \
 덱(`#111`)과 문서(`#8a8f96`)가 저절로 갈린다.
 
 **서명란은 결재 문서에만 넣는다.** `.bd-sign` 이 있지만 회의록에는 쓰지 않는다.
-사규·품의처럼 결재선이 필요한 문서의 마지막 쪽에만 붙인다(`doc-policy.html` 참조).
+사규·품의처럼 결재선이 필요한 문서의 마지막 쪽에만 붙인다(보관 `archive/doc-policy.html` 참조).
 `.bd-body` **안이 아니라** `.bd-page` 직계로 둔다 — `.bd-page` 가 세로 flex 이고
 `.bd-body` 가 `flex:1` 이라 그것만으로 지면 바닥에 붙는다. 안에 두면 본문 흐름을 따라
 중간에 뜬다.
@@ -956,15 +956,15 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 고정이고, 열이 많은 표만 `.bw-scroll` 로 감싸 고정을 포기한다. 검사기가
 둘을 같이 쓰면 실패시킨다.
 
-### 보드 5종
+### 보드 — 관리보드 1종 + 보관 4종
 
 | 용도 | `--deck` | 파일 | 특징 |
 |---|---|---|---|
-| 과제 실행보드 | `board` | `board-task.html` | 가장 작은 견본. 레일 · KPI · 필터 표 · 메모 |
+| 과제 실행보드 | `board` | `archive/board-task.html` | 가장 작은 견본. 레일 · KPI · 필터 표 · 메모 |
 | 관리보드 | `manage` | `board-manage.html` | 절 12 · 표 8 · 일정 격자 · 가로 막대 |
-| 실행보드 | `execboard` | `board-exec.html` | 상태 알약 4단 순환 · 설비 진행판 · 주차 막대 |
-| 팀보드 | `teamboard` | `board-team.html` | 칸반 4열 · 주차 격자 · 상세 겹칩 |
-| 점검보드 | `gapcheck` | `board-gap.html` | 공백 부모 + 대응 자식 · 비율 띠 · 대조표 · 단계 목록 |
+| 실행보드 | `execboard` | `archive/board-exec.html` | 상태 알약 4단 순환 · 설비 진행판 · 주차 막대 |
+| 팀보드 | `teamboard` | `archive/board-team.html` | 칸반 4열 · 주차 격자 · 상세 겹칩 |
+| 점검보드 | `gapcheck` | `archive/board-gap.html` | 공백 부모 + 대응 자식 · 비율 띠 · 대조표 · 단계 목록 |
 
 뒤 네 벌은 사내에서 따로 만들어 쓰던 보드를 옮긴 것이다. 옮기며 드러난 것들.
 
@@ -1003,13 +1003,12 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 애니메이션 12계열 · 발표 기능을 뽑아 이 계통으로 옮겼다. 원본의 수치 · 조직 · 인물 · 원문은
 옮기지 않았다 — 견본은 전부 가상 시나리오다.
 
-**새 보고서는 새로 그리지 않는다. 아래 세 파일에서 복사한다.**
+**새 보고서는 새로 그리지 않는다. 아래 두 파일에서 복사한다.**
 
 | 파일 | `--deck` | 장 | 쓰는 법 |
 |---|---|---|---|
 | `assets/live-standard.html` | `standard` | 15 | **출발점.** 표지 · 목차 · 보고 요지 · 장 간지 · 본문 · 로드맵 · 결정 요청 · 마무리 · 부록 간지 · 예상 질문 · 용어 |
 | `assets/live-catalog.html` | `livecatalog` | 51 | 부품 견본첩. 필요한 장을 **통째로** 복사해 기준 덱 사이에 끼우고 내용만 바꾼다 |
-| `assets/live-brief.html` | `live` | 8 | 짧은 브리핑 견본 |
 
 ```bash
 # 1. 기준 덱을 복사해 내용만 바꾼다. 없는 부품은 카탈로그에서 장째 가져온다

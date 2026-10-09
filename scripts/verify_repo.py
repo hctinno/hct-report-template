@@ -6,12 +6,12 @@
     python3 scripts/verify_repo.py --only decks
 
 검사 항목
-  docs      A4 문서 4종을 check_doc.py 9항목으로 판정한다.
+  docs      A4 문서(회의록 + 보관 3종)를 check_doc.py 9항목으로 판정한다.
   decks     덱을 apply_brand.py 로 만들고 check_deck.py 17항목으로 판정한다.
             목록은 apply_brand.py 의 DECKS 가 정한다 — 여기 세지 않는다.
             `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
-  boards    웹 보드 5종을 check_board.py 11항목으로 판정한다.
+  boards    웹 보드(관리보드 + 보관 4종)를 check_board.py 11항목으로 판정한다.
   live      라이브 덱을 check_live.py 27항목으로 판정한다. 고정 지면이 없고
             치수가 rem 이라 px 하한이 아니라 rem 하한으로 본다.
             견본만이 아니라 apply_brand.py 산출물(단일 파일 · 연결형)도 본다.
@@ -63,7 +63,7 @@ from apply_brand import LIVE as _LIVE_FILES  # noqa: E402
 EXPECTED_PPTX = len(DECKS) - 1
 
 # A4 문서. 슬라이드가 아니라 지면이 794x1123 이고 검사기가 다르다.
-DOCS = ["doc-minutes.html", "doc-policy.html", "doc-manual.html", "doc-notice.html"]
+DOCS = ["doc-minutes.html", "archive/doc-policy.html", "archive/doc-manual.html", "archive/doc-notice.html"]
 
 # dist/ 의 두 파일은 빌드 명령이 서로 다르다. 아래가 그 정본이다.
 DIST_BUILDS = [
@@ -497,7 +497,7 @@ def check_palette(log):
 
 # 지시서 12장이 요구하는 판정 중 A4 공통 규칙(크기·대비·글자·머리말)은 check_doc.py
 # 가 이미 본다. 여기서는 FCC/KC 템플릿에만 있는 규칙을 본다 — 중복 구현하지 않는다.
-FCC_DIR = os.path.join(SKILL, "assets", "fcc-kc")
+FCC_DIR = os.path.join(SKILL, "assets", "archive", "fcc-kc")
 
 
 def fcc_templates():
@@ -516,7 +516,7 @@ def check_fcc(log):
     누가 말한 것인지, 시안인지」를 지면 스스로 밝히는가다."""
     files = fcc_templates()
     if not files:
-        log.fail("FCC/KC 템플릿", "assets/fcc-kc/templates 가 비어 있다")
+        log.fail("FCC/KC 템플릿", "assets/archive/fcc-kc/templates 가 비어 있다")
         return
 
     # 1) 재생성 대조 — 조립 스크립트 산출물과 저장소 파일이 같은가
@@ -898,7 +898,7 @@ def check_viewer(log):
     chrome = need_browser()
     from playwright.sync_api import sync_playwright
 
-    deck = os.path.join(ASSETS, "deck-internal-report.html")
+    deck = os.path.join(ASSETS, "archive", "deck-internal-report.html")
     url = "file://" + os.path.abspath(deck)
     bad = []
     with sync_playwright() as pw:
@@ -954,7 +954,8 @@ def check_present(log):
     chrome = need_browser()
     from playwright.sync_api import sync_playwright
 
-    decks = sorted(f for f in os.listdir(ASSETS)
+    # 고정 지면 덱은 보관 폴더에 있다(PPTX 원본). 보관해도 발표 모드는 살아 있어야 한다.
+    decks = sorted(os.path.join("archive", f) for f in os.listdir(os.path.join(ASSETS, "archive"))
                    if f.startswith("deck-") and f.endswith(".html"))
     bad = []
     with sync_playwright() as pw:
@@ -1026,7 +1027,7 @@ def check_present(log):
 # ------------------------------------------------------- HTML · PPTX 내용 동기화
 
 def check_sync(log):
-    """같은 내용이 assets/deck-*.html 과 pptx/content.js 두 곳에 있다.
+    """같은 내용이 assets/archive/deck-*.html 과 pptx/content.js 두 곳에 있다.
 
     합치지 않기로 했다. HTML 을 손으로 고치는 것이 이 시스템의 사용법이고,
     HTML 을 생성물로 만들면 그 사용법이 사라진다. 대신 갈라짐을 기계가 잡는다.

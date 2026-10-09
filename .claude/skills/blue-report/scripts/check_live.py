@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """블루 리포트 라이브 덱 점검기 — 고정 지면이 없는 발표 덱이다.
 
-    python3 check_live.py live-brief.html
-    python3 check_live.py live-brief.html --shots out/
+    python3 check_live.py live-standard.html
+    python3 check_live.py live-standard.html --shots out/
 
 check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과 24px 하한을
 본다. 라이브 계통은 한 장이 100dvh 이고 치수가 전부 rem 이라 px 하한이라는

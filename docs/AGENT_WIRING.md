@@ -57,8 +57,8 @@ claude.ai → 좌측 하단 이니셜 → Settings → **Instructions for Claude
 
     github.com/hctinno/hct-report-template   (기본 브랜치는 main 이 아니라 full/main)
 
-붙인 뒤 docs/CODEX_DECK_PROMPT.md 를 전부 읽고 그대로 수행한다. 그 문서에 슬라이드 덱 12종,
-A4 문서 4종, 웹 보드 5종의 목록과 각각의 --deck 이름, 금지 사항, 검사 절차가 들어 있다.
+붙인 뒤 docs/CODEX_DECK_PROMPT.md 를 전부 읽고 그대로 수행한다. 그 문서에 고르는 양식 4종(기준 덱 · 부품 카탈로그 ·
+회의록 · 관리보드)과 보관 양식의 목록과 각각의 --deck 이름, 금지 사항, 검사 절차가 들어 있다.
 덱과 A4 문서와 웹 보드는 규격이 서로 달라 바꿔 쓸 수 없다. 용도가 분명하지 않으면 먼저 묻는다.
 
 완료라고 말하기 전에 그 저장소의 검사 스크립트를 돌리고 결과를 함께 제시한다.

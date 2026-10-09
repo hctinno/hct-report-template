@@ -25,28 +25,34 @@ sys.path.insert(0, HERE)
 ROOT = os.path.dirname(HERE)
 ASSETS = os.path.join(ROOT, "assets")
 
-# 용도별 덱. 이름으로 고르거나 --deck 에 파일 경로를 직접 준다.
+# 고르는 양식은 넷이다. 나머지는 assets/archive/ 에 보관한다 — 이름으로 계속 부를 수 있고
+# 검사도 그대로 받지만, 안내·목록에는 나오지 않는다. 고정 지면 덱 12종은 PPTX 빌드
+# (pptx/content.js)가 내용을 맞춰 보는 원본이라 지우지 않고 보관만 했다.
+SELECTABLE = ("standard", "livecatalog", "minutes", "manage")
+ARCHIVE = "archive/"
+
+# 용도별 덱(보관). 이름으로 고르거나 --deck 에 파일 경로를 직접 준다.
 DECKS = {
-    "catalog":  "deck-template.html",         # 레이아웃 19종 카탈로그
-    "internal": "deck-internal-report.html",  # 사내 보고 (월간)
-    "weekly":   "deck-weekly-report.html",    # 조직 주간보고
-    "ax":       "deck-ax-weekly.html",        # AX 조직 주간보고 (1장 + 부록)
-    "team":     "deck-team-weekly.html",      # 팀 단위 압축 주간보고 (2장 · 가로)
-    "sales":    "deck-sales-proposal.html",   # 외부 제안·영업
-    "project":  "deck-project-report.html",   # 프로젝트 착수·완료
-    "training": "deck-training.html",         # 교육·기술 설명
-    "exec":     "deck-exec-report.html",      # 경영진 보고 (결론 먼저 · 6장)
-    "allhands": "deck-allhands.html",         # 전직원 보고 (타운홀)
-    "strategy": "deck-strategy-report.html",  # 전략 보고 (논증형 결정 요청 · 16장)
-    "report":   "deck-report.html",           # 고밀도 보고 (본문 14 + 부록 5 · 도해 중심)
+    "catalog":  ARCHIVE + "deck-template.html",         # 레이아웃 19종 카탈로그
+    "internal": ARCHIVE + "deck-internal-report.html",  # 사내 보고 (월간)
+    "weekly":   ARCHIVE + "deck-weekly-report.html",    # 조직 주간보고
+    "ax":       ARCHIVE + "deck-ax-weekly.html",        # AX 조직 주간보고 (1장 + 부록)
+    "team":     ARCHIVE + "deck-team-weekly.html",      # 팀 단위 압축 주간보고 (2장 · 가로)
+    "sales":    ARCHIVE + "deck-sales-proposal.html",   # 외부 제안·영업
+    "project":  ARCHIVE + "deck-project-report.html",   # 프로젝트 착수·완료
+    "training": ARCHIVE + "deck-training.html",         # 교육·기술 설명
+    "exec":     ARCHIVE + "deck-exec-report.html",      # 경영진 보고 (결론 먼저 · 6장)
+    "allhands": ARCHIVE + "deck-allhands.html",         # 전직원 보고 (타운홀)
+    "strategy": ARCHIVE + "deck-strategy-report.html",  # 전략 보고 (논증형 결정 요청 · 16장)
+    "report":   ARCHIVE + "deck-report.html",           # 고밀도 보고 (본문 14 + 부록 5 · 도해 중심)
 }
 
 # A4 문서. 덱과 달리 가로 슬라이드가 아니라 794x1123 세로 지면이다.
 DOCS = {
     "minutes": "doc-minutes.html",           # 회의록
-    "policy":  "doc-policy.html",            # 사규·규정 (조·항·호 · 개정 이력 · 결재란)
-    "manual":  "doc-manual.html",            # 매뉴얼·가이드 (목차 · 절차 단계 · 캡처)
-    "notice":  "doc-notice.html",            # 공지 (1쪽 완결)
+    "policy":  ARCHIVE + "doc-policy.html",            # 사규·규정 (조·항·호 · 개정 이력 · 결재란)
+    "manual":  ARCHIVE + "doc-manual.html",            # 매뉴얼·가이드 (목차 · 절차 단계 · 캡처)
+    "notice":  ARCHIVE + "doc-notice.html",            # 공지 (1쪽 완결)
 }
 
 # 웹 보드. 슬라이드도 A4 도 아닌 제3의 계통이다 — 지면 크기가 없고 화면 폭에
@@ -56,11 +62,11 @@ DOCS = {
 # 보드에 영영 닿지 않는다. exec·team 이 실제로 덱에 있어 그렇게 묻혔다.
 # 아래 NAMES 검사가 같은 실수를 다시 못 하게 막는다.
 BOARDS = {
-    "board":     "board-task.html",    # 과제 실행보드 — 레일 · KPI · 표 · 메모 (가장 작은 견본)
+    "board":     ARCHIVE + "board-task.html",    # 과제 실행보드 — 레일 · KPI · 표 · 메모 (가장 작은 견본)
     "manage":    "board-manage.html",  # 관리보드 — 절 12 · 표 8 대시보드형. 전사 여러 축을 한 화면에
-    "execboard": "board-exec.html",    # 실행보드 — 항목마다 상태 알약과 메모. 매일 움직이는 목록
-    "teamboard": "board-team.html",    # 팀보드 — 칸반 4열. 주간 회의에서 화면을 같이 보며 좁힐 때
-    "gapcheck":  "board-gap.html",     # 점검보드 — 공백 부모 + 대응 자식. 빠진 칸을 찾을 때
+    "execboard": ARCHIVE + "board-exec.html",    # 실행보드 — 항목마다 상태 알약과 메모. 매일 움직이는 목록
+    "teamboard": ARCHIVE + "board-team.html",    # 팀보드 — 칸반 4열. 주간 회의에서 화면을 같이 보며 좁힐 때
+    "gapcheck":  ARCHIVE + "board-gap.html",     # 점검보드 — 공백 부모 + 대응 자식. 빠진 칸을 찾을 때
 }
 
 # 라이브 덱 — 고정 지면이 없는 발표 계통. 한 장이 100dvh 이고 치수가 전부 rem 이다.
@@ -69,13 +75,16 @@ LIVE = {
     # 새 보고서는 standard 에서 시작한다. 레이아웃 어휘가 한 파일에 모여 있고
     # 머리띠·꼬리띠·로고·워터마크가 전부 달려 있다.
     "standard": "live-standard.html",  # 기준 덱 — 새 보고서의 출발점
-    "live": "live-brief.html",         # 라이브 브리핑 — 짧은 브리핑용 (견본)
+    "live": ARCHIVE + "live-brief.html",         # 라이브 브리핑 — 짧은 브리핑용 (견본)
     # 부품 견본첩. 기준 덱에 없는 부품·위젯·애니메이션을 장 단위로 복사해 쓴다.
     # 발표물이 아니라 견본이지만 검사는 똑같이 받는다 — 복사해 간 장이 그대로 통과해야 한다.
     "livecatalog": "live-catalog.html",  # 라이브 부품 카탈로그 (51장)
 }
 
 # 네 표의 이름이 겹치면 뒤에 오는 쪽이 통째로 묻힌다. 불러오는 순간 걸리게 둔다.
+_all = list(DECKS) + list(DOCS) + list(BOARDS) + list(LIVE)
+assert all(k in _all for k in SELECTABLE), "SELECTABLE 에 없는 이름"
+ARCHIVED = [k for k in _all if k not in SELECTABLE]
 _dup = ([k for k in DOCS if k in DECKS]
         + [k for k in BOARDS if k in DECKS or k in DOCS]
         + [k for k in LIVE if k in DECKS or k in DOCS or k in BOARDS])
@@ -278,6 +287,16 @@ SHEET = re.compile(r'<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"')
 SCRIPT = re.compile(r'<script[^>]+src="([^"]+)"')
 
 
+# 보관 견본은 assets/archive/ 에 있어 CSS·뷰어를 ../ 로 부른다. 산출물은 보관 폴더 밖에
+# 나가므로 읽자마자 ../ 를 떼어 assets/ 견본과 같은 모양으로 만든다 — 그래야 아래
+# copy_assets 와 단일 파일 인라인이 하나의 규칙(assets/ 기준 이름)으로 돈다.
+LOCAL_UP = re.compile(r'((?:href|src)=")(?:\.\./)+([^":/]+\.(?:css|js)")')
+
+
+def local_links(html):
+    return LOCAL_UP.sub(r"\1\2", html)
+
+
 def copy_assets(html, out):
     """단일 파일이 아닐 때, HTML 이 부르는 CSS · 뷰어 JS · 폰트를 결과물 옆에 같이 둔다.
 
@@ -325,11 +344,9 @@ def main():
     ap.add_argument("--single-file", action="store_true",
                     help="CSS까지 인라인해 파일 하나로 만든다")
     ap.add_argument("--title", help="이 덱의 문서명 (푸터에 들어간다). brand.json의 docTitle보다 우선한다")
-    ap.add_argument("--deck", default="catalog",
-                    help="덱 이름(" + " · ".join(DECKS) + ") · A4 문서 이름("
-                         + " · ".join(DOCS) + ") · 웹 보드 이름("
-                         + " · ".join(BOARDS) + ") · 라이브 덱 이름("
-                         + " · ".join(LIVE) + ") · 또는 HTML 파일 경로")
+    ap.add_argument("--deck", default="standard",
+                    help="양식 이름(" + " · ".join(SELECTABLE) + ") · 또는 HTML 파일 경로. "
+                         "보관 양식(" + " · ".join(ARCHIVED) + ")도 이름으로 부를 수 있다")
     a = ap.parse_args()
 
     brand = load_brand(a.brand)
@@ -348,14 +365,12 @@ def main():
     deck_path = resolve(a.deck)
     if not os.path.isfile(deck_path):
         sys.exit(f"오류: 덱·문서를 찾지 못했다 — {deck_path}\n"
-                 f"덱 이름: {' · '.join(DECKS)}\n"
-                 f"문서 이름: {' · '.join(DOCS)}\n"
-                 f"보드 이름: {' · '.join(BOARDS)}\n"
-                 f"라이브 이름: {' · '.join(LIVE)}")
+                 f"양식 이름: {' · '.join(SELECTABLE)}\n"
+                 f"보관 양식: {' · '.join(ARCHIVED)}")
     is_doc = os.path.basename(deck_path).startswith("doc-")
     print(f"{'문서' if is_doc else '덱'}: {os.path.basename(deck_path)}")
 
-    html = open(deck_path, encoding="utf-8").read()
+    html = local_links(open(deck_path, encoding="utf-8").read())
     m_title = re.search(r'data-deck-title="([^"]*)"', html)
     own_title = m_title.group(1) if m_title else ""
     html, n, left = apply(html, brand, uris, a.title)
