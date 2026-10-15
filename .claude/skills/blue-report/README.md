@@ -1059,12 +1059,13 @@ python3 scripts/check_live.py 보고서.html --shots out/
   <span data-pg aria-live="polite"></span>
   <button type="button" data-act="next" aria-label="다음 장">›</button>
   <span class="bl-hud-sep" aria-hidden="true"></span>
-  <button type="button" data-act="expand" aria-pressed="true">펼침<kbd>E</kbd></button>
-  <button type="button" data-act="horiz" aria-pressed="false">가로<kbd>H</kbd></button>
-  <button type="button" data-act="notes" aria-pressed="false">메모<kbd>N</kbd></button>
+  <button type="button" data-act="expand" aria-pressed="true">펼침<kbd>X</kbd></button>
+  <button type="button" data-act="horiz" aria-pressed="false">가로<kbd>V</kbd></button>
+  <button type="button" data-act="notes" aria-pressed="false">메모<kbd>M</kbd></button>
   <button type="button" data-act="laser" aria-pressed="false">레이저<kbd>L</kbd></button>
-  <button type="button" data-act="present">발표<kbd>F</kbd></button>
-  <button type="button" data-act="script">대본<kbd>S</kbd></button>
+  <button type="button" data-act="pen" aria-pressed="false">펜<kbd>P</kbd></button>
+  <button type="button" data-act="present">발표<kbd>Shift+F5</kbd></button>
+  <button type="button" data-act="script">대본<kbd>Alt+F5</kbd></button>
   <button type="button" data-act="help" aria-label="단축키 도움말">?</button>
 </div>
 <div id="bl-jump" hidden aria-hidden="true"></div>
@@ -1341,20 +1342,44 @@ data-type="video/webm">` 에 base64. 처음 열 때 한 번만 풀어 둔다. �
 
 ### 발표 — 키 · 모드 · 대본 창
 
+**단축키는 파워포인트 슬라이드 쇼와 같다.** 파워포인트를 써 본 사람이면 따로 배우지 않고 발표한다.
+파워포인트에 없는 우리 기능(메모 · 펼침 · 가로)만 파워포인트가 쓰지 않는 글자에 두었다.
+
 | 조작 | 키 | 비고 |
 |---|---|---|
-| 넘김 | ← → ↑ ↓ · PgUp PgDn · Space | 단계가 있으면 단계부터. 발표 중 화면 클릭도 다음 |
+| 처음부터 발표 | F5 | 전체화면 · 조작판 · 진행선 · 커서 숨김 · 레이저 저절로 켜짐 |
+| 이 장부터 발표 | Shift+F5 (F) | 다시 누르면 끝. 창을 화면 크기로 키우거나 F11 도 발표 |
+| 발표자 보기(대본 창) | Alt+F5 (S) | 두 번째 화면용. 팝업이 막히면 같은 창 오른쪽에 |
+| 다음 | → ↓ · PgDn · Space · Enter · N | 단계가 있으면 단계부터. 발표 중 화면 클릭도 다음 |
+| 이전 | ← ↑ · PgUp · Backspace | |
+| 처음 · 끝 | Home · End | |
 | 쪽 이동 | 숫자 Enter · `0` 표지 · `a` 숫자 Enter | 세 자리까지 · 3초 안에 · Backspace 지움 · 없는 쪽은 「없음」 |
-| 처음 · 끝 | Home End | |
-| 펼침 | E | 단계 전부 보기 ↔ 한 단계씩 |
-| 가로 보기 | H | 휠 한 칸 = 한 장 |
-| 메모 | N | 지금 장의 발표자 노트를 지면 아래에 |
-| 발표 | F · F11 | 전체화면 · 조작판 · 진행선 · 커서 숨김 · 레이저 저절로 켜짐 |
-| 레이저 | L | |
-| 대본 창 | S · P | 두 번째 화면용. 팝업이 막히면 같은 창 오른쪽에 |
-| 도움말 · 닫기 | ? · Esc | 겹창 → 숫자 입력 → 도움말 → 발표 순으로 닫는다 |
+| 검은 화면 · 흰 화면 | B (.) · W (,) | 아무 키나 누르면 돌아온다 |
+| 펜 | P · Ctrl+P | 화면에 쓴다. 다시 누르거나 Esc 로 끄면 레이저로 돌아간다. 도구판에서 색(빨강 · 파랑 · 검정) |
+| 형광펜 · 지우개 | Ctrl+I · Ctrl+E | 지우개는 닿은 획을 지운다 |
+| 필기 지우기 · 숨기기 | E · Ctrl+M | E 는 이 장만. 필기는 장마다 남고 창을 닫으면 사라진다(파일에 안 남음) |
+| 펜 끄기 | Ctrl+A · Esc | |
+| 레이저 | Ctrl+L (L) | 발표 모드에서는 저절로 켜진다 |
+| 메모 | M | 지금 장의 발표자 노트를 지면 아래에 |
+| 펼침 | X | 단계 전부 보기 ↔ 한 단계씩 |
+| 가로 보기 | V | 휠 한 칸 = 한 장 |
+| 도움말 · 닫기 | F1 (?) · Esc | Esc 는 겹창 → 숫자 입력 → 도움말 → 펜 → 발표 순으로 닫는다 |
 
-- 글자 키는 물리 위치로 읽는다 — 한글 입력 상태에서도 E · H · N · F · L · P · S 가 그대로 듣는다.
+괄호 안은 예전 키(별칭)다. 그대로 듣지만 조작판에는 파워포인트 키를 적는다.
+
+**키를 바꾸려면** 덱 끝(뷰어 스크립트 앞)에 JSON 을 둔다. 적은 동작만 바뀌고 나머지는 그대로다.
+도움말 · 조작판 단추 글자가 함께 바뀐다.
+
+```html
+<script type="application/json" id="bl-keys">{"pen": ["p", "ctrl+p"], "notes": ["m"]}</script>
+```
+
+동작 이름 — `next` `prev` `first` `last` `fromStart` `fromHere` `presenter` `black` `white` `pen`
+`highlighter` `eraser` `erase` `ink` `arrow` `laser` `notes` `expand` `horiz` `help`.
+키 이름 — 글자 · `f1`~`f12` · `arrowright` 등 · `space` · `enter` · `backspace` · `pageup` · `home` ·
+`.` `,` `?`. 조합은 `ctrl+` · `alt+` · `shift+` (맥의 ⌘ 는 `ctrl`).
+
+- 글자 키는 물리 위치로 읽는다 — 한글 입력 상태에서도 P · B · W · M 이 그대로 듣는다.
 - 발표 중 화면 아래 끝에 마우스를 대면 조작판이 잠깐 보인다. 창을 화면 크기로 키우거나
   F11 을 눌러도 발표 모드로 들어간다.
 - 발표 중 화면 클릭은 「다음」이다. 단추 · 칩 · 탭 · 고르기 카드 같은 조작 요소는 빠진다.

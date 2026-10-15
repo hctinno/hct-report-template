@@ -747,10 +747,10 @@ def _engine_once(log, label, path):
         expect(J("__t.cur()") == here and J("__t.on('#bl-jump.is-bad')"), "없는 쪽 999 → 제자리 · 「없음」 표시")
 
         # 메모 · 도움말 (발표 밖에서)
-        key("n"); wait()
+        key("m"); wait()
         expect(J("__t.on('#bl-notes') && document.getElementById('bl-notes').innerText.trim().length > 10"),
-               "N — 발표자 노트 띠")
-        key("n"); wait()
+               "M — 발표자 노트 띠")
+        key("m"); wait()
         key("Shift+Slash"); wait()
         expect(J("__t.on('#bl-help')"), "? — 단축키 도움말")
         key("Escape"); wait()
@@ -759,8 +759,9 @@ def _engine_once(log, label, path):
         # 발표 · 단계 · 레이저
         go("gantt")
         g = J("__t.idx('gantt')")
-        key("f"); wait(600)
-        expect(J("document.getElementById('deck').classList.contains('bl-deck--present')"), "F — 발표 모드")
+        key("Shift+F5"); wait(600)
+        expect(J("document.getElementById('deck').classList.contains('bl-deck--present')") and J("__t.cur()") == g,
+               "Shift+F5 — 이 장부터 발표")
         expect(J("getComputedStyle(document.querySelector('.bl-hud')).display") == "none", "발표 중 조작판 숨김")
         expect(J("document.body.classList.contains('laser')"), "발표 모드에서 레이저 저절로 켜짐")
         s0, tot = J("__t.shown('gantt')")
@@ -772,11 +773,30 @@ def _engine_once(log, label, path):
         expect(J("__t.cur()") == g + 1, "단계를 다 연 뒤 → 는 다음 장")
         key("ArrowLeft"); wait(450)
         expect(J("__t.cur()") == g and J("__t.shown('gantt')")[0] == tot, "← 로 돌아오면 단계가 다 열린 채")
-        key("l"); wait()
-        expect(not J("document.body.classList.contains('laser')"), "L — 레이저 끔")
-        key("l"); wait()
+        key("Control+l"); wait()
+        expect(not J("document.body.classList.contains('laser')"), "Ctrl+L — 레이저 끔")
+        key("Control+l"); wait()
+        # 파워포인트 화면 키 — 검은 화면 · 펜 · 형광펜 · 지우기
+        c = J("__t.cur()")
+        key("b"); wait()
+        expect(J("__t.on('#bl-blank.is-black')"), "B — 검은 화면")
+        key("ArrowRight"); wait()
+        expect(not J("__t.on('#bl-blank')") and J("__t.cur()") == c, "아무 키 — 검은 화면에서 돌아옴(장 그대로)")
+        key("p"); wait()
+        expect(J("document.body.classList.contains('inking')") and J("__t.on('#bl-inkbar')"), "P — 펜 · 도구판")
+        pg.mouse.move(500, 400); pg.mouse.down(); pg.mouse.move(700, 460, steps=8); pg.mouse.up(); wait()
+        expect(J("(blDeck.ink[blDeck.index] || []).length") == 1 and J("__t.cur()") == c, "펜 한 획 · 장 안 넘어감")
+        key("e"); wait()
+        expect(J("(blDeck.ink[blDeck.index] || []).length") == 0, "E — 이 장 필기 지움")
+        key("Escape"); wait()
+        expect(not J("document.body.classList.contains('inking')") and J("document.body.classList.contains('laser')")
+               and J("document.getElementById('deck').classList.contains('bl-deck--present')"), "Esc — 펜만 끄고 발표는 계속")
         key("Escape"); wait(600)
         expect(not J("document.getElementById('deck').classList.contains('bl-deck--present')"), "Esc — 발표 끝")
+        key("F5"); wait(600)
+        expect(J("document.getElementById('deck').classList.contains('bl-deck--present')") and J("__t.cur()") == 0,
+               "F5 — 처음부터 발표")
+        key("Escape"); wait(600)
 
         # 겹창 — 열려 있는 동안 키가 뒤의 덱으로 새지 않는다
         go("hcard")
@@ -830,20 +850,20 @@ def _engine_once(log, label, path):
         # 대본 창 — 팝업 · 팝업이 막힌 창의 같은 창 패널
         try:
             with pg.expect_popup(timeout=4000) as pop:
-                key("p")
+                key("Alt+F5")
             pw_ = pop.value
             pw_.wait_for_timeout(500)
-            expect(len(pw_.evaluate("document.getElementById('root').innerText")) > 20, "P — 대본 팝업에 노트")
-            key("p"); wait(400)
-            expect(pw_.is_closed(), "P 다시 — 대본 팝업 닫힘")
+            expect(len(pw_.evaluate("document.getElementById('root').innerText")) > 20, "Alt+F5 — 발표자 보기 팝업에 노트")
+            key("Alt+F5"); wait(400)
+            expect(pw_.is_closed(), "Alt+F5 다시 — 발표자 보기 닫힘")
         except Exception as e:  # noqa: BLE001
-            bad.append(f"P — 대본 팝업이 열리지 않음 ({str(e).splitlines()[0][:80]})")
+            bad.append(f"Alt+F5 — 발표자 보기 팝업이 열리지 않음 ({str(e).splitlines()[0][:80]})")
         J("window.open = () => null")
-        key("p"); wait(400)
+        key("Alt+F5"); wait(400)
         expect(J("__t.on('#bl-scr') && document.documentElement.classList.contains('bl-scr')"),
                "팝업이 막히면 같은 창 오른쪽에 대본")
-        key("p"); wait()
-        expect(not J("__t.on('#bl-scr')"), "P 다시 — 대본 패널 닫힘")
+        key("Alt+F5"); wait()
+        expect(not J("__t.on('#bl-scr')"), "Alt+F5 다시 — 대본 패널 닫힘")
         br.close()
 
     if errs:

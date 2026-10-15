@@ -14,6 +14,18 @@ claude plugin marketplace update blue-tools   # 최신판 받기
 
 ---
 
+## 1.7.0 — 2026-10-15
+
+**발표 단축키를 파워포인트와 같게 했다** — F5 처음부터 · Shift+F5 이 장부터 · Alt+F5 발표자 보기 ·
+B/W 검은·흰 화면 · P 펜 · Ctrl+I 형광펜 · Ctrl+E 지우개 · E 필기 지우기 · Ctrl+M 필기 숨김 ·
+Ctrl+L 레이저 · F1 도움말. 우리 기능은 M 메모 · X 펼침 · V 가로.
+
+- 발표 중 펜으로 화면에 쓴다(도구판 — 펜 · 형광펜 · 지우개 · 색 · 모두 지우기)
+- 덱의 `<script type="application/json" id="bl-keys">` 로 키를 바꿀 수 있다
+- 예전 키 F · S · L 은 별칭으로 남겼다
+
+---
+
 ## 1.6.0 — 2026-10-08
 
 **고르는 양식을 넷으로 줄였다** — 기준 덱(`standard`) · 라이브 부품 카탈로그(`livecatalog`) ·

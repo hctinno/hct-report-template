@@ -71,7 +71,8 @@ simulation, evidence/document/video overlay)? Copy **the whole slide** from `liv
 your deck and replace its content. Each catalog slide names its component and code in the top rail
 (C01, T03, …). Do not invent class names — a class that is not in `blue-live.css` does nothing.
 The component index, widget attributes, data formats (evidence JSON, stacked-bar JSON, document,
-video), speaker-note syntax and keyboard map are in `.claude/skills/blue-report/README.md`, chapter
+video), speaker-note syntax and keyboard map (PowerPoint slide-show keys: F5, Shift+F5, Alt+F5, B/W, P pen,
+Ctrl+I/E, F1; overridable with `<script type="application/json" id="bl-keys">`) are in `.claude/skills/blue-report/README.md`, chapter
 「6-3. 라이브 덱」.
 
 Colour comes from `data-c="1"…"6" | navy | ok | warn | alert | mute`, never an inline colour.
