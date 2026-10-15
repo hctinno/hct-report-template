@@ -121,8 +121,10 @@ python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file 
 그 아래) · 제목은 「주장 — `<em>`핵심구`</em>`」 · 본문 덩어리는 `.bl-mid` 로 세로 가운데 ·
 지면 본문은 개조식 · 마무리는 「질의응답」으로 닫는다 · 쪽번호와 문서명은 비워 둔다(엔진이 채운다).
 
-발표 키 — ← → 넘김(단계 먼저) · 숫자 Enter 쪽 이동 · `0` 표지 · `a` 부록 쪽번호 · F 발표(전체화면 ·
-레이저) · L 레이저 · S/P 대본 창 · N 메모 · E 펼침 · H 가로 · ? 도움말 · Esc 닫기.
+발표 키 — **파워포인트 슬라이드 쇼와 같다.** F5 처음부터 · Shift+F5 이 장부터 · Alt+F5 발표자 보기(대본) ·
+→ Space Enter N 다음 · ← Backspace 이전 · 숫자 Enter 쪽 이동 · B/W 검은·흰 화면 · P(Ctrl+P) 펜 · Ctrl+I 형광펜 ·
+Ctrl+E 지우개 · E 필기 지우기 · Ctrl+M 필기 숨김 · Ctrl+L 레이저 · F1 도움말 · Esc 닫기. 우리 기능은 M 메모 ·
+X 펼침 · V 가로. 덱마다 바꾸려면 `<script type="application/json" id="bl-keys">` — README 「6-3」.
 
 ## 3. 차트와 도해는 반드시 스크립트로 만든다
 

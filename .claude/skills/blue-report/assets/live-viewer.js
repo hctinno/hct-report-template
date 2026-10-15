@@ -7,7 +7,11 @@
 //   넘김      ← → ↑ ↓ · PgUp PgDn · Space · Home End · 발표 중 화면 클릭 · 가로 보기 휠 · 밀기
 //   단계      data-f="1" 부터. 같은 번호는 함께 열린다. 번호를 건너뛰어도 된다
 //   쪽 이동   숫자 + Enter = 그 쪽번호. 0 = 표지. a(ㅁ) 를 먼저 누르면 부록 쪽번호
-//   모드      E 펼침 · H 가로 · N 메모 · F 발표(전체화면) · L 레이저 · P(S) 대본 창 · ? 도움말
+//   단축키    파워포인트 슬라이드 쇼를 따른다 — F5 처음부터 · Shift+F5 이 장부터 · Alt+F5 발표자
+//             보기 · B 검은 화면 · W 흰 화면 · P(Ctrl+P) 펜 · Ctrl+I 형광펜 · Ctrl+E 지우개 ·
+//             E 필기 지우기 · Ctrl+M 필기 숨김 · Ctrl+A 펜 끄기 · Ctrl+L 레이저 · F1 도움말.
+//             우리 기능은 빈 글자에 — M 메모 · X 펼침 · V 가로. 표 KEYMAP 이 한 곳이고, 덱의
+//             <script type="application/json" id="bl-keys"> 로 바꿀 수 있다
 //   발표 중   레이저가 저절로 켜지고 커서 · 조작판 · 진행선이 숨는다. 화면 아래 끝에
 //             마우스를 대면 조작판이 잠깐 보인다. 창을 화면 크기로 키우거나 F11 을 눌러도
 //             발표 모드로 들어간다
@@ -311,6 +315,7 @@
     B.classList.toggle('present', on);
     B.classList.remove('peek');
     stepAt[i] = 0;
+    if (!on) { setTool(null); setBlank(null); }
     setLaser(on);
     if (on) timerReset();
     sync();
@@ -369,7 +374,7 @@
   // 발표 중 조작판 엿보기 — 화면 아래 끝에 마우스를 대면 잠깐 보인다
   var peekT = 0;
   D.addEventListener('mousemove', function (e) {
-    if (laserOn) placeLaser(e.clientX, e.clientY);
+    if (laserOn && !tool) placeLaser(e.clientX, e.clientY);
     if (!isPresent()) return;
     var near = e.clientY > W.innerHeight - 78;
     if (near) { clearTimeout(peekT); B.classList.add('peek'); }
@@ -543,14 +548,6 @@
   }
 
   // ── 도움말 ────────────────────────────────────────────────────────────
-  var KEYS = [
-    ['← → ↑ ↓', '이전 · 다음 (단계 포함)'], ['Space · PgDn', '다음'],
-    ['숫자 Enter', '그 쪽으로 이동 · 0 은 표지'], ['a 숫자 Enter', '부록 쪽으로 이동'],
-    ['Home End', '처음 · 끝'], ['E', '펼침 — 단계 전부 보기 · 끄면 한 단계씩'],
-    ['H', '가로 보기'], ['N', '메모 — 이 장의 발표자 노트'], ['F', '발표 — 전체화면 · 레이저'],
-    ['L', '레이저'], ['P', '대본 창 — 타이머 · 배정 시간 · 편집'], ['?', '이 도움말'],
-    ['Esc', '닫기 · 발표 끝']
-  ];
   var helpEl = null;
   function helpOn() { return !!(helpEl && !helpEl.hidden); }
   function toggleHelp() {
@@ -558,7 +555,8 @@
       helpEl = mk('div'); helpEl.id = 'bl-help';
       helpEl.setAttribute('role', 'dialog'); helpEl.setAttribute('aria-label', '단축키');
       var dl = mk('dl');
-      KEYS.forEach(function (k) { dl.appendChild(mk('dt', null, k[0])); dl.appendChild(mk('dd', null, k[1])); });
+      helpRows().forEach(function (k) { dl.appendChild(mk('dt', null, k[0])); dl.appendChild(mk('dd', null, k[1])); });
+      dl.appendChild(mk('p', 'bl-help-note', '파워포인트 슬라이드 쇼 단축키와 같다 · 덱의 #bl-keys 로 바꿀 수 있다'));
       helpEl.appendChild(dl);
       helpEl.hidden = true;
       helpEl.addEventListener('click', function () { helpEl.hidden = true; });
@@ -805,8 +803,9 @@
   function popupKey(e) {
     if (e.target && /^(TEXTAREA|INPUT)$/.test(e.target.tagName)) { fieldKey(e); return; }
     var k = e.key;
-    if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') { e.preventDefault(); next(); }
-    else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); prev(); }
+    var act = KEYIDX[comboOf(e)];
+    if (act === 'next') { e.preventDefault(); next(); }
+    else if (act === 'prev') { e.preventDefault(); prev(); }
     else if (k === 'Home') { e.preventDefault(); goTo(0); }
     else if (k === 'End') { e.preventDefault(); goTo(slides.length - 1); }
   }
@@ -2118,7 +2117,8 @@
 
   // 발표 중 화면 클릭 = 다음. 단추 · 칩 · 고르기 카드 같은 것은 빼고
   deck.addEventListener('click', function (e) {
-    if (!isPresent() || topModal()) return;
+    if (!isPresent() || topModal() || tool) return;
+    if (blankMode) { setBlank(null); return; }
     if (e.target.closest && e.target.closest(INTERACTIVE)) {
       // 단추를 누른 뒤에도 Space 가 「다음」이 되게 초점을 덱으로 돌린다
       setTimeout(function () { try { deck.focus({ preventScroll: true }); } catch (er) { /* 무시 */ } }, 0);
@@ -2128,6 +2128,259 @@
     if (peekSeqClick()) return;
     next();
   });
+
+  // ── 단축키 표 ─────────────────────────────────────────────────────────
+  // 파워포인트 슬라이드 쇼 단축키를 그대로 쓴다. 처음 보는 사람도 손에 익은 키로 발표하게.
+  // 파워포인트에 없는 우리 기능(메모 · 펼침 · 가로)은 파워포인트가 쓰지 않는 글자에 둔다.
+  // 표가 한 곳이다 — 도움말 · 조작판 글자 · 키 처리가 전부 여기서 읽는다. 덱마다 바꾸려면
+  //   <script type="application/json" id="bl-keys">{"pen": ["p", "ctrl+p"], "notes": ["m"]}</script>
+  // 키 이름: 글자 · f1~f12 · arrowright 등 · space · enter · backspace · pageup · home · . , ?
+  // 조합은 ctrl+ · alt+ · shift+ (맥의 ⌘ 는 ctrl 로 본다)
+  var KEYMAP = {
+    next:        { keys: ['arrowright', 'arrowdown', 'pagedown', 'space', 'enter', 'n'], hud: 'arrowright', label: '다음 (단계 먼저)' },
+    prev:        { keys: ['arrowleft', 'arrowup', 'pageup', 'backspace'], hud: 'arrowleft', label: '이전' },
+    first:       { keys: ['home'], label: '첫 장' },
+    last:        { keys: ['end'], label: '마지막 장' },
+    fromStart:   { keys: ['f5'], label: '처음부터 발표' },
+    fromHere:    { keys: ['shift+f5', 'f'], hud: 'shift+f5', label: '이 장부터 발표 · 다시 누르면 끝' },
+    presenter:   { keys: ['alt+f5', 's'], hud: 'alt+f5', label: '발표자 보기 — 대본 · 타이머 · 다음 장' },
+    black:       { keys: ['b', '.'], label: '검은 화면 · 아무 키나 누르면 돌아옴' },
+    white:       { keys: ['w', ','], label: '흰 화면 · 아무 키나 누르면 돌아옴' },
+    pen:         { keys: ['p', 'ctrl+p'], hud: 'p', label: '펜 — 화면에 쓰기 · 다시 누르면 끔' },
+    highlighter: { keys: ['ctrl+i'], label: '형광펜' },
+    eraser:      { keys: ['ctrl+e'], label: '지우개 — 닿은 획 지우기' },
+    erase:       { keys: ['e'], label: '이 장 필기 모두 지우기' },
+    ink:         { keys: ['ctrl+m'], label: '필기 보이기 · 숨기기' },
+    arrow:       { keys: ['ctrl+a'], label: '펜 끄기 (레이저로 돌아감)' },
+    laser:       { keys: ['ctrl+l', 'l'], hud: 'l', label: '레이저 켜기 · 끄기' },
+    notes:       { keys: ['m'], label: '메모 — 이 장의 발표자 노트' },
+    expand:      { keys: ['x'], label: '펼침 — 단계 전부 보기 · 끄면 한 단계씩' },
+    horiz:       { keys: ['v'], label: '가로 보기' },
+    help:        { keys: ['f1', '?'], hud: '?', label: '이 도움말' }
+  };
+  (function () {
+    var o = null;
+    try {
+      var el = D.getElementById('bl-keys');
+      if (el) o = JSON.parse(el.textContent);
+      else if (W.BL_KEYS) o = W.BL_KEYS;
+    } catch (er) { if (W.console) console.warn('bl-keys JSON 을 읽지 못했다', er); }
+    if (!o) return;
+    Object.keys(o).forEach(function (a) {
+      if (!KEYMAP[a]) { if (W.console) console.warn('bl-keys — 모르는 동작:', a); return; }
+      var ks = [].concat(o[a]).map(function (x) { return String(x).toLowerCase().replace(/\s+/g, ''); });
+      KEYMAP[a].keys = ks;
+      if (ks.indexOf(KEYMAP[a].hud) < 0) KEYMAP[a].hud = ks[0];
+    });
+  })();
+  var KEYIDX = {};
+  Object.keys(KEYMAP).forEach(function (a) { KEYMAP[a].keys.forEach(function (c) { KEYIDX[c] = a; }); });
+
+  // 눌린 키를 표의 이름으로. 글자는 물리 위치(code)로 본다 — 한글 입력 중에도 P · B · W 가 듣는다.
+  // 기호(? . ,)는 Shift 를 따지지 않는다 — ? 는 이미 Shift 를 누른 글자다.
+  function comboOf(e) {
+    var k = e.key || '', c = e.code || '', main;
+    if (/^Key[A-Z]$/.test(c)) main = c.slice(3).toLowerCase();
+    else if (k === ' ') main = 'space';
+    else main = k.toLowerCase();
+    var named = main.length > 1 || /^[a-z]$/.test(main);
+    return (e.ctrlKey || e.metaKey ? 'ctrl+' : '') + (e.altKey ? 'alt+' : '') +
+           (e.shiftKey && named ? 'shift+' : '') + main;
+  }
+  var PRETTY = { arrowright: '→', arrowleft: '←', arrowup: '↑', arrowdown: '↓', pagedown: 'PgDn', pageup: 'PgUp',
+                 space: 'Space', enter: 'Enter', backspace: 'Backspace', home: 'Home', end: 'End', escape: 'Esc' };
+  function pretty(c) {
+    return c.split('+').map(function (p) {
+      if (p === 'ctrl') return 'Ctrl'; if (p === 'alt') return 'Alt'; if (p === 'shift') return 'Shift';
+      return PRETTY[p] || p.toUpperCase();
+    }).join('+');
+  }
+  function helpRows() {
+    var rows = Object.keys(KEYMAP).map(function (a) {
+      return [KEYMAP[a].keys.map(pretty).join(' · '), KEYMAP[a].label];
+    });
+    rows.splice(4, 0, ['숫자 Enter', '그 쪽으로 이동 · 0 은 표지'], ['a 숫자 Enter', '부록 쪽으로 이동']);
+    rows.push(['Esc', '닫기 · 펜 끄기 · 발표 끝']);
+    return rows;
+  }
+
+  // ── 검은 화면 · 흰 화면 ───────────────────────────────────────────────
+  var blankEl = null, blankMode = null;
+  function setBlank(m) {
+    blankMode = m && blankMode !== m ? m : null;
+    if (!blankEl && !blankMode) return;
+    if (!blankEl) {
+      blankEl = mk('div'); blankEl.id = 'bl-blank'; blankEl.setAttribute('aria-hidden', 'true');
+      blankEl.addEventListener('click', function () { setBlank(null); });
+      B.appendChild(blankEl);
+    }
+    blankEl.className = blankMode ? 'is-' + blankMode : '';
+    blankEl.hidden = !blankMode;
+    emit('deck:blank', { mode: blankMode });
+  }
+
+  // ── 필기 — 펜 · 형광펜 · 지우개 ─────────────────────────────────────
+  // 장마다 투명 캔버스를 한 장 깐다. 획은 장 크기에 대한 비율로 적어 두어 창 크기가 바뀌거나
+  // 가로 보기로 바꿔도 같은 자리에 다시 그린다. 필기는 이 창에만 있다 — 파일에는 남지 않는다.
+  var tool = null, inkHidden = false, penColor = '--br-alert-text', INK = {};
+  var PEN_COLORS = [['--br-alert-text', '빨강'], ['--br-cobalt', '파랑'], ['--br-text', '검정']];
+  function tok(name) { return getComputedStyle(R).getPropertyValue(name).trim() || 'crimson'; }
+  function inkOf(s) {
+    var c = s.querySelector(':scope > canvas.bl-ink');
+    if (c) return c;
+    c = mk('canvas', 'bl-ink'); c.setAttribute('aria-hidden', 'true');
+    s.appendChild(c);
+    bindInk(c, s);
+    sizeInk(c, s);
+    return c;
+  }
+  function sizeInk(c, s) {
+    var r = s.getBoundingClientRect(), d = W.devicePixelRatio || 1;
+    var w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    drawInk(slides.indexOf(s));
+  }
+  function drawInk(k) {
+    var s = slides[k], c = s && s.querySelector(':scope > canvas.bl-ink');
+    if (!c) return;
+    var g = c.getContext('2d');
+    g.clearRect(0, 0, c.width, c.height);
+    (INK[k] || []).forEach(function (st) {
+      g.save();
+      g.globalAlpha = st.hl ? 0.4 : 1;
+      if (st.hl) g.globalCompositeOperation = 'multiply';
+      g.strokeStyle = st.color; g.lineWidth = st.w * c.width;
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      g.beginPath();
+      st.pts.forEach(function (p, j) {
+        var x = p[0] * c.width, y = p[1] * c.height;
+        if (j) g.lineTo(x, y); else { g.moveTo(x, y); if (st.pts.length === 1) g.lineTo(x + 0.01, y); }
+      });
+      g.stroke();
+      g.restore();
+    });
+  }
+  function bindInk(c, s) {
+    var cur = null;
+    function pt(e) { var r = c.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }
+    function eraseAt(k, p) {
+      var r = c.getBoundingClientRect(), tx = 12 / r.width, ty = 12 / r.height, list = INK[k] || [];
+      var left = list.filter(function (st) {
+        return !st.pts.some(function (q) { return Math.abs(q[0] - p[0]) < tx && Math.abs(q[1] - p[1]) < ty; });
+      });
+      if (left.length !== list.length) { INK[k] = left; drawInk(k); }
+    }
+    c.addEventListener('pointerdown', function (e) {
+      if (!tool) return;
+      e.preventDefault(); e.stopPropagation();
+      try { c.setPointerCapture(e.pointerId); } catch (er) { /* 무시 */ }
+      var k = slides.indexOf(s);
+      if (tool === 'eraser') { cur = { k: k, erase: true }; eraseAt(k, pt(e)); return; }
+      var hl = tool === 'hl';
+      cur = { k: k, st: { hl: hl, color: tok(hl ? '--br-warn-line' : penColor), w: hl ? 0.016 : 0.0028, pts: [pt(e)] } };
+      (INK[k] = INK[k] || []).push(cur.st);
+      drawInk(k);
+    });
+    c.addEventListener('pointermove', function (e) {
+      if (!cur) return;
+      if (cur.erase) { eraseAt(cur.k, pt(e)); return; }
+      cur.st.pts.push(pt(e)); drawInk(cur.k);
+    });
+    function end() { cur = null; }
+    c.addEventListener('pointerup', end);
+    c.addEventListener('pointercancel', end);
+    c.addEventListener('click', function (e) { if (tool) e.stopPropagation(); });
+  }
+  function setTool(t) {
+    t = t || null;
+    if (t === tool) t = null;                       // 같은 키를 다시 누르면 끈다
+    tool = t;
+    B.classList.toggle('inking', !!tool);
+    B.setAttribute('data-ink', tool || '');
+    if (tool) {
+      slides.forEach(inkOf);
+      if (inkHidden) setInkHidden(false);
+      if (laserOn) setLaser(false);
+    } else if (isPresent() && !laserOn) {
+      setLaser(true);                                // 발표 중이면 레이저로 돌아간다
+    }
+    inkBar();
+    paintToggles();
+    emit('deck:ink', { tool: tool });
+  }
+  function setInkHidden(on) {
+    inkHidden = !!on;
+    B.classList.toggle('ink-hidden', inkHidden);
+    if (inkHidden && tool) setTool(null);
+    toast(inkHidden ? '필기 숨김 · ' + pretty(KEYMAP.ink.keys[0]) + ' 로 다시 보기' : '필기 보임');
+  }
+  function eraseSlide() {
+    if (!(INK[i] && INK[i].length)) return;
+    INK[i] = []; drawInk(i);
+    toast('이 장 필기를 지웠다');
+  }
+  W.addEventListener('resize', function () {
+    slides.forEach(function (s) { var c = s.querySelector(':scope > canvas.bl-ink'); if (c) sizeInk(c, s); });
+  });
+  D.addEventListener('deck:sync', function () {
+    if (!tool) return;
+    var s = slides[i], c = s && s.querySelector(':scope > canvas.bl-ink');
+    if (c) sizeInk(c, s);
+  });
+
+  // 필기 도구판 — 펜을 켜면 화면 위에 뜬다. 도구 · 색 · 지우기 · 끄기
+  var inkBarEl = null;
+  function inkBar() {
+    if (!tool) { if (inkBarEl) inkBarEl.hidden = true; return; }
+    if (!inkBarEl) {
+      inkBarEl = mk('div'); inkBarEl.id = 'bl-inkbar'; inkBarEl.setAttribute('role', 'toolbar');
+      inkBarEl.setAttribute('aria-label', '필기 도구');
+      function btn(label, title, fn, data) {
+        var b = mk('button', null, label); b.type = 'button'; b.title = title;
+        if (data) Object.keys(data).forEach(function (k2) { b.setAttribute(k2, data[k2]); });
+        b.addEventListener('click', function (e) { e.stopPropagation(); fn(); });
+        inkBarEl.appendChild(b);
+        return b;
+      }
+      btn('펜', '펜 · ' + KEYMAP.pen.keys.map(pretty).join(' / '), function () { if (tool !== 'pen') setTool('pen'); }, { 'data-tool': 'pen' });
+      btn('형광펜', '형광펜 · ' + KEYMAP.highlighter.keys.map(pretty).join(' / '), function () { if (tool !== 'hl') setTool('hl'); }, { 'data-tool': 'hl' });
+      btn('지우개', '지우개 · ' + KEYMAP.eraser.keys.map(pretty).join(' / '), function () { if (tool !== 'eraser') setTool('eraser'); }, { 'data-tool': 'eraser' });
+      PEN_COLORS.forEach(function (pc) {
+        var b = btn('', pc[1], function () { penColor = pc[0]; if (tool !== 'pen') setTool('pen'); else inkBar(); },
+                    { 'data-color': pc[0], 'aria-label': pc[1] + ' 펜' });
+        b.className = 'bl-ink-sw'; b.style.setProperty('--sw', 'var(' + pc[0] + ')');
+      });
+      btn('모두 지우기', '이 장 필기 모두 지우기 · ' + pretty(KEYMAP.erase.keys[0]), eraseSlide);
+      btn('끄기', '펜 끄기 · Esc', function () { setTool(null); });
+      B.appendChild(inkBarEl);
+    }
+    inkBarEl.hidden = false;
+    $$('[data-tool]', inkBarEl).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-tool') === tool ? 'true' : 'false'); });
+    $$('[data-color]', inkBarEl).forEach(function (b) { b.setAttribute('aria-pressed', tool === 'pen' && b.getAttribute('data-color') === penColor ? 'true' : 'false'); });
+  }
+
+  // 표의 동작 이름 → 할 일
+  var DO = {
+    next: next, prev: prev,
+    first: function () { goTo(0); },
+    last: function () { goTo(slides.length - 1); },
+    fromStart: function () { goTo(0); if (!isPresent()) enterPresent(null); },
+    fromHere: togglePresent,
+    presenter: openPresenter,
+    black: function () { setBlank('black'); },
+    white: function () { setBlank('white'); },
+    pen: function () { setTool('pen'); },
+    highlighter: function () { setTool('hl'); },
+    eraser: function () { setTool('eraser'); },
+    erase: eraseSlide,
+    ink: function () { setInkHidden(!inkHidden); },
+    arrow: function () { if (tool) setTool(null); },
+    laser: function () { if (tool) setTool(null); setLaser(!laserOn); },
+    notes: toggleNotes,
+    expand: toggleExpand,
+    horiz: toggleHoriz,
+    help: toggleHelp
+  };
 
   // ── 키 ────────────────────────────────────────────────────────────────
   var jbuf = '', japx = false, jtimer = 0, jel = null;
@@ -2174,32 +2427,35 @@
       return;
     }
     if (isField(e.target)) return;
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    var k = e.key, code = e.code;
+    if (/^(Control|Shift|Alt|Meta|Process|Unidentified)$/.test(e.key)) return;
+    var k = e.key, code = e.code, plain = !(e.ctrlKey || e.metaKey || e.altKey);
 
-    if (/^[0-9]$/.test(k)) { if (jbuf.length < 3) jbuf += k; jumpShow(); e.preventDefault(); return; }
+    // 검은·흰 화면은 아무 키나 누르면 돌아온다 — 파워포인트와 같다
+    if (blankMode) { setBlank(null); e.preventDefault(); return; }
+
+    if (plain && /^[0-9]$/.test(k)) { if (jbuf.length < 3) jbuf += k; jumpShow(); e.preventDefault(); return; }
     if (jbuf || japx) {
       if (k === 'Enter') { if (jbuf) jumpGo(); e.preventDefault(); return; }
       if (k === 'Backspace') { jbuf = jbuf.slice(0, -1); jumpShow(); e.preventDefault(); return; }
       if (k === 'Escape') { jbuf = ''; japx = false; jumpShow(); e.preventDefault(); return; }
     }
-    if (!jbuf && (code === 'KeyA' || k === 'a' || k === 'A' || k === 'ㅁ')) { japx = !japx; jumpShow(); e.preventDefault(); return; }
-    if (helpOn() && (k === 'Escape' || k === '?')) { toggleHelp(); e.preventDefault(); return; }
-
-    if ((k === ' ' || k === 'Enter') && isActivator(e.target)) return;   // 초점 받은 단추는 제 일을 한다
-    if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') { next(); e.preventDefault(); return; }
-    if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { prev(); e.preventDefault(); return; }
-    if (k === 'Home') { goTo(0); e.preventDefault(); return; }
-    if (k === 'End') { goTo(slides.length - 1); e.preventDefault(); return; }
-    if (k === '?' || (code === 'Slash' && e.shiftKey)) { toggleHelp(); e.preventDefault(); return; }
-    // 글자 키는 물리 위치(code)로 본다 — 한글 입력 상태에서도 E · H · N · F · L · P 가 그대로 듣는다
-    if (code === 'KeyE') { toggleExpand(); e.preventDefault(); return; }
-    if (code === 'KeyH') { toggleHoriz(); e.preventDefault(); return; }
-    if (code === 'KeyN') { toggleNotes(); e.preventDefault(); return; }
-    if (code === 'KeyF') { togglePresent(); e.preventDefault(); return; }
-    if (code === 'KeyL') { setLaser(!laserOn); e.preventDefault(); return; }
-    if (code === 'KeyP' || code === 'KeyS') { openPresenter(); e.preventDefault(); return; }
-    if (k === 'Escape' && isPresent()) { exitPresent(); e.preventDefault(); }
+    if (plain && !jbuf && (code === 'KeyA' || k === 'a' || k === 'A' || k === 'ㅁ')) {
+      japx = !japx; jumpShow(); e.preventDefault(); return;
+    }
+    // Esc 는 하나씩 닫는다 — 도움말 → 펜 → 발표
+    if (k === 'Escape') {
+      if (helpOn()) toggleHelp();
+      else if (tool) setTool(null);
+      else if (isPresent()) exitPresent();
+      else return;
+      e.preventDefault(); return;
+    }
+    if ((k === ' ' || k === 'Enter') && plain && isActivator(e.target)) return;   // 초점 받은 단추는 제 일을 한다
+    var act = KEYIDX[comboOf(e)];
+    if (!act) return;
+    if (helpOn() && act !== 'help') toggleHelp();
+    e.preventDefault();
+    DO[act]();
   }, true);
 
   // ── 조작판 ────────────────────────────────────────────────────────────
@@ -2215,15 +2471,22 @@
     set('laser', laserOn);
     set('present', isPresent());
     set('script', presenterOpen());
+    set('pen', tool === 'pen' || tool === 'hl');
   }
   var ACTS = {
     prev: prev, next: next, present: togglePresent, script: openPresenter, presenter: openPresenter,
     expand: toggleExpand, horiz: toggleHoriz, notes: toggleNotes, help: toggleHelp,
-    laser: function () { setLaser(!laserOn); }
+    laser: function () { setLaser(!laserOn); },
+    pen: function () { setTool(tool === 'pen' ? null : 'pen'); }
   };
+  // 단추에 적힌 단축키도 표에서 가져온다 — 표를 바꾸면 단추 글자도 따라 바뀐다
+  var ACT_KEY = { prev: 'prev', next: 'next', present: 'fromHere', script: 'presenter', presenter: 'presenter',
+                  expand: 'expand', horiz: 'horiz', notes: 'notes', help: 'help', laser: 'laser', pen: 'pen' };
   $$('[data-act]').forEach(function (b) {
-    var fn = ACTS[b.getAttribute('data-act')];
+    var a = b.getAttribute('data-act'), fn = ACTS[a];
     if (fn) b.onclick = fn;
+    var kb = b.querySelector('kbd'), km = KEYMAP[ACT_KEY[a]];
+    if (kb && km) kb.textContent = pretty(km.hud || km.keys[0]);
   });
   // 예전 덱의 id 방식도 받아 준다
   var pb = D.getElementById('bl-present');
@@ -2245,5 +2508,6 @@
   // 다른 스크립트가 덱을 움직일 수 있게 최소한만 내놓는다
   W.blDeck = { go: function (n) { goTo(n); }, next: next, prev: prev, present: togglePresent,
                laser: function (on) { setLaser(on == null ? !laserOn : on); }, presenter: openPresenter,
+               tool: function (t) { setTool(t || null); }, keys: KEYMAP, ink: INK,
                get index() { return i; }, get step() { return stepAt[i]; }, slides: slides };
 })();
