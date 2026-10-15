@@ -556,8 +556,8 @@
       helpEl.setAttribute('role', 'dialog'); helpEl.setAttribute('aria-label', '단축키');
       var dl = mk('dl');
       helpRows().forEach(function (k) { dl.appendChild(mk('dt', null, k[0])); dl.appendChild(mk('dd', null, k[1])); });
+      dl.appendChild(mk('p', 'bl-help-note', '파워포인트 슬라이드 쇼 단축키와 같다 · 덱의 #bl-keys 로 바꿀 수 있다'));
       helpEl.appendChild(dl);
-      helpEl.appendChild(mk('p', 'bl-help-note', '파워포인트 슬라이드 쇼 단축키와 같다 · 덱의 #bl-keys 로 바꿀 수 있다'));
       helpEl.hidden = true;
       helpEl.addEventListener('click', function () { helpEl.hidden = true; });
       B.appendChild(helpEl);
