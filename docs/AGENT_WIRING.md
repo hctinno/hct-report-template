@@ -52,7 +52,7 @@ claude.ai → 좌측 하단 이니셜 → Settings → **Instructions for Claude
 
 ```text
 사내 보고서·발표자료·덱·슬라이드·회의록·공지·매뉴얼·보드·대시보드·현황판을 회사 양식이나
-템플릿으로 만들라는 요청을 받으면, 새 스타일을 만들지 말고 먼저 아래 저장소를 현재 세션에
+템플릿으로 만들라는 요청을 받으면, 임의 양식으로 만들지 말고 먼저 아래 저장소를 현재 세션에
 붙인다. 세션에 저장소를 붙이는 수단이 있으면 그것을 쓰고, 없으면 git clone 한다.
 
     github.com/hctinno/hct-report-template   (기본 브랜치는 main 이 아니라 full/main)
@@ -72,7 +72,7 @@ Codex 는 `.claude/skills/` 를 인식하지 못한다. 전역 지침 파일에 
 
 ```text
 사내 보고서·발표자료·덱·회의록·공지·매뉴얼·보드·대시보드를 회사 양식이나 템플릿으로
-만들라는 요청을 받으면, 새 스타일을 만들지 말고 먼저 아래를 받는다.
+만들라는 요청을 받으면, 임의 양식으로 만들지 말고 먼저 아래를 받는다.
 
     git clone -b full/main https://github.com/hctinno/hct-report-template.git
 

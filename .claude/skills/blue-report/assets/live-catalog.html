@@ -1445,6 +1445,55 @@
     <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
+  <section class="bl-sl" id="own" data-notes="문의 천 건이 계약 예순다섯 건이 되기까지 네 단계다. 폭이 그 단계에 남은 건수다.&#10;&#10;오른쪽 세 줄이 가장 많이 빠지는 자리다. 둘째 단계 견적 회신이 가장 크다.&#10;&#10;※ 이 장의 깔때기는 카탈로그 부품이 아니다. 장 안 &lt;style data-own&gt; 에서 새로 짰다 — 장 id(#own)와 자기 접두어(x-)로 범위를 묶고, 색은 --br-* 토큰, 치수는 rem 만 쓴다. 머리띠 · 꼬리띠 · 로고 · 워터마크 · 제목 밴드는 그대로 둔다.">
+    <style data-own>
+      /* 맞춤 본문 견본 — 장째 복사하면 이 CSS 도 함께 따라간다 */
+      #own .x-fun { display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--bl-sp-5); align-items: center }
+      #own .x-steps { display: grid; gap: .55rem; margin: 0; padding: 0; list-style: none }
+      #own .x-step { box-sizing: border-box; width: calc(var(--w) * 1%); margin-inline: auto; padding: .85rem 2.2rem;
+        display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+        background: var(--x-bg, var(--br-navy)); color: var(--br-on-dark);
+        clip-path: polygon(0 0, 100% 0, calc(100% - 1.2rem) 100%, 1.2rem 100%) }
+      #own .x-step span { font-size: var(--bl-fs-body); font-weight: 600 }
+      #own .x-step b { font: 700 var(--bl-fs-kpi)/1 var(--br-font-num) }
+      #own .x-step--key { --x-bg: var(--br-cobalt) }
+      #own .x-drop { display: grid; gap: .7rem; margin: 0; padding: 0; list-style: none }
+      #own .x-drop li { padding: .8rem 1.1rem; border-left: .3rem solid var(--br-alert-line);
+        background: var(--br-tint); font-size: var(--bl-fs-body) }
+      #own .x-drop b { color: var(--br-alert-text) }
+      @media (prefers-reduced-motion: no-preference) {
+        html.bl-anim #own:not(.in) .x-step { opacity: 0 }
+        #own.in .x-step { animation: xGrow .7s var(--bl-ease-out) both; animation-delay: calc(var(--i, 0) * .15s) }
+      }
+      @keyframes xGrow { from { opacity: 0; transform: scaleX(.3) } to { opacity: 1; transform: none } }
+      @media (max-width: 900px) { #own .x-fun { grid-template-columns: 1fr } }
+    </style>
+    <header class="bl-hd">
+      <span class="bl-code"><b>X01</b>맞춤 본문 — 장 안 &lt;style data-own&gt; 로 새로 짠 깔때기</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd">
+      <h2 class="bl-title">문의에서 계약까지 — <em>네 단계, 6.5% 도달</em></h2>
+      <p class="bl-lede">가상 시나리오 · 최근 분기 문의 1,000건 기준 · <strong>견적 회신 단계 이탈 최대</strong></p>
+      <div class="bl-mid"><div class="x-fun">
+        <ol class="x-steps" aria-label="단계별 남은 건수">
+          <li class="x-step" style="--w: 100; --i: 0"><span>문의 접수</span><b>1,000</b></li>
+          <li class="x-step" style="--w: 82; --i: 1"><span>상담 완료</span><b>420</b></li>
+          <li class="x-step x-step--key" style="--w: 64; --i: 2"><span>견적 회신</span><b>180</b></li>
+          <li class="x-step" style="--w: 46; --i: 3"><span>계약</span><b>65</b></li>
+        </ol>
+        <ul class="x-drop">
+          <li><b>−58%</b> 접수 → 상담 · 회신 지연</li>
+          <li><b>−57%</b> 상담 → 견적 · 일정 불일치</li>
+          <li><b>−64%</b> 견적 → 계약 · 가격 비교</li>
+        </ul>
+      </div></div>
+    </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+  </section>
+
   <section class="bl-sl" id="fin" data-notes="마지막 한 문장만 남기고 끝낸다. 노란 막대가 그려지는 동안 잠깐 멈춘다.&#10;&#10;※ 인사말은 적지 않는다. 지면 본문은 존댓말 종결을 쓰지 않는다 — 「질의응답」으로 닫는다.&#10;&#10;→ 전환: 질문을 받는다. 질문이 나오면 a 를 누르고 부록 쪽번호로 바로 간다.">
     <header class="bl-hd">
       <span class="bl-code"><b>끝</b>마무리 .bl-fin</span>

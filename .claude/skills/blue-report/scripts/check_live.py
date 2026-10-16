@@ -11,7 +11,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
 판정이 겹치는 것(문체·raw hex·마크 대비)은 check_deck.py 에서 불러 쓴다.
 같은 낱말을 두 스크립트가 다르게 판정하는 일이 없도록 한 곳에만 둔다.
 
-검사 항목 (27)
+검사 항목 (29)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 문체 — 존댓말·평서형 종결 없이 명사형인가 (check_deck.py 규칙 재사용)
     2. 색 — 토큰 밖 raw hex 를 본문에 직접 쓰지 않았는가
@@ -49,6 +49,12 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
    27. 세로 넘침 — 16:9 화면에서 장마다 본문이 꼬리띠 위에서 끝나는가. 지면은 한 화면
        높이에 overflow:hidden 이라 넘친 줄은 잘려 사라진다. 900px 이하 읽기 폭(장이 내용만큼
        늘어난다)에서는 꼬리띠가 장 안에 있고 본문이 그 위에서 끝나는가
+  정적 — 본문 맞춤 디자인 (1.47.0)
+   28. 맞춤 CSS — 덱 안 <style> 로 본문을 새로 짜도 된다. 대신 고정 영역(머리띠 · 꼬리띠 ·
+       쪽번호 · 로고 · 워터마크 · 진행선 · 제목 밴드 · 조작판)을 건드리지 않고, 장 id 나 자기
+       클래스로 범위를 묶고, 색은 --br-* · --bl-* 토큰만, 치수는 rem 만, bl-·br- 이름은
+       새로 짓지 않는가
+   29. 본문 표현 — 내용 장 중 글 · 표만 있는 장이 절반을 넘지 않는가 (주의만, 실패 아님)
 
 왜 rem 으로 판정하는가
   px 로 재면 창 크기에 따라 결과가 달라져 같은 파일이 통과했다 떨어졌다 한다.
@@ -269,7 +275,8 @@ def check_literal_px(html, rep, path_hint=None):
 
     테두리 1px 는 실선 한 줄이라 배율을 따라갈 이유가 없다. 미디어 질의의
     분기점도 뷰포트 자체의 값이라 예외다."""
-    css = "\n".join(re.findall(r"<style[^>]*>(.*?)</style>", html, re.S))
+    css = "\n".join(b for b in re.findall(r"<style[^>]*>(.*?)</style>", html, re.S)
+                    if any(sig in b for sig in _SYS_SIGS))       # 맞춤 블록은 28번이 본다
     # 원본 형태에서는 blue-live.css 가 외부 파일이라 <style> 이 비어 있다. 그대로
     # 두면 묶은 판에서만 검사가 돌고 원본은 무사통과한다 — 고치는 자리는 원본인데.
     # 링크를 따라가 디스크에서 읽어 함께 본다.
@@ -331,6 +338,236 @@ def _slices(html):
         end = starts[k + 1].start() if k + 1 < len(starts) else len(html)
         out.append((m.group(0), html[m.start():end]))
     return out
+
+
+# ---------------------------------------------------------------- 본문 맞춤 CSS
+
+# 계통 CSS 를 덱 안에 묶어 넣은 블록인지 — 토큰 정의가 있으면 계통 것이다.
+_SYS_SIGS = ("--br-page:", "--bl-fs-body:")
+# 어느 자리에 나와도 안 되는 고정 영역. 이 이름이 선택자에 있으면 고정 영역을 건드린다.
+FIXED_ANY = ("bl-hd", "bl-rf", "bl-rf-name", "bl-pg", "bl-code", "br-mark", "br-watermark",
+             "br-wordmark", "br-logo", "bl-hud", "bl-hud-sep", "bl-title",
+             "#bl-prog", "#bl-jump", "#bl-notes", "#bl-help", "#bl-ev-panel", "#bl-inkbar",
+             "#bl-blank", "bl-ink")
+# 조상으로는 써도 되지만 대상(마지막 덩어리)이면 안 되는 것 — 지면 · 덱 자체다.
+FIXED_SUBJECT = ("bl-sl", "bl-deck", "#deck")
+_BARE_SUBJECT = re.compile(r"^(?:html|body|:root|main|section|header|footer|\*)$")
+_COLOR_PROPS = re.compile(r"(?:^|-)(?:color|background|border|outline|fill|stroke|shadow|"
+                          r"stop-color|flood-color|lighting-color|caret|accent|column-rule|"
+                          r"text-decoration)")
+_NAMED = ("white", "black", "red", "blue", "green", "gray", "grey", "orange", "yellow",
+          "purple", "pink", "navy", "silver", "teal", "aqua", "cyan", "magenta", "lime",
+          "maroon", "olive", "brown", "gold", "violet", "indigo", "crimson", "coral",
+          "salmon", "beige", "ivory", "khaki", "tomato", "orchid", "skyblue", "steelblue",
+          "royalblue", "lightgray", "darkgray", "whitesmoke", "gainsboro")
+_RAW_COLOR = re.compile(r"#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(|"
+                        r"\b(?:" + "|".join(_NAMED) + r")\b", re.I)
+_SHADOW_OK = re.compile(r"rgba?\(\s*(?:0\s*,\s*0\s*,\s*0|255\s*,\s*255\s*,\s*255|0 0 0|255 255 255)"
+                        r"\s*[,/][^)]*\)", re.I)
+
+
+def own_css_blocks(html):
+    """덱이 스스로 적은 <style> 블록. 계통 CSS 를 묶어 넣은 블록은 뺀다."""
+    out = []
+    for m in re.finditer(r"<style[^>]*>(.*?)</style>", html, re.S):
+        body = m.group(1)
+        if any(sig in body for sig in _SYS_SIGS):
+            continue
+        out.append(body)
+    return out
+
+
+def _rules(css):
+    """(선택자, 선언) 목록. @media · @supports 는 벗기고 @keyframes 속은 따로 낸다."""
+    css = re.sub(r"/\*.*?\*/", " ", css, flags=re.S)
+    frames = []
+
+    def take_frames(m):
+        frames.append(m.group(0))
+        return " "
+    # @keyframes 이름 { from {…} to {…} } — 중괄호 두 겹을 통째로 떼어 낸다
+    css = re.sub(r"@(?:-webkit-)?keyframes\s+[\w-]+\s*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}", take_frames, css)
+    css = re.sub(r"@(?:media|supports|container|layer)[^{]*\{", "", css)
+    rules = [(m.group(1).strip(), m.group(2)) for m in re.finditer(r"([^{}]+)\{([^{}]*)\}", css)]
+    kf = []
+    for f in frames:
+        kf += [(m.group(1).strip(), m.group(2)) for m in re.finditer(r"([^{}]+)\{([^{}]*)\}",
+                                                                       f.split("{", 1)[1])]
+    return rules, kf, len(frames)
+
+
+def _tokens(sel):
+    return set("." + c for c in re.findall(r"\.([\w-]+)", sel)) | set(re.findall(r"#[\w-]+", sel))
+
+
+def _decls(text):
+    for d in text.split(";"):
+        if ":" in d:
+            k, v = d.split(":", 1)
+            yield k.strip().lower(), v.strip()
+
+
+def own_css_problems(css_list, known, slide_ids=()):
+    """맞춤 CSS 를 판정해 (실패 목록, 주의 목록) 을 돌려준다.
+
+    known 은 계통 클래스 이름, slide_ids 는 덱의 장 id(#…)다."""
+    slide_ids = {"#" + i.lstrip("#") for i in slide_ids}
+    bad, warn = [], []
+    n_frames, has_reduce = 0, False
+    for css in css_list:
+        if "prefers-reduced-motion" in css or "html.bl-anim" in css:
+            has_reduce = True
+        if re.search(r"@font-face|@import", css):
+            bad.append("@font-face · @import — 폰트 · 외부 CSS 를 덧붙이지 않는다")
+        rules, kf, nf = _rules(css)
+        n_frames += nf
+        for sel_list, decls in rules:
+            for sel in (x.strip() for x in sel_list.split(",")):
+                if not sel:
+                    continue
+                toks = _tokens(sel)
+                hit = [t for t in FIXED_ANY if ("." + t if not t.startswith("#") else t) in toks]
+                if hit:
+                    bad.append(f"고정 영역을 건드린다 — {sel[:60]}  ({' '.join(hit)})")
+                    continue
+                subject = re.split(r"\s*[>+~]\s*|\s+", sel.strip())[-1]
+                bare = re.sub(r"::?[\w-]+(\([^)]*\))?", "", subject)
+                stoks = _tokens(bare)
+                frame = any(("." + t if not t.startswith("#") else t) in stoks for t in FIXED_SUBJECT)
+                # 장 id 만으로 된 대상(#s9, #s9.in)은 그 장의 지면 자체다. 자기 변수(--x-*)만
+                # 정의하는 것은 괜찮다 — 본문 안으로 값을 내려 주는 자리다.
+                slide = stoks and all(t in slide_ids or t in (".in",) or t.startswith(".is-")
+                                      for t in stoks) and any(t in slide_ids for t in stoks)
+                only_vars = all(k.startswith("--") for k, _ in _decls(decls))
+                if _BARE_SUBJECT.match(bare) or frame or (slide and not only_vars):
+                    bad.append(f"지면 · 덱 전체를 대상으로 삼는다 — {sel[:60]}")
+                    continue
+                scoped = any(t.startswith("#") or not t[1:].startswith(("bl-", "br-")) for t in toks)
+                if not scoped:
+                    bad.append(f"범위가 없다 — 장 id(#…) 나 자기 클래스로 묶는다: {sel[:60]}")
+                for c in re.findall(r"\.(b[lr]-[\w-]+)", sel):
+                    if c not in known:
+                        bad.append(f"bl-·br- 이름을 새로 지었다 — .{c} (자기 클래스는 다른 접두어)")
+            for k, v in _decls(decls):
+                if re.match(r"--b[lr]-", k):
+                    bad.append(f"계통 토큰을 덮어쓴다 — {k}")
+                _color_bad(k, v, sel_list, bad)
+                _px_bad(k, v, sel_list, bad)
+        for sel, decls in kf:
+            for k, v in _decls(decls):
+                _color_bad(k, v, "@keyframes " + sel, bad)
+                _px_bad(k, v, "@keyframes " + sel, bad)
+    if n_frames and not has_reduce:
+        warn.append(f"맞춤 @keyframes {n_frames}개에 움직임 줄이기 분기가 없다 — "
+                    "@media (prefers-reduced-motion: no-preference) 안에 두거나 html.bl-anim 에 묶는다")
+    # 같은 위반이 여러 번 나오면 한 번만 보인다
+    return list(dict.fromkeys(bad)), warn
+
+
+def _color_bad(k, v, where, bad):
+    if not (_COLOR_PROPS.search(k) or k.startswith("--")):
+        return
+    val = re.sub(r"var\([^()]*(?:\([^()]*\)[^()]*)*\)", " ", v)   # 토큰 참조는 지운다
+    val = re.sub(r"url\([^)]*\)", " ", val)
+    if "shadow" in k or k in ("filter",):
+        val = _SHADOW_OK.sub(" ", val)
+    m = _RAW_COLOR.search(val)
+    if m:
+        bad.append(f"색을 직접 적었다 — {where[:40]} {{ {k}: {v[:40]} }} · --br-* 토큰을 쓴다")
+
+
+def _px_bad(k, v, where, bad):
+    if not re.search(r"-?[\d.]+px\b", v):
+        return
+    if ("border" in k or k == "outline") and re.match(r"[\d.]*1px", v):
+        return
+    if k in ("backdrop-filter", "filter", "box-shadow", "text-shadow"):
+        return
+    bad.append(f"px 치수 — {where[:40]} {{ {k}: {v[:40]} }} · rem 으로 적는다")
+
+
+def check_own_css(html, rep, path):
+    """본문 맞춤 CSS — 새로 짜도 되지만 고정 영역 · 색 · 치수 · 이름 규칙 안에서."""
+    own = own_css_blocks(html)
+    if not own:
+        rep.o("맞춤 CSS — 없음 (계통 부품만 사용)")
+        return
+    known = _system_classes(html, path)
+    ids = re.findall(r'<section[^>]*\bbl-sl\b[^>]*\bid="([^"]+)"|<section[^>]*\bid="([^"]+)"[^>]*\bbl-sl\b', html)
+    bad, warn = own_css_problems(own, known, [a or b for a, b in ids])
+    for w in warn:
+        rep.w(w)
+    if bad:
+        rep.f(f"맞춤 CSS 위반 {len(bad)}건 — 본문은 새로 짜도 되지만 고정 영역 · 토큰 · rem 규칙은 지킨다")
+        for b in bad[:10]:
+            print(f"        {b}")
+    else:
+        n = sum(len(_rules(c)[0]) for c in own)
+        rep.o(f"맞춤 CSS — 블록 {len(own)}개 · 규칙 {n}개, 고정 영역 · 색 · 치수 · 이름 규칙 지킴")
+
+
+def _system_classes(html, path):
+    """계통 CSS(덱이 부르는 파일 + 묶어 넣은 블록)와 뷰어 JS 가 아는 bl-·br- 이름."""
+    p = _Slides()
+    p.feed(html)
+    p.close()
+    css = "\n".join(b for b in re.findall(r"<style[^>]*>(.*?)</style>", html, re.S)
+                    if any(sig in b for sig in _SYS_SIGS))
+    js = "\n".join(re.findall(r"<script(?![^>]*\btype=\"application/json\")(?![^>]*\btype=\"text/plain\")[^>]*>(.*?)</script>",
+                              html, re.S))
+    for kind, ref in p.links:
+        text = _read_near(path, ref)
+        if kind == "css":
+            css += "\n" + text
+        else:
+            js += "\n" + text
+    return set(re.findall(r"\.(b[lr]-[\w-]+)", css)) | set(re.findall(r"\b(b[lr]-[\w-]+)", js))
+
+
+# 그림 · 도식 부품 — 이것이 하나라도 있으면 글 · 표만 있는 장이 아니다.
+VISUAL_CLS = ("bl-tc", "bl-lc", "bl-hc", "bl-meter", "bl-lanes", "bl-span", "bl-dots", "bl-gantt",
+              "bl-org", "bl-matrix", "bl-orgtree", "bl-svgbox", "bl-raci", "bl-road", "bl-kpis",
+              "bl-donut-box", "bl-bar", "bl-stack", "bl-wf", "bl-sc", "bl-rack", "bl-checks",
+              "bl-waffle", "bl-pickset", "bl-heat", "bl-mock", "bl-stair", "bl-chev", "bl-hero",
+              "bl-vs", "bl-simq", "bl-decide", "bl-road2", "bl-pipe", "bl-flowbox", "bl-fl-zone",
+              "bl-baton", "bl-ghost", "bl-tabset", "bl-scenebox", "bl-flow", "bl-stat",
+              "bl-gauge", "bl-prog", "bl-focusset", "bl-agenda")
+# 표현을 따질 장이 아닌 것 — 표지 · 간지 · 마무리 · 부록 · 질문
+_FRAME_CLS = ("bl-sl--cover", "bl-sl--chapter", "bl-sl--apxdiv", "bl-fin", "bl-qa", "bl-chapter",
+              "bl-apxdiv")
+
+
+def check_visual(html, rep):
+    """내용 장 중 글 · 표만 있는 장이 얼마나 되는가. 판정이 아니라 신호다.
+
+    1.7.0 으로 만든 덱이 표 · 목록만으로 채워져 밋밋하게 나온 일이 있었다. 검사기가
+    바닥(띠 · 폰트 · 대비)만 보니 그래도 실패 0 이었다. 여기서는 막지 않고 알린다 —
+    표가 맞는 장도 있다."""
+    own = "\n".join(own_css_blocks(html))
+    own_cls = set(re.findall(r"\.((?!b[lr]-)[a-zA-Z][\w-]*)", own))
+    content, plain = 0, []
+    for k, (tag, body) in enumerate(_slices(html), 1):
+        if any(c in tag for c in _FRAME_CLS) or "data-apx" in tag:
+            continue
+        bd = re.search(r'class="[^"]*\bbl-bd\b[^"]*"', body)
+        if not bd or any(re.search(r'class="[^"]*\b' + c + r'\b', body) for c in _FRAME_CLS):
+            continue
+        body = body[bd.start():]
+        content += 1
+        cls = set(" ".join(re.findall(r'class="([^"]*)"', body)).split())
+        has_media = bool(re.search(r"<(svg|canvas|video)\b", body)) or bool(
+            re.search(r"<img\b(?![^>]*br-logo)", body.split("bl-rf")[0]))
+        if has_media or cls & set(VISUAL_CLS) or cls & own_cls:
+            continue
+        m = re.search(r'id="([^"]+)"', tag)
+        plain.append(f"{k:02d}" + (f"({m.group(1)})" if m else ""))
+    if not content:
+        rep.o("본문 표현 — 내용 장 없음 (해당 없음)")
+    elif len(plain) * 2 > content:
+        rep.w(f"본문 표현 — 내용 장 {content}장 중 {len(plain)}장이 글 · 표뿐: {' '.join(plain[:12])}. "
+              "흐름 · 일정 · 비교 · 수치는 카탈로그 부품이나 맞춤 도식으로 그린다")
+    else:
+        rep.o(f"본문 표현 — 내용 장 {content}장 중 글 · 표뿐인 장 {len(plain)}장")
 
 
 def check_chrome(html, rep):
@@ -580,29 +817,21 @@ def _read_near(path, ref):
 def check_classes(html, rep, path):
     """bl- · br- 클래스가 전부 정의돼 있는가.
 
-    CSS(덱이 부르는 것 + 문서 안 <style>)의 클래스 선택자와 뷰어 JS 가 쓰는 이름이
-    「아는 클래스」다. 그 밖의 이름은 지어낸 것이다 — 아무 모양도 동작도 붙지 않는다."""
+    계통 CSS(덱이 부르는 것 + 묶어 넣은 블록)의 클래스 선택자와 뷰어 JS 가 쓰는 이름이
+    「아는 클래스」다. 그 밖의 bl-·br- 이름은 지어낸 것이다 — 아무 모양도 동작도 붙지 않는다.
+    덱 안 맞춤 CSS 에 적었다고 아는 이름이 되지 않는다. 자기 클래스는 다른 접두어로 짓는다."""
     p = _Slides()
     p.feed(html)
     p.close()
-    css = "\n".join(re.findall(r"<style[^>]*>(.*?)</style>", html, re.S))
-    js = "\n".join(re.findall(r"<script(?![^>]*\btype=\"application/json\")(?![^>]*\btype=\"text/plain\")[^>]*>(.*?)</script>",
-                              html, re.S))
-    for kind, ref in p.links:
-        text = _read_near(path, ref)
-        if kind == "css":
-            css += "\n" + text
-        else:
-            js += "\n" + text
-    known = set(re.findall(r"\.(b[lr]-[\w-]+)", css)) | set(re.findall(r"\b(b[lr]-[\w-]+)", js))
+    known = _system_classes(html, path)
     unknown = sorted(c for c in p.classes if c not in known)
-    if not css.strip():
+    if not known:
         rep.w("클래스 검사 생략 — 덱이 부르는 CSS 를 찾지 못했다")
     elif unknown:
-        rep.f(f"정의 없는 클래스 {len(unknown)}개 — CSS · 뷰어 어디에도 없다: {' '.join(unknown[:12])}")
-        print("        부품은 live-catalog.html 에서 장째 복사한다. 클래스를 지어내지 않는다")
+        rep.f(f"정의 없는 클래스 {len(unknown)}개 — 계통 CSS · 뷰어 어디에도 없다: {' '.join(unknown[:12])}")
+        print("        bl-·br- 는 계통 이름이다. 카탈로그 부품은 그 이름 그대로, 맞춤 도식은 다른 접두어로 짓는다")
     else:
-        rep.o(f"클래스 — bl-·br- {len(p.classes)}개 모두 CSS · 뷰어에 있다")
+        rep.o(f"클래스 — bl-·br- {len(p.classes)}개 모두 계통 CSS · 뷰어에 있다")
 
 
 # ---------------------------------------------------------------- 렌더 검사
@@ -826,6 +1055,8 @@ def main():
     check_evidence(html, rep)
     check_steps(html, rep)
     check_classes(html, rep, a.path)
+    check_own_css(html, rep, a.path)
+    check_visual(html, rep)
     check_render(a.path, rep, a.shots, seen_style=bad)
 
     sys.exit(rep.render())
