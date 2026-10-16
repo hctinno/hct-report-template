@@ -26,7 +26,7 @@ blue-report/
 │  ├─ blue-live.css            라이브 계통 — 배율 · 띠 · 부품 38종 · 움직임 12계열 · 아이콘 135종
 │  ├─ live-viewer.js           라이브 엔진 — 넘김 · 단계 · 쪽 이동 · 발표 · 레이저 · 대본 창 · 겹창 · 위젯
 │  ├─ live-standard.html       기준 덱 15장 — 새 보고서의 출발점
-│  ├─ live-catalog.html        라이브 부품 카탈로그 51장 — 필요한 장을 통째로 복사
+│  ├─ live-catalog.html        라이브 부품 카탈로그 52장 — 그대로 · 고쳐 · 참고해 쓴다
 │  ├─ archive/                 보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
 │  ├─ LICENSE-Lucide.txt       아이콘 저작권 고지 (ISC · MIT)
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
@@ -44,7 +44,7 @@ blue-report/
    ├─ palette.py               N단계 램프 생성 + 대비 검증
    ├─ check_deck.py            덱 자동 점검 17항목 + 슬라이드별 PNG
    ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
-   ├─ check_live.py            라이브 덱 점검 27항목 (엔진 기동 · 근거 JSON · 단계 · 클래스 · 세로 넘침)
+   ├─ check_live.py            라이브 덱 점검 29항목 (엔진 기동 · 근거 JSON · 단계 · 클래스 · 세로 넘침 · 맞춤 CSS · 본문 표현)
    ├─ make_icons.py            Lucide 아이콘 → blue-live.css 마스크 (--check 는 오프라인)
    ├─ make_font_subset.py      Pretendard 서브셋 (한글 · 라틴 · 기호)
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
@@ -61,7 +61,7 @@ blue-report/
 | 무엇을 만드나 | `--deck` | 파일 |
 |---|---|---|
 | 보고서 · 발표 덱 (기본) | `standard` | `assets/live-standard.html` — 「6-3」 |
-| 기준 덱에 없는 부품 — 장째 복사 | `livecatalog` | `assets/live-catalog.html` — 「6-3」 |
+| 부품 재사용 · 참고 | `livecatalog` | `assets/live-catalog.html` — 「6-3」 |
 | 회의록 (A4) | `minutes` | `assets/doc-minutes.html` |
 | 고쳐 가며 쓰는 현황판 | `manage` | `assets/board-manage.html` |
 
@@ -1003,20 +1003,22 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 애니메이션 12계열 · 발표 기능을 뽑아 이 계통으로 옮겼다. 원본의 수치 · 조직 · 인물 · 원문은
 옮기지 않았다 — 견본은 전부 가상 시나리오다.
 
-**새 보고서는 새로 그리지 않는다. 아래 두 파일에서 복사한다.**
+**새 보고서는 기준 덱을 틀로 삼는다.** 머리띠 · 꼬리띠 · 로고 · 워터마크 · 진행선 · 제목 밴드는
+그대로 두고, 본문은 내용에 맞게 짠다 — 카탈로그 부품을 그대로 · 고쳐 쓰거나, 없으면 새로 짠다
+(아래 「본문 맞춤 디자인」).
 
 | 파일 | `--deck` | 장 | 쓰는 법 |
 |---|---|---|---|
 | `assets/live-standard.html` | `standard` | 15 | **출발점.** 표지 · 목차 · 보고 요지 · 장 간지 · 본문 · 로드맵 · 결정 요청 · 마무리 · 부록 간지 · 예상 질문 · 용어 |
-| `assets/live-catalog.html` | `livecatalog` | 51 | 부품 견본첩. 필요한 장을 **통째로** 복사해 기준 덱 사이에 끼우고 내용만 바꾼다 |
+| `assets/live-catalog.html` | `livecatalog` | 52 | 부품첩. 맞는 장을 복사해 그대로 · 고쳐 쓰거나, 참고해 새로 짠다. `own` 장(X01)이 맞춤 본문 견본 |
 
 ```bash
-# 1. 기준 덱을 복사해 내용만 바꾼다. 없는 부품은 카탈로그에서 장째 가져온다
+# 1. 기준 덱을 틀로 복사한다. 본문은 카탈로그 부품을 쓰거나 고치거나 <style data-own> 으로 새로 짠다
 cp assets/live-standard.html 작업/보고서.html
 # 2. 회사 정보 · 로고를 넣고 CSS · 뷰어 JS · 폰트까지 한 파일로 묶는다 (권장)
 #    --title 을 빼면 brand.json 의 docTitle 이 덱 제목을 덮는다 — 장마다 꼬리띠 문서명이 바뀐다
 python3 scripts/apply_brand.py --brand brand.json --deck 작업/보고서.html --title "문서명" --single-file -o 보고서.html
-# 3. 27항목 검사. 실패 0 이어야 완료다. 장마다 남는 PNG 를 눈으로 넘겨 본다
+# 3. 29항목 검사. 실패 0 이어야 완료다. 장마다 남는 PNG 를 눈으로 넘겨 본다
 python3 scripts/check_live.py 보고서.html --shots out/
 ```
 
@@ -1080,6 +1082,66 @@ python3 scripts/check_live.py 보고서.html --shots out/
 - 브랜드 마크와 워터마크 안의 자리표시자는 그대로 둔다. `apply_brand.py` 가 채운다.
 - JS 가 없어도 세로로 스크롤하면 전부 읽힌다. 숨김(등장 전 모습)은 엔진이 `html.bl-anim`
   을 달았을 때만 걸린다.
+
+### 본문 맞춤 디자인 — 고정 영역은 그대로, 본문은 내용에 맞게
+
+기준 덱은 **틀**이지 본문 모양의 상한이 아니다. 지면을 둘로 나눈다.
+
+| 구역 | 무엇 | 규칙 |
+|---|---|---|
+| 고정 영역 | 머리띠 `.bl-hd`(코드 · 브랜드 마크) · 꼬리띠 `.bl-rf`(문서명 · 쪽번호) · 워터마크 `.br-watermark` · 진행선 `#bl-prog` · 제목 형광 밴드 `.bl-title` · 조작판 `.bl-hud` · 겹창 · 발표 엔진 | 기준 덱 그대로. 맞춤 CSS 선택자에 이 이름을 넣지 않는다 |
+| 자유 영역 | `.bl-bd` 안, 제목 · 리드 아래 본문 전부 | 내용에 맞게 짠다 — 카탈로그 부품 그대로 · 변형 · 새 도식 · 새 레이아웃 · 새 애니메이션 |
+
+**순서** — 장마다 내용의 성격을 먼저 정하고 표현을 고른다. 표 · 목록은 마지막 선택이다.
+
+| 내용 | 먼저 볼 카탈로그 부품 | 맞지 않으면 새로 짤 것의 예 |
+|---|---|---|
+| 흐름 · 경로 · 유입 | 흐름도 `flow` · 노선도 `route` · 파이프라인 `pipe` · 바통 `baton` | 깔때기(`own` 장) · 경로 지도 SVG · 분기 트리 |
+| 일정 · 단계 · 연혁 | 간트 `gantt` · 레인 `lanes` · 연혁 `history` · 실행 길 `decide` | 연도 열 간트 · 마일스톤 띠 · 계단 로드맵 |
+| 비교 · 선택 | 좌우 대비 `vs` · 두 해 `years` · 매트릭스 `matrix` | 2×2 포지셔닝 · 점수 막대 쌍 · 레이더 대용 막대 |
+| 구성 · 비율 | 도넛 `kpi` · 누적 막대 `stack` · 랙 `rack` · 와플 `waffle` | 트리맵 칸 · 비율 띠 |
+| 수치 · 추세 | 수치 타일 `kpi` · 워터폴 `stack` · 계단 `stair` · 히어로 `hero` | 스파크 선 · 목표 대비 게이지 |
+| 구조 · 조직 · 체계 | 조직도 `org` · 구성도 `net` · RACI `raci` | 계층 블록 · 영역 경계도 |
+| 화면 · 시연 | 목업 `explorer` · 포털 `portal` · 캡처 `shot` · 탭 `tabs` · 장면 `coach` | 화면 위 주석 화살 · 전후 슬라이더 |
+
+**맞춤 CSS 쓰는 법** — 견본은 카탈로그 `own` 장(X01 깔때기). 장째 복사하면 CSS 도 함께 따라간다.
+
+```html
+<section class="bl-sl" id="funnel" data-notes="…">
+  <style data-own>
+    #funnel .x-steps { display: grid; gap: .55rem }                       /* 범위: 장 id + 자기 접두어 */
+    #funnel .x-step  { padding: .85rem 2.2rem; background: var(--br-navy);  /* 색: 토큰만 */
+                       color: var(--br-on-dark); clip-path: polygon(…) }    /* 치수: rem 만 */
+    @media (prefers-reduced-motion: no-preference) {                        /* 움직임 줄이기 분기 */
+      html.bl-anim #funnel:not(.in) .x-step { opacity: 0 }                  /* 들어오기 전 */
+      #funnel.in .x-step { animation: xGrow .7s var(--bl-ease-out) both }   /* 장에 들어오면 */
+    }
+    @keyframes xGrow { from { opacity: 0; transform: scaleX(.3) } to { opacity: 1; transform: none } }
+  </style>
+  <header class="bl-hd">…그대로…</header>
+  <div class="bl-bd">
+    <h2 class="bl-title">주장 — <em>핵심구</em></h2>
+    <div class="bl-mid"><ol class="x-steps">…</ol></div>
+  </div>
+  <footer class="bl-rf">…그대로…</footer> <div class="br-watermark">…그대로…</div>
+</section>
+```
+
+| 해도 된다 | 하지 않는다 (검사기 28번 실패) |
+|---|---|
+| 장 안 `<style data-own>` · 인라인 SVG · CSS 격자 · `clip-path` · 그라데이션(토큰 색) | 고정 영역 클래스를 선택자에 넣기(`.bl-hd` · `.bl-rf` · `.bl-pg` · `.br-mark` · `.br-watermark` · `.bl-title` · `#bl-prog` · `.bl-hud` …) |
+| 카탈로그 부품을 장 안에서 고쳐 쓰기 — `#장id .bl-tc { … }` | 범위 없는 선택자(`.bl-bd p` · `table`) — 모든 장이 바뀐다 |
+| 자기 클래스 · 자기 변수 — `x-` 등 `bl-` · `br-` 아닌 접두어, `--x-*` | `bl-` · `br-` 이름 새로 짓기, `--br-*` · `--bl-*` 토큰 덮어쓰기 |
+| `var(--br-*)` · `var(--bl-*)` · `currentColor` · `transparent` | hex · `rgb()` · `hsl()` · 색 이름(`white` 등). 그림자의 검정 · 흰 반투명만 예외 |
+| `rem` · `%` · `fr` · `em` · 테두리 `1px` | 그 밖의 `px` |
+| 새 `@keyframes` — 움직임 줄이기 분기 안에서 | 장 자체(`#장id { padding … }` · `.bl-sl`) · `html` · `body` 를 대상으로 삼기, `@font-face` · `@import` |
+
+맞춤 장도 글자 하한(본문 1.0rem) · 대비 · 16:9 한 화면 · 좁은 폭 접힘을 그대로 검사받는다.
+900px 이하에서 접히도록 `@media (max-width: 900px)` 분기를 함께 적는다. 움직임에 정보를 싣지 않는다
+— 감속 모드에서는 처음부터 최종 모습이어야 한다.
+
+검사기 29번 「본문 표현」은 표지 · 간지 · 마무리 · 부록을 뺀 내용 장 중 글 · 표만 있는 장이 절반을
+넘으면 **주의**를 낸다. 실패는 아니지만, 뜨면 그 장들을 위 대응표로 다시 본다.
 
 ### 장 종류와 쪽번호
 
@@ -1201,11 +1263,12 @@ python3 scripts/check_live.py 보고서.html --shots out/
 | | 노선도 (역 자동 순환) | `.bl-route` | `route` · S07 |
 | | 상태 격자 시뮬레이션 | `.bl-simg` | `simg` · S08 |
 | | 근거 패널 · 원문 · 영상 | `.bl-ev` · `[data-doc]` · `[data-video]` | `media` · S09 |
+| 맞춤 본문 | 장 안 `<style data-own>` 으로 새로 짠 깔때기 — 범위 · 토큰 · rem · 움직임 분기 견본 | 자기 접두어 `x-` | `own` · X01 |
 | 참고 | 아이콘 135종 · 움직임 견본 · 조작 요약 | `.bl-i` · `.bl-a` | `icons` · `motion` · `keys` |
 
 ### 부품 속성 — 값으로 모양을 바꾸는 자리
 
-장째 복사한 뒤 숫자만 바꿀 때 본다. 값은 전부 마크업의 `data-*` 또는 `style="--변수: 값"` 이다.
+장째 복사한 뒤 숫자를 바꾸거나 모양을 고칠 때 본다. 값은 전부 마크업의 `data-*` 또는 `style="--변수: 값"` 이다.
 
 | 부품 | 자리 | 뜻 |
 |---|---|---|
@@ -1441,15 +1504,16 @@ python3 scripts/donut.py --live --raw --total 360 --unit 건 --caption "주간 �
 # 가운데 숫자는 구멍에 맞춰 저절로 줄지만, 단위는 짧게(h · 건 · %) 두는 편이 읽기 좋다
 python3 scripts/make_icons.py --check         # 아이콘 CSS 가 목록과 맞는가 (오프라인)
 python3 scripts/make_font_subset.py --check   # 폰트 서브셋이 글자 목록과 맞는가
-python3 scripts/check_live.py 보고서.html --shots out/   # 27항목 + 장마다 화면 PNG
+python3 scripts/check_live.py 보고서.html --shots out/   # 29항목 + 장마다 화면 PNG
 ```
 
 ### 검사기가 보는 것 · 눈으로 볼 것
 
-`check_live.py` 27항목 — 문체(원문 · 그려진 글자) · 토큰 밖 hex · 두 CSS · rem · 노트 · 머리띠 ·
+`check_live.py` 29항목 — 문체(원문 · 그려진 글자) · 토큰 밖 hex · 두 CSS · rem · 노트 · 머리띠 ·
 꼬리띠 · 쪽번호 · 마크 · 워터마크 · 마크 짝 · 브랜드 자리 · 근거 JSON · 스타일 · 폰트 · 지면 끝 ·
 조작판 겹침 · 글자 하한 둘 · 가로 넘침 · 데이터 마크 대비 · 엔진 기동 · 단계와 `[클릭]` ·
-정의 없는 클래스 · 보이지 않는 글자 · 세로 넘침(16:9 한 화면 · 좁은 폭 꼬리띠).
+정의 없는 클래스 · 보이지 않는 글자 · 세로 넘침(16:9 한 화면 · 좁은 폭 꼬리띠) · 맞춤 CSS(고정 영역 ·
+범위 · 토큰 · rem · 이름 · 움직임 분기) · 본문 표현(글 · 표뿐인 장 비율 — 주의만).
 
 검사기가 못 보는 것 — 제목 핵심구 `<em>` · 장 종류 표시(`data-apx` 등) · 여백과 균형 · 내용의
 맞고 틀림 · 고르지 않은 탭 판(검토에서는 첫 판만 보인다) · 겹쳐 놓인 그림 마디끼리의 겹침.

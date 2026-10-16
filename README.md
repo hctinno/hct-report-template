@@ -121,7 +121,7 @@ python scripts/install_blue_report_skill.py --target <프로젝트경로>   # �
 | 무엇을 만드나 | `--deck` | 파일 |
 |---|---|---|
 | 보고서 · 발표 덱 (기본) | `standard` | `live-standard.html` — 기준 덱 15장 |
-| 기준 덱에 없는 부품 | `livecatalog` | `live-catalog.html` — 부품 카탈로그 51장, 장째 복사 |
+| 기준 덱에 없는 부품 | `livecatalog` | `live-catalog.html` — 부품 카탈로그 52장, 재사용·참고 |
 | 회의록 (A4 인쇄) | `minutes` | `doc-minutes.html` |
 | 고쳐 가며 쓰는 현황판 | `manage` | `board-manage.html` — 관리보드 |
 
@@ -150,7 +150,7 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 | 파일 | `--deck` 이름 | 용도 |
 |---|---|---|
 | `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점.** 15장 · 표지 · 목차 · 장 간지 · 마무리 · 부록 간지 · 예상 질문까지 사내 발표 덱 짜임새 |
-| `live-catalog.html` | `livecatalog` | **라이브 부품 카탈로그 51장.** 부품 38종 · 애니메이션 12계열 · 위젯 · 근거 · 원문 · 영상 겹창 · 아이콘 135종. 필요한 장을 통째로 복사해 기준 덱에 끼운다 |
+| `live-catalog.html` | `livecatalog` | **라이브 부품 카탈로그 52장.** 부품 38종 · 애니메이션 12계열 · 위젯 · 근거 · 원문 · 영상 겹창 · 아이콘 135종 · 맞춤 본문 견본(`own`). 그대로 · 고쳐 · 참고해 쓴다 — 본문은 내용에 맞게 새로 짜도 된다 |
 
 카탈로그는 사내 발표 덱 56장을 렌더해 뽑은 장 짜임새 · 부품 · 움직임 · 발표 기능을 옮긴 것이다.
 실내용(수치 · 조직 · 인물 · 원문)은 옮기지 않았고 견본은 가상 시나리오로 채웠다. 부품 색인 · 위젯 속성 ·
@@ -161,13 +161,17 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 
 ### 지면 크롬은 선택이 아니다
 
-`check_live.py` 가 27항목을 판정하고, 그중 여섯이 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
+`check_live.py` 가 29항목을 판정하고, 그중 여섯이 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
 머리띠 브랜드 마크 · 워터마크 · **마크 배경 짝**. 하나라도 빠지면 실패다.
 
 넷은 산출물이 실제로 회사 문서로 나왔는지를 본다 — 로고 자리에 「COMPANY NAME」이 남지
 않았는가, 계통 CSS 와 본문 폰트가 렌더에서 붙었는가, 지면이 화면 끝까지 닿는가, 출처 칩이
 근거에 이어지는가. 앞의 셋은 견본을 복사해 내용만 바꾸거나 `--single-file` 없이 낸 산출물을
 옮겼을 때 실제로 깨졌던 자리다.
+
+**고정은 크롬뿐이다.** 본문은 내용에 맞게 짠다 — 카탈로그 부품을 그대로 · 고쳐 쓰거나, 장 안
+`<style data-own>` 으로 새 도식 · 레이아웃 · 애니메이션을 만든다. 검사기 28번이 맞춤 CSS 가 크롬을
+건드리지 않고 토큰 · rem · 이름 규칙을 지켰는지 보고, 29번이 글 · 표뿐인 장이 절반을 넘으면 알린다.
 
 ### 사내 발표 덱과 같은 부품
 
@@ -382,7 +386,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   assets/board-manage.html               관리보드
   assets/blue-live.css                   라이브 계통 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/live-standard.html              기준 덱 — 새 보고서의 출발점
-  assets/live-catalog.html               라이브 부품 카탈로그 51장 — 장째 복사
+  assets/live-catalog.html               라이브 부품 카탈로그 52장 — 재사용·참고
   assets/live-viewer.js                  라이브 엔진
   assets/archive/                        보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
   scripts/check_deck.py                  슬라이드 17항목 자동 점검

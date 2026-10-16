@@ -12,7 +12,7 @@
             `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
   boards    웹 보드(관리보드 + 보관 4종)를 check_board.py 11항목으로 판정한다.
-  live      라이브 덱을 check_live.py 27항목으로 판정한다. 고정 지면이 없고
+  live      라이브 덱을 check_live.py 29항목으로 판정한다. 고정 지면이 없고
             치수가 rem 이라 px 하한이 아니라 rem 하한으로 본다.
             견본만이 아니라 apply_brand.py 산출물(단일 파일 · 연결형)도 본다.
             엔진 기능(넘김 · 단계 · 쪽번호 이동 · 발표 · 레이저 · 겹창 · 근거 ·
@@ -658,6 +658,61 @@ def check_icons(log):
         log.ok("라이브 아이콘", (out or [""])[-1].strip())
 
 
+def check_own_css(log, out_dir):
+    """본문 맞춤 CSS 규칙(check_live 28번)이 실제로 잡는가 — 통과 · 위반 견본을 넣어 본다.
+
+    본문은 새로 짜도 되지만 고정 영역 · 토큰 · rem · 이름 규칙은 지킨다. 규칙이 글로만
+    있고 검사기가 못 잡으면 다른 에이전트의 덱에서 머리띠가 사라져도 실패 0 이 나온다.
+    판정 함수는 문자열로 확인하고, 마지막에 덱 한 벌을 통째로 돌려 종료 코드까지 본다."""
+    sys.path.insert(0, SCRIPTS)
+    from check_live import own_css_problems, _system_classes  # noqa: E402
+    base = open(os.path.join(ASSETS, "live-standard.html"), encoding="utf-8").read()
+    known = _system_classes(base, os.path.join(ASSETS, "live-standard.html"))
+    cases = [
+        ("통과 — 장 id 범위 · 토큰 · rem · 움직임 분기",
+         "#s9 { --x-c: var(--br-cat-2) } #s9 .x-a { color: var(--br-navy); padding: 1rem; border: 1px solid var(--br-hairline) }"
+         " #s9 .bl-tc { gap: .5rem }"
+         " @media (prefers-reduced-motion: no-preference) { #s9.in .x-a { animation: xA 1s both } }"
+         " @keyframes xA { from { opacity: 0 } to { opacity: 1 } }", None),
+        ("머리띠를 건드림", "#s9 .bl-hd { background: var(--br-navy) }", "고정 영역"),
+        ("워터마크 숨김", ".x-a .br-watermark { display: none }", "고정 영역"),
+        ("제목 밴드 변경", "#s9 .bl-title { font-size: 3rem }", "고정 영역"),
+        ("지면 전체 대상", "#s9.bl-sl { padding: 0 }", "지면 · 덱 전체"),
+        ("장 id 로 지면 변경", "#s9 { padding: 0 }", "지면 · 덱 전체"),
+        ("body 대상", "body { margin: 1rem }", "지면 · 덱 전체"),
+        ("범위 없음", ".bl-bd p { margin: 0 }", "범위가 없다"),
+        ("hex 색", "#s9 .x-a { color: #ff0000 }", "색을 직접"),
+        ("rgb 색", "#s9 .x-a { background: rgb(10, 20, 30) }", "색을 직접"),
+        ("이름 색", "#s9 .x-a { border-color: white }", "색을 직접"),
+        ("px 치수", "#s9 .x-a { width: 320px }", "px 치수"),
+        ("bl- 이름 짓기", "#s9 .bl-funnel { display: grid }", "bl-·br- 이름을 새로"),
+        ("토큰 덮어쓰기", "#s9 { --br-navy: var(--br-cat-1) }", "계통 토큰"),
+        ("폰트 덧붙이기", "@import url(x.css);", "@font-face"),
+    ]
+    for label, css, want in cases:
+        bad, warn = own_css_problems([css], known, ["s9"])
+        if want is None:
+            ok = not bad and not warn
+            got = "; ".join(bad + warn)[:90]
+        else:
+            ok = any(want in b for b in bad)
+            got = "; ".join(bad)[:90] or "잡지 못했다"
+        (log.ok if ok else log.fail)(f"맞춤 CSS {label}", "" if ok else got)
+    bad, warn = own_css_problems(["#s9 .x-a { animation: xA 1s } @keyframes xA { to { opacity: 1 } }"], known)
+    (log.ok if warn and not bad else log.fail)("맞춤 CSS 움직임 분기 없음 → 주의", "; ".join(bad + warn)[:90])
+
+    # 덱 한 벌 — 위반 블록을 넣으면 check_live 가 실패로 끝나야 한다
+    path = os.path.join(out_dir, "own-bad.html")
+    bad_html = base.replace("</head>", "<style data-own>#s9 .bl-hd { display: none }</style>\n</head>", 1)
+    for f in ("blue-report.css", "blue-live.css", "live-viewer.js"):
+        shutil.copy(os.path.join(ASSETS, f), out_dir)
+    open(path, "w", encoding="utf-8").write(bad_html)
+    r = run([sys.executable, os.path.join(SCRIPTS, "check_live.py"), path])
+    hit = r.returncode != 0 and "맞춤 CSS 위반" in r.stdout
+    (log.ok if hit else log.fail)("맞춤 CSS 덱 단위 — 위반이면 check_live 실패",
+                                  "" if hit else (r.stdout.strip().splitlines() or [""])[-1])
+
+
 def check_live_engine(log, out_dir):
     """라이브 덱 엔진이 발표 기능을 실제로 해내는가 — 카탈로그 덱을 띄워 눌러 본다.
 
@@ -1240,6 +1295,7 @@ def main():
             print("\n── 라이브 덱 ──")
             check_live(log, tmp)
             check_icons(log)
+            check_own_css(log, tmp)
             check_live_engine(log, tmp)
         if "fcc" in only:
             print("\n── H-INNO FCC/KC 템플릿 ──")
