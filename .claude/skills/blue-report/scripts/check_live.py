@@ -53,7 +53,9 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
    28. 맞춤 CSS — 덱 안 <style> 로 본문을 새로 짜도 된다. 대신 고정 영역(머리띠 · 꼬리띠 ·
        쪽번호 · 로고 · 워터마크 · 진행선 · 제목 밴드 · 조작판)을 건드리지 않고, 장 id 나 자기
        클래스로 범위를 묶고, 색은 --br-* · --bl-* 토큰만, 치수는 rem 만, bl-·br- 이름은
-       새로 짓지 않는가
+       새로 짓지 않는가. 형태 · 움직임도 계통 눈금만 — 글꼴 var(--br-font-*), 모서리
+       var(--bl-r-*) · 0 · 50%, 그림자 var(--bl-shadow*), 곡선 var(--bl-ease*) · linear,
+       길이 0.15~1.2s(무한 반복 12s). 인라인 style= 도 형태 · 움직임을 본다 (1.48.0)
    29. 본문 표현 — 내용 장 중 글 · 표만 있는 장이 절반을 넘지 않는가 (주의만, 실패 아님)
 
 왜 rem 으로 판정하는가
@@ -453,15 +455,71 @@ def own_css_problems(css_list, known, slide_ids=()):
                     bad.append(f"계통 토큰을 덮어쓴다 — {k}")
                 _color_bad(k, v, sel_list, bad)
                 _px_bad(k, v, sel_list, bad)
+                _form_bad(k, v, sel_list, bad)
         for sel, decls in kf:
             for k, v in _decls(decls):
                 _color_bad(k, v, "@keyframes " + sel, bad)
                 _px_bad(k, v, "@keyframes " + sel, bad)
+                _form_bad(k, v, "@keyframes " + sel, bad)
     if n_frames and not has_reduce:
         warn.append(f"맞춤 @keyframes {n_frames}개에 움직임 줄이기 분기가 없다 — "
                     "@media (prefers-reduced-motion: no-preference) 안에 두거나 html.bl-anim 에 묶는다")
     # 같은 위반이 여러 번 나오면 한 번만 보인다
     return list(dict.fromkeys(bad)), warn
+
+
+# 형태 · 움직임 토큰 (1.48.0). 색만 토큰이면 장마다 모서리 · 그림자 · 속도가 제각각이라
+# 한 덱이 여러 덱처럼 보인다. 계통 CSS 가 실제로 쓰는 눈금만 허용한다.
+_FONT_OK = re.compile(r"^(?:var\(--(?:br-font-(?:kr|num|label)|bl-font-mono)\)|inherit)$")
+_RADIUS_OK = re.compile(r"^(?:0|50%|var\(--bl-r-(?:xs|s|m|l|pill)\)|inherit)$")
+_SHADOW_TOKEN = re.compile(r"^(?:none|var\(--bl-shadow(?:-up)?\)|inherit|"
+                           r"inset 0 0 0 [\d.]+rem var\(--b[rl]-[\w-]+\))$")
+_EASE_WORD = re.compile(r"\b(?:ease(?:-in|-out|-in-out)?|step-start|step-end)\b|cubic-bezier\(|steps\(")
+DUR_MIN, DUR_MAX, LOOP_MAX = 0.15, 1.2, 12.0     # 초. 무한 반복(흐르는 점 · 도는 표식)만 길게
+
+
+def _secs(t):
+    return float(t[:-2]) / 1000 if t.endswith("ms") else float(t[:-1])
+
+
+def _form_bad(k, v, where, bad):
+    """글꼴 · 모서리 · 그림자 · 곡선 · 길이를 계통 눈금에 묶는다."""
+    v = v.replace("!important", "").strip()
+    w = where[:40]
+    if k == "font-family" and not _FONT_OK.match(v):
+        bad.append(f"글꼴을 직접 정했다 — {w} {{ {k}: {v[:40]} }} · var(--br-font-kr) 등 토큰만")
+    elif k == "font" and v != "inherit" and not re.search(r"var\(--(?:br-font-|bl-font-)", v):
+        bad.append(f"글꼴을 직접 정했다 — {w} {{ font: {v[:40]} }} · 글꼴 자리에 var(--br-font-*)")
+    elif re.fullmatch(r"border(?:-[a-z]+)*-radius", k):
+        parts = re.split(r"\s+(?![^()]*\))|\s*/\s*", v)
+        if not all(_RADIUS_OK.match(x) for x in parts if x):
+            bad.append(f"모서리를 직접 정했다 — {w} {{ {k}: {v[:40]} }} · var(--bl-r-xs|s|m|l|pill) · 0 · 50%")
+    elif k == "box-shadow":
+        if not all(_SHADOW_TOKEN.match(x.strip()) for x in re.split(r",(?![^()]*\))", v)):
+            bad.append(f"그림자를 직접 정했다 — {w} {{ {k}: {v[:40]} }} · var(--bl-shadow) · var(--bl-shadow-up) · none")
+    elif k == "text-shadow" and v not in ("none", "inherit"):
+        bad.append(f"글자 그림자 — {w} {{ {k}: {v[:40]} }} · 쓰지 않는다")
+    elif k in ("animation", "transition") or k.endswith(("-timing-function", "-duration")):
+        if v in ("none", "inherit", "initial", "unset"):
+            return
+        for item in re.split(r",(?![^()]*\))", v):
+            item = item.strip()
+            ease_free = re.sub(r"var\([^()]*\)", " ", item)
+            if _EASE_WORD.search(ease_free):
+                bad.append(f"움직임 곡선을 직접 정했다 — {w} {{ {k}: {item[:40]} }} · var(--bl-ease|ease-out|ease-pop) · linear")
+            elif k in ("animation", "transition") and "var(--bl-ease" not in item \
+                    and not re.search(r"\blinear\b", item):
+                bad.append(f"움직임 곡선이 없다(기본 ease 가 걸린다) — {w} {{ {k}: {item[:40]} }} · var(--bl-ease*) 를 적는다")
+            if k.endswith("-timing-function"):
+                continue
+            times = re.findall(r"(?<![\w.-])(\d*\.?\d+m?s)\b", ease_free)
+            if not times:
+                continue
+            d = _secs(times[0])                         # 첫 시간 값이 길이, 둘째는 지연
+            top = LOOP_MAX if "infinite" in item else DUR_MAX
+            if d and not (DUR_MIN <= d <= top):
+                bad.append(f"움직임 길이 {times[0]} — {w} · {DUR_MIN}~{DUR_MAX}s"
+                           + (f" (무한 반복은 {LOOP_MAX:g}s 까지)" if top == DUR_MAX else ""))
 
 
 def _color_bad(k, v, where, bad):
@@ -487,23 +545,35 @@ def _px_bad(k, v, where, bad):
 
 
 def check_own_css(html, rep, path):
-    """본문 맞춤 CSS — 새로 짜도 되지만 고정 영역 · 색 · 치수 · 이름 규칙 안에서."""
+    """본문 맞춤 CSS — 새로 짜도 되지만 고정 영역 · 색 · 치수 · 이름 · 형태 · 움직임 규칙 안에서.
+
+    인라인 style= 도 형태 · 움직임 규칙(글꼴 · 모서리 · 그림자 · 곡선 · 길이)을 본다 —
+    <style> 을 피해 속성에 적으면 같은 결과가 나기 때문이다."""
     own = own_css_blocks(html)
-    if not own:
+    inline_bad = []
+    body = _blank(html, r"<style[^>]*>.*?</style>")
+    body = _blank(body, r"<script[^>]*>.*?</script>")
+    for tag in re.findall(r"<[^>]*\sstyle=\"[^\"]*\"[^>]*>", body):
+        if "br-logo" in tag or "br-wordmark" in tag:
+            continue                                   # apply_brand.py 가 넣는 로고 치수
+        for k, v in _decls(re.search(r'style="([^"]*)"', tag).group(1)):
+            _form_bad(k, v, "style=", inline_bad)
+    if not own and not inline_bad:
         rep.o("맞춤 CSS — 없음 (계통 부품만 사용)")
         return
     known = _system_classes(html, path)
     ids = re.findall(r'<section[^>]*\bbl-sl\b[^>]*\bid="([^"]+)"|<section[^>]*\bid="([^"]+)"[^>]*\bbl-sl\b', html)
-    bad, warn = own_css_problems(own, known, [a or b for a, b in ids])
+    bad, warn = own_css_problems(own, known, [a or b for a, b in ids]) if own else ([], [])
+    bad = list(dict.fromkeys(bad + inline_bad))
     for w in warn:
         rep.w(w)
     if bad:
-        rep.f(f"맞춤 CSS 위반 {len(bad)}건 — 본문은 새로 짜도 되지만 고정 영역 · 토큰 · rem 규칙은 지킨다")
+        rep.f(f"맞춤 CSS 위반 {len(bad)}건 — 본문은 새로 짜도 되지만 고정 영역 · 토큰 · rem · 형태 · 움직임 규칙은 지킨다")
         for b in bad[:10]:
             print(f"        {b}")
     else:
         n = sum(len(_rules(c)[0]) for c in own)
-        rep.o(f"맞춤 CSS — 블록 {len(own)}개 · 규칙 {n}개, 고정 영역 · 색 · 치수 · 이름 규칙 지킴")
+        rep.o(f"맞춤 CSS — 블록 {len(own)}개 · 규칙 {n}개, 고정 영역 · 색 · 치수 · 이름 · 형태 · 움직임 규칙 지킴")
 
 
 def _system_classes(html, path):

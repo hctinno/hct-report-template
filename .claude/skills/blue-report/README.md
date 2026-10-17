@@ -1134,7 +1134,17 @@ python3 scripts/check_live.py 보고서.html --shots out/
 | 자기 클래스 · 자기 변수 — `x-` 등 `bl-` · `br-` 아닌 접두어, `--x-*` | `bl-` · `br-` 이름 새로 짓기, `--br-*` · `--bl-*` 토큰 덮어쓰기 |
 | `var(--br-*)` · `var(--bl-*)` · `currentColor` · `transparent` | hex · `rgb()` · `hsl()` · 색 이름(`white` 등). 그림자의 검정 · 흰 반투명만 예외 |
 | `rem` · `%` · `fr` · `em` · 테두리 `1px` | 그 밖의 `px` |
+| 글꼴 `var(--br-font-kr)` · `--br-font-num` · `--br-font-label` · `var(--bl-font-mono)` | 다른 `font-family`, 글꼴 자리가 빈 `font:` 단축 |
+| 모서리 `var(--bl-r-xs \| s \| m \| l \| pill)` · `0` · `50%`(원) | 그 밖의 `border-radius` 값 |
+| 그림자 `var(--bl-shadow)` · `var(--bl-shadow-up)` · `none` · 테두리 고리 `inset 0 0 0 .16rem var(--br-*)` | 직접 적은 그림자, `text-shadow` |
+| 곡선 `var(--bl-ease)` · `var(--bl-ease-out)` · `var(--bl-ease-pop)` · 무한 반복은 `linear` | `ease` · `ease-in-out` · `cubic-bezier()` · `steps()`, 곡선 생략(기본 `ease`) |
+| 길이 0.15 ~ 1.2초 · 무한 반복(흐르는 점 · 도는 표식)은 12초까지 | 그보다 짧거나 긴 움직임 |
 | 새 `@keyframes` — 움직임 줄이기 분기 안에서 | 장 자체(`#장id { padding … }` · `.bl-sl`) · `html` · `body` 를 대상으로 삼기, `@font-face` · `@import` |
+
+**형태 · 움직임도 한 덱의 말투다.** 색만 토큰이면 장마다 모서리 · 그림자 · 속도가 달라 여러 덱을
+이어 붙인 것처럼 보인다. 위 표의 눈금이 계통 부품이 실제로 쓰는 값이다. 인라인 `style=` 도 같은
+검사를 받는다. 움직임은 **먼저 기존 12계열(`bl-a` — 카탈로그 `motion` 장)로 표현**하고, 없을 때만
+새 `@keyframes` 를 짠다.
 
 맞춤 장도 글자 하한(본문 1.0rem) · 대비 · 16:9 한 화면 · 좁은 폭 접힘을 그대로 검사받는다.
 900px 이하에서 접히도록 `@media (max-width: 900px)` 분기를 함께 적는다. 움직임에 정보를 싣지 않는다

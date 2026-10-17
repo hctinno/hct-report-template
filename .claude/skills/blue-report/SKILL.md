@@ -109,6 +109,8 @@ python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file 
      애니메이션을 직접 적는다. 견본은 카탈로그 `own` 장(X01). 규칙: 장 id(`#장id`)나 자기
      접두어(`x-` 등)로 범위를 묶고, 색은 `var(--br-*)` · `var(--bl-*)` 토큰만, 치수는 `rem`,
      `bl-` · `br-` 이름은 새로 짓지 않고, 고정 영역 클래스는 선택자에 넣지 않는다.
+     형태 · 움직임도 계통 눈금만 — 글꼴 `var(--br-font-*)` · 모서리 `var(--bl-r-*)` · 그림자
+     `var(--bl-shadow*)` · 곡선 `var(--bl-ease*)` · 길이 0.15~1.2초. 움직임은 먼저 `bl-a` 12계열로.
    - 표 · 목록만으로 장을 채우지 않는다. 표가 맞는 장(부록 · 상세 비교)만 표로 둔다.
 3. 도넛은 `python3 scripts/donut.py --live …` 로 만든다. 아이콘은 `<i class="bl-i bl-i--이름">`
    (Lucide 135종 — 목록은 카탈로그 `icons` 장).
