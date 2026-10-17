@@ -672,7 +672,7 @@ def check_own_css(log, out_dir):
         ("통과 — 장 id 범위 · 토큰 · rem · 움직임 분기",
          "#s9 { --x-c: var(--br-cat-2) } #s9 .x-a { color: var(--br-navy); padding: 1rem; border: 1px solid var(--br-hairline) }"
          " #s9 .bl-tc { gap: .5rem }"
-         " @media (prefers-reduced-motion: no-preference) { #s9.in .x-a { animation: xA 1s both } }"
+         " @media (prefers-reduced-motion: no-preference) { #s9.in .x-a { animation: xA 1s var(--bl-ease) both } }"
          " @keyframes xA { from { opacity: 0 } to { opacity: 1 } }", None),
         ("머리띠를 건드림", "#s9 .bl-hd { background: var(--br-navy) }", "고정 영역"),
         ("워터마크 숨김", ".x-a .br-watermark { display: none }", "고정 영역"),
@@ -688,6 +688,20 @@ def check_own_css(log, out_dir):
         ("bl- 이름 짓기", "#s9 .bl-funnel { display: grid }", "bl-·br- 이름을 새로"),
         ("토큰 덮어쓰기", "#s9 { --br-navy: var(--br-cat-1) }", "계통 토큰"),
         ("폰트 덧붙이기", "@import url(x.css);", "@font-face"),
+        # 형태 · 움직임 토큰 (1.48.0)
+        ("통과 — 형태 · 움직임 토큰", "#s9 .x-a { font: 700 var(--bl-fs-kpi)/1 var(--br-font-num);"
+         " border-radius: var(--bl-r-s) var(--bl-r-s) 0 0; box-shadow: var(--bl-shadow);"
+         " transition: transform .3s var(--bl-ease) } #s9 .x-b { border-radius: 50%;"
+         " animation: xSpin 8s linear infinite }", None),
+        ("글꼴 직접 지정", "#s9 .x-a { font-family: serif }", "글꼴을 직접"),
+        ("font 단축에 글꼴 없음", "#s9 .x-a { font: 700 1rem Georgia }", "글꼴을 직접"),
+        ("모서리 직접 값", "#s9 .x-a { border-radius: .7rem }", "모서리를 직접"),
+        ("그림자 직접 값", "#s9 .x-a { box-shadow: 0 1rem 2rem var(--br-navy) }", "그림자를 직접"),
+        ("글자 그림자", "#s9 .x-a { text-shadow: 0 0 .2rem var(--br-navy) }", "글자 그림자"),
+        ("곡선 직접 값", "#s9 .x-a { transition: opacity .3s ease-in-out }", "움직임 곡선을 직접"),
+        ("곡선 생략", "#s9 .x-a { transition: opacity .3s }", "움직임 곡선이 없다"),
+        ("너무 긴 움직임", "#s9 .x-a { transition: opacity 2s var(--bl-ease) }", "움직임 길이"),
+        ("너무 빠른 움직임", "#s9 .x-a { animation-duration: 80ms }", "움직임 길이"),
     ]
     for label, css, want in cases:
         bad, warn = own_css_problems([css], known, ["s9"])
@@ -698,7 +712,7 @@ def check_own_css(log, out_dir):
             ok = any(want in b for b in bad)
             got = "; ".join(bad)[:90] or "잡지 못했다"
         (log.ok if ok else log.fail)(f"맞춤 CSS {label}", "" if ok else got)
-    bad, warn = own_css_problems(["#s9 .x-a { animation: xA 1s } @keyframes xA { to { opacity: 1 } }"], known)
+    bad, warn = own_css_problems(["#s9 .x-a { animation: xA 1s var(--bl-ease) } @keyframes xA { to { opacity: 1 } }"], known)
     (log.ok if warn and not bad else log.fail)("맞춤 CSS 움직임 분기 없음 → 주의", "; ".join(bad + warn)[:90])
 
     # 덱 한 벌 — 위반 블록을 넣으면 check_live 가 실패로 끝나야 한다
@@ -710,6 +724,16 @@ def check_own_css(log, out_dir):
     r = run([sys.executable, os.path.join(SCRIPTS, "check_live.py"), path])
     hit = r.returncode != 0 and "맞춤 CSS 위반" in r.stdout
     (log.ok if hit else log.fail)("맞춤 CSS 덱 단위 — 위반이면 check_live 실패",
+                                  "" if hit else (r.stdout.strip().splitlines() or [""])[-1])
+
+    # 인라인 style= 로 우회해도 형태 · 움직임 규칙에 걸려야 한다
+    path = os.path.join(out_dir, "own-inline.html")
+    inline_html = base.replace('<div class="bl-bd">', '<div class="bl-bd"><p class="x-q" '
+                               'style="font-family: serif; transition: opacity .3s ease">인라인</p>', 1)
+    open(path, "w", encoding="utf-8").write(inline_html)
+    r = run([sys.executable, os.path.join(SCRIPTS, "check_live.py"), path])
+    hit = r.returncode != 0 and "글꼴을 직접" in r.stdout and "움직임 곡선을 직접" in r.stdout
+    (log.ok if hit else log.fail)("맞춤 CSS 인라인 style= — 형태 · 움직임 위반이면 실패",
                                   "" if hit else (r.stdout.strip().splitlines() or [""])[-1])
 
 

@@ -876,6 +876,14 @@ body.present #bl-notes { display: none }
 
   --bl-shadow:    0 .3rem .9rem color-mix(in srgb, var(--br-navy) 7%, transparent);
   --bl-shadow-up: 0 .5rem 1.2rem color-mix(in srgb, var(--br-navy) 20%, transparent);
+
+  /* 모서리 눈금 — 맞춤 본문(<style data-own>)은 이 다섯과 0 · 50%(원)만 쓴다.
+     계통 부품이 실제로 쓰는 값(.25 · .4 · .6 · 1rem · 알약)을 그대로 옮겼다 */
+  --bl-r-xs:   .25rem;   /* 칩 · 작은 배지 */
+  --bl-r-s:    .4rem;    /* 카드 · 행 */
+  --bl-r-m:    .6rem;    /* 큰 카드 · 그림 상자 */
+  --bl-r-l:    1rem;     /* 판 · 겹창 */
+  --bl-r-pill: 99rem;    /* 알약 */
 }
 
 /* ── 범주 색 ─────────────────────────────────────────────────────────────── */

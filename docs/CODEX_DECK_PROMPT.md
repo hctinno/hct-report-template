@@ -111,7 +111,11 @@ PowerPoint 파일이 꼭 필요할 때만 쓴다.**
 - 고정 영역 클래스(`.bl-hd` · `.bl-rf` · `.bl-pg` · `.br-mark` · `.br-watermark` · `.bl-title` · `#bl-prog` ·
   `.bl-hud`)와 장 자체 · `html` · `body` 는 선택자에 넣지 않는다
 - 색은 `var(--br-*)` · `var(--bl-*)` 토큰만(hex · `rgb()` · 색 이름 금지), 치수는 `rem`
-- 새 `@keyframes` 는 `@media (prefers-reduced-motion: no-preference)` 안에서 건다
+- 형태 · 움직임도 토큰만 — 글꼴 `var(--br-font-*)` · 모서리 `var(--bl-r-xs|s|m|l|pill)` · 0 · 50% ·
+  그림자 `var(--bl-shadow)` · `var(--bl-shadow-up)` · 곡선 `var(--bl-ease*)`(무한 반복만 `linear`) ·
+  길이 0.15~1.2초. 인라인 `style=` 도 같다
+- 움직임은 먼저 기존 12계열(`bl-a`)로 표현하고, 없을 때만 새 `@keyframes` 를
+  `@media (prefers-reduced-motion: no-preference)` 안에서 건다
 - 표 · 목록만으로 장을 채우지 않는다 — 글 · 표뿐인 장이 내용 장의 절반을 넘으면 검사기가 주의를 낸다
 
 대응표와 허용 · 금지 목록 전문은 스킬 `README.md` 「6-3 · 본문 맞춤 디자인」.
