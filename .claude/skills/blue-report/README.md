@@ -30,6 +30,7 @@ blue-report/
 │  ├─ archive/                 보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
 │  ├─ LICENSE-Lucide.txt       아이콘 저작권 고지 (ISC · MIT)
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
+├─ DESIGN.md                  발표 덱 디자인 규칙 — 톤 · 위계 · 그릴 것 · 움직임 절제 · 토큰. 먼저 읽는다
 ├─ references/
 │  ├─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
 │  └─ decisions/                규격을 바꾼 근거(실측·대조) 원본. README.md 가 색인이다
@@ -44,7 +45,7 @@ blue-report/
    ├─ palette.py               N단계 램프 생성 + 대비 검증
    ├─ check_deck.py            덱 자동 점검 17항목 + 슬라이드별 PNG
    ├─ check_doc.py             A4 문서 점검 9항목 + 쪽별 PNG
-   ├─ check_live.py            라이브 덱 점검 29항목 (엔진 기동 · 근거 JSON · 단계 · 클래스 · 세로 넘침 · 맞춤 CSS · 본문 표현)
+   ├─ check_live.py            라이브 덱 점검 30항목 (엔진 기동 · 근거 JSON · 단계 · 클래스 · 세로 넘침 · 맞춤 CSS · 본문 표현 · 움직임 절제)
    ├─ make_icons.py            Lucide 아이콘 → blue-live.css 마스크 (--check 는 오프라인)
    ├─ make_font_subset.py      Pretendard 서브셋 (한글 · 라틴 · 기호)
    ├─ ensure_deps.py           필요한 것을 스스로 갖춘다 (수동 설치 불필요)
@@ -1003,6 +1004,8 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 애니메이션 12계열 · 발표 기능을 뽑아 이 계통으로 옮겼다. 원본의 수치 · 조직 · 인물 · 원문은
 옮기지 않았다 — 견본은 전부 가상 시나리오다.
 
+**먼저 `DESIGN.md`(디자인 규칙 한 장)를 읽는다.** 이 절은 그 규칙을 받치는 규격 전문이다.
+
 **새 보고서는 기준 덱을 틀로 삼는다.** 머리띠 · 꼬리띠 · 로고 · 워터마크 · 진행선 · 제목 밴드는
 그대로 두고, 본문은 내용에 맞게 짠다 — 카탈로그 부품을 그대로 · 고쳐 쓰거나, 없으면 새로 짠다
 (아래 「본문 맞춤 디자인」).
@@ -1018,7 +1021,7 @@ cp assets/live-standard.html 작업/보고서.html
 # 2. 회사 정보 · 로고를 넣고 CSS · 뷰어 JS · 폰트까지 한 파일로 묶는다 (권장)
 #    --title 을 빼면 brand.json 의 docTitle 이 덱 제목을 덮는다 — 장마다 꼬리띠 문서명이 바뀐다
 python3 scripts/apply_brand.py --brand brand.json --deck 작업/보고서.html --title "문서명" --single-file -o 보고서.html
-# 3. 29항목 검사. 실패 0 이어야 완료다. 장마다 남는 PNG 를 눈으로 넘겨 본다
+# 3. 30항목 검사. 실패 0 이어야 완료다. 장마다 남는 PNG 를 눈으로 넘겨 본다
 python3 scripts/check_live.py 보고서.html --shots out/
 ```
 
@@ -1514,12 +1517,12 @@ python3 scripts/donut.py --live --raw --total 360 --unit 건 --caption "주간 �
 # 가운데 숫자는 구멍에 맞춰 저절로 줄지만, 단위는 짧게(h · 건 · %) 두는 편이 읽기 좋다
 python3 scripts/make_icons.py --check         # 아이콘 CSS 가 목록과 맞는가 (오프라인)
 python3 scripts/make_font_subset.py --check   # 폰트 서브셋이 글자 목록과 맞는가
-python3 scripts/check_live.py 보고서.html --shots out/   # 29항목 + 장마다 화면 PNG
+python3 scripts/check_live.py 보고서.html --shots out/   # 30항목 + 장마다 화면 PNG
 ```
 
 ### 검사기가 보는 것 · 눈으로 볼 것
 
-`check_live.py` 29항목 — 문체(원문 · 그려진 글자) · 토큰 밖 hex · 두 CSS · rem · 노트 · 머리띠 ·
+`check_live.py` 30항목 — 문체(원문 · 그려진 글자) · 토큰 밖 hex · 두 CSS · rem · 노트 · 머리띠 ·
 꼬리띠 · 쪽번호 · 마크 · 워터마크 · 마크 짝 · 브랜드 자리 · 근거 JSON · 스타일 · 폰트 · 지면 끝 ·
 조작판 겹침 · 글자 하한 둘 · 가로 넘침 · 데이터 마크 대비 · 엔진 기동 · 단계와 `[클릭]` ·
 정의 없는 클래스 · 보이지 않는 글자 · 세로 넘침(16:9 한 화면 · 좁은 폭 꼬리띠) · 맞춤 CSS(고정 영역 ·

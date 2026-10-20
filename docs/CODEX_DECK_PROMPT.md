@@ -61,6 +61,10 @@ brand/hct/brand.json
 
 ### 1. 규격 읽기
 
+**`.claude/skills/blue-report/DESIGN.md` 를 먼저 읽는다.** 발표 덱의 디자인 규칙 한 장이다 — 톤 ·
+한 장의 위계 · 내용별로 무엇을 그릴지 · 움직임 절제 · 토큰. 기준 덱 · 카탈로그는 틀과 부품이고,
+구체적인 도식 · 효과는 이 규칙에 따라 내용을 보고 직접 판단한다.
+
 `.claude/skills/blue-report/README.md` 를 **전부** 읽는다. 이것이 규격서다.
 색값, 타입 스케일, 간격, 차트 계산법, 문체 규칙이 전부 여기 있다.
 
@@ -270,8 +274,8 @@ python .claude/skills/blue-report/scripts/check_doc.py   decks-out/doc.html    #
 python .claude/skills/blue-report/scripts/check_board.py decks-out/board.html  # 웹 보드
 ```
 
-`check_deck.py` 가 17항목, `check_live.py` 가 29항목을 기계로 판정한다.
-`check_live.py` 의 29항목 중 여섯이 지면 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
+`check_deck.py` 가 17항목, `check_live.py` 가 30항목을 기계로 판정한다.
+`check_live.py` 의 30항목 중 여섯이 지면 크롬이다 — 머리띠 · 꼬리띠 · 쪽번호 ·
 머리띠 브랜드 마크 · 워터마크 · 마크 배경 짝. 넷은 산출물이 회사 문서로 나왔는지다 —
 로고 자리표시자 · 스타일 · 본문 폰트 · 지면 끝. 출처 칩이 있으면 근거에 이어지는지도 본다.
 조작판이 꼬리띠의 문서명·쪽번호를 덮는지는 1600·760·400px 세 폭에서 장마다 잰다.

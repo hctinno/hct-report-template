@@ -11,7 +11,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
 판정이 겹치는 것(문체·raw hex·마크 대비)은 check_deck.py 에서 불러 쓴다.
 같은 낱말을 두 스크립트가 다르게 판정하는 일이 없도록 한 곳에만 둔다.
 
-검사 항목 (29)
+검사 항목 (30)
   정적 — HTML 원문만 본다. Playwright 없이도 돈다.
     1. 문체 — 존댓말·평서형 종결 없이 명사형인가 (check_deck.py 규칙 재사용)
     2. 색 — 토큰 밖 raw hex 를 본문에 직접 쓰지 않았는가
@@ -57,6 +57,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
        var(--bl-r-*) · 0 · 50%, 그림자 var(--bl-shadow*), 곡선 var(--bl-ease*) · linear,
        길이 0.15~1.2s(무한 반복 12s). 인라인 style= 도 형태 · 움직임을 본다 (1.48.0)
    29. 본문 표현 — 내용 장 중 글 · 표만 있는 장이 절반을 넘지 않는가 (주의만, 실패 아님)
+   30. 움직임 절제 — 장마다 등장 계열 2종 · 반복 움직임 1종을 넘지 않는가 (주의만). DESIGN.md 「4」
 
 왜 rem 으로 판정하는가
   px 로 재면 창 크기에 따라 결과가 달라져 같은 파일이 통과했다 떨어졌다 한다.
@@ -314,10 +315,11 @@ def check_literal_px(html, rep, path_hint=None):
     # 뒤 선언과 한 덩어리로 잡혀 없는 위반이 생긴다 — 실제로 width:100% 가
     # 앞 태그의 height:40px 에 붙어 걸렸다.
     #
-    # br-logo 는 예외다. 그 height 는 brand.json 의 logoHeight 를 apply_brand.py 가
-    # 넣은 값이라 이 파일이 적은 치수가 아니다.
+    # br-logo · br-wordmark 는 예외다. 로고 높이와 글자 로고 크기는 brand.json 을 읽어
+    # apply_brand.py 가 넣은 값이라 이 파일이 적은 치수가 아니다. 글자 로고만 쓰는
+    # 브랜드(로고 그림 없음)로 묶으면 장마다 실패가 났다.
     for tag in re.findall(r"<[^>]*\sstyle=\"[^\"]*\"[^>]*>", html):
-        if "br-logo" in tag:
+        if "br-logo" in tag or "br-wordmark" in tag:
             continue
         m = re.search(r'style="([^"]*)"', tag)
         if m:
@@ -605,6 +607,39 @@ VISUAL_CLS = ("bl-tc", "bl-lc", "bl-hc", "bl-meter", "bl-lanes", "bl-span", "bl-
 # 표현을 따질 장이 아닌 것 — 표지 · 간지 · 마무리 · 부록 · 질문
 _FRAME_CLS = ("bl-sl--cover", "bl-sl--chapter", "bl-sl--apxdiv", "bl-fin", "bl-qa", "bl-chapter",
               "bl-apxdiv")
+
+
+# 등장(한 번) · 반복(계속) 계열. 반복은 읽는 동안 눈을 끌어 장마다 한 종만 둔다.
+LOOP_FAM = ("flow", "blink", "pulse", "ripple", "glow", "run", "spin")
+ENTER_MAX, LOOP_KINDS_MAX = 2, 1
+
+
+def check_motion(html, rep):
+    """장마다 움직임 종류가 과하지 않은가 — 판정이 아니라 신호다 (DESIGN.md 「4」).
+
+    부록 장(data-apx)은 뺀다. 카탈로그의 움직임 견본처럼 모아 보여 주는 자리다."""
+    busy = []
+    for k, (tag, body) in enumerate(_slices(html), 1):
+        if "data-apx" in tag:
+            continue
+        fam = set(re.findall(r"\bbl-a--([a-z0-9]+)", body))
+        enter = sorted(f for f in fam if f not in LOOP_FAM)
+        loops = {f for f in fam if f in LOOP_FAM}
+        if "<animateMotion" in body or "<animate " in body:
+            loops.add("svg")
+        for css in re.findall(r"<style[^>]*>(.*?)</style>", body, re.S):
+            for m in re.finditer(r"animation(?:-name)?\s*:\s*([^;}]*infinite[^;}]*)", css):
+                name = re.findall(r"\b(x[A-Z]\w*|[a-z][\w-]*[A-Z]\w*)\b", m.group(1))
+                loops.add("own:" + (name[0] if name else "?"))
+        if len(enter) > ENTER_MAX or len(loops) > LOOP_KINDS_MAX:
+            m = re.search(r'id="([^"]+)"', tag)
+            busy.append(f"{k:02d}" + (f"({m.group(1)})" if m else "")
+                        + f" 등장 {len(enter)} · 반복 {len(loops)}")
+    if busy:
+        rep.w(f"움직임 과다 {len(busy)}장 — 장마다 등장 {ENTER_MAX}종 · 반복 {LOOP_KINDS_MAX}종까지: "
+              + " · ".join(busy[:6]))
+    else:
+        rep.o(f"움직임 절제 — 장마다 등장 {ENTER_MAX}종 · 반복 {LOOP_KINDS_MAX}종 이내 (부록 제외)")
 
 
 def check_visual(html, rep):
@@ -1127,6 +1162,7 @@ def main():
     check_classes(html, rep, a.path)
     check_own_css(html, rep, a.path)
     check_visual(html, rep)
+    check_motion(html, rep)
     check_render(a.path, rep, a.shots, seen_style=bad)
 
     sys.exit(rep.render())
