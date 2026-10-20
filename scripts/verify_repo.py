@@ -12,7 +12,7 @@
             `실패` 가 하나라도 있으면 저장소 점검이 실패한다.
             `주의` 는 허용한다 — 도넛을 쓰지 않은 덱에서 나오는 정상 결과다.
   boards    웹 보드(관리보드 + 보관 4종)를 check_board.py 11항목으로 판정한다.
-  live      라이브 덱을 check_live.py 29항목으로 판정한다. 고정 지면이 없고
+  live      라이브 덱을 check_live.py 30항목으로 판정한다. 고정 지면이 없고
             치수가 rem 이라 px 하한이 아니라 rem 하한으로 본다.
             견본만이 아니라 apply_brand.py 산출물(단일 파일 · 연결형)도 본다.
             엔진 기능(넘김 · 단계 · 쪽번호 이동 · 발표 · 레이저 · 겹창 · 근거 ·
@@ -725,6 +725,18 @@ def check_own_css(log, out_dir):
     hit = r.returncode != 0 and "맞춤 CSS 위반" in r.stdout
     (log.ok if hit else log.fail)("맞춤 CSS 덱 단위 — 위반이면 check_live 실패",
                                   "" if hit else (r.stdout.strip().splitlines() or [""])[-1])
+
+    # 움직임 절제(30번) — 등장 3종 · 반복 2종이면 주의, 2종 · 1종이면 통과
+    from check_live import check_motion, Report  # noqa: E402
+    def motion(body):
+        rep = Report()
+        check_motion('<section class="bl-sl" id="m">' + body + '</section>', rep)
+        return rep
+    busy = motion('<i class="bl-a bl-a--up"></i><i class="bl-a bl-a--gx"></i><i class="bl-a bl-a--pop"></i>'
+                  '<i class="bl-a bl-a--pulse"></i><svg><animateMotion/></svg>')
+    calm = motion('<i class="bl-a bl-a--up"></i><i class="bl-a bl-a--gx"></i><svg><animateMotion/></svg>')
+    (log.ok if busy.warn and not calm.warn else log.fail)(
+        "움직임 절제 — 과하면 주의 · 절제면 통과", "; ".join(busy.warn + calm.warn)[:90])
 
     # 인라인 style= 로 우회해도 형태 · 움직임 규칙에 걸려야 한다
     path = os.path.join(out_dir, "own-inline.html")

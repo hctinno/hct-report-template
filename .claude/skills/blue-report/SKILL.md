@@ -10,6 +10,8 @@ description: "사내 보고서·발표 덱·회의록·현황판을 회사 공�
 
 ## 1. 먼저 읽을 것
 
+- **`DESIGN.md` — 발표 덱 디자인 규칙(톤 · 위계 · 무엇을 그릴까 · 움직임 절제 · 토큰). 제일 먼저 읽는다.**
+  기준 덱 · 카탈로그는 틀과 부품이고, 무엇을 어떻게 그릴지는 이 규칙으로 판단한다.
 - `references/rules.md` — 차트·문체·레이아웃 규칙 전문. 차트를 그리기 전에 반드시 읽는다.
 - `assets/blue-report.css` — 색·타입·간격 토큰과 파운데이션 클래스. **색은 여기 토큰으로만 쓴다.**
 - `assets/live-standard.html` 기준 덱 · `assets/live-catalog.html` 부품 카탈로그 ·
@@ -121,7 +123,7 @@ python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file 
 6. `python3 scripts/apply_brand.py --brand <brand.json> --deck <파일> --title "문서명" --single-file -o <결과>.html`
    로 로고 · CSS · 엔진을 한 파일에 묶는다. **`--title` 을 빼면 brand.json 의 `docTitle` 이 덱 제목을
    덮어 장마다 꼬리띠 문서명이 회사 기본값으로 바뀐다.**
-7. `python3 scripts/check_live.py <결과>.html --shots out/` 29항목 실패 0 을 확인하고, `out/` 에
+7. `python3 scripts/check_live.py <결과>.html --shots out/` 30항목 실패 0 을 확인하고, `out/` 에
    장마다 남는 PNG 를 눈으로 넘겨 본다(여백 · 균형 · 겹침은 검사기가 못 본다). 29번 「본문 표현」
    주의가 뜨면 글 · 표뿐인 장을 그림으로 바꾼다.
 
@@ -226,10 +228,10 @@ python3 scripts/check_deck.py <작업경로>/deck.html --shots out/
 데이터 대비 2:1, 본문 영역 겹침, 브랜드 마크 존재, 마크와 본문 겹침, 로고 변형과 배경 밝기,
 도넛 검산)을 검사하고 슬라이드별 PNG를 남긴다.
 
-라이브 덱(기준 덱 포함)은 `python3 scripts/check_live.py <파일> --shots out/` 이 29항목을 본다 —
+라이브 덱(기준 덱 포함)은 `python3 scripts/check_live.py <파일> --shots out/` 이 30항목을 본다 —
 문체 · rem · 토큰 · 띠 · 마크 짝 · 근거 JSON · 글자 하한 · 가로 · 세로 넘침 · 조작판 겹침 ·
 엔진 기동 · 단계와 [클릭] · 정의 없는 클래스 · 보이지 않는 글자 · 맞춤 CSS(고정 영역 · 토큰 · rem ·
-이름) · 본문 표현(글 · 표뿐인 장 비율, 주의만). `--shots` 는 장마다 PNG 를 남긴다.
+이름) · 본문 표현(글 · 표뿐인 장 비율, 주의만) · 움직임 절제(장마다 등장 2종 · 반복 1종, 주의만). `--shots` 는 장마다 PNG 를 남긴다.
 
 **`실패`가 0이 아니면 완료가 아니다.** `주의`는 허용된다 — 도넛을 쓰지 않은 덱에서
 도넛 검산 항목이 `주의`로 나오는 것이 정상이다.
