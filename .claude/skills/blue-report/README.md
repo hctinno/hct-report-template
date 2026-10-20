@@ -26,10 +26,11 @@ blue-report/
 │  ├─ blue-live.css            라이브 계통 — 배율 · 띠 · 부품 38종 · 움직임 12계열 · 아이콘 135종
 │  ├─ live-viewer.js           라이브 엔진 — 넘김 · 단계 · 쪽 이동 · 발표 · 레이저 · 대본 창 · 겹창 · 위젯
 │  ├─ live-standard.html       기준 덱 15장 — 새 보고서의 출발점
-│  ├─ live-catalog.html        라이브 부품 카탈로그 52장 — 그대로 · 고쳐 · 참고해 쓴다
+│  ├─ live-catalog.html        라이브 부품 카탈로그 56장 — 그대로 · 고쳐 · 참고해 쓴다
 │  ├─ archive/                 보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
 │  ├─ LICENSE-Lucide.txt       아이콘 저작권 고지 (ISC · MIT)
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
+├─ MOTION.md                  효과 라이브러리 — 요청 시 고르는 연출 패턴 · 단일 효과 22종 · 단계 흐리게
 ├─ DESIGN.md                  발표 덱 디자인 규칙 — 톤 · 위계 · 그릴 것 · 움직임 절제 · 토큰. 먼저 읽는다
 ├─ references/
 │  ├─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
@@ -1013,7 +1014,7 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 | 파일 | `--deck` | 장 | 쓰는 법 |
 |---|---|---|---|
 | `assets/live-standard.html` | `standard` | 15 | **출발점.** 표지 · 목차 · 보고 요지 · 장 간지 · 본문 · 로드맵 · 결정 요청 · 마무리 · 부록 간지 · 예상 질문 · 용어 |
-| `assets/live-catalog.html` | `livecatalog` | 52 | 부품첩. 맞는 장을 복사해 그대로 · 고쳐 쓰거나, 참고해 새로 짠다. `own` 장(X01)이 맞춤 본문 견본 |
+| `assets/live-catalog.html` | `livecatalog` | 56 | 부품첩. 맞는 장을 복사해 그대로 · 고쳐 쓰거나, 참고해 새로 짠다. `own` 장(X01)이 맞춤 본문 견본 |
 
 ```bash
 # 1. 기준 덱을 틀로 복사한다. 본문은 카탈로그 부품을 쓰거나 고치거나 <style data-own> 으로 새로 짠다
@@ -1141,7 +1142,7 @@ python3 scripts/check_live.py 보고서.html --shots out/
 | 모서리 `var(--bl-r-xs \| s \| m \| l \| pill)` · `0` · `50%`(원) | 그 밖의 `border-radius` 값 |
 | 그림자 `var(--bl-shadow)` · `var(--bl-shadow-up)` · `none` · 테두리 고리 `inset 0 0 0 .16rem var(--br-*)` | 직접 적은 그림자, `text-shadow` |
 | 곡선 `var(--bl-ease)` · `var(--bl-ease-out)` · `var(--bl-ease-pop)` · 무한 반복은 `linear` | `ease` · `ease-in-out` · `cubic-bezier()` · `steps()`, 곡선 생략(기본 `ease`) |
-| 길이 0.15 ~ 1.2초 · 무한 반복(흐르는 점 · 도는 표식)은 12초까지 | 그보다 짧거나 긴 움직임 |
+| 길이 0.15 ~ 2.4초 · 무한 반복(흐르는 점 · 도는 표식)은 12초까지 | 그보다 짧거나 긴 움직임 |
 | 새 `@keyframes` — 움직임 줄이기 분기 안에서 | 장 자체(`#장id { padding … }` · `.bl-sl`) · `html` · `body` 를 대상으로 삼기, `@font-face` · `@import` |
 
 **형태 · 움직임도 한 덱의 말투다.** 색만 토큰이면 장마다 모서리 · 그림자 · 속도가 달라 여러 덱을
@@ -1276,6 +1277,7 @@ python3 scripts/check_live.py 보고서.html --shots out/
 | | 노선도 (역 자동 순환) | `.bl-route` | `route` · S07 |
 | | 상태 격자 시뮬레이션 | `.bl-simg` | `simg` · S08 |
 | | 근거 패널 · 원문 · 영상 | `.bl-ev` · `[data-doc]` · `[data-video]` | `media` · S09 |
+| 연출 패턴 | 데이터 그리기 · 경로 그리기 · 단계 전개 + 흐리게(`data-dim`) · 전과 후 — `MOTION.md` 「2」 | `bl-a` 조합 · `data-dim` | `mx-data` · `mx-path` · `mx-steps` · `mx-swap` · M01~M04 |
 | 맞춤 본문 | 장 안 `<style data-own>` 으로 새로 짠 깔때기 — 범위 · 토큰 · rem · 움직임 분기 견본 | 자기 접두어 `x-` | `own` · X01 |
 | 참고 | 아이콘 135종 · 움직임 견본 · 조작 요약 | `.bl-i` · `.bl-a` | `icons` · `motion` · `keys` |
 

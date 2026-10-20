@@ -10,6 +10,8 @@ description: "사내 보고서·발표 덱·회의록·현황판을 회사 공�
 
 ## 1. 먼저 읽을 것
 
+- **`MOTION.md` — 효과 라이브러리.** 사용자가 애니메이션 · 효과를 요청하면 여기서 고른다(연출 패턴 ·
+  단일 효과 22종 · 단계 전개 + 지난 단계 흐리게). 요청이 없으면 덧붙이지 않는다.
 - **`DESIGN.md` — 발표 덱 디자인 규칙(톤 · 위계 · 무엇을 그릴까 · 움직임 절제 · 토큰). 제일 먼저 읽는다.**
   기준 덱 · 카탈로그는 틀과 부품이고, 무엇을 어떻게 그릴지는 이 규칙으로 판단한다.
 - `references/rules.md` — 차트·문체·레이아웃 규칙 전문. 차트를 그리기 전에 반드시 읽는다.
@@ -26,7 +28,7 @@ description: "사내 보고서·발표 덱·회의록·현황판을 회사 공�
 | 무엇을 만드나 | `--deck` | 파일 | 계통 · 검사기 |
 |---|---|---|---|
 | 보고서 · 발표 덱 (기본) | `standard` | `assets/live-standard.html` | 라이브 덱 · `check_live.py` |
-| 부품 재사용 · 참고 — 장째 복사 · 변형 | `livecatalog` | `assets/live-catalog.html` | 라이브 덱 부품첩(52장) |
+| 부품 재사용 · 참고 — 장째 복사 · 변형 | `livecatalog` | `assets/live-catalog.html` | 라이브 덱 부품첩(56장) |
 | 회의록 (A4 인쇄) | `minutes` | `assets/doc-minutes.html` | A4 문서 · `check_doc.py` |
 | 고쳐 가며 쓰는 현황판 · 대시보드 | `manage` | `assets/board-manage.html` | 웹 보드 · `check_board.py` |
 
@@ -98,7 +100,7 @@ python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file 
 | 용도 | `--deck` | 파일 | 장수 |
 |---|---|---|---|
 | 기준 덱 — 출발점 | `standard` | `live-standard.html` | 15 |
-| 부품 카탈로그 — 재사용 · 참고 | `livecatalog` | `live-catalog.html` | 52 |
+| 부품 카탈로그 — 재사용 · 참고 | `livecatalog` | `live-catalog.html` | 56 |
 
 1. `live-standard.html` 을 복사해 뼈대로 쓴다. **고정 영역**(머리띠 · 꼬리띠 · 쪽번호 · 로고 ·
    워터마크 · 진행선 · 제목 형광 밴드 · 조작판 · 엔진)은 그대로 둔다.
@@ -112,7 +114,7 @@ python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file 
      접두어(`x-` 등)로 범위를 묶고, 색은 `var(--br-*)` · `var(--bl-*)` 토큰만, 치수는 `rem`,
      `bl-` · `br-` 이름은 새로 짓지 않고, 고정 영역 클래스는 선택자에 넣지 않는다.
      형태 · 움직임도 계통 눈금만 — 글꼴 `var(--br-font-*)` · 모서리 `var(--bl-r-*)` · 그림자
-     `var(--bl-shadow*)` · 곡선 `var(--bl-ease*)` · 길이 0.15~1.2초. 움직임은 먼저 `bl-a` 12계열로.
+     `var(--bl-shadow*)` · 곡선 `var(--bl-ease*)` · 길이 0.15~2.4초. 효과는 요청이 있을 때 `MOTION.md` 에서 고른다.
    - 표 · 목록만으로 장을 채우지 않는다. 표가 맞는 장(부록 · 상세 비교)만 표로 둔다.
 3. 도넛은 `python3 scripts/donut.py --live …` 로 만든다. 아이콘은 `<i class="bl-i bl-i--이름">`
    (Lucide 135종 — 목록은 카탈로그 `icons` 장).
@@ -231,7 +233,7 @@ python3 scripts/check_deck.py <작업경로>/deck.html --shots out/
 라이브 덱(기준 덱 포함)은 `python3 scripts/check_live.py <파일> --shots out/` 이 30항목을 본다 —
 문체 · rem · 토큰 · 띠 · 마크 짝 · 근거 JSON · 글자 하한 · 가로 · 세로 넘침 · 조작판 겹침 ·
 엔진 기동 · 단계와 [클릭] · 정의 없는 클래스 · 보이지 않는 글자 · 맞춤 CSS(고정 영역 · 토큰 · rem ·
-이름) · 본문 표현(글 · 표뿐인 장 비율, 주의만) · 움직임 절제(장마다 등장 2종 · 반복 1종, 주의만). `--shots` 는 장마다 PNG 를 남긴다.
+이름) · 본문 표현(글 · 표뿐인 장 비율, 주의만) · 움직임 절제(장마다 등장 3종 · 반복 2종, 주의만 — 고르는 법은 `MOTION.md`). `--shots` 는 장마다 PNG 를 남긴다.
 
 **`실패`가 0이 아니면 완료가 아니다.** `주의`는 허용된다 — 도넛을 쓰지 않은 덱에서
 도넛 검산 항목이 `주의`로 나오는 것이 정상이다.

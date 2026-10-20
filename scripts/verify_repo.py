@@ -700,7 +700,7 @@ def check_own_css(log, out_dir):
         ("글자 그림자", "#s9 .x-a { text-shadow: 0 0 .2rem var(--br-navy) }", "글자 그림자"),
         ("곡선 직접 값", "#s9 .x-a { transition: opacity .3s ease-in-out }", "움직임 곡선을 직접"),
         ("곡선 생략", "#s9 .x-a { transition: opacity .3s }", "움직임 곡선이 없다"),
-        ("너무 긴 움직임", "#s9 .x-a { transition: opacity 2s var(--bl-ease) }", "움직임 길이"),
+        ("너무 긴 움직임", "#s9 .x-a { transition: opacity 3s var(--bl-ease) }", "움직임 길이"),
         ("너무 빠른 움직임", "#s9 .x-a { animation-duration: 80ms }", "움직임 길이"),
     ]
     for label, css, want in cases:
@@ -726,14 +726,15 @@ def check_own_css(log, out_dir):
     (log.ok if hit else log.fail)("맞춤 CSS 덱 단위 — 위반이면 check_live 실패",
                                   "" if hit else (r.stdout.strip().splitlines() or [""])[-1])
 
-    # 움직임 절제(30번) — 등장 3종 · 반복 2종이면 주의, 2종 · 1종이면 통과
+    # 움직임 절제(30번) — 등장 4종 · 반복 3종이면 주의, 등장 2종 · 반복 1종이면 통과
     from check_live import check_motion, Report  # noqa: E402
     def motion(body):
         rep = Report()
         check_motion('<section class="bl-sl" id="m">' + body + '</section>', rep)
         return rep
     busy = motion('<i class="bl-a bl-a--up"></i><i class="bl-a bl-a--gx"></i><i class="bl-a bl-a--pop"></i>'
-                  '<i class="bl-a bl-a--pulse"></i><svg><animateMotion/></svg>')
+                  '<i class="bl-a bl-a--left"></i><i class="bl-a bl-a--pulse"></i><i class="bl-a bl-a--spin"></i>'
+                  '<svg><animateMotion/></svg>')
     calm = motion('<i class="bl-a bl-a--up"></i><i class="bl-a bl-a--gx"></i><svg><animateMotion/></svg>')
     (log.ok if busy.warn and not calm.warn else log.fail)(
         "움직임 절제 — 과하면 주의 · 절제면 통과", "; ".join(busy.warn + calm.warn)[:90])
@@ -864,6 +865,16 @@ def _engine_once(log, label, path):
         expect(J("__t.cur()") == g + 1, "단계를 다 연 뒤 → 는 다음 장")
         key("ArrowLeft"); wait(450)
         expect(J("__t.cur()") == g and J("__t.shown('gantt')")[0] == tot, "← 로 돌아오면 단계가 다 열린 채")
+        # 지난 단계 흐리게(data-dim) — 연출 패턴 M03. 셋째 단계에서 앞 두 줄만 흐리다
+        if J("__t.idx('mx-steps')") >= 0:
+            go("mx-steps"); wait(450)
+            for _ in range(3):
+                key("ArrowRight"); wait(350)
+            past = J("[...document.querySelectorAll('#mx-steps [data-f]')].map(e => e.classList.contains('is-past'))")
+            op = J("getComputedStyle(document.querySelector('#mx-steps [data-f]')).opacity")
+            expect(past == [True, True, False, False] and float(op) < 0.5,
+                   f"data-dim — 지난 단계 흐리게 ({past} · 첫 줄 불투명도 {op})")
+            go("gantt"); wait(450)
         key("Control+l"); wait()
         expect(not J("document.body.classList.contains('laser')"), "Ctrl+L — 레이저 끔")
         key("Control+l"); wait()

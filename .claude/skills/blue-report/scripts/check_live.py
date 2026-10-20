@@ -55,9 +55,9 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
        클래스로 범위를 묶고, 색은 --br-* · --bl-* 토큰만, 치수는 rem 만, bl-·br- 이름은
        새로 짓지 않는가. 형태 · 움직임도 계통 눈금만 — 글꼴 var(--br-font-*), 모서리
        var(--bl-r-*) · 0 · 50%, 그림자 var(--bl-shadow*), 곡선 var(--bl-ease*) · linear,
-       길이 0.15~1.2s(무한 반복 12s). 인라인 style= 도 형태 · 움직임을 본다 (1.48.0)
+       길이 0.15~2.4s(무한 반복 12s). 인라인 style= 도 형태 · 움직임을 본다 (1.48.0)
    29. 본문 표현 — 내용 장 중 글 · 표만 있는 장이 절반을 넘지 않는가 (주의만, 실패 아님)
-   30. 움직임 절제 — 장마다 등장 계열 2종 · 반복 움직임 1종을 넘지 않는가 (주의만). DESIGN.md 「4」
+   30. 움직임 절제 — 장마다 등장 계열 3종 · 반복 움직임 2종을 넘지 않는가 (주의만). MOTION.md
 
 왜 rem 으로 판정하는가
   px 로 재면 창 크기에 따라 결과가 달라져 같은 파일이 통과했다 떨어졌다 한다.
@@ -477,7 +477,7 @@ _RADIUS_OK = re.compile(r"^(?:0|50%|var\(--bl-r-(?:xs|s|m|l|pill)\)|inherit)$")
 _SHADOW_TOKEN = re.compile(r"^(?:none|var\(--bl-shadow(?:-up)?\)|inherit|"
                            r"inset 0 0 0 [\d.]+rem var\(--b[rl]-[\w-]+\))$")
 _EASE_WORD = re.compile(r"\b(?:ease(?:-in|-out|-in-out)?|step-start|step-end)\b|cubic-bezier\(|steps\(")
-DUR_MIN, DUR_MAX, LOOP_MAX = 0.15, 1.2, 12.0     # 초. 무한 반복(흐르는 점 · 도는 표식)만 길게
+DUR_MIN, DUR_MAX, LOOP_MAX = 0.15, 2.4, 12.0     # 최종본: 등장 .5~.6s · 그리기 .8~2.4s     # 초. 무한 반복(흐르는 점 · 도는 표식)만 길게
 
 
 def _secs(t):
@@ -611,7 +611,7 @@ _FRAME_CLS = ("bl-sl--cover", "bl-sl--chapter", "bl-sl--apxdiv", "bl-fin", "bl-q
 
 # 등장(한 번) · 반복(계속) 계열. 반복은 읽는 동안 눈을 끌어 장마다 한 종만 둔다.
 LOOP_FAM = ("flow", "blink", "pulse", "ripple", "glow", "run", "spin")
-ENTER_MAX, LOOP_KINDS_MAX = 2, 1
+ENTER_MAX, LOOP_KINDS_MAX = 3, 2      # 최종본(2026-10 사내 발표 덱) 장별 연출 기준
 
 
 def check_motion(html, rep):

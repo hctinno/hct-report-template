@@ -1494,6 +1494,141 @@
     <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
   </section>
 
+  <!-- ══ 연출 패턴 — MOTION.md 「2」. 효과는 사용자가 요청할 때 여기서 골라 붙인다 ══ -->
+  <section class="bl-sl" id="mx-data" data-notes="막대가 위에서부터 차례로 자라고, 숫자가 함께 올라간다. 강조 막대는 맨 마지막에 자라 눈이 거기서 멈춘다.&#10;&#10;마지막에 도장이 찍히며 결론을 닫는다.&#10;&#10;※ 연출 패턴 M01 데이터 그리기 — 막대 gx(순번 --i) · 숫자 data-count · 강조 막대는 --d 로 늦게 · 결론은 도장 하나.">
+    <header class="bl-hd">
+      <span class="bl-code"><b>M01</b>연출 패턴 · 데이터 그리기 — 막대 순차 성장 · 숫자 세기 · 강조는 마지막</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd">
+      <h2 class="bl-title">유형별 처리 시간 — <em>견적이 가장 오래</em></h2>
+      <p class="bl-lede">가상 시나리오 · 문의 1건 평균 · <strong>강조 막대가 마지막에 자람</strong></p>
+      <div class="bl-mid bl-split bl-split--main">
+        <div class="bl-bars">
+          <div class="bl-bar-row"><span class="bl-bar-name">기술 문의</span><div class="bl-bar-track"><div class="bl-bar bl-a bl-a--gx" style="width:65%; --i: 0"></div></div><span class="bl-bar-val">5.4h</span></div>
+          <div class="bl-bar-row"><span class="bl-bar-name">일정 변경</span><div class="bl-bar-track"><div class="bl-bar bl-a bl-a--gx" style="width:37%; --i: 1"></div></div><span class="bl-bar-val">3.1h</span></div>
+          <div class="bl-bar-row"><span class="bl-bar-name">서류 발급</span><div class="bl-bar-track"><div class="bl-bar bl-a bl-a--gx" style="width:31%; --i: 2"></div></div><span class="bl-bar-val">2.6h</span></div>
+          <div class="bl-bar-row is-key"><span class="bl-bar-name">견적</span><div class="bl-bar-track"><div class="bl-bar bl-bar--key bl-a bl-a--gx" style="width:75%; --d: .6s"></div></div><span class="bl-bar-val">6.2h</span></div>
+        </div>
+        <div class="bl-stack-v">
+          <div class="bl-stat"><span class="bl-stat-v" data-count>6.2<sup>h</sup></span><span class="bl-stat-t">견적 평균 · 가장 김</span></div>
+          <span class="bl-stamp" style="--d: 1.2s">우선 개선</span>
+        </div>
+      </div>
+    </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+  </section>
+
+  <section class="bl-sl" id="mx-path" data-notes="선이 왼쪽에서부터 그려지고, 지나간 역이 차례로 켜진다. 지금 역만 맥박이 뛴다 — 눈이 머물 곳은 하나다.&#10;&#10;※ 연출 패턴 M02 경로 그리기 — 선 draw → 역 pop(순번 --i) → 지금 역 pulse 하나.">
+    <style data-own>
+      /* 경로 그리기 — 선 · 역 · 지금 역 */
+      #mx-path .x-way { position: relative; height: 12rem }
+      #mx-path .x-way svg { position: absolute; inset: 0; width: 100%; height: 100% }
+      #mx-path .x-way path { fill: none; stroke: var(--br-cobalt); stroke-width: .35rem }
+      #mx-path .x-st { position: absolute; left: calc(var(--x) * 1%); top: calc(50% - 1.1rem); transform: translateX(-50%);
+        display: grid; justify-items: center; gap: .5rem; width: 10rem; text-align: center }
+      #mx-path .x-dot { width: 1.6rem; height: 1.6rem; margin: .3rem 0; border-radius: 50%; background: var(--br-card);
+        box-shadow: inset 0 0 0 .3rem var(--br-cobalt) }
+      #mx-path .x-st.is-done .x-dot { background: var(--br-cobalt) }
+      #mx-path .x-st.is-now .x-dot { --c: var(--br-cobalt); background: var(--br-cobalt); width: 2.2rem; height: 2.2rem; margin: 0 }
+      #mx-path .x-st b { font: 800 var(--bl-fs-h3)/1.2 var(--br-font-kr) }
+      #mx-path .x-st span { font-size: var(--bl-fs-body); color: var(--br-text-2) }
+      @media (max-width: 900px) { #mx-path .x-st { width: 6rem } }
+    </style>
+    <header class="bl-hd">
+      <span class="bl-code"><b>M02</b>연출 패턴 · 경로 그리기 — 선 그리기 · 역 차례 켜짐 · 지금 역 맥박</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd">
+      <h2 class="bl-title">통합 접수까지 — <em>지금은 셋째 역</em></h2>
+      <p class="bl-lede">가상 시나리오 · 네 단계 · <strong>맥박은 지금 역 하나에만</strong></p>
+      <div class="bl-mid">
+        <div class="x-way">
+          <svg viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true"><path class="bl-a bl-a--draw" pathLength="1" d="M100 60 H900"></path></svg>
+          <div class="x-st is-done bl-a bl-a--pop" style="--x: 10; --i: 4"><i class="x-dot"></i><b>대장 통합</b><span>2023 · 완료</span></div>
+          <div class="x-st is-done bl-a bl-a--pop" style="--x: 36.7; --i: 7"><i class="x-dot"></i><b>분류 기준</b><span>2024 · 완료</span></div>
+          <div class="x-st is-now bl-a bl-a--pop" style="--x: 63.3; --i: 10"><i class="x-dot bl-a bl-a--pulse"></i><b>채팅 시범</b><span>지금 · 6주차</span></div>
+          <div class="x-st bl-a bl-a--pop" style="--x: 90; --i: 13"><i class="x-dot"></i><b>전 창구 확대</b><span>계획</span></div>
+        </div>
+      </div>
+    </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+  </section>
+
+  <section class="bl-sl" id="mx-steps" data-dim data-notes="한 줄씩 연다. 다음 줄이 열리면 앞 줄은 흐려진다 — 지금 말하는 줄만 또렷하다.&#10;&#10;[클릭] 접수 · [클릭] 분류 · [클릭] 답변 · [클릭] 기록.&#10;&#10;※ 연출 패턴 M03 단계 전개 + 지난 단계 흐리게 — 장에 data-dim, 줄마다 data-f. 발표 모드에서만 접힌다.">
+    <style data-own>
+      #mx-steps .x-rows { display: grid; gap: var(--bl-sp-2) }
+      #mx-steps .x-row { display: grid; grid-template-columns: 3rem 12rem 1fr; gap: 1.2rem; align-items: center;
+        padding: 1rem 0; border-bottom: 1px solid var(--bl-line) }
+      #mx-steps .x-row b { font: 800 var(--bl-fs-h3)/1.2 var(--br-font-kr) }
+      #mx-steps .x-row p { margin: 0; font-size: var(--bl-fs-body); color: var(--br-text-2) }
+      @media (max-width: 900px) { #mx-steps .x-row { grid-template-columns: 3rem 1fr } #mx-steps .x-row p { grid-column: 2 } }
+    </style>
+    <header class="bl-hd">
+      <span class="bl-code"><b>M03</b>연출 패턴 · 단계 전개 — 한 줄씩 열고 지난 줄은 흐리게 (data-dim)</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd">
+      <h2 class="bl-title">문의 처리 네 단계 — <em>지금 말하는 줄만 또렷하게</em></h2>
+      <p class="bl-lede">가상 시나리오 · 발표 모드(Shift+F5)에서 → 로 넘겨 확인 · <strong>앞 줄은 28%로 물러남</strong></p>
+      <div class="bl-mid">
+        <div class="x-rows">
+          <div class="x-row" data-f="1"><span class="bl-num bl-num--solid">1</span><b>접수</b><p>세 창구 기록을 한 대장으로 · 접수 번호 자동 부여</p></div>
+          <div class="x-row" data-f="2"><span class="bl-num bl-num--solid">2</span><b>분류</b><p>유형 7종 · 긴급도 3단 · 담당 팀 자동 배정</p></div>
+          <div class="x-row" data-f="3"><span class="bl-num bl-num--solid">3</span><b>답변</b><p>답변 서식 12종 · 검토 필요 건만 2인 확인</p></div>
+          <div class="x-row" data-f="4"><span class="bl-num bl-num--solid">4</span><b>기록</b><p>사례집 갱신 · 유형별 처리 시간 집계</p></div>
+        </div>
+      </div>
+    </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+  </section>
+
+  <section class="bl-sl" id="mx-swap" data-notes="왼쪽 지금 방식이 하나씩 지워지고, 오른쪽 바뀐 방식이 흑백에서 색으로 살아난다. 마지막에 아래 띠가 결론을 닫는다.&#10;&#10;※ 연출 패턴 M04 전과 후 — 지금 쪽 strike(순번) → 바뀐 쪽 tint(순번) → 결론 띠 up 하나.">
+    <style data-own>
+      #mx-swap .x-sw { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--bl-sp-4); align-items: start }
+      #mx-swap .x-col { display: grid; gap: .9rem }
+      #mx-swap .x-col h3 { margin: 0 0 .3rem; padding-bottom: .6rem; border-bottom: .2rem solid var(--x-c, var(--br-text-3));
+        font: 800 var(--bl-fs-h3)/1.2 var(--br-font-kr); color: var(--x-c, var(--br-text-2)) }
+      #mx-swap .x-col--new { --x-c: var(--br-cobalt) }
+      #mx-swap .x-col span { font-size: var(--bl-fs-body) }
+      #mx-swap .x-arw { align-self: center; font: 800 var(--bl-fs-kpi)/1 var(--br-font-num); color: var(--br-text-3) }
+      #mx-swap .x-band { margin: var(--bl-sp-4) 0 0; padding: .9rem 1.3rem; background: var(--br-navy); color: var(--br-on-dark);
+        font: 800 var(--bl-fs-h3)/1.3 var(--br-font-kr) }
+      @media (max-width: 900px) { #mx-swap .x-sw { grid-template-columns: 1fr } #mx-swap .x-arw { display: none } }
+    </style>
+    <header class="bl-hd">
+      <span class="bl-code"><b>M04</b>연출 패턴 · 전과 후 — 지금 방식 지우기 · 바뀐 방식 살아나기 · 결론 띠</span>
+      <span class="bl-sp"></span>
+      <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+    </header>
+    <div class="bl-bd">
+      <h2 class="bl-title">접수 방식 — <em>세 창구에서 한 대장으로</em></h2>
+      <p class="bl-lede">가상 시나리오 · <strong>지워지는 쪽 먼저, 살아나는 쪽 다음, 결론은 마지막</strong></p>
+      <div class="bl-mid">
+        <div class="x-sw">
+          <div class="x-col"><h3>지금</h3>
+            <span class="bl-a bl-a--strike" style="--i: 0">창구마다 다른 엑셀</span>
+            <span class="bl-a bl-a--strike" style="--i: 2">같은 고객 문의 중복</span>
+            <span class="bl-a bl-a--strike" style="--i: 4">담당자 부재 시 정지</span></div>
+          <span class="x-arw" aria-hidden="true">→</span>
+          <div class="x-col x-col--new"><h3>바뀐 뒤</h3>
+            <span class="bl-a bl-a--tint" style="--i: 7">공용 대장 한 벌</span>
+            <span class="bl-a bl-a--tint" style="--i: 9">접수 번호로 중복 묶음</span>
+            <span class="bl-a bl-a--tint" style="--i: 11">누구나 이어받음</span></div>
+        </div>
+        <p class="x-band bl-a bl-a--up" style="--d: 1.4s">한 창구 · 한 번호 · 한 기록</p>
+      </div>
+    </div>
+    <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
+    <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
+  </section>
+
   <section class="bl-sl" id="fin" data-notes="마지막 한 문장만 남기고 끝낸다. 노란 막대가 그려지는 동안 잠깐 멈춘다.&#10;&#10;※ 인사말은 적지 않는다. 지면 본문은 존댓말 종결을 쓰지 않는다 — 「질의응답」으로 닫는다.&#10;&#10;→ 전환: 질문을 받는다. 질문이 나오면 a 를 누르고 부록 쪽번호로 바로 간다.">
     <header class="bl-hd">
       <span class="bl-code"><b>끝</b>마무리 .bl-fin</span>

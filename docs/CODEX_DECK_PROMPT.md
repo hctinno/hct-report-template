@@ -64,6 +64,8 @@ brand/hct/brand.json
 **`.claude/skills/blue-report/DESIGN.md` 를 먼저 읽는다.** 발표 덱의 디자인 규칙 한 장이다 — 톤 ·
 한 장의 위계 · 내용별로 무엇을 그릴지 · 움직임 절제 · 토큰. 기준 덱 · 카탈로그는 틀과 부품이고,
 구체적인 도식 · 효과는 이 규칙에 따라 내용을 보고 직접 판단한다.
+사용자가 애니메이션 · 효과를 요청하면 **`.claude/skills/blue-report/MOTION.md`(효과 라이브러리)** 에서
+고른다 — 연출 패턴(카탈로그 `mx-*` 장) · 단일 효과 22종 · 단계 전개 + 지난 단계 흐리게(`data-dim`).
 
 `.claude/skills/blue-report/README.md` 를 **전부** 읽는다. 이것이 규격서다.
 색값, 타입 스케일, 간격, 차트 계산법, 문체 규칙이 전부 여기 있다.
@@ -99,7 +101,7 @@ PowerPoint 파일이 꼭 필요할 때만 쓴다.**
 | 파일 | `--deck` 이름 | 용도 | 장수 |
 |---|---|---|---|
 | `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 15 |
-| `live-catalog.html` | `livecatalog` | **부품 카탈로그** — 그대로 · 고쳐 · 참고해 쓰는 부품첩 | 52 |
+| `live-catalog.html` | `livecatalog` | **부품 카탈로그** — 그대로 · 고쳐 · 참고해 쓰는 부품첩 | 56 |
 
 기준 덱에 없는 부품(간트 · 조직도 · 역할 매트릭스 · 도넛 · 누적 막대 · 워터폴 · 히트맵 ·
 흐름도 · 파이프라인 · 화면 목업 · 탭 · 장면 · 노선도 · 시뮬레이션 · 근거 · 원문 · 영상 겹창)은
@@ -117,7 +119,7 @@ PowerPoint 파일이 꼭 필요할 때만 쓴다.**
 - 색은 `var(--br-*)` · `var(--bl-*)` 토큰만(hex · `rgb()` · 색 이름 금지), 치수는 `rem`
 - 형태 · 움직임도 토큰만 — 글꼴 `var(--br-font-*)` · 모서리 `var(--bl-r-xs|s|m|l|pill)` · 0 · 50% ·
   그림자 `var(--bl-shadow)` · `var(--bl-shadow-up)` · 곡선 `var(--bl-ease*)`(무한 반복만 `linear`) ·
-  길이 0.15~1.2초. 인라인 `style=` 도 같다
+  길이 0.15~2.4초. 인라인 `style=` 도 같다
 - 움직임은 먼저 기존 12계열(`bl-a`)로 표현하고, 없을 때만 새 `@keyframes` 를
   `@media (prefers-reduced-motion: no-preference)` 안에서 건다
 - 표 · 목록만으로 장을 채우지 않는다 — 글 · 표뿐인 장이 내용 장의 절반을 넘으면 검사기가 주의를 낸다
