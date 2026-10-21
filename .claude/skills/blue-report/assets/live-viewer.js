@@ -44,6 +44,10 @@
   function reduced() { return !!mqReduce.matches; }
   // 숨김 상태(장에 들어오기 전 모습)는 이 표시가 있을 때만 건다. JS 가 없으면 전부 보인다
   R.classList.add('bl-anim');
+  // 패턴 장(.xf — 패턴첩에서 옮겨 온 최종본 형태)은 최종본의 연출 신호를 읽는다.
+  // html.anim · body.expand · [data-f].on · .dim 을 이 엔진 상태에 맞춰 같이 단다.
+  var hasPat = !!D.querySelector('.bl-sl.xf');
+  if (hasPat) R.classList.add('anim');
 
   // ── 도구 ──────────────────────────────────────────────────────────────
   function $(sel, el) { return (el || D).querySelector(sel); }
@@ -158,16 +162,19 @@
   function paintSteps() {
     var st = staged();
     deck.classList.toggle('bl-deck--staged', st);
+    if (hasPat) B.classList.toggle('expand', !st);
     slides.forEach(function (s, k) {
       var lv = levels(s);
       if (!lv.length) return;
       var th = st ? threshold(k) : Infinity;
       // data-dim 을 단 장은 지난 단계를 흐리게 둔다 — 지금 말하는 단계만 또렷하다(최종본의 .fr.dim).
       var dim = st && s.hasAttribute('data-dim');
+      var pat = s.classList.contains('xf');
       $$('[data-f]', s).forEach(function (el) {
         var n = parseFloat(el.getAttribute('data-f')) || 0;
         el.classList.toggle('is-shown', n <= th);
         el.classList.toggle('is-past', dim && n < th);
+        if (pat) { el.classList.toggle('on', n <= th); el.classList.toggle('dim', dim && n < th); }
       });
       s.setAttribute('data-step', st ? stepAt[k] : lv.length);
     });

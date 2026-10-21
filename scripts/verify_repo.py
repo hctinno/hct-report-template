@@ -773,6 +773,57 @@ def check_live_engine(log, out_dir):
         _engine_once(log, label, p)
 
 
+def check_pattern_engine(log):
+    """패턴첩 — 최종본 형태의 장(.xf)이 이 엔진 상태를 최종본 신호로 읽는가.
+
+    패턴 장의 CSS 는 최종본 클래스(html.anim · body.expand · [data-f].on · .dim)를 본다.
+    엔진이 그것을 달지 않으면 지면 검사는 통과해도 발표 중 단계가 열리지 않는다."""
+    sys.path.insert(0, SCRIPTS)
+    from ensure_deps import need_browser
+    from playwright.sync_api import sync_playwright
+    path = os.path.join(ASSETS, _LIVE_FILES["patterns"])
+    bad, errs = [], []
+    with sync_playwright() as pw:
+        br = pw.chromium.launch(executable_path=need_browser())
+        pg = br.new_page(viewport={"width": 1600, "height": 900})
+        pg.on("pageerror", lambda e: errs.append(str(e).splitlines()[0]))
+        pg.goto("file://" + os.path.abspath(path))
+        pg.wait_for_timeout(900)
+        J = pg.evaluate
+        n = J("document.querySelectorAll('#deck > .bl-sl.xf').length")
+        if n < 60:
+            bad.append(f"패턴 장 {n}개 — 63개여야 한다")
+        if not J("document.documentElement.classList.contains('anim')"):
+            bad.append("html.anim 없음")
+        if not J("document.body.classList.contains('expand')"):
+            bad.append("펼침 보기인데 body.expand 없음")
+        sid = "pt-lanes3"
+        J(f"blDeck.go([...document.querySelectorAll('#deck > .bl-sl')].findIndex(s => s.id === '{sid}'))")
+        pg.wait_for_timeout(400)
+        pg.keyboard.press("Shift+F5")
+        pg.wait_for_timeout(600)
+        J(f"document.getElementById('{sid}').setAttribute('data-dim', '')")
+        on0 = J(f"document.querySelectorAll('#{sid} [data-f].on').length")
+        for _ in range(3):
+            pg.keyboard.press("ArrowRight")
+            pg.wait_for_timeout(300)
+        on3 = J(f"document.querySelectorAll('#{sid} [data-f].on').length")
+        dim = J(f"document.querySelectorAll('#{sid} [data-f].dim').length")
+        if J("document.body.classList.contains('expand')"):
+            bad.append("발표 중인데 body.expand 가 남음")
+        if not (on0 == 0 and on3 > 0):
+            bad.append(f"단계 → .on 미연결 ({on0} → {on3})")
+        if dim == 0:
+            bad.append("data-dim 인데 지난 단계 .dim 없음")
+        br.close()
+    if errs:
+        bad.append("스크립트 예외 " + " · ".join(errs[:3]))
+    if bad:
+        log.fail("패턴첩 엔진 연결", " · ".join(bad))
+    else:
+        log.ok("패턴첩 엔진 연결", f"패턴 장 {n}개 · anim · expand · 단계 .on · 흐리게 .dim")
+
+
 def _engine_once(log, label, path):
     sys.path.insert(0, SCRIPTS)
     from ensure_deps import need_browser
@@ -865,16 +916,6 @@ def _engine_once(log, label, path):
         expect(J("__t.cur()") == g + 1, "단계를 다 연 뒤 → 는 다음 장")
         key("ArrowLeft"); wait(450)
         expect(J("__t.cur()") == g and J("__t.shown('gantt')")[0] == tot, "← 로 돌아오면 단계가 다 열린 채")
-        # 지난 단계 흐리게(data-dim) — 연출 패턴 M03. 셋째 단계에서 앞 두 줄만 흐리다
-        if J("__t.idx('mx-steps')") >= 0:
-            go("mx-steps"); wait(450)
-            for _ in range(3):
-                key("ArrowRight"); wait(350)
-            past = J("[...document.querySelectorAll('#mx-steps [data-f]')].map(e => e.classList.contains('is-past'))")
-            op = J("getComputedStyle(document.querySelector('#mx-steps [data-f]')).opacity")
-            expect(past == [True, True, False, False] and float(op) < 0.5,
-                   f"data-dim — 지난 단계 흐리게 ({past} · 첫 줄 불투명도 {op})")
-            go("gantt"); wait(450)
         key("Control+l"); wait()
         expect(not J("document.body.classList.contains('laser')"), "Ctrl+L — 레이저 끔")
         key("Control+l"); wait()
@@ -1344,6 +1385,7 @@ def main():
             check_icons(log)
             check_own_css(log, tmp)
             check_live_engine(log, tmp)
+            check_pattern_engine(log)
         if "fcc" in only:
             print("\n── H-INNO FCC/KC 템플릿 ──")
             check_fcc(log)

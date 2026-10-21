@@ -4,8 +4,10 @@
 `scripts/check_live.py` 가 판정한다. 이 문서는 그 사이 — **무엇을 어떻게 그릴지 판단하는 기준**이다.
 구체적인 도식 · 효과는 만드는 에이전트가 내용을 보고 고른다. 아래는 그 판단의 틀이다.
 
-출발점은 둘이다. 틀은 `assets/live-standard.html`(기준 덱), 부품은 `assets/live-catalog.html`
-(카탈로그 — 그대로 · 고쳐 · 참고). 맞는 것이 없으면 장 안 `<style data-own>` 으로 새로 짠다.
+출발점은 셋이다. 틀은 `assets/live-standard.html`(기준 덱), **본문 디자인 기준은
+`assets/live-patterns.html`(패턴첩 — 사내 발표 덱 최종본의 본문 연출 63종, 내용은 가상)**, 작은 부품은
+`assets/live-catalog.html`(카탈로그). 패턴첩 장은 통째로 가져와 글 · 수치만 바꾼다(덱 머리에
+`blue-pattern.css`). 맞는 것이 없으면 장 안 `<style data-own>` 으로 새로 짠다.
 
 ---
 
@@ -31,16 +33,18 @@
 
 ## 3. 무엇을 그릴까 — 내용이 모양을 정한다
 
-| 내용 | 그린다 | 먼저 볼 카탈로그 장 |
-|---|---|---|
-| 흐름 · 경로 · 유입 | 흐름도 · 깔때기 · 노선도 | `flow` · `own` · `route` · `pipe` |
-| 일정 · 단계 · 연혁 | 간트 · 레인 · 연표 · 실행 길 | `gantt` · `lanes` · `history` · `decide` |
-| 비교 · 선택 | 좌우 대비 · 매트릭스 · 나란한 막대 | `vs` · `years` · `matrix` |
-| 구성 · 비율 | 도넛 · 100% 누적 막대 · 와플 | `kpi` · `stack` · `waffle` |
-| 수치 · 추세 | 수치 타일 · 강조 막대 · 계단 · 워터폴 | `kpi` · `stair` · `stack` · `hero` |
-| 구조 · 조직 | 조직도 · 구성도 · RACI | `org` · `net` · `raci` |
-| 화면 · 시연 | 목업 · 캡처 + 주석 · 탭 | `explorer` · `shot` · `tabs` |
-| 여러 소식 · 사례 나열 | 색띠 카드 · 초점 행 · 카드 + 연결자 | `tcard` · `focusrow` · `hcard` |
+| 내용 | 그린다 | 먼저 볼 패턴첩 장 | 카탈로그 장 |
+|---|---|---|---|
+| 표지 · 간지 · 목차 · 마무리 | 상승 곡선 표지 · 큰 번호 간지 · 결론 한 문장 | `pt-cover` · `pt-index` · `pt-chapter` · `pt-closing` | — |
+| 흐름 · 경로 · 유입 | 허브 · 시스템 지도 · 깔때기 · 노선 | `pt-hub` · `pt-system-map` · `pt-api-first` · `pt-ai-draft-flow` · `pt-journey` | `flow` · `own` · `route` |
+| 일정 · 단계 · 연혁 | 연표 · 간트 · 연도 단계 · 단계 카드 | `pt-timeline-cluster` · `pt-roadmap-gantt` · `pt-stage-gantt` · `pt-phase-years` · `pt-steps3` · `pt-process5` | `gantt` · `lanes` |
+| 비교 · 선택 | 3구역 편집 · 전과 후 패널 · 같은 진단 다른 처방 | `pt-three-zone` · `pt-before-after-panel` · `pt-same-diagnosis` · `pt-keyin` | `vs` · `matrix` |
+| 구성 · 비율 | 도넛 · 100% 누적 막대 | `pt-subscription` · `pt-account-mgmt` · `pt-stack-compare` | `kpi` · `stack` |
+| 수치 · 추세 | 콤보 차트 · 워터폴 · 격차 3패널 · 큰 수치 카드 | `pt-combo-chart` · `pt-segment-waterfall` · `pt-gap-3panel` · `pt-four-cards` · `pt-tier-support` | `stair` · `hero` |
+| 구조 · 조직 · 역할 | 쉐브론 3단 · 원형 링 · 노선 역할 · 팀 역량 · 경계도 | `pt-chevron3` · `pt-ring-roles` · `pt-metro-roles` · `pt-team` · `pt-boundary` | `org` · `raci` |
+| 화면 · 시연 | 파일 화면 · 실시간 화면 · 탭 + 화면 겹창 | `pt-governance-b` · `pt-device-data` · `pt-peer-tabs` · `pt-radar-case` · `pt-web-coaching` | `explorer` · `tabs` |
+| 여러 사례 · 소식 | 사례 탭 · 안팎 두 방향 · 칸반 | `pt-global-two-way` · `pt-kanban5` · `pt-security-scenes` | `tcard` · `focusrow` |
+| 상세 · 근거(부록) | 이력 표 · 유형 매트릭스 · 출처 목록 · 질문 답 | `pt-proc-table` · `pt-type-matrix` · `pt-global-sources` · `pt-qa` | — |
 
 - 표 · 목록은 **마지막 선택**이다. 부록 · 상세 비교처럼 표가 맞는 장만 표로 둔다.
 - 수치가 있으면 수치가 주인공이다. 문장 안에 묻지 않는다.
@@ -49,8 +53,8 @@
 
 - **기본은 부품에 든 움직임만**(막대 성장 · 도넛 · 흐름선 · 숫자 세기). 효과를 덧붙이지 않는다.
 - 사용자가 애니메이션 · 효과를 요청하면 **`MOTION.md`(효과 라이브러리)에서 고른다** — 연출 패턴
-  (데이터 그리기 · 경로 그리기 · 단계 전개 + 흐리게 · 전과 후 · 흐름 · 장면 넘김)을 먼저 보고, 없으면
-  단일 효과 22종을 조합한다. 견본은 카탈로그 `mx-*` · `motion` 장.
+  (패턴첩 장에 든 움직임 — 데이터 그리기 · 경로 그리기 · 전과 후 · 흐름 · 화면 시연 …)을 먼저 보고,
+  없으면 단일 효과 22종을 조합한다. 단일 효과 견본은 카탈로그 `motion` 장.
 - 원칙은 하나 — 효과는 **읽는 순서를 안내**한다. 순서대로 등장 · 값은 그려지며 · 강조는 마지막 ·
   반복은 「지금 · 흐름」에만, 시선을 끄는 반복은 한 화면에 한 곳.
 - 감속 모드에서는 처음부터 최종 모습 — 움직임에 정보를 싣지 않는다. 검사기 30번은 장마다 등장 3종 ·
@@ -62,6 +66,7 @@
 |---|---|
 | 색 | `--br-navy` · `--br-cobalt` · `--br-text*` · `--br-tint` · `--br-cat-1~6` · 상태 `--br-ok-* · --br-warn-* · --br-alert-*` · 부품은 `data-c` |
 | 글꼴 | `--br-font-kr` · `--br-font-num`(수치) · `--bl-font-mono`(세는 숫자) |
+| 패턴 장 | `blue-pattern.css` 가 그린다 — 장 안 색 · 치수는 손대지 않고 글 · 수치만 바꾼다. 패턴 장 글자는 최종본 밀도(1.0rem 미만 허용, 검사기 주의) |
 | 글자 크기 | `--bl-fs-title` · `--bl-fs-lede` · `--bl-fs-body`(본문 1.0rem 이상) · `--bl-fs-kpi` · `--bl-fs-kpi-l` · 라벨 `--bl-fs-lbl` |
 | 간격 | `--bl-sp-1~5` · 판 너비 `--bl-max` |
 | 모서리 | `--bl-r-xs · s · m · l · pill` · `0` · `50%` |
