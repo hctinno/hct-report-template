@@ -101,7 +101,7 @@ PowerPoint 파일이 꼭 필요할 때만 쓴다.**
 | 파일 | `--deck` 이름 | 용도 | 장수 |
 |---|---|---|---|
 | `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 15 |
-| `live-patterns.html` | `patterns` | **패턴첩** — 사내 발표 덱 최종본의 본문 디자인 · 연출(내용 가상). 장째 가져와 글만 바꾼다 · 덱 머리에 `blue-pattern.css` | 63 |
+| `live-patterns.html` | `patterns` | **패턴첩** — 사내 발표 덱 최종본의 디자인 언어 용례(내용 가상). 문법(`references/design-language.md`)으로 내용에 맞게 응용 · 덱 머리에 `blue-pattern.css` | 64 |
 | `live-catalog.html` | `livecatalog` | **부품 카탈로그** — 그대로 · 고쳐 · 참고해 쓰는 부품첩 | 52 |
 
 기준 덱에 없는 부품(간트 · 조직도 · 역할 매트릭스 · 도넛 · 누적 막대 · 워터폴 · 히트맵 ·

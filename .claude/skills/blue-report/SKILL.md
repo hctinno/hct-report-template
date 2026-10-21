@@ -12,9 +12,10 @@ description: "사내 보고서·발표 덱·회의록·현황판을 회사 공�
 
 - **`MOTION.md` — 효과 라이브러리.** 사용자가 애니메이션 · 효과를 요청하면 여기서 고른다(패턴첩 장의
   연출 · 단일 효과 22종 · 단계 전개 + 지난 단계 흐리게). 요청이 없으면 덧붙이지 않는다.
-- **`assets/live-patterns.html` — 패턴첩(63장).** 사내 발표 덱 최종본의 본문 디자인 · 연출을 형태 그대로
-  옮긴 것(내용은 가상). 본문을 그릴 때 **먼저 여기서 맞는 장을 찾아 통째로 가져온다** — 덱 머리에
-  `blue-pattern.css` 를 더하고 장의 `xf` · `pt-이름` 클래스를 지우지 않는다. 고르는 표는 `DESIGN.md` 「3」.
+- **`references/design-language.md` — 디자인 언어.** 사내 발표 덱 최종본에서 뽑은 색 역할 · 글자 위계 ·
+  배치 문법 · 부품 · 연출 순서. 용례는 `assets/live-patterns.html`(패턴첩 63장, 내용은 가상).
+  **베끼지 않는다** — 내용을 먼저 보고 이 문법으로 내용에 맞게 짠다. 맞는 용례는 가져와 고쳐 쓰고,
+  없으면 문법을 빌려 새로 짠다(견본 `pt-applied`). 덱 머리에 `blue-pattern.css`.
 - **`DESIGN.md` — 발표 덱 디자인 규칙(톤 · 위계 · 무엇을 그릴까 · 움직임 절제 · 토큰). 제일 먼저 읽는다.**
   기준 덱 · 카탈로그는 틀과 부품이고, 무엇을 어떻게 그릴지는 이 규칙으로 판단한다.
 - `references/rules.md` — 차트·문체·레이아웃 규칙 전문. 차트를 그리기 전에 반드시 읽는다.
@@ -31,7 +32,7 @@ description: "사내 보고서·발표 덱·회의록·현황판을 회사 공�
 | 무엇을 만드나 | `--deck` | 파일 | 계통 · 검사기 |
 |---|---|---|---|
 | 보고서 · 발표 덱 (기본) | `standard` | `assets/live-standard.html` | 라이브 덱 · `check_live.py` |
-| 본문 디자인 기준 — 장째 복사 | `patterns` | `assets/live-patterns.html` | 패턴첩(63장 · 최종본 형태) |
+| 본문 디자인 기준 — 문법 · 용례 | `patterns` | `assets/live-patterns.html` | 패턴첩(63장 + 응용 견본) · `references/design-language.md` |
 | 부품 재사용 · 참고 — 장째 복사 · 변형 | `livecatalog` | `assets/live-catalog.html` | 라이브 덱 부품첩(52장) |
 | 회의록 (A4 인쇄) | `minutes` | `assets/doc-minutes.html` | A4 문서 · `check_doc.py` |
 | 고쳐 가며 쓰는 현황판 · 대시보드 | `manage` | `assets/board-manage.html` | 웹 보드 · `check_board.py` |
@@ -104,7 +105,7 @@ python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file 
 | 용도 | `--deck` | 파일 | 장수 |
 |---|---|---|---|
 | 기준 덱 — 출발점 | `standard` | `live-standard.html` | 15 |
-| 패턴첩 — 본문 디자인 기준 | `patterns` | `live-patterns.html` | 63 |
+| 패턴첩 — 디자인 언어 용례 | `patterns` | `live-patterns.html` | 64 |
 | 부품 카탈로그 — 재사용 · 참고 | `livecatalog` | `live-catalog.html` | 52 |
 
 1. `live-standard.html` 을 복사해 뼈대로 쓴다. **고정 영역**(머리띠 · 꼬리띠 · 쪽번호 · 로고 ·
@@ -112,7 +113,9 @@ python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file 
 2. **본문은 내용에 맞게 짠다.** 장마다 먼저 「이 내용은 무엇인가」를 정한다 — 흐름 · 일정 ·
    비교 · 구성 · 수치 · 구조 · 화면. 그다음 그것을 그릴 표현을 고른다(README 「6-3 본문 맞춤
    디자인」의 대응표).
-   - **패턴첩(`live-patterns.html`)에 맞는 장이 있으면 그 장을 통째로 가져와 글 · 수치만 바꾼다.**
+   - **디자인 언어(`references/design-language.md`)로 짠다.** 내용 모양에 맞는 배치 문법을 고르고
+     패턴첩 용례 장을 열어 위계 · 밀도 · 연출을 본다. 꼭 맞으면 그 장을 가져와 칸 수 · 순서 · 강조 ·
+     문구를 내용에 맞게 고치고, 아니면 문법을 빌려 새로 짠다(색은 `--bl-pt-*`). 그대로 베끼지 않는다.
      덱 머리에 `<link rel="stylesheet" href="blue-pattern.css">` 를 더한다.
    - 카탈로그(`live-catalog.html`)에 맞는 부품이 있으면 그 장을 복사해 쓰거나 고쳐 쓴다.
      장마다 머리띠 왼쪽에 부품 이름과 코드(C01 · T03 …)가 적혀 있다.
