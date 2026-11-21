@@ -33,6 +33,7 @@
 종료 코드는 실패가 하나라도 있으면 1, 아니면 0 이다.
 """
 import argparse
+import glob
 import json
 import os
 import re
@@ -268,6 +269,42 @@ def check_live(log, out_dir):
         if fail or r.returncode != 0:
             log.fail(label, detail)
         elif warn:
+            log.warn(label, detail)
+        else:
+            log.ok(label, detail)
+
+
+def check_build(log, out_dir):
+    """본문만 쓴 견본(examples/*/deck.yaml)이 build_deck.py 로 조립되고 check_live.py 를 통과하는가.
+
+    새 보고서의 기본 경로다. 틀(머리띠 · 꼬리띠 · 로고 · 워터마크 · 표지 · 목차 · 간지)을 빌드가 다는데,
+    그 빌드가 깨지면 에이전트가 만드는 덱이 전부 깨진다. 견본 둘을 실제로 조립해 본다."""
+    ex_root = os.path.join(SKILL, "examples")
+    plans = sorted(glob.glob(os.path.join(ex_root, "*", "deck.yaml")))
+    if not plans:
+        log.fail("조립 견본", "examples/*/deck.yaml 이 없다")
+        return
+    for plan in plans:
+        name = os.path.basename(os.path.dirname(plan))
+        label = f"조립 견본 {name}"
+        out = os.path.join(out_dir, "build", f"{name}.html")
+        r = run([sys.executable, os.path.join(SCRIPTS, "build_deck.py"), plan,
+                 "--brand", BRAND, "--single-file", "-o", out])
+        if r.returncode != 0 or not os.path.exists(out):
+            log.fail(label, "build_deck.py 실패 — " + (r.stderr.strip().splitlines() or [""])[-1])
+            continue
+        warns = [x for x in r.stderr.splitlines() if x.startswith("주의")]
+        r = run([sys.executable, os.path.join(SCRIPTS, "check_live.py"), out])
+        print(r.stdout, end="")
+        m = RESULT_RE.search(r.stdout)
+        if not m:
+            log.fail(label, "check_live.py 가 결과 줄을 내지 않았다")
+            continue
+        ok, warn, fail = (int(x) for x in m.groups())
+        detail = f"통과 {ok} · 주의 {warn} · 실패 {fail}" + (f" · 빌드 주의 {len(warns)}" if warns else "")
+        if fail or r.returncode != 0:
+            log.fail(label, detail)
+        elif warn or warns:
             log.warn(label, detail)
         else:
             log.ok(label, detail)
@@ -1386,6 +1423,7 @@ def main():
             check_own_css(log, tmp)
             check_live_engine(log, tmp)
             check_pattern_engine(log)
+            check_build(log, tmp)
         if "fcc" in only:
             print("\n── H-INNO FCC/KC 템플릿 ──")
             check_fcc(log)

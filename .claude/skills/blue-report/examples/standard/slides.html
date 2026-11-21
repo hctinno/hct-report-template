@@ -1,0 +1,234 @@
+<!-- 본문 파일 — 장마다 <section id> 하나. 본문만 쓴다.
+     머리띠 · 꼬리띠 · 로고 · 워터마크 · 쪽번호는 쓰지 않는다 — build_deck.py 가 단다.
+     속성: id(필수) · data-name(머리띠 이름) · data-notes(발표자 노트, ~한다 형) ·
+           data-toc · data-sub(장 간지 목록 문구) · data-bd(본문 칸 배치 클래스) · class(bl-sl--dark 등) -->
+
+<section id="gist" data-name="보고 요지" data-bd="bl-gist"
+         data-notes="이 장 하나로 보고 전체를 말한다. 왼쪽이 결론과 결정 요청, 오른쪽이 그 결론을 받치는 세 줄이다. 시간이 없으면 이 장만 보이고 요청 두 건을 바로 묻는다. 62%는 시범 2건 실측이라 출처 칩을 눌러 범위를 같이 보여 준다.">
+  <div class="bl-gist-l">
+    <p class="bl-kicker">반복 업무 자동화 확산</p>
+    <h2 class="bl-title">반복 단계만 도구로<br><em>판단은 사람에게</em></h2>
+    <p class="bl-lede">시범 2건 실측 · 처리 시간 62% 단축<button type="button" class="bl-ev" data-ev="E2" data-claim="시범 2건 처리 시간 62% 단축">출처</button><br><strong>9월 안 결정 두 건이 4분기 일정의 전제</strong></p>
+    <div class="bl-ask">
+      <b>결정 요청</b>
+      <ol>
+        <li><span class="bl-mn">01</span><div><h3>부서별 조사 담당 1인 지정</h3><p>9월 2주 · 대상 업무 확정의 전제</p></div></li>
+        <li><span class="bl-mn">02</span><div><h3>도구 계정 12석 배정</h3><p>10월 착수분 · 분기 단위 재검토</p></div></li>
+      </ol>
+    </div>
+  </div>
+  <div class="bl-gist-r">
+    <div class="bl-gist-row"><span class="bl-gist-k">현황</span><div><h3>월 168시간이 반복 단계에 묶임</h3><p>정리 단계 62% · 3개 팀 9명 8주 기록<br>담당자 부재 시 업무 정지</p></div></div>
+    <div class="bl-gist-row"><span class="bl-gist-k">실행</span><div><h3>넉 달 동안 5건 순차 착수</h3><p>직접 수행 3건 · 전사 협조 2건<br>9월 조사 결과로 우선순위 확정</p></div></div>
+    <div class="bl-gist-row"><span class="bl-gist-k">판정</span><div><h3>12월 세 기준으로 확산 여부 결정</h3><p>적용 여부 · 기록 잔존 · 재사용 가능성<br>미달 과제는 중단 후 보고</p></div></div>
+  </div>
+</section>
+
+<section id="steps" data-name="실태" data-toc="반복 업무의 네 단계" data-sub="수집 · 정리 · 작성 · 회람"
+         data-notes="네 단계를 왼쪽부터 짚는다. 마지막 결론 줄만 또렷하게 읽는다.">
+  <h2 class="bl-title">반복 업무의 네 단계 — <em>수집 · 정리 · 작성 · 회람</em></h2>
+  <p class="bl-lede">수집 → 정리 → 작성 → 회람 · 네 단계 모두 사람 손을 거치는 구조</p>
+  <div class="bl-flow bl-flow--4 bl-mid">
+    <div class="bl-card bl-card--t1">
+      <span class="bl-ord">1</span><h3>수집</h3>
+      <p>설비·시스템 4곳에서 값을 내려받음</p>
+    </div>
+    <div class="bl-conn">›</div>
+    <div class="bl-card bl-card--t2">
+      <span class="bl-ord">2</span><h3>정리</h3>
+      <p>서식 맞춤 · 단위 환산 · 누락 확인</p>
+    </div>
+    <div class="bl-conn">›</div>
+    <div class="bl-card bl-card--t3">
+      <span class="bl-ord">3</span><h3>작성</h3>
+      <p>표와 도표로 옮겨 보고 서식에 끼움</p>
+    </div>
+    <div class="bl-conn">›</div>
+    <div class="bl-card bl-card--t4">
+      <span class="bl-ord">4</span><h3>회람</h3>
+      <p>검토 회신 반영 후 재배포</p>
+    </div>
+  </div>
+  <p class="bl-concl"><b>네 단계 중 셋이 규칙으로 정해진 일</b> · 사람 판단이 필요한 곳은 검토 회신 반영 한 곳뿐</p>
+</section>
+
+<section id="hours" data-name="시간 분포" data-toc="월 168시간의 분포" data-sub="단계별 시간 · 가장 무거운 단계"
+         data-notes="수치 넉 점을 먼저 읽고, 막대에서 어느 단계가 가장 무거운지 짚는다.">
+  <h2 class="bl-title">월 <em>168시간</em>이 네 단계에 묶임</h2>
+  <p class="bl-lede">3개 팀 · 9명 · 8주 기록 기준 <strong>정리 단계가 절반 이상</strong><button type="button" class="bl-ev" data-ev="E1" data-claim="월 168시간 · 정리 단계 62%">출처</button></p>
+  <div class="bl-cols--4 bl-cols bl-mid">
+    <div class="bl-stat"><span class="bl-stat-v" data-count>168</span><span class="bl-stat-t">월 소요 시간</span></div>
+    <div class="bl-stat"><span class="bl-stat-v">9</span><span class="bl-stat-t">관여 인원</span></div>
+    <div class="bl-stat"><span class="bl-stat-v">4</span><span class="bl-stat-t">대상 단계</span></div>
+    <div class="bl-stat"><span class="bl-stat-v">62<sup>%</sup></span><span class="bl-stat-t">정리 단계 비중</span></div>
+  </div>
+  <div class="bl-bars">
+    <div class="bl-bar-row"><span class="bl-bar-name">정리</span>
+      <div class="bl-bar-track"><div class="bl-bar" style="width:62%"></div></div>
+      <span class="bl-bar-val">104h</span></div>
+    <div class="bl-bar-row"><span class="bl-bar-name">작성</span>
+      <div class="bl-bar-track"><div class="bl-bar" style="width:23%"></div></div>
+      <span class="bl-bar-val">39h</span></div>
+    <div class="bl-bar-row"><span class="bl-bar-name">수집 · 회람</span>
+      <div class="bl-bar-track"><div class="bl-bar" style="width:15%"></div></div>
+      <span class="bl-bar-val">25h</span></div>
+  </div>
+  <p class="bl-src">출처 — 3개 팀 자체 기록 2026-07-01 ~ 08-25 · 표본 9명</p>
+</section>
+
+<section id="targets" data-name="대상 업무" data-toc="대상 업무 6건" data-sub="착수 순서와 선정 기준"
+         data-notes="표는 위에서 셋까지만 읽는다. 나머지는 눈으로 훑게 둔다.">
+  <h2 class="bl-title">대상 업무 <em>6건</em>과 착수 순서</h2>
+  <p class="bl-lede">월 소요 시간이 큰 순서 · 착수 난도와 함께 배치</p>
+  <table class="bl-tbl bl-mid">
+    <thead><tr><th>순서</th><th>업무</th><th>담당</th><th class="num">월 소요</th><th>난도</th><th>상태</th></tr></thead>
+    <tbody>
+      <tr><td>01</td><td>측정값 수집 자동화</td><td>기술1팀</td><td class="num">48h</td><td>중</td><td><span class="bl-chip bl-chip--ok">진행 중</span></td></tr>
+      <tr><td>02</td><td>성적서 초안 작성</td><td>품질팀</td><td class="num">36h</td><td>중</td><td><span class="bl-chip bl-chip--ok">진행 중</span></td></tr>
+      <tr><td>03</td><td>주간 보고 취합</td><td>운영지원팀</td><td class="num">28h</td><td>하</td><td><span class="bl-chip bl-chip--wait">착수 예정</span></td></tr>
+      <tr><td>04</td><td>외부 공고 검토</td><td>영업지원팀</td><td class="num">24h</td><td>상</td><td><span class="bl-chip bl-chip--wait">착수 예정</span></td></tr>
+      <tr><td>05</td><td>서식 오류 점검</td><td>품질팀</td><td class="num">18h</td><td>하</td><td><span class="bl-chip bl-chip--wait">착수 예정</span></td></tr>
+      <tr><td>06</td><td>자산 대장 대조</td><td>운영지원팀</td><td class="num">14h</td><td>상</td><td><span class="bl-chip bl-chip--risk">보류</span></td></tr>
+    </tbody>
+  </table>
+  <p class="bl-note">보류 1건은 원본 대장 정비가 앞서야 하는 건 · 4분기 재검토 대상</p>
+</section>
+
+<section id="compare" data-name="전후 비교" data-toc="지금과 바꾼 뒤" data-sub="바뀌는 것은 사람이 아니라 단계"
+         data-notes="왼쪽이 지금, 오른쪽이 바꾼 뒤다. 바뀌는 것은 사람이 아니라 단계라는 점을 짚는다.">
+  <h2 class="bl-title">바뀌는 것은 사람이 아니라 <em>단계</em></h2>
+  <p class="bl-lede">사람이 판단하는 자리는 그대로 · 규칙으로 정해진 자리만 도구로 이관</p>
+  <div class="bl-cols--sidebar bl-cols bl-mid">
+    <div class="bl-card bl-card--risk">
+      <h3>지금</h3>
+      <ul class="bl-ul">
+        <li>네 단계 모두 사람 손</li>
+        <li>서식 오류를 회람 뒤에 발견</li>
+        <li>담당자 부재 시 정지</li>
+        <li>기록이 개인 파일에 남음</li>
+      </ul>
+    </div>
+    <div class="bl-card bl-card--ok">
+      <h3>바꾼 뒤</h3>
+      <div class="bl-cols">
+        <ul class="bl-ul">
+          <li>수집 · 정리 · 초안 작성은 도구</li>
+          <li>서식 오류를 작성 시점에 표시</li>
+        </ul>
+        <ul class="bl-ul">
+          <li>담당자 부재와 무관하게 진행</li>
+          <li>기록이 공용 저장소에 축적</li>
+        </ul>
+      </div>
+      <p class="bl-callout">검토 회신 반영은 그대로 사람이 수행 · 판단을 도구에 넘기지 않음</p>
+    </div>
+  </div>
+  <div class="bl-cols--3 bl-cols">
+    <div class="bl-card bl-card--key">
+      <span class="bl-stat-v">62<sup>%</sup></span>
+      <h3>처리 시간 단축<button type="button" class="bl-ev" data-ev="E2" data-claim="시범 2건 처리 시간 62% 단축">출처</button></h3>
+      <p>시범 2건 · 건당 4.2시간 → 1.6시간<br>확산 시 같은 폭은 미보장</p>
+    </div>
+    <div class="bl-card bl-card--ok">
+      <span class="bl-stat-v">0</span>
+      <h3>회람 뒤 발견한 서식 오류<button type="button" class="bl-ev" data-ev="E3" data-claim="회람 뒤 발견 서식 오류 0건">출처</button></h3>
+      <p>시범 4주 · 작성 시점 표시 14건<br>이전 4주는 회람 뒤 9건</p>
+    </div>
+    <div class="bl-card bl-card--key">
+      <span class="bl-stat-v">12</span>
+      <h3>필요한 도구 계정<button type="button" class="bl-ev" data-ev="E4" data-claim="도구 계정 12석">출처</button></h3>
+      <p>대상 업무 담당자 기준<br>분기마다 사용 실적 재검토</p>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap" data-name="넉 달 일정" data-toc="넉 달 로드맵" data-sub="과제 5건 · 일정과 담당"
+         data-notes="넉 달 일정을 과제별로 보여 준다. 오른쪽 끝이 각 과제가 12월에 내놓아야 할 결과다. 01과 02는 전사 협조 건이라 부서 응답이 늦으면 뒤 과제가 같이 밀린다. 다섯 건을 넉 달에 다 끝낸다고 약속하지 않는다는 점을 마지막 줄로 분명히 한다.">
+  <h2 class="bl-title">넉 달 로드맵 — <em>동시에 진행할 5가지 과제</em></h2>
+  <p class="bl-lede">9월 조사 → 10~11월 실행 → 12월 판정 · <strong>협조 2건은 부서 응답이 일정의 전제</strong></p>
+  <div class="bl-road bl-mid">
+    <div class="bl-road-h"><span>과제 · 담당</span><span class="bl-mn">9월</span><span class="bl-mn">10월</span><span class="bl-mn">11월</span><span class="bl-mn">12월</span><span>확인할 결과</span></div>
+    <div class="bl-road-r" data-cat="1">
+      <div class="bl-road-k"><span class="bl-mn">01</span><div><h3>대상 업무 조사</h3><small>전 부서 · 운영지원팀</small></div></div>
+      <span class="bl-road-c" style="grid-column: 2 / 3">조사</span>
+      <span class="bl-road-c bl-road-c--soft" style="grid-column: 3 / 4">보완</span>
+      <p class="bl-road-out">대상 업무 목록 확정</p>
+    </div>
+    <div class="bl-road-r" data-cat="2">
+      <div class="bl-road-k"><span class="bl-mn">02</span><div><h3>사용 규칙 정립</h3><small>보안 담당 · 운영지원팀</small></div></div>
+      <span class="bl-road-c" style="grid-column: 3 / 4">보안 검토</span>
+      <span class="bl-road-c bl-road-c--soft" style="grid-column: 4 / 6">시행 · 보완</span>
+      <p class="bl-road-out">입력 금지 자료 기준</p>
+    </div>
+    <div class="bl-road-r" data-cat="4">
+      <div class="bl-road-k"><span class="bl-mn">03</span><div><h3>측정값 수집 자동화</h3><small>기술1팀</small></div></div>
+      <span class="bl-road-c" style="grid-column: 3 / 5">구축 · 시범</span>
+      <span class="bl-road-c bl-road-c--soft" style="grid-column: 5 / 6">판정</span>
+      <p class="bl-road-out">수집 소요 시간 실측</p>
+    </div>
+    <div class="bl-road-r" data-cat="3">
+      <div class="bl-road-k"><span class="bl-mn">04</span><div><h3>성적서 초안 작성</h3><small>기술1팀</small></div></div>
+      <span class="bl-road-c" style="grid-column: 3 / 5">초안 도구 적용</span>
+      <span class="bl-road-c bl-road-c--soft" style="grid-column: 5 / 6">판정</span>
+      <p class="bl-road-out">서식 오류 건수 비교</p>
+    </div>
+    <div class="bl-road-r" data-cat="5">
+      <div class="bl-road-k"><span class="bl-mn">05</span><div><h3>주간 보고 취합</h3><small>운영지원팀</small></div></div>
+      <span class="bl-road-c" style="grid-column: 4 / 5">적용</span>
+      <span class="bl-road-c bl-road-c--soft" style="grid-column: 5 / 6">판정</span>
+      <p class="bl-road-out">취합 지연 일수</p>
+    </div>
+  </div>
+  <p class="bl-concl"><b>넉 달에 5건 전부 완료를 약속하지 않음</b> · 조사 결과로 우선순위를 정해 순차 진행</p>
+</section>
+
+<section id="ask" data-name="결정 요청" data-toc="결정 요청 세 가지" data-sub="조사 협조 · 계정 12석 · 판정 기준"
+         data-notes="세 건을 하나씩 펼친다. 각각 무엇을 승인받는지 한 문장으로 말하고 다음으로 넘어간다.&#10;&#10;[클릭] 전 부서 조사 협조 — 부서마다 담당 1명 · 9월 2주 동안 20분씩이다.&#10;&#10;[클릭] 도구 계정 12석 — 대상 업무 담당자 기준 · 분기마다 사용 실적으로 다시 본다.&#10;&#10;[클릭] 12월 판정 기준 — 적용 여부 · 기록 잔존 · 재사용 가능성 세 가지에 합의를 받는다.&#10;&#10;→ 전환: 세 건 모두 9월 안에 정해져야 10월에 착수한다.">
+  <h2 class="bl-title">실행에 필요한 <em>세 가지</em><span class="bl-tag">요청</span></h2>
+  <p class="bl-lede">조사 협조 · 도구 계정 · 판정 기준 합의</p>
+  <div class="bl-rows bl-mid">
+    <div class="bl-card bl-card--key" data-f="1">
+      <span class="bl-ord">요청 1</span>
+      <h3>전 부서 조사 협조</h3>
+      <p>9월 2주 · 부서별 담당 1인 지정 · 소요 20분 내외</p>
+    </div>
+    <div class="bl-card bl-card--key" data-f="2">
+      <span class="bl-ord">요청 2</span>
+      <h3>도구 계정 12석</h3>
+      <p>대상 업무 담당자 기준 · 10월 배정 · 분기 단위 재검토</p>
+    </div>
+    <div class="bl-card bl-card--key" data-f="3">
+      <span class="bl-ord">요청 3</span>
+      <h3>12월 판정 기준 합의</h3>
+      <p>적용 여부 · 기록 잔존 · 재사용 가능성 세 항목</p>
+    </div>
+  </div>
+  <p class="bl-concl"><b>세 건 모두 9월 안 확정 필요</b> · 지연 시 10월 착수분이 11월로 밀림</p>
+</section>
+
+<section id="qa" data-name="예상 질문"
+         data-notes="가장 많이 나올 질문 셋이다. 답의 첫 줄만 읽어도 답이 되게 썼다. 그 밖의 질문은 대본 창 메모에 적어 둔다.">
+  <h2 class="bl-title">예상 질문 — <em>범위와 부담</em></h2>
+  <p class="bl-lede">가장 많이 나올 질문 셋 · 그 밖은 발표자 메모</p>
+  <div class="bl-qa">
+    <div class="bl-qa-i"><p class="bl-qa-q"><b>1</b>다섯 건을 넉 달에 다 끝내는가?</p><div class="bl-qa-a"><b>A</b><p><strong>약속하지 않음</strong><span>9월 조사로 우선순위를 정해 순차 착수 · 미달 과제는 중단 후 보고</span></p></div></div>
+    <div class="bl-qa-i"><p class="bl-qa-q"><b>2</b>부서별 조사 담당의 부담은 얼마인가?</p><div class="bl-qa-a"><b>A</b><p><strong>1인 · 20분 내외</strong><span>9월 2주 한 번 · 서식 한 장 작성</span></p></div></div>
+    <div class="bl-qa-i"><p class="bl-qa-q"><b>3</b>도구 계정 12석은 언제 회수하는가?</p><div class="bl-qa-a"><b>A</b><p><strong>분기마다 사용 실적 재검토</strong><span>미사용 계정 회수 · 지침 개정안 제4조</span></p></div></div>
+  </div>
+</section>
+
+<section id="terms" data-name="용어"
+         data-notes="부록은 질문이 나올 때만 연다. 쪽번호 체계가 바뀌는 것이 부록으로 넘어왔다는 신호다.">
+  <h2 class="bl-title">이 보고에서 쓰는 <em>용어 4개</em></h2>
+  <p class="bl-lede">처음 나오는 자리에도 괄호로 풀어 둔 것들</p>
+  <table class="bl-tbl bl-mid">
+    <thead><tr><th>용어</th><th>이 보고에서의 뜻</th><th>혼동하기 쉬운 것</th></tr></thead>
+    <tbody>
+      <tr><td>대상 업무</td><td>규칙으로 정해져 되풀이되는 일 · 판단이 필요 없는 구간</td><td>업무 전체가 아니라 그중 한 구간</td></tr>
+      <tr><td>착수</td><td>도구를 실제 업무에 처음 적용한 시점</td><td>검토 시작 시점이 아님</td></tr>
+      <tr><td>판정</td><td>12월에 적용 여부 · 기록 · 재사용을 확인하는 절차</td><td>성과 평가와 별개</td></tr>
+      <tr><td>재사용</td><td>다음 사람이 그대로 꺼내 쓸 수 있는 상태</td><td>개인 파일에 남은 것은 해당 없음</td></tr>
+    </tbody>
+  </table>
+  <p class="bl-src">용어 정의 기준일 — 2026-09-15</p>
+</section>

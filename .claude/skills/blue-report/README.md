@@ -33,7 +33,8 @@ blue-report/
 │  ├─ LICENSE-Lucide.txt       아이콘 저작권 고지 (ISC · MIT)
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
 ├─ MOTION.md                  효과 라이브러리 — 요청 시 고르는 연출 패턴 · 단일 효과 22종 · 단계 흐리게
-├─ DESIGN.md                  발표 덱 디자인 규칙 — 톤 · 위계 · 그릴 것 · 움직임 절제 · 토큰. 먼저 읽는다
+├─ DESIGN.md                  본문 스타일 한 장 — 발표 덱을 만들 때 먼저, 처음부터 끝까지 읽는다
+├─ examples/                  본문만 쓴 견본 — standard(기준 덱 내용) · showcase(카탈로그 · 패턴첩 조립)
 ├─ references/
 │  ├─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
 │  └─ decisions/                규격을 바꾼 근거(실측·대조) 원본. README.md 가 색인이다
@@ -44,6 +45,7 @@ blue-report/
 │  ├─ content.js               용도별 덱 11종의 내용
 │  └─ build.js                 실행 진입점
 └─ scripts/
+   ├─ build_deck.py            발표 덱 조립 — 본문만 쓴 장 + 조립 목록 → 틀 · 표지 · 목차 · 간지까지 붙인 덱
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지 · --live 는 라이브 덱용)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
    ├─ check_deck.py            덱 자동 점검 17항목 + 슬라이드별 PNG
@@ -1008,9 +1010,13 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 애니메이션 12계열 · 발표 기능을 뽑아 이 계통으로 옮겼다. 원본의 수치 · 조직 · 인물 · 원문은
 옮기지 않았다 — 견본은 전부 가상 시나리오다.
 
-**먼저 `DESIGN.md`(디자인 규칙 한 장)를 읽는다.** 이 절은 그 규칙을 받치는 규격 전문이다.
+**먼저 `DESIGN.md`(본문 스타일 한 장)를 읽는다.** 이 절은 그 규칙을 받치는 규격 전문이다.
 
-**새 보고서는 기준 덱을 틀로 삼는다.** 머리띠 · 꼬리띠 · 로고 · 워터마크 · 진행선 · 제목 밴드는
+**새 보고서는 본문만 쓰고 `scripts/build_deck.py` 가 틀을 씌운다** — 조립 목록 `deck.yaml` · 본문 파일
+`slides.html` 형식은 `DESIGN.md` 「0 · 1 · 2」, 견본은 `examples/`. 아래는 빌드가 다는 틀과 본문에 쓰는
+부품의 규격이다. 기준 덱을 복사해 쓰는 옛 방식도 그대로 돈다.
+
+**기준 덱은 틀의 견본이다.** 머리띠 · 꼬리띠 · 로고 · 워터마크 · 진행선 · 제목 밴드는
 그대로 두고, 본문은 내용에 맞게 짠다 — 카탈로그 부품을 그대로 · 고쳐 쓰거나, 없으면 새로 짠다
 (아래 「본문 맞춤 디자인」).
 
@@ -1239,7 +1245,7 @@ python3 scripts/check_live.py 보고서.html --shots out/
 | 분류 | 부품 | 주 클래스 | 장 id · 코드 |
 |---|---|---|---|
 | 장 짜임새 | 목차 | `.bl-agenda` | `agenda` · 00 |
-| | 장 간지 | `.bl-sl--chapter` · `.bl-chapter` · `.bl-chapter-nav` | `ch1` ~ `ch5` |
+| | 장 간지 | `.bl-sl--chapter` · `.bl-chapter.bl-chapter--toc` — 큰 장 번호 `.bl-chapter-no` · 「이 장에서」 목록 `.bl-chapter-toc`(절이 많으면 `--compact`) · 이름 붙은 진행 표시 `.bl-chapter-nav` | `ch1` ~ `ch5` |
 | | 마무리 | `.bl-fin` · `.bl-fin-l1` · `.bl-fin-l2` · `.bl-fin-mk` · `.bl-fin-ty` | `fin` |
 | | 부록 간지 | `.bl-sl--apxdiv` · `.bl-apxdiv` | `apx` |
 | | 예상 질문 | `.bl-qa` | `qa` |
