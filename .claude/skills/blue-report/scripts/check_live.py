@@ -404,7 +404,12 @@ def own_css_blocks(html):
     """덱이 스스로 적은 <style> 블록. 계통 CSS 를 묶어 넣은 블록은 뺀다."""
     out = []
     # 스크립트 안 문자열의 「<style」 이 진짜 블록과 짝지어지지 않게 지우고, 패턴 장(계통 CSS 몫)은 뺀다
-    html = _blank(_blank(_pattern_blank(html), r"<script[^>]*>.*?</script>"), r"<!--.*?-->")
+    # 순서가 중요하다 — 계통 CSS 를 한 파일에 넣으면 그 주석 속 「<script …>」 글자가 진짜 스크립트
+    # 블록의 시작으로 읽혀, 다음 </script> 까지(덱 본문 전부) 지워졌다. 그러면 단일 파일 산출물에서
+    # 맞춤 CSS 검사(28)와 본문 표현(29)이 아무것도 못 본다. 주석(HTML · CSS)을 먼저 지운다.
+    html = _blank(_pattern_blank(html), r"<!--.*?-->")
+    html = _blank(html, r"/\*.*?\*/")
+    html = _blank(html, r"<script[^>]*>.*?</script>")
     for m in re.finditer(r"<style[^>]*>(.*?)</style>", html, re.S):
         body = m.group(1)
         if any(sig in body for sig in _SYS_SIGS):

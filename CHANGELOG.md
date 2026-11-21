@@ -28,6 +28,9 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 - `DESIGN.md` 를 **본문 스타일 한 장**으로 다시 썼다 — 일하는 방식 · 본문 파일 형식 · 조립 목록 · 위계 ·
   내용별 표현(패턴첩 · 카탈로그 id) · 색 역할 · 토큰 · 금지 · 점검. 에이전트가 반드시 읽을 문서는 이것 하나다.
 - SKILL · CLAUDE · AGENTS · CODEX 프롬프트 · README 를 새 방식으로. 기준 덱 복사 방식은 예비로 남겼다.
+- `check_live.py` 버그 수정 — 한 파일 산출물에서 계통 CSS 주석 속 「<script …>」 글자를 스크립트 시작으로 읽어
+  덱 본문을 통째로 지운 뒤 맞춤 CSS 를 찾았다. 그래서 단일 파일 덱의 맞춤 CSS 검사(28)와 본문 표현(29)이
+  아무것도 보지 못했다. HTML · CSS 주석을 먼저 지우도록 순서를 바꿨다.
 
 **장 간지 목차형 — 제목만 있던 빈 화면을 「이 장에서」 목록으로 채운다.**
 - `blue-live.css`: `.bl-chapter--toc` · `.bl-chapter-no`(큰 장 번호) · `.bl-chapter-toc`(절 목록, 많으면 `--compact`) ·
