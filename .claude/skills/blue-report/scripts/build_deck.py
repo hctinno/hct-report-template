@@ -126,6 +126,15 @@ def clean_name(name):
     return H.escape(re.sub(r"\s+", " ", n).strip(" ·—") or plain(name), quote=False)
 
 
+def add_takeaway(inner, text):
+    """본문 끝에 결론 줄(.bl-concl)을 붙인다. 라이브러리 장처럼 .bl-bd 가 이미 있으면 그 안 끝에."""
+    line = f'\n  <p class="bl-concl bl-concl--ch">{text}</p>'
+    if re.search(r'<div class="bl-bd\b', inner):
+        i = inner.rfind("</div>")
+        return inner[:i] + line + "\n    " + inner[i:]
+    return inner.rstrip() + line + "\n"
+
+
 def title_of(inner):
     m = re.search(r'<h[12][^>]*class="[^"]*\bbl-title\b[^"]*"[^>]*>(.*?)</h[12]>', inner, re.S)
     return plain(m.group(1)) if m else ""
@@ -351,6 +360,11 @@ class Deck:
             items = [self.item(r) for r in ch.get("slides") or []]
             if not items:
                 die(f"장 「{ch['name']}」에 slides 가 비었다")
+            if ch.get("takeaway"):
+                # 장 결론 — 장(章)의 끝(또는 처음) 한 장에만 결론 줄을 단다. 장마다 붙이지 않는다.
+                at = -1 if str(ch.get("takeaway_at", "last")) != "first" else 0
+                a, inner, dcode, dname = items[at]
+                items[at] = (a, add_takeaway(inner, ch["takeaway"]), dcode, dname)
             built, rows = [], []
             for a, inner, dcode, dname in items:
                 num += 1

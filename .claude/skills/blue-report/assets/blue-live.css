@@ -414,6 +414,10 @@ body.present #bl-prog { opacity: 0 }
 .bl-concl b { color: var(--br-alert-text) }
 .bl-sl--dark .bl-concl { color: var(--br-on-dark); border-left-color: var(--br-amber) }
 .bl-sl--dark .bl-concl b { color: var(--br-amber) }
+/* 장 결론 — 조립 목록 takeaway 로 장(章) 끝 한 장에만 붙는다. 붉은 선(문제 표시)과 구별해 짙은 띠로 둔다 */
+.bl-concl--ch { border-left: 0; background: var(--br-navy); color: var(--br-on-dark); border-radius: var(--bl-r-m);
+                padding: .95rem 1.6rem; display: flex; gap: 1.2rem; align-items: baseline }
+.bl-concl--ch b { color: var(--br-accent-on-dark); white-space: nowrap }
 
 /* ── 수치 ────────────────────────────────────────────────────────────────── */
 .bl-stat { display: flex; flex-direction: column; gap: var(--bl-sp-1); min-width: 0 }
