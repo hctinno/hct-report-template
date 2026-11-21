@@ -17,7 +17,7 @@ Four separate lineages. They are not interchangeable: different page size, diffe
 | Slide decks | exactly 1920x1080 | `--br-fs-*` | 24px | `check_deck.py` — 17 items |
 | A4 documents | 794x1123 portrait (1123x794 landscape) | `--bd-fs-*` | 14px (10.5pt) | `check_doc.py` — 9 items |
 | Web boards | no fixed page; reflows with viewport | `--bw-fs-*` | 12.5px | `check_board.py` — 11 items |
-| Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 27 items |
+| Live decks | no fixed page; 100dvh per slide, 16:9 rem scaling | `--bl-fs-*` | body 1.0rem · note 0.78rem | `check_live.py` — 30 items |
 
 ### Templates to choose from — 4, in `.claude/skills/blue-report/assets/`
 
@@ -51,9 +51,21 @@ which fixes the paths in the output.
 
 ### Live decks — the house standard and the parts catalog
 
-**Start every new report from `live-standard.html` (`--deck standard`).** It is the canonical
-starting point: copy it and replace the content. Do not compose a deck from scratch and do not
-invent chrome — the house look lives in this file and in `blue-live.css`.
+**Write body only; the build adds the chrome.** Read `.claude/skills/blue-report/DESIGN.md` (the one-page
+body style guide, Korean) first. A report is three files — `deck.yaml` (cover info, chapter order, slide
+ids, closing, appendix), `slides.html` (one `<section id>` per slide, body only) and optional
+`evidence.json` — built by
+
+    python3 .claude/skills/blue-report/scripts/build_deck.py <dir>/deck.yaml --brand brand/hct/brand.json --single-file -o decks-out/<name>.html
+    python3 .claude/skills/blue-report/scripts/check_live.py decks-out/<name>.html --shots decks-out/shots
+
+The build adds the top rail, footer, page numbers, logo, watermark, fonts, progress bar, controls and
+presenter engine, and generates the cover, agenda, chapter dividers, closing and appendix divider. Never
+write those yourself (they are stripped with a warning). Library slides can be pulled by id:
+`catalog:<id>` (parts catalog) and `patterns:<id>` (design-language examples). Worked examples:
+`.claude/skills/blue-report/examples/standard/` and `examples/showcase/`.
+
+Copying `live-standard.html` and replacing its content still works, but it is the fallback.
 
 Same purpose as a slide deck, different mechanics. No fixed page: one slide is `100dvh`, the root
 font-size follows the viewport (`clamp(10.5px, min(1vw, 1.78vh), 20px)` — `1.78vh` is 16:9), and every

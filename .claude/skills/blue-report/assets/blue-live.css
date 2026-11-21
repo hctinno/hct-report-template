@@ -414,6 +414,10 @@ body.present #bl-prog { opacity: 0 }
 .bl-concl b { color: var(--br-alert-text) }
 .bl-sl--dark .bl-concl { color: var(--br-on-dark); border-left-color: var(--br-amber) }
 .bl-sl--dark .bl-concl b { color: var(--br-amber) }
+/* 장 결론 — 조립 목록 takeaway 로 장(章) 끝 한 장에만 붙는다. 붉은 선(문제 표시)과 구별해 짙은 띠로 둔다 */
+.bl-concl--ch { border-left: 0; background: var(--br-navy); color: var(--br-on-dark); border-radius: var(--bl-r-m);
+                padding: .95rem 1.6rem; display: flex; gap: 1.2rem; align-items: baseline }
+.bl-concl--ch b { color: var(--br-accent-on-dark); white-space: nowrap }
 
 /* ── 수치 ────────────────────────────────────────────────────────────────── */
 .bl-stat { display: flex; flex-direction: column; gap: var(--bl-sp-1); min-width: 0 }
@@ -1094,6 +1098,34 @@ body.present #bl-notes { display: none }
 .bl-chapter-nav > li { width: 4.6rem; padding-top: .7rem; border-top: .14rem solid var(--br-hairline);
                        font: 500 1rem/1 var(--bl-font-mono); color: var(--br-text-3) }
 .bl-chapter-nav > li.is-on { border-top: .22rem solid var(--br-mark); color: var(--br-mark); font-weight: 600 }
+
+/* 장 간지 — 목차형(.bl-chapter--toc). 왼쪽 큰 장 번호 · 제목 · 부제, 오른쪽 「이 장에서」 절 목록,
+   아래 장 이름이 붙은 진행 표시. 제목만 있는 간지는 화면 절반이 비어 투박해 보인다 —
+   장 안에 무엇이 오는지를 미리 보여 주면 빈자리가 정보가 된다. 옛 마크업(.bl-chapter)은 그대로 산다. */
+.bl-chapter--toc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+                   grid-template-rows: 1fr auto; gap: 0 var(--bl-sp-5); align-items: center }
+.bl-chapter-main { display: flex; flex-direction: column; gap: 1.2rem; padding-right: var(--bl-sp-5);
+                   border-right: 1px solid var(--br-hairline); align-self: stretch; justify-content: center }
+.bl-chapter-no { margin: 0 0 .4rem; font: 800 9rem/.82 var(--br-font-num); letter-spacing: -.04em;
+                 color: var(--br-mark) }
+.bl-chapter--toc .bl-title { font-size: 3.2rem; line-height: 1.15; white-space: normal }
+.bl-chapter--toc .bl-lede { margin: 0; color: var(--br-text-2) }
+.bl-chapter-side { min-width: 0 }
+.bl-chapter-toc { list-style: none; margin: 0; padding: 0 }
+.bl-chapter-toc-h { margin: 0; font: 700 var(--bl-fs-body)/1 var(--br-font-kr); color: var(--br-text-3);
+                    padding-bottom: 1rem; border-bottom: .14rem solid var(--br-navy) }
+.bl-chapter-toc > li { display: grid; grid-template-columns: 4.2rem minmax(0, 1fr); gap: 0 var(--bl-sp-3);
+                       align-items: baseline; padding: 1.25rem 0; border-bottom: 1px solid var(--br-hairline) }
+.bl-chapter-toc > li > b { font: 600 1.5rem/1 var(--bl-font-mono); color: var(--br-mark) }
+.bl-chapter-toc h3 { margin: 0 0 .3rem; font: 800 var(--bl-fs-h3)/1.3 var(--br-font-kr) }
+.bl-chapter-toc p { margin: 0; color: var(--br-text-2) }
+.bl-chapter-toc--compact > li { grid-template-columns: 3.6rem minmax(0, 1fr); padding: .72rem 0 }
+.bl-chapter-toc--compact > li > b { font-size: 1.1rem }
+.bl-chapter-toc--compact h3 { margin: 0; font: 700 var(--bl-fs-body)/1.35 var(--br-font-kr);
+                              white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.bl-chapter--toc .bl-chapter-nav { grid-column: 1 / -1; margin: var(--bl-sp-4) 0 0; gap: 1rem }
+.bl-chapter--toc .bl-chapter-nav > li { flex: 1; width: auto; font-family: var(--br-font-kr); font-size: var(--bl-fs-body) }
+.bl-chapter--toc .bl-chapter-nav > li > b { font: 600 1rem/1 var(--bl-font-mono); margin-right: .6rem }
 
 /* 부록 간지 — 어두운 지면. 큰 + 기호와 제목. 쪽번호 자리에 「부록」이 찍힌다 */
 .bl-apxdiv { display: grid; grid-template-columns: 14rem 1fr; gap: 3rem; align-items: center;
@@ -2368,6 +2400,8 @@ html.bl-scr .bl-deck { width: 66vw }
   .bl-flow--2 > .bl-conn, .bl-flow--5 > .bl-conn { transform: rotate(90deg); justify-self: center }
   .bl-ghost > * + *, .bl-kpi + .bl-kpi { border-left: 0; border-top: 1px solid var(--br-hairline) }
   .bl-chapter .bl-title { white-space: normal }
+  .bl-chapter--toc { grid-template-columns: 1fr }
+  .bl-chapter-main { border-right: 0; padding-right: 0 }
   .bl-apxdiv { grid-template-columns: 1fr }
   .bl-agenda > li { grid-template-columns: 3rem minmax(0, 1fr) }
   .bl-agenda > li > span { grid-column: 2 }

@@ -43,7 +43,7 @@
        · 표지      눈썹 .bl-cover-k · 제목 + .bl-tag · 구분선 · 한 줄 메시지 · 발표자 .bl-sig
        · 목차      .bl-agenda — 번호 · 장 제목 · 부제 한 줄씩. 마지막 행 + 부록
        · 보고 요지  .bl-gist — 왼쪽 결론 + 결정 요청 .bl-ask · 오른쪽 근거 세 줄
-       · 장 간지    .bl-sl--chapter — Chapter 라벨 · 큰 제목 · 진행 표시 .bl-chapter-nav
+       · 장 간지    .bl-sl--chapter .bl-chapter--toc — 큰 장 번호 · 제목 · 「이 장에서」 절 목록 · 진행 표시
        · 로드맵    .bl-road — 과제 행 × 기간 열 + 확인할 결과. 행 색은 data-cat
        · 출처 칩   수치 옆 .bl-ev → 문서 끝 #bl-evidence JSON 의 근거로 열린다
        · 마무리    .bl-fin — 전제 한 줄 · 핵심 문장(형광 막대) · 질의응답
@@ -127,17 +127,28 @@
   </section>
 
   <!-- 03 간지 ─────────────────────────────────────────────────────────── -->
-  <section class="bl-sl bl-sl--chapter" data-notes="장 간지는 제목만 읽고 넘어간다. 아래 칸이 지금 몇째 장인지 알려 준다.">
+  <section class="bl-sl bl-sl--chapter" data-notes="장 간지는 제목과 오른쪽 세 절만 읽고 넘어간다. 아래 칸이 지금 몇째 장인지 알려 준다.">
     <header class="bl-hd">
       <span class="bl-code"><b>CH 01</b>현황</span>
       <span class="bl-sp"></span>
       <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
-    <div class="bl-bd bl-chapter">
-      <p class="bl-chapter-k">Chapter 01</p>
-      <h2 class="bl-title">반복 업무의 실태</h2>
-      <p class="bl-lede">어느 일이 얼마나 되풀이되는가</p>
-      <ol class="bl-chapter-nav" aria-label="장 진행"><li class="is-on">01</li><li>02</li><li>03</li></ol>
+    <div class="bl-bd bl-chapter bl-chapter--toc">
+      <div class="bl-chapter-main">
+        <p class="bl-chapter-k">Chapter</p>
+        <p class="bl-chapter-no">01</p>
+        <h2 class="bl-title">반복 업무의 실태</h2>
+        <p class="bl-lede">어느 일이 얼마나 되풀이되는가</p>
+      </div>
+      <div class="bl-chapter-side">
+        <p class="bl-chapter-toc-h">이 장에서</p>
+        <ol class="bl-chapter-toc">
+          <li><b>01</b><div><h3>반복 업무의 네 단계</h3><p>수집 · 정리 · 작성 · 회람</p></div></li>
+          <li><b>02</b><div><h3>월 168시간의 분포</h3><p>단계별 시간 · 가장 무거운 단계</p></div></li>
+          <li><b>03</b><div><h3>대상 업무 6건</h3><p>착수 순서와 선정 기준</p></div></li>
+        </ol>
+      </div>
+      <ol class="bl-chapter-nav" aria-label="장 진행"><li class="is-on"><b>01</b>현황</li><li><b>02</b>실행</li><li><b>03</b>결정</li></ol>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
     <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
@@ -247,11 +258,22 @@
       <span class="bl-sp"></span>
       <div class="br-mark" data-on="dark"><!-- 로고 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>
     </header>
-    <div class="bl-bd bl-chapter">
-      <p class="bl-chapter-k">Chapter 02</p>
-      <h2 class="bl-title">넉 달 동안 무엇을 하는가</h2>
-      <p class="bl-lede">지금과 바꾼 뒤의 차이 · 일정과 담당 · 결정 요청</p>
-      <ol class="bl-chapter-nav" aria-label="장 진행"><li>01</li><li class="is-on">02</li><li>03</li></ol>
+    <div class="bl-bd bl-chapter bl-chapter--toc">
+      <div class="bl-chapter-main">
+        <p class="bl-chapter-k">Chapter</p>
+        <p class="bl-chapter-no">02</p>
+        <h2 class="bl-title">넉 달 동안 무엇을 하는가</h2>
+        <p class="bl-lede">바뀌는 단계 · 일정과 담당 · 결정 요청</p>
+      </div>
+      <div class="bl-chapter-side">
+        <p class="bl-chapter-toc-h">이 장에서</p>
+        <ol class="bl-chapter-toc">
+          <li><b>04</b><div><h3>지금과 바꾼 뒤</h3><p>바뀌는 것은 사람이 아니라 단계</p></div></li>
+          <li><b>05</b><div><h3>넉 달 로드맵</h3><p>과제 5건 · 일정과 담당</p></div></li>
+          <li><b>06</b><div><h3>결정 요청 세 가지</h3><p>조사 협조 · 계정 12석 · 판정 기준</p></div></li>
+        </ol>
+      </div>
+      <ol class="bl-chapter-nav" aria-label="장 진행"><li><b>01</b>현황</li><li class="is-on"><b>02</b>실행</li><li><b>03</b>결정</li></ol>
     </div>
     <footer class="bl-rf"><span class="bl-rf-name"></span><span class="bl-pg"></span></footer>
     <div class="br-watermark" data-on="light"><!-- 워터마크 자리: apply_brand.py 가 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div>

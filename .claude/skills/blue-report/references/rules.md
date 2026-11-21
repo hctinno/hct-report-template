@@ -172,7 +172,7 @@ d = k × √value
 | 로드맵 | `.bl-road` · `.bl-road-r[data-cat]` · `.bl-road-c` · `.bl-road-out` | 과제 행 × 기간 열 + 확인할 결과. 칸은 `style="grid-column: 2 / 4"` (2열이 첫 기간) |
 | 출처 | `.bl-ev data-ev` + `#bl-evidence` | 수치 바로 옆에 단다. 근거는 문서 끝 JSON 한 벌. `data-ev="E1,E2"` 는 탭 |
 | 목차 | `.bl-agenda` | 번호 · 장 제목 · 부제 한 줄씩. 마지막 행 + 부록 |
-| 장 간지 | `.bl-sl--chapter` · `.bl-chapter-k` · `.bl-chapter-nav` | Chapter 라벨 · 큰 제목 · 진행 표시(지금 장 `.is-on`) |
+| 장 간지 | `.bl-sl--chapter` · `.bl-chapter--toc` · `.bl-chapter-no` · `.bl-chapter-toc` · `.bl-chapter-nav` | 큰 장 번호 · 제목 · 「이 장에서」 절 목록 · 장 이름 진행 표시(지금 장 `.is-on`). 제목만 둔 간지 금지 |
 | 마무리 | `.bl-fin` · `.bl-fin-l1` · `.bl-fin-l2` · `.bl-fin-mk` · `.bl-fin-ty` | 전제 한 줄 · 핵심 문장(형광 막대) · 「질의응답」 |
 | 부록 | `.bl-sl--apxdiv` · 이후 장 `data-apx` | 간지 쪽번호는 「부록」, 부록 장은 「부록 NN / MM」 |
 | 예상 질문 | `.bl-qa` | 왼쪽 질문(~가?) · 오른쪽 답(A 표지 · 개조식) |

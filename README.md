@@ -173,7 +173,15 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 
 **효과(애니메이션)는 요청이 있을 때 `.claude/skills/blue-report/MOTION.md` 라이브러리에서 고른다.**
 
-**디자인 규칙은 `.claude/skills/blue-report/DESIGN.md` 한 장이다** — 톤 · 위계 · 그릴 것 · 움직임 절제 · 토큰.
+**새 덱은 본문만 쓰고 빌드가 틀을 씌운다.** 에이전트가 읽을 문서는 `.claude/skills/blue-report/DESIGN.md`
+(본문 스타일 한 장) 하나다. `deck.yaml`(조립 목록) + `slides.html`(장마다 본문만)을
+`scripts/build_deck.py` 가 조립한다 — 머리띠 · 꼬리띠 · 쪽번호 · 로고 · 워터마크 · 폰트 · 진행선 · 발표 기능,
+표지 · 목차 · 장 간지 · 마무리 · 부록 간지는 빌드가 만든다. 견본은 `.claude/skills/blue-report/examples/`.
+
+```bash
+python3 .claude/skills/blue-report/scripts/build_deck.py .claude/skills/blue-report/examples/standard/deck.yaml \
+  --brand brand/hct/brand.json --single-file -o decks-out/견본.html
+```
 
 **고정은 크롬뿐이다.** 본문은 내용에 맞게 짠다 — 카탈로그 부품을 그대로 · 고쳐 쓰거나, 장 안
 `<style data-own>` 으로 새 도식 · 레이아웃 · 애니메이션을 만든다. 검사기 28번이 맞춤 CSS 가 크롬을

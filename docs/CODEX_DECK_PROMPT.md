@@ -54,114 +54,58 @@ cd hct-report-template
 ```
 .claude/skills/blue-report/README.md
 .claude/skills/blue-report/references/rules.md
-.claude/skills/blue-report/assets/live-standard.html
+.claude/skills/blue-report/DESIGN.md
+.claude/skills/blue-report/scripts/build_deck.py
 .claude/skills/blue-report/scripts/check_live.py
 brand/hct/brand.json
 ```
 
 ### 1. 규격 읽기
 
-**`.claude/skills/blue-report/DESIGN.md` 를 먼저 읽는다.** 발표 덱의 디자인 규칙 한 장이다 — 톤 ·
-한 장의 위계 · 내용별로 무엇을 그릴지 · 움직임 절제 · 토큰. 기준 덱 · 카탈로그는 틀과 부품이고,
-구체적인 도식 · 효과는 이 규칙에 따라 내용을 보고 직접 판단한다.
-사용자가 애니메이션 · 효과를 요청하면 **`.claude/skills/blue-report/MOTION.md`(효과 라이브러리)** 에서
-고른다 — 연출 패턴(패턴첩 `live-patterns.html` 장) · 단일 효과 22종 · 단계 전개 + 지난 단계 흐리게(`data-dim`).
+**`.claude/skills/blue-report/DESIGN.md`(본문 스타일 한 장)를 처음부터 끝까지 읽는다.** 발표 덱을 만드는 데
+필요한 것이 이 한 장에 있다 — 일하는 방식 · 본문 파일 형식 · 조립 목록 · 위계 · 내용별로 그릴 것 · 색 역할 ·
+토큰 · 금지 · 끝내기 전 점검. 나머지 문서는 찾아보는 색인이다 — 부품 속성 · 위젯 · 근거 JSON · 발표 키는
+스킬 `README.md` 「6-3」, 색 역할 상세는 `references/design-language.md`, 차트 규칙은 `references/rules.md`.
+사용자가 애니메이션 · 효과를 요청하면 **`.claude/skills/blue-report/MOTION.md`** 에서 고른다.
 
-`.claude/skills/blue-report/README.md` 를 **전부** 읽는다. 이것이 규격서다.
-색값, 타입 스케일, 간격, 차트 계산법, 문체 규칙이 전부 여기 있다.
+### 2. 덱 고르기와 만들기
 
-`.claude/skills/blue-report/references/rules.md` 는 같은 내용의 압축본이다. 함께 읽는다.
+| 무엇을 만드나 | 만드는 법 |
+|---|---|
+| 보고서 · 발표 덱 (기본) | **본문만 쓰고 `build_deck.py` 로 조립** — 아래 |
+| 회의록 (A4 인쇄) | `--deck minutes` 견본을 복사해 내용만 바꾼다 — 아래 「회의록」 |
+| 고쳐 가며 쓰는 현황판 | `--deck manage` 견본을 복사해 내용만 바꾼다 — 아래 「관리보드」 |
 
-규격을 읽지 않고 시작하지 않는다. 이 시스템은 "파란색을 쓴다" 수준의 지침이 아니라
-값과 계산식이 정해진 체계다.
-
-### 2. 덱 고르기 — 새로 만들지 말고 골라서 내용만 바꾼다
-
-**그냥 「보고서」·「발표자료」를 만들라는 지시라면 답은 기준 덱 `standard` 다.**
-`assets/live-standard.html` 을 복사해 내용만 바꾼다. 회사 발표 덱의 표준 모양이
-그 파일에 다 들어 있다 — 머리띠, 꼬리띠, 로고, 워터마크, 진행선, 제목 형광 밴드.
-고르는 양식은 넷이다. 용도에 맞는 것을 복사해 **내용만** 교체한다. 레이아웃과 스타일을 새로
-설계하지 않는다.
-
-| 무엇을 만드나 | `--deck` 이름 | 파일 |
-|---|---|---|
-| 보고서 · 발표 덱 (기본) | `standard` | `live-standard.html` |
-| 기준 덱에 없는 부품 — 장째 복사 | `livecatalog` | `live-catalog.html` |
-| 회의록 (A4 인쇄) | `minutes` | `doc-minutes.html` |
-| 고쳐 가며 쓰는 현황판 | `manage` | `board-manage.html` |
-
-경영진 보고 · 주간보고 · 전략 보고처럼 용도가 달라도 발표·보고는 전부 기준 덱이다.
-「회의록」이면 `minutes`, 「관리보드 · 대시보드 · 현황판」이면 `manage`, 그 밖은 `standard`.
-
+경영진 보고 · 주간보고 · 전략 보고처럼 용도가 달라도 발표 · 보고는 전부 첫 줄이다.
 나머지 양식은 `assets/archive/` 에 보관했다(아래 「보관 양식」). **사람이 이름을 짚거나
 PowerPoint 파일이 꼭 필요할 때만 쓴다.**
 
-#### 기준 덱 · 부품 카탈로그 — 고정 지면이 없는 계통
+#### 발표 덱 — 본문만 쓰고 빌드가 틀을 씌운다
 
-| 파일 | `--deck` 이름 | 용도 | 장수 |
-|---|---|---|---|
-| `live-standard.html` | `standard` | **기준 덱 — 새 보고서의 출발점** | 15 |
-| `live-patterns.html` | `patterns` | **패턴첩** — 사내 발표 덱 최종본의 디자인 언어 용례(내용 가상). 문법(`references/design-language.md`)으로 내용에 맞게 응용 · 덱 머리에 `blue-pattern.css` | 64 |
-| `live-catalog.html` | `livecatalog` | **부품 카탈로그** — 그대로 · 고쳐 · 참고해 쓰는 부품첩 | 52 |
-
-기준 덱에 없는 부품(간트 · 조직도 · 역할 매트릭스 · 도넛 · 누적 막대 · 워터폴 · 히트맵 ·
-흐름도 · 파이프라인 · 화면 목업 · 탭 · 장면 · 노선도 · 시뮬레이션 · 근거 · 원문 · 영상 겹창)은
-**`live-catalog.html` 에서 찾아 그대로 쓰거나 고쳐 쓴다.** 장마다 머리띠 왼쪽에 부품 이름과 코드가
-적혀 있고, 색인 · 위젯 속성 · 근거 JSON · 발표 키는 스킬 `README.md` 「6-3. 라이브 덱」에 있다.
-
-**고정 영역은 그대로, 본문은 내용에 맞게 짠다.** 머리띠 · 꼬리띠 · 쪽번호 · 로고 · 워터마크 · 진행선 ·
-제목 형광 밴드 · 조작판 · 엔진은 기준 덱 그대로 둔다. 그 사이 본문은 장마다 내용의 성격(흐름 · 일정 ·
-비교 · 구성 · 수치 · 구조 · 화면)을 먼저 정하고 그릴 표현을 고른다. 카탈로그에 맞는 부품이 없으면
-장 안 `<style data-own>` 에 CSS · SVG · 애니메이션을 새로 적는다 — 견본은 카탈로그 `own` 장(X01).
-
-- 범위 — 선택자는 장 id(`#장id`)나 자기 접두어(`x-` 등)로 묶는다. `bl-` · `br-` 이름은 새로 짓지 않는다
-- 고정 영역 클래스(`.bl-hd` · `.bl-rf` · `.bl-pg` · `.br-mark` · `.br-watermark` · `.bl-title` · `#bl-prog` ·
-  `.bl-hud`)와 장 자체 · `html` · `body` 는 선택자에 넣지 않는다
-- 색은 `var(--br-*)` · `var(--bl-*)` 토큰만(hex · `rgb()` · 색 이름 금지), 치수는 `rem`
-- 형태 · 움직임도 토큰만 — 글꼴 `var(--br-font-*)` · 모서리 `var(--bl-r-xs|s|m|l|pill)` · 0 · 50% ·
-  그림자 `var(--bl-shadow)` · `var(--bl-shadow-up)` · 곡선 `var(--bl-ease*)`(무한 반복만 `linear`) ·
-  길이 0.15~2.4초. 인라인 `style=` 도 같다
-- 움직임은 먼저 기존 12계열(`bl-a`)로 표현하고, 없을 때만 새 `@keyframes` 를
-  `@media (prefers-reduced-motion: no-preference)` 안에서 건다
-- 표 · 목록만으로 장을 채우지 않는다 — 글 · 표뿐인 장이 내용 장의 절반을 넘으면 검사기가 주의를 낸다
-
-대응표와 허용 · 금지 목록 전문은 스킬 `README.md` 「6-3 · 본문 맞춤 디자인」.
-
-한 장이 `100dvh` 이고 루트 글자 크기가 `clamp(10.5px, min(1vw, 1.78vh), 20px)` 로 창을
-따라간다. 안의 치수는 **전부 `rem`** 이다. `px` 를 적으면 그 값만 창과 무관하게 굳어
-작은 창에서 그 요소만 커진다 — `check_live.py` 가 막는다.
-
-복사할 때 다음 4개를 같은 폴더에 함께 둔다.
+`decks-out/<보고서>/` 에 파일 셋을 만든다. 견본은 `.claude/skills/blue-report/examples/standard/`.
 
 ```
-assets/blue-report.css      색·폰트 토큰
-assets/blue-live.css        배율·띠·부품
-assets/live-viewer.js       엔진 — 넘김 · 단계 · 발표 · 레이저 · 대본 창 · 겹창 · 위젯
-assets/fonts/               폰트 서브셋
+deck.yaml       조립 목록 — 표지 정보 · 장(章) 순서 · 장마다 넣을 장 id · 마무리 · 부록
+slides.html     본문 파일 — 장마다 <section id="…" data-name data-notes> 하나, 본문만
+evidence.json   출처 칩 근거(선택)
 ```
 
-**지면 크롬은 장식이 아니라 필수다.** 장마다 전부 있어야 하고, 하나라도 빠지면
-`check_live.py` 가 실패로 잡는다.
+```bash
+python .claude/skills/blue-report/scripts/build_deck.py decks-out/<보고서>/deck.yaml --brand brand/hct/brand.json --single-file -o decks-out/<보고서>.html
+python .claude/skills/blue-report/scripts/check_live.py decks-out/<보고서>.html --shots decks-out/<보고서>-shots
+```
 
-| 부품 | 마크업 | 담는 것 |
-|---|---|---|
-| 머리띠 | `<header class="bl-hd">` | `<span class="bl-code"><b>01</b>절이름</span>` + `.bl-sp` + `.br-mark` |
-| 꼬리띠 | `<footer class="bl-rf">` | `.bl-rf-name`(문서명) + `.bl-pg`(쪽번호) |
-| 워터마크 | `<div class="br-watermark" data-on="…">` | 우하단에 옅게 깔리는 로고타입 |
-| 진행선 | `<div id="bl-prog">` | 덱에 하나 · `<main>` 앞 |
+- **쓰지 않는 것:** 머리띠 · 꼬리띠 · 쪽번호 · 로고 · 워터마크 · 폰트 · 진행선 · 조작판 · 발표 기능,
+  표지 · 목차 · 장 간지 · 마무리 · 부록 간지. 빌드가 만든다. 본문에 섞어 쓰면 떼고 주의를 낸다.
+- **쓰는 것:** 장마다 제목(「주장 — `<em>`핵심구`</em>`」) · 리드 · 본문 도식 · 발표자 노트.
+  `DESIGN.md` 「4」 대응표에서 내용 모양에 맞는 표현을 고르고, 부품 카탈로그(`assets/live-catalog.html`)나
+  패턴첩(`assets/live-patterns.html`)의 해당 장을 열어 마크업을 가져와 내용에 맞게 고친다.
+  조립 목록에 `catalog:<id>` · `patterns:<id>` 를 적으면 그 장을 견본 그대로 불러 볼 수 있다.
+- 맞는 부품이 없으면 장 안 `<style data-own>` 으로 새로 짠다 — 선택자는 `#장id` · `x-` 접두어,
+  색은 `var(--br-*)` · `var(--bl-*)` 토큰, 치수는 `rem`. 견본은 카탈로그 `own` 장.
+- 실패가 0 이 될 때까지 본문 파일을 고치고 다시 빌드한다. `--shots` 로 남은 장별 PNG 를 눈으로 넘겨 본다.
 
-`.br-mark` 와 `.br-watermark` 안의 자리표시자 마크업은 **손대지 않는다.**
-4절의 `apply_brand.py` 가 `brand.json` 의 로고로 채운다.
-
-`data-on` 이 지면과 **반대**인 점을 놓치기 쉽다. `data-on` 은 「이 마크가 어떤 배경 위에
-앉는가」인데, 머리띠 마크가 앉는 곳은 지면이 아니라 띠이고 띠 색은 지면과 반대다.
-
-| 지면 | 띠 색 | 머리띠 마크 | 워터마크 |
-|---|---|---|---|
-| 밝은 장 (기본) | 짙음 | `data-on="dark"` | `data-on="light"` |
-| 어두운 장 `bl-sl--dark` | 흼 | `data-on="light"` | `data-on="dark"` |
-
-제목의 핵심구는 `<em>` 으로 감싼다. 형광 밴드가 거기에만 걸린다.
+옛 방식(기준 덱 `live-standard.html` 을 복사해 내용만 바꾸기)도 그대로 돌지만 예비다.
 
 #### 회의록 — A4 세로 문서
 
@@ -235,6 +179,7 @@ assets/deck-viewer.js
 처리돼 있어 저장소를 더럽히지 않는다. 저장소 루트에 결과 파일을 흩어 놓지 않는다.
 
 ```bash
+# 발표 덱은 2절의 build_deck.py 가 브랜드까지 입힌다. 아래 apply_brand.py 는 회의록 · 보드 · 보관 양식용
 # HTML — 회사명·로고·저작권을 넣어 한 파일로 만든다
 python .claude/skills/blue-report/scripts/apply_brand.py --brand brand/hct/brand.json --deck standard --title "문서명" --single-file -o decks-out/deck.html
 

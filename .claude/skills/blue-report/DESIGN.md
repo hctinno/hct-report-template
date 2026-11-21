@@ -1,27 +1,83 @@
-# 디자인 규칙 — 발표 덱(기준 덱 · 라이브 계통)
+# 본문 스타일 한 장 — 발표 덱을 만드는 에이전트가 반드시 읽는 문서
 
-**먼저 이 장을 읽는다.** 규격 전문(부품 색인 · 속성 · 키)은 `README.md` 「6-3」, 넘으면 안 되는 선은
-`scripts/check_live.py` 가 판정한다. 이 문서는 그 사이 — **무엇을 어떻게 그릴지 판단하는 기준**이다.
-구체적인 도식 · 효과는 만드는 에이전트가 내용을 보고 고른다. 아래는 그 판단의 틀이다.
-
-출발점은 셋이다. 틀은 `assets/live-standard.html`(기준 덱), **본문 디자인 기준은 사내 발표 덱 최종본의
-디자인 언어** — 문법은 `references/design-language.md`, 용례는 `assets/live-patterns.html`(패턴첩 63장,
-내용은 가상) — 작은 부품은 `assets/live-catalog.html`(카탈로그).
-**패턴첩은 베낄 원본이 아니라 기준이다.** 내용을 먼저 보고, 그 문법(색 역할 · 위계 · 배치 · 연출)으로
-내용에 맞는 장을 짠다 — 꼭 맞는 용례가 있으면 가져와 고쳐 쓰고, 없으면 문법을 빌려 장 안
-`<style data-own>` 으로 새로 짜고, 둘을 섞어도 된다. 덱 머리에 `blue-pattern.css` 를 부른다.
-고정 영역(「6」)은 어느 경우에도 그대로다.
+**이 문서 하나면 덱을 만들 수 있다.** 나머지 문서는 찾아보는 색인이다 — 부품 속성은 `README.md` 「6-3」,
+색 역할 상세는 `references/design-language.md`, 효과 목록은 `MOTION.md`.
 
 ---
 
-## 1. 톤
+## 0. 일하는 방식 — 본문만 쓰고 빌드가 틀을 씌운다
+
+```
+보고서/
+  deck.yaml        조립 목록 — 표지 정보 · 장(章) 순서 · 장마다 넣을 장 id · 마무리 · 부록
+  slides.html      본문 파일 — <section id> 마다 본문만
+  evidence.json    출처 근거(선택)
+```
+
+```bash
+python3 scripts/build_deck.py 보고서/deck.yaml --brand <brand.json> --single-file -o decks-out/보고서.html
+python3 scripts/check_live.py decks-out/보고서.html --shots decks-out/shots   # 실패 0 까지 고친다
+```
+
+- 견본: `examples/standard/`(기준 덱 내용을 이 형식으로 옮긴 것) · `examples/showcase/`(카탈로그 · 패턴첩 장을 id 로 불러 조립).
+- **쓰지 않는 것 — 빌드가 만든다:** 머리띠 · 꼬리띠 · 쪽번호 · 회사 로고 · 워터마크 · 폰트 · 진행선 ·
+  조작판 · 발표 기능, 그리고 표지 · 목차 · 장 간지 · 마무리 · 부록 간지. 본문에 섞어 쓰면 빌드가 떼고 주의를 낸다.
+- **쓰는 것:** 장마다 제목 · 리드 · 본문 도식 · 발표자 노트. 이 문서의 스타일로.
+
+## 1. 본문 파일 — 장 하나 = `<section>` 하나
+
+```html
+<section id="hours" data-name="시간 분포"
+         data-toc="월 168시간의 분포" data-sub="단계별 시간 · 가장 무거운 단계"
+         data-notes="수치 넉 점을 먼저 읽고, 막대에서 가장 무거운 단계를 짚는다.">
+  <h2 class="bl-title">월 <em>168시간</em>이 네 단계에 묶임</h2>
+  <p class="bl-lede">3개 팀 · 9명 · 8주 기록 기준 <strong>정리 단계가 절반 이상</strong></p>
+  <div class="bl-kpis bl-mid">…</div>
+</section>
+```
+
+| 속성 | 뜻 |
+|---|---|
+| `id` | 필수 · 조립 목록이 부르는 이름 |
+| `data-name` | 머리띠 왼쪽 짧은 이름(없으면 장 이름) |
+| `data-notes` | 발표자 노트 — `~한다` 형 · `[클릭]` · `**굵게**` · `→ 전환:` · `※ 메모` |
+| `data-toc` · `data-sub` | 장 간지 「이 장에서」 목록 문구(없으면 제목) |
+| `data-bd` | 본문 칸 배치 클래스(예: `bl-gist`) |
+| `class` | 장 변형 — `bl-sl--dark`(어두운 지면) · `bl-sl--dense` |
+
+- 맞춤 CSS 는 장 안 `<style data-own>` — 선택자는 `#장id` 나 `x-` 접두어로 묶는다.
+- 출처 칩 `<button type="button" class="bl-ev" data-ev="E1">출처</button>` → `evidence.json` 의 `E1`.
+- 단계 전개는 요소에 `data-f="1"` 부터, 노트의 `[클릭]` 수와 맞춘다.
+
+## 2. 조립 목록 — `deck.yaml`
+
+```yaml
+title: 업무 자동화 확산 계획
+body: slides.html
+evidence: evidence.json
+cover: {date: 2026-09, org: 운영지원팀, title: 업무 자동화 <em>확산 계획</em>, tag: (안),
+        message: 되풀이되는 일은 도구에 <b>판단은 사람에게</b>, presenter: {team: 운영지원팀, name: 홍길동, role: 팀장}}
+front: [gist]                          # 목차 다음 · 첫 간지 앞(보고 요지)
+chapters:
+  - {name: 현황, title: 반복 업무의 실태, lede: 어느 일이 얼마나 되풀이되는가, slides: [steps, hours, catalog:gantt]}
+  - {name: 실행, title: 넉 달 동안 무엇을 하는가, lede: 바뀌는 단계 · 일정, slides: [compare, roadmap],
+     takeaway: <b>결론</b> · 다섯 건 동시 착수가 아니라 조사 결과로 순차 착수}   # 장 결론 — 그 장 끝 한 장에만
+closing: {lead: 사람이 판단하는 자리는 지키고, line: 되풀이되는 자리만, mark: 도구로, sign: 9월 조사 · 10월 착수}
+appendix: [qa, terms]
+```
+
+- 장 자리에는 본문 id 말고 **라이브러리 장**도 부른다 — `catalog:<id>`(부품 카탈로그) · `patterns:<id>`(패턴첩).
+  가져온 장은 그대로가 아니라 **견본**이다. 맞는 부품이면 본문 파일로 복사해 내용을 바꾼다.
+- 장(章)이 둘 이상이면 목차가, 장마다 간지가 자동으로 붙는다. 순서를 바꾸면 목차 · 간지 · 쪽번호가 따라온다.
+- 짧은 브리핑(본문 8장 안팎)이거나 요약 장이 목차 구실을 하면 `agenda: false` · `dividers: false`.
+- **장 결론은 `takeaway` 한 줄로** — 빌드가 그 장(章)의 마지막 장 맨 아래에 결론 줄을 단다(`takeaway_at: first` 면 첫 장).
+  본문 장마다 결론 줄 · 시사점 · 해석 상자를 붙이지 않는다(「3」).
+
+## 3. 톤과 한 장의 위계
 
 - **기업 보고.** 차분하고 단정하게. 장식보다 정보, 놀람보다 이해.
 - **한 장 한 주장.** 제목이 주장이다 — 「주장 — `<em>`핵심구`</em>`」. 제목만 넘겨 읽어도 보고가 된다.
-- **코발트 · 딥네이비 바탕에 강조 하나.** 한 장에 눈이 먼저 가는 곳은 하나다.
-- 문체는 개조식(명사형). 지면에 `~합니다` · `~한다` 를 쓰지 않는다.
-
-## 2. 한 장의 위계
+- 문체는 개조식(명사형 종결). 지면에 `~합니다` · `~한다` · `~없다` 를 쓰지 않는다(노트만 `~한다`).
 
 ```
 제목(주장)        ← 한 줄. 핵심구를 <em> 형광 밴드로
@@ -31,62 +87,82 @@
 ```
 
 - 주인공은 **하나**다. 도식 둘을 나란히 두면 둘 다 약해진다 — 장을 나눈다.
-- 16:9 한 화면에 들어가야 한다. 넘치면 줄이지 말고 장을 나눈다.
-- 빈자리는 아래에 모은다. 억지로 늘리지 않는다.
+- **하단 메시지는 드물게.** 결론 줄(`.bl-concl`) · 시사점 · 해석 같은 장 맨 아래 한 줄은 장(章)의 처음이나 끝,
+  결정 · 전환 장에만 둔다 — 장(章)마다 하나. 모든 장에 붙이면 아무도 읽지 않는다. 그 장의 주장은 제목이 말한다.
+  검사기가 내용 장의 절반 초과 · 연속 3장이면 주의를 낸다.
+- 16:9 한 화면에 들어가야 한다. 넘치면 줄이지 말고 장을 나눈다. 본문 덩어리는 `.bl-mid` 로 세로 가운데.
+- 큰 수치는 장마다 하나가 주인공 — 숫자는 크게, 단위는 작게 옆에.
 
-## 3. 무엇을 그릴까 — 내용이 모양을 정한다
+## 4. 무엇을 그릴까 — 내용이 모양을 정한다
 
-| 내용 | 그린다 | 용례(패턴첩 장) — 문법을 보고 내용에 맞게 짠다 | 카탈로그 장 |
+먼저 내용의 모양을 정한다(흐름 · 일정 · 비교 · 구성 · 수치 · 구조 · 화면 · 사례). 그다음 아래 표에서 표현을
+고르고 용례 장을 연다 — 따라 그리려는 것이 아니라 위계와 밀도를 보려는 것이다.
+
+| 내용 | 그린다 | 용례(패턴첩 `patterns:`) | 부품(카탈로그 `catalog:`) |
 |---|---|---|---|
-| 표지 · 간지 · 목차 · 마무리 | 상승 곡선 표지 · 큰 번호 간지 · 결론 한 문장 | `pt-cover` · `pt-index` · `pt-chapter` · `pt-closing` | — |
-| 흐름 · 경로 · 유입 | 허브 · 시스템 지도 · 깔때기 · 노선 | `pt-hub` · `pt-system-map` · `pt-api-first` · `pt-ai-draft-flow` · `pt-journey` | `flow` · `own` · `route` |
-| 일정 · 단계 · 연혁 | 연표 · 간트 · 연도 단계 · 단계 카드 | `pt-timeline-cluster` · `pt-roadmap-gantt` · `pt-stage-gantt` · `pt-phase-years` · `pt-steps3` · `pt-process5` | `gantt` · `lanes` |
-| 비교 · 선택 | 3구역 편집 · 전과 후 패널 · 같은 진단 다른 처방 | `pt-three-zone` · `pt-before-after-panel` · `pt-same-diagnosis` · `pt-keyin` | `vs` · `matrix` |
-| 구성 · 비율 | 도넛 · 100% 누적 막대 | `pt-subscription` · `pt-account-mgmt` · `pt-stack-compare` | `kpi` · `stack` |
-| 수치 · 추세 | 콤보 차트 · 워터폴 · 격차 3패널 · 큰 수치 카드 | `pt-combo-chart` · `pt-segment-waterfall` · `pt-gap-3panel` · `pt-four-cards` · `pt-tier-support` | `stair` · `hero` |
-| 구조 · 조직 · 역할 | 쉐브론 3단 · 원형 링 · 노선 역할 · 팀 역량 · 경계도 | `pt-chevron3` · `pt-ring-roles` · `pt-metro-roles` · `pt-team` · `pt-boundary` | `org` · `raci` |
-| 화면 · 시연 | 파일 화면 · 실시간 화면 · 탭 + 화면 겹창 | `pt-governance-b` · `pt-device-data` · `pt-peer-tabs` · `pt-radar-case` · `pt-web-coaching` | `explorer` · `tabs` |
-| 여러 사례 · 소식 | 사례 탭 · 안팎 두 방향 · 칸반 | `pt-global-two-way` · `pt-kanban5` · `pt-security-scenes` | `tcard` · `focusrow` |
-| 상세 · 근거(부록) | 이력 표 · 유형 매트릭스 · 출처 목록 · 질문 답 | `pt-proc-table` · `pt-type-matrix` · `pt-global-sources` · `pt-qa` | — |
+| 흐름 · 경로 · 유입 | 허브 · 시스템 지도 · 깔때기 · 노선 | `pt-hub` · `pt-system-map` · `pt-api-first` · `pt-journey` | `flow` · `own` · `route` · `pipe` |
+| 일정 · 단계 · 연혁 | 연표 · 간트 + 오늘 선 · 연도 단계 · 단계 카드 | `pt-timeline-cluster` · `pt-roadmap-gantt` · `pt-phase-years` · `pt-steps3` | `gantt` · `lanes` · `history` |
+| 비교 · 선택 | 3구역 편집 · 전과 후 패널 · 좌우 대비 | `pt-three-zone` · `pt-before-after-panel` · `pt-same-diagnosis` | `vs` · `years` · `matrix` |
+| 구성 · 비율 | 도넛 · 100% 누적 막대 | `pt-subscription` · `pt-stack-compare` | `kpi` · `stack` · `rack` |
+| 수치 · 추세 | 큰 수치 타일 · 콤보 · 워터폴 · 계단 | `pt-combo-chart` · `pt-segment-waterfall` · `pt-gap-3panel` · `pt-four-cards` | `kpi` · `stair` · `hero` |
+| 구조 · 조직 · 역할 | 쉐브론 3단 · 링 · 경계도 · 조직도 | `pt-chevron3` · `pt-ring-roles` · `pt-boundary` · `pt-team` | `org` · `team` · `matrix` |
+| 화면 · 시연 | 목업 + 번호 주석 · 탭 + 화면 | `pt-governance-b` · `pt-device-data` · `pt-peer-tabs` | `explorer` · `portal` · `shot` · `tabs` |
+| 여러 사례 | 탭 · 색띠 카드 열 · 칸반 | `pt-global-two-way` · `pt-four-cards` · `pt-kanban5` | `tcard` · `focusrow` · `hcard` |
+| 결정 요청 | 요청 카드 + 결론 줄 · 결정 판 | `pt-chevron3` | `decide` |
+| 상세 · 근거(부록) | 편집 표 · 질문 답 | `pt-proc-table` · `pt-type-matrix` · `pt-qa` | `raci` · `monthly` · `qa` |
 
-- 표 · 목록은 **마지막 선택**이다. 부록 · 상세 비교처럼 표가 맞는 장만 표로 둔다.
+- **같은 짜임을 되풀이하지 않는다.** 장 종류가 같아도(뉴스 10건 · 과제 8건) 한 틀에 끼우지 않는다 — 장마다 내용 모양(금액 · 추세 · 전후 · 구조 · 경로 · 1:1 비교 · 분류 · 계획 · 화면 · 단계)을 먼저 보고 짠다. 같은 짜임은 덱 안에서 3장까지.
+- **표 · 목록은 마지막 선택이다.** 부록 · 상세 비교처럼 표가 맞는 장만 표로 둔다(검사 29번).
 - 수치가 있으면 수치가 주인공이다. 문장 안에 묻지 않는다.
+- 용례의 칸 수 · 문구를 그대로 두고 숫자만 갈지 않는다. 내용이 넷이면 넷, 둘이면 둘로 짠다.
+- 맞는 것이 없으면 문법(이 문서의 색 · 위계)을 빌려 `<style data-own>` 으로 새로 짠다 — 견본은 `catalog:own`.
 
-## 4. 움직임 — 요청이 있을 때, 라이브러리에서
+## 5. 색 — 이름이 아니라 역할로
 
-- **기본은 부품에 든 움직임만**(막대 성장 · 도넛 · 흐름선 · 숫자 세기). 효과를 덧붙이지 않는다.
-- 사용자가 애니메이션 · 효과를 요청하면 **`MOTION.md`(효과 라이브러리)에서 고른다** — 연출 패턴
-  (패턴첩 장에 든 움직임 — 데이터 그리기 · 경로 그리기 · 전과 후 · 흐름 · 화면 시연 …)을 먼저 보고,
-  없으면 단일 효과 22종을 조합한다. 단일 효과 견본은 카탈로그 `motion` 장.
-- 원칙은 하나 — 효과는 **읽는 순서를 안내**한다. 순서대로 등장 · 값은 그려지며 · 강조는 마지막 ·
-  반복은 「지금 · 흐름」에만, 시선을 끄는 반복은 한 화면에 한 곳.
-- 감속 모드에서는 처음부터 최종 모습 — 움직임에 정보를 싣지 않는다. 검사기 30번은 장마다 등장 3종 ·
-  반복 2종을 넘으면 주의를 낸다.
+| 역할 | 토큰 | 쓰는 자리 |
+|---|---|---|
+| 주 강조 | `--br-cobalt` · `--br-navy` (`--bl-pt-brand` · `--bl-pt-brand-2`) | 기본 강조 · 번호 머리 · 큰 수치 · 짙은 카드 |
+| 당사 · 결과 | `--bl-pt-orange` · `--bl-pt-orange-d` | 당사 막대 · 결과 화살 · 결론 강조어 |
+| 비교 대상 | `--bl-pt-gray` | 업계 · 경쟁 · 과거 — 주인공을 돋보이게 물린다 |
+| 진행 · 지금 | `--bl-pt-blue` | 진행 중 단계 · 지금 위치 |
+| 상태 | `--br-ok-*` · `--br-warn-*` · `--br-alert-*` | 상태를 말할 때만. 장식 금지 |
+| 바탕 강조 | `--br-tint` (`--bl-pt-tint`) | 결론 띠 · 강조 칸 바탕 |
+| 계열 구분 | `--br-cat-1~6` · 부품은 `data-c` | 순서 없는 항목(부서 · 제품) |
 
-## 5. 토큰 요약 — 새로 짤 때 이 값만
+- 한 장에 강조색은 **하나가 주인공** — 대개 주황(당사 · 결과) 아니면 코발트.
+- 비교는 「주인공 색 하나 + 회색」. 여러 색을 같은 무게로 늘어놓지 않는다.
+- 데이터 마크는 배경 대비 2:1 이상. 밝은 지면에 `--br-soft-*` 를 쓰지 않는다.
+- `--bl-pt-*` 를 쓰는 장이 있으면 빌드가 `blue-pattern.css` 를 함께 부른다.
+
+## 6. 움직임 — 요청이 있을 때만
+
+- 기본은 부품에 든 움직임만(막대 성장 · 도넛 · 흐름선 · 숫자 세기). 효과를 덧붙이지 않는다.
+- 요청이 있으면 `MOTION.md` 에서 고른다. 원칙: 틀이 먼저 → 값이 그려지고 → 강조가 마지막.
+  반복은 「지금 · 흐름」 한 곳만. 장마다 등장 3종 · 반복 2종을 넘지 않는다(검사 30번).
+
+## 7. 토큰 — 새로 짤 때 이 값만
 
 | 무엇 | 토큰 |
 |---|---|
-| 디자인 언어 색 | `--bl-pt-*` — 지면 · 잉크 · 선 · 코발트 · 딥네이비 · 진행 파랑 · 당사 주황 · 비교 회색 · 상태 · 결론 띠. 역할은 `references/design-language.md` 「1」 |
-| 색 | `--br-navy` · `--br-cobalt` · `--br-text*` · `--br-tint` · `--br-cat-1~6` · 상태 `--br-ok-* · --br-warn-* · --br-alert-*` · 부품은 `data-c` |
 | 글꼴 | `--br-font-kr` · `--br-font-num`(수치) · `--bl-font-mono`(세는 숫자) |
-| 패턴 장 | 패턴첩에서 가져온 용례 장(`xf`)은 `blue-pattern.css` 가 그린다 — 고쳐 써도 되지만 새로 짜는 장에 `xf` 를 달지 않는다. 용례 장의 작은 글자는 최종본 밀도라 주의만 뜬다 — 새 장은 하한을 지킨다 |
-| 글자 크기 | `--bl-fs-title` · `--bl-fs-lede` · `--bl-fs-body`(본문 1.0rem 이상) · `--bl-fs-kpi` · `--bl-fs-kpi-l` · 라벨 `--bl-fs-lbl` |
+| 글자 크기 | `--bl-fs-title` · `--bl-fs-lede` · `--bl-fs-h3` · `--bl-fs-body`(1.0rem 이상) · `--bl-fs-kpi` · `--bl-fs-kpi-l` · 라벨 `--bl-fs-lbl` |
 | 간격 | `--bl-sp-1~5` · 판 너비 `--bl-max` |
-| 모서리 | `--bl-r-xs · s · m · l · pill` · `0` · `50%` |
-| 그림자 | `--bl-shadow` · `--bl-shadow-up` |
-| 움직임 | `--bl-ease` · `--bl-ease-out` · `--bl-ease-pop` · 길이 0.15~2.4초 — 고르는 법은 `MOTION.md` |
+| 모서리 · 그림자 | `--bl-r-xs · s · m · l · pill` · `--bl-shadow` · `--bl-shadow-up` |
+| 움직임 | `--bl-ease` · `--bl-ease-out` · `--bl-ease-pop` · 길이 0.15~2.4초 |
 
-hex · `rgb()` · 색 이름 · `px`(테두리 1px 제외) · 다른 글꼴은 쓰지 않는다.
+## 8. 금지
 
-## 6. 고정 — 손대지 않는다
+- hex · `rgb()` · 색 이름 · `px`(테두리 1px 제외) · 다른 글꼴.
+- 파이 차트. 도넛은 `python3 scripts/donut.py --live …` 로 만든다 — 각도를 손으로 쓰지 않는다.
+- 글자 24px(본문 1.0rem) 미만 — `%` 첨자 · 라벨 계열만 예외.
+- 계통 이름(`bl-` · `br-` · `pt-` · `xf`) 새로 짓기. 맞춤 클래스는 `x-` 접두어.
+- 고정 영역 클래스(`bl-hd` · `bl-rf` · `br-mark` · `br-watermark` · `bl-pg`)를 본문이나 맞춤 선택자에 넣기.
+- 예시 수치 · 부서명을 실제 내용으로 바꾸지 않고 남기기.
+- 본문 장마다 같은 모양의 하단 메시지(결론 · 시사점 · 해석) 붙이기 — 장 결론은 조립 목록 `takeaway`.
 
-머리띠(코드 · 브랜드 마크) · 꼬리띠(문서명 · 쪽번호) · 워터마크 · 진행선 · 제목 형광 밴드 · 조작판 ·
-발표 엔진. 기준 덱 그대로 두고, 맞춤 CSS 선택자에도 넣지 않는다.
+## 9. 끝내기 전에
 
-## 7. 끝내기 전에
-
-1. `apply_brand.py --single-file` 로 묶는다.
-2. `check_live.py <결과> --shots out/` — 실패 0. 29번(글 · 표뿐인 장) · 30번(움직임 과다) 주의도 없앤다.
-   효과를 넣었으면 브라우저 발표 모드에서 단계까지 넘겨 보며 순서 · 속도를 확인한다.
-3. `out/` 의 장별 PNG 를 넘겨 본다 — 주인공이 하나인가, 빈자리가 아래에 모였나, 제목만으로 읽히나.
+1. `build_deck.py … --brand … --single-file` 로 빌드한다.
+2. `check_live.py <결과> --shots <폴더>` — **실패 0.** 29번(글 · 표뿐인 장) · 30번(움직임 과다) 주의도 없앤다.
+3. `<폴더>` 의 장별 PNG 를 넘겨 본다 — 주인공이 하나인가 · 빈자리가 아래에 모였나 · 제목만으로 읽히나 ·
+   글자가 겹치거나 잘리지 않았나. 고칠 것이 있으면 본문 파일을 고치고 다시 빌드한다.

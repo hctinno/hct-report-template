@@ -57,6 +57,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
        var(--bl-r-*) · 0 · 50%, 그림자 var(--bl-shadow*), 곡선 var(--bl-ease*) · linear,
        길이 0.15~2.4s(무한 반복 12s). 인라인 style= 도 형태 · 움직임을 본다 (1.48.0)
    29. 본문 표현 — 내용 장 중 글 · 표만 있는 장이 절반을 넘지 않는가 (주의만, 실패 아님)
+       + 장 하단 메시지(결론 줄 · 시사점 · 해석)가 장마다 반복되지 않는가 — 절반 초과 · 연속 3장이면 주의
    30. 움직임 절제 — 장마다 등장 계열 3종 · 반복 움직임 2종을 넘지 않는가 (주의만). MOTION.md
 
 왜 rem 으로 판정하는가
@@ -404,7 +405,12 @@ def own_css_blocks(html):
     """덱이 스스로 적은 <style> 블록. 계통 CSS 를 묶어 넣은 블록은 뺀다."""
     out = []
     # 스크립트 안 문자열의 「<style」 이 진짜 블록과 짝지어지지 않게 지우고, 패턴 장(계통 CSS 몫)은 뺀다
-    html = _blank(_blank(_pattern_blank(html), r"<script[^>]*>.*?</script>"), r"<!--.*?-->")
+    # 순서가 중요하다 — 계통 CSS 를 한 파일에 넣으면 그 주석 속 「<script …>」 글자가 진짜 스크립트
+    # 블록의 시작으로 읽혀, 다음 </script> 까지(덱 본문 전부) 지워졌다. 그러면 단일 파일 산출물에서
+    # 맞춤 CSS 검사(28)와 본문 표현(29)이 아무것도 못 본다. 주석(HTML · CSS)을 먼저 지운다.
+    html = _blank(_pattern_blank(html), r"<!--.*?-->")
+    html = _blank(html, r"/\*.*?\*/")
+    html = _blank(html, r"<script[^>]*>.*?</script>")
     for m in re.finditer(r"<style[^>]*>(.*?)</style>", html, re.S):
         body = m.group(1)
         if any(sig in body for sig in _SYS_SIGS):
@@ -647,7 +653,7 @@ ENTER_MAX, LOOP_KINDS_MAX = 3, 2      # 최종본(2026-10 사내 발표 덱) 장
 
 
 def check_motion(html, rep):
-    """장마다 움직임 종류가 과하지 않은가 — 판정이 아니라 신호다 (DESIGN.md 「4」).
+    """장마다 움직임 종류가 과하지 않은가 — 판정이 아니라 신호다 (DESIGN.md 「6」).
 
     부록 장(data-apx)은 뺀다. 카탈로그의 움직임 견본처럼 모아 보여 주는 자리다."""
     busy = []
@@ -705,6 +711,39 @@ def check_visual(html, rep):
               "흐름 · 일정 · 비교 · 수치는 카탈로그 부품이나 맞춤 도식으로 그린다")
     else:
         rep.o(f"본문 표현 — 내용 장 {content}장 중 글 · 표뿐인 장 {len(plain)}장")
+    check_messages(html, rep)
+
+
+# 장 하단 메시지 — 결론 줄(.bl-concl) 이나 「해석 · 시사점 · 결론」 머리를 단 한 줄 상자.
+# 장마다 붙이면 읽는 사람이 무시한다(W47 시험 덱: 내용 장 12장 중 10장). 장(章)의 끝에 한 번,
+# 결정 · 전환 장에만 둔다. 위반일 때만 주의를 더하고, 지키면 29번 통과 줄에 묻어 둔다.
+_MSG_LABEL = re.compile(r"<(?:b|strong|span)[^>]*>\s*(?:해석|시사점|결론|요약|핵심|So what|HCT 관점)\s*(?:→|:)?\s*</(?:b|strong|span)>")
+MSG_RATIO, MSG_RUN = 0.5, 3
+
+
+def check_messages(html, rep):
+    flags = []
+    for k, (tag, body) in enumerate(_slices(html), 1):
+        if any(c in tag for c in _FRAME_CLS) or "data-apx" in tag:
+            continue
+        bd = re.search(r'class="[^"]*\bbl-bd\b[^"]*"', body)
+        if not bd or any(re.search(r'class="[^"]*\b' + c + r'\b', body) for c in _FRAME_CLS):
+            continue
+        b = re.sub(r"<style\b.*?</style>|<script\b.*?</script>", "", body[bd.start():], flags=re.S)
+        m = re.search(r'id="([^"]+)"', tag)
+        flags.append((f"{k:02d}" + (f"({m.group(1)})" if m else ""),
+                      bool(re.search(r'class="[^"]*\bbl-concl\b', b) or _MSG_LABEL.search(b))))
+    if len(flags) < 4:
+        return
+    hit = [n for n, f in flags if f]
+    run = best = 0
+    for _, f in flags:
+        run = run + 1 if f else 0
+        best = max(best, run)
+    if len(hit) > len(flags) * MSG_RATIO or best >= MSG_RUN:
+        rep.w(f"장 하단 메시지 반복 — 내용 장 {len(flags)}장 중 {len(hit)}장 · 연속 최대 {best}장: "
+              f"{' '.join(hit[:10])}. 결론 줄 · 시사점은 장(章)의 끝에 한 번, 결정 · 전환 장에만 둔다 "
+              "(조립 목록 chapters[].takeaway)")
 
 
 def check_chrome(html, rep):
