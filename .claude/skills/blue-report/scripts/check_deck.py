@@ -236,11 +236,12 @@ SENTINEL = {
     "blue-live.css":   "--bl-fs-body",
     "blue-doc.css":    "--bd-fs-body",
     "blue-web.css":    "--bw-fs-body",
+    "hct-web.css":     "--color-bg-canvas",   # 관리보드 — HCT 웹 디자인 템플릿 계통
 }
 
 
 # 계통마다 마크업이 쓰는 클래스 접두어. 이 접두어를 쓰는 문서는 그 CSS 가 붙어야 한다.
-PREFIX = {"blue-live.css": "bl-", "blue-doc.css": "bd-", "blue-web.css": "bw-"}
+PREFIX = {"blue-live.css": "bl-", "blue-doc.css": "bd-", "blue-web.css": "bw-", "hct-web.css": "hct"}
 _CLASS = re.compile(r'\bclass="([^"]*)"')
 _CODE = re.compile(r"<(style|script)\b.*?</\1>", re.S)
 

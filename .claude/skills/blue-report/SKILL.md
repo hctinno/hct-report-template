@@ -29,11 +29,17 @@ description: "사내 보고서·발표 덱·회의록·현황판을 회사 공�
 | 본문 디자인 기준 — 문법 · 용례 | `patterns` | `assets/live-patterns.html` | 패턴첩(63장 + 응용 견본) · `references/design-language.md` |
 | 부품 재사용 · 참고 — 장째 복사 · 변형 | `livecatalog` | `assets/live-catalog.html` | 라이브 덱 부품첩(52장) |
 | 회의록 (A4 인쇄) | `minutes` | `assets/doc-minutes.html` | A4 문서 · `check_doc.py` |
-| 고쳐 가며 쓰는 현황판 · 대시보드 | `manage` | `assets/board-manage.html` | 웹 보드 · `check_board.py` |
+| 고쳐 가며 쓰는 현황판 · 대시보드 | `manage` | `assets/board-manage.html` | HCT 웹 디자인 템플릿 v2.1.0 · `check_board.py` |
 
 판단 기준은 하나다 — **요청에서 읽히면 묻지 말고 고른다.** 「회의록 · 미팅 노트」면 `minutes`,
 「관리보드 · 대시보드 · 현황판 · 체크리스트 화면」이면 `manage`, 그 밖은 전부 `standard`.
 고른 것을 한 줄로 밝히고 바로 만든다. 카탈로그는 결과물이 아니라 부품을 가져오거나 참고하는 부품첩이다.
+
+장을 짤 때 먼저 볼 두 카드 — **`LAYOUTS.md`(짜임 카드 12종 — 내용 모양별 장 나누기)** · **`COMPONENTS.md`(부품
+카드 20종 — 구조 · 속성 · 토큰 · 할 것 / 하지 말 것 · 복사용 HTML)**. 둘 다 `scripts/build_cards.py` 가 원본에서
+만드는 생성 파일이다 — 손으로 고치지 않는다. 시각 스타일은 조립 목록 `style:` 한 줄로 고른다 — A 프레임형(기본) ·
+C 혼합형(권장). 본문 HTML 은 같다(`DESIGN.md` 「2-1」). 관리보드는 HCT 웹 디자인 템플릿 v2.1.0 의 `hct-*` 부품으로 짠다.
+실제로 동작하는 웹 앱은 웹 디자인 템플릿(React + Tailwind)을 직접 쓴다.
 
 ## 2-1. 보관 양식 — 이름을 짚거나 PowerPoint 가 꼭 필요할 때만
 

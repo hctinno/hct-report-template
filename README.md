@@ -225,10 +225,15 @@ python3 .claude/skills/blue-report/scripts/build_deck.py .claude/skills/blue-rep
 
 | 파일 | 용도 | 특징 |
 |---|---|---|
-| `board-manage.html` | 관리보드 (대시보드형) | 절 12 · 표 8 · 일정 격자 · 가로 막대 |
+| `board-manage.html` | 관리보드 (대시보드형) | HCT 웹 디자인 템플릿 v2.1.0 앱 셸 · 지표 4칸 · 과제 표 · 상태 분포 · 할 일 · 일정 |
 
-보드는 `blue-report.css` + `blue-web.css` 두 파일을 함께 부른다. 글자 하한이
-12.5px 이고 `check_board.py` 가 11항목을 판정한다.
+관리보드는 **HCT 웹 디자인 템플릿 v2.1.0**(`hctinno/HCT-WEB-DESIGN-TEMPLATE`)의 명세로 짠다.
+`blue-report.css`(폰트 · 로고) + `hct-web.css`(템플릿 토큰 · `hct-*` 부품 — `scripts/sync_web_template.py` 가
+템플릿 DESIGN.md 에서 뽑는 생성 파일) + `hct-board.css`(앱 셸 — 사이드바 240 · 상단바 48 · 본문 24×20)
+세 벌을 부른다. 글자 하한 11px(템플릿 micro), `check_board.py` 14항목. 상태 색은 템플릿 이름 그대로
+(할 일 회색 · 진행 info · 검토 review · 막힘 danger · 완료 success).
+**실제로 동작하는 사내 웹 앱**은 이 견본이 아니라 웹 디자인 템플릿(React + Tailwind)을 직접 쓴다 —
+관리보드는 정적 현황판 견본이다. 보관 보드 4종(`archive/`)은 옛 `blue-web.css` 계통 그대로다.
 
 ---
 
@@ -397,7 +402,7 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/doc-minutes.html · doc-viewer.* 회의록과 A4 뷰어
   assets/blue-web.css                    웹 보드 파운데이션 — 토큰은 위 파일 것을 쓴다
-  assets/board-manage.html               관리보드
+  assets/board-manage.html               관리보드 (HCT 웹 디자인 템플릿 v2.1.0)
   assets/blue-live.css                   라이브 계통 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/live-standard.html              기준 덱 — 새 보고서의 출발점
   assets/live-patterns.html              패턴첩 63장 — 본문 디자인 기준(최종본 형태)
@@ -407,7 +412,9 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   assets/archive/                        보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
   scripts/check_deck.py                  슬라이드 17항목 자동 점검
   scripts/check_doc.py                   A4 문서 9항목 자동 점검
-  scripts/check_board.py                 웹 보드 11항목 자동 점검
+  scripts/check_board.py                 웹 보드 자동 점검 (관리보드는 웹 템플릿 기준 14항목)
+  scripts/build_cards.py                 짜임 카드(LAYOUTS.md) · 부품 카드(COMPONENTS.md) 생성
+  scripts/sync_web_template.py           웹 디자인 템플릿 → assets/hct-web.css
   scripts/apply_brand.py                 브랜드 일괄 적용
   scripts/to_pdf.py                      PDF 내보내기
   scripts/make_logo_variants.py          로고 두 벌 생성

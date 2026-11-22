@@ -55,6 +55,8 @@ cd hct-report-template
 .claude/skills/blue-report/README.md
 .claude/skills/blue-report/references/rules.md
 .claude/skills/blue-report/DESIGN.md
+.claude/skills/blue-report/LAYOUTS.md
+.claude/skills/blue-report/COMPONENTS.md
 .claude/skills/blue-report/scripts/build_deck.py
 .claude/skills/blue-report/scripts/check_live.py
 brand/hct/brand.json
@@ -67,6 +69,10 @@ brand/hct/brand.json
 토큰 · 금지 · 끝내기 전 점검. 나머지 문서는 찾아보는 색인이다 — 부품 속성 · 위젯 · 근거 JSON · 발표 키는
 스킬 `README.md` 「6-3」, 색 역할 상세는 `references/design-language.md`, 차트 규칙은 `references/rules.md`.
 사용자가 애니메이션 · 효과를 요청하면 **`.claude/skills/blue-report/MOTION.md`** 에서 고른다.
+장을 짤 때는 카드 두 장을 연다 — **`LAYOUTS.md`**(짜임 카드 12종 · 내용 모양별 구조 · 주인공 · 할 것 / 하지 말 것 ·
+복사용 본문)와 **`COMPONENTS.md`**(부품 카드 20종 · 클래스 구조 · 속성 · 토큰 · 복사용 HTML). 생성 파일이므로 고치지 않는다.
+시각 스타일은 조립 목록 `style:` 한 줄 — `a` 프레임형 · `c` 혼합형(정하지 않았으면 `c`). 본문 HTML 은 같고,
+맞춤 CSS 는 역할 토큰으로만 짠다(`DESIGN.md` 「2-1」).
 
 ### 2. 덱 고르기와 만들기
 
@@ -118,12 +124,15 @@ python .claude/skills/blue-report/scripts/check_live.py decks-out/<보고서>.ht
 #### 관리보드 — 웹 보드
 
 읽는 물건이 아니라 **화면에서 상태를 바꾸는 것**이다. 지면 크기가 없고 화면 폭에 따라
-흐른다. 글자 하한이 12.5px 로 다르고 검사기도 `check_board.py` 다. PPTX·PDF 대상이 아니다.
-`blue-report.css` 와 `blue-web.css` 두 벌을 함께 부른다.
+흐른다. 검사기는 `check_board.py` 다. PPTX·PDF 대상이 아니다.
+HCT 웹 디자인 템플릿 v2.1.0 명세로 짠다 — `blue-report.css` · `hct-web.css`(템플릿 토큰 · `hct-*` 부품,
+생성 파일) · `hct-board.css`(앱 셸) 세 벌을 부르고 글자 하한은 11px 다. 부품은 템플릿 DESIGN.md §7 의
+`hct-*` 클래스를 그대로 쓰고 새 색을 만들지 않는다. 실제로 동작하는 웹 앱은 이 견본이 아니라
+웹 디자인 템플릿(React + Tailwind)을 직접 쓴다.
 
 | 파일 | `--deck` 이름 | 용도 |
 |---|---|---|
-| `board-manage.html` | `manage` | 관리보드 (대시보드형 · 절 12 · 표 8 · 일정 격자) |
+| `board-manage.html` | `manage` | 관리보드 (웹 템플릿 앱 셸 · 지표 · 과제 표 · 상태 분포 · 일정) |
 
 #### 보관 양식 — `assets/archive/`
 

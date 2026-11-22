@@ -53,6 +53,7 @@ python3 scripts/check_live.py decks-out/보고서.html --shots decks-out/shots  
 
 ```yaml
 title: 업무 자동화 확산 계획
+style: c                               # 시각 스타일 — a 프레임 · c 혼합(「2-1」). 없으면 a
 body: slides.html
 evidence: evidence.json
 cover: {date: 2026-09, org: 운영지원팀, title: 업무 자동화 <em>확산 계획</em>, tag: (안),
@@ -72,6 +73,30 @@ appendix: [qa, terms]
 - 짧은 브리핑(본문 8장 안팎)이거나 요약 장이 목차 구실을 하면 `agenda: false` · `dividers: false`.
 - **장 결론은 `takeaway` 한 줄로** — 빌드가 그 장(章)의 마지막 장 맨 아래에 결론 줄을 단다(`takeaway_at: first` 면 첫 장).
   본문 장마다 결론 줄 · 시사점 · 해석 상자를 붙이지 않는다(「3」).
+
+## 2-1. 시각 스타일 — A 또는 C
+
+**본문 HTML · 부품 · 조립 · 발표 엔진 · 검사는 하나다.** 스타일은 보이는 규칙만 바꾼다 — 조립 목록의 `style:` 한 줄
+(또는 `build_deck.py --style`)이 `assets/blue-style.css` 를 덧입힌다. 같은 본문을 스타일만 바꿔 다시 빌드할 수 있다.
+
+| | **A 프레임형** (`style: a` · 기본값) | **C 혼합형** (`style: c` · 권장) |
+|---|---|---|
+| 인상 | 업무 도구 · 대시보드 · 길 찾기 쉬움 | 정돈된 구조 + 지면감 · 한 장 한 메시지 |
+| 머리띠 · 꼬리띠 | 짙은 남색 띠 둘이 장을 감싼다 | 밝은 띠 + 아래 굵은 남색 선 한 줄 · 얇은 꼬리띠 |
+| 제목 | 800 한 굵기 · 핵심구에 형광 밴드 | **300 ↔ 900 대비** · 핵심구는 주인공 색 · 밴드 없음 |
+| 장 리듬 | 밝은 장 연속 (표지만 어둠) | 표지 광선 · 장 간지 · 마무리가 어두운 장 |
+| 카드 | 테두리 상자 | 테두리 없는 옅은 바탕 상자 |
+| 막대 · 수치 | 단색 막대 · 700 수치 | 그라데이션 막대 · 800 수치 |
+| 장 결론(`takeaway`) | 짙은 띠 | 짙은 띠 |
+| 고른다 | 화면 발표 · 회의 진행 · 근거 추적이 앞설 때 | 배포 · 경영진 보고 · **정하지 않았으면 이것** |
+
+- 워터마크(배경 회사 로고)는 두 스타일 모두 본문 위에 섞기로 얹혀 카드 · 띠 · 표에 가려지지 않는다 — 빌드가 단다. 본문에서
+  워터마크 자리를 비우려고 배치를 바꾸지 않는다.
+- **스타일 이름으로 갈라 짜지 않는다.** 맞춤 CSS(`<style data-own>`)는 역할 토큰(`--br-mark` · `--br-text-2` ·
+  `--br-hairline` · `--bl-band` …)으로 짠다 — 그러면 두 스타일에서 저절로 맞는다. `[data-style]` 선택자는 쓰지 않는다.
+- 제목에 핵심구(`<em>`)를 반드시 둔다 — C 는 그 굵기 대비가 위계의 전부다. 핵심구 없는 제목은 800 한 굵기로 떨어진다.
+- 어두운 장은 빌드가 정한다(C 의 간지 · 마무리). 본문 장을 일부러 어둡게 하려면 `class="bl-sl--dark"` — 덱에 두세 장까지.
+- 머리띠 로고의 밝은 · 어두운 판도 빌드가 스타일에 맞춰 단다(A 는 지면과 반대, C 는 같음) — 손대지 않는다.
 
 ## 3. 톤과 한 장의 위계
 
@@ -98,6 +123,13 @@ appendix: [qa, terms]
 먼저 내용의 모양을 정한다(흐름 · 일정 · 비교 · 구성 · 수치 · 구조 · 화면 · 사례). 그다음 아래 표에서 표현을
 고르고 용례 장을 연다 — 따라 그리려는 것이 아니라 위계와 밀도를 보려는 것이다.
 
+**카드 두 장을 먼저 본다** — 둘 다 원본에서 뽑는 생성 파일(`scripts/build_cards.py`)이라 코드와 어긋나지 않는다.
+- `LAYOUTS.md` — **짜임 카드 12종**. 내용 모양(큰 금액 · 추세 + 구성 · 규칙 전후 · 구조 · 경로 · 1:1 비교 · 분류 ·
+  계획 · 화면 · 단계별 수치 · 요약 지도 · 점검 카드)마다 구조 · 주인공 · 할 것 / 하지 말 것 · 바꿀 곳 · 복사용 본문과
+  맞춤 CSS. 견본 덱 `examples/layouts/`.
+- `COMPONENTS.md` — **부품 카드 20종**. 부품마다 구조(클래스 순서) · 속성 · 토큰 · 할 것 / 하지 말 것 · 복사용 HTML.
+  카드 마크업 그대로를 담은 대조 덱 `examples/components/` 를 검사가 그려 본다.
+
 | 내용 | 그린다 | 용례(패턴첩 `patterns:`) | 부품(카탈로그 `catalog:`) |
 |---|---|---|---|
 | 흐름 · 경로 · 유입 | 허브 · 시스템 지도 · 깔때기 · 노선 | `pt-hub` · `pt-system-map` · `pt-api-first` · `pt-journey` | `flow` · `own` · `route` · `pipe` |
@@ -108,6 +140,7 @@ appendix: [qa, terms]
 | 구조 · 조직 · 역할 | 쉐브론 3단 · 링 · 경계도 · 조직도 | `pt-chevron3` · `pt-ring-roles` · `pt-boundary` · `pt-team` | `org` · `team` · `matrix` |
 | 화면 · 시연 | 목업 + 번호 주석 · 탭 + 화면 | `pt-governance-b` · `pt-device-data` · `pt-peer-tabs` | `explorer` · `portal` · `shot` · `tabs` |
 | 여러 사례 | 탭 · 색띠 카드 열 · 칸반 | `pt-global-two-way` · `pt-four-cards` · `pt-kanban5` | `tcard` · `focusrow` · `hcard` |
+| 보고 요지(첫머리 한 장) | 결론 한 줄 + 단계 3개 큰 수치 흐름 + 결정 요청 띠 — 흐름형 `bl-gist--flow` | `examples/standard` 장 `gist` | `bl-gist-steps` · `bl-gist-ask` |
 | 결정 요청 | 요청 카드 + 결론 줄 · 결정 판 | `pt-chevron3` | `decide` |
 | 상세 · 근거(부록) | 편집 표 · 질문 답 | `pt-proc-table` · `pt-type-matrix` · `pt-qa` | `raci` · `monthly` · `qa` |
 

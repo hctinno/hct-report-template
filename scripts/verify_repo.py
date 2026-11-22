@@ -284,12 +284,17 @@ def check_build(log, out_dir):
     if not plans:
         log.fail("조립 견본", "examples/*/deck.yaml 이 없다")
         return
-    for plan in plans:
-        name = os.path.basename(os.path.dirname(plan))
+    # 시각 스타일 C 는 기준 견본(standard)으로 한 번 더 조립한다 — 같은 본문 · 다른 스타일
+    runs = [(p, None) for p in plans]
+    std = os.path.join(ex_root, "standard", "deck.yaml")
+    if os.path.exists(std):
+        runs += [(std, "c")]
+    for plan, style in runs:
+        name = os.path.basename(os.path.dirname(plan)) + (f" · 스타일 {style.upper()}" if style else "")
         label = f"조립 견본 {name}"
-        out = os.path.join(out_dir, "build", f"{name}.html")
+        out = os.path.join(out_dir, "build", name.replace(" · 스타일 ", "-") + ".html")
         r = run([sys.executable, os.path.join(SCRIPTS, "build_deck.py"), plan,
-                 "--brand", BRAND, "--single-file", "-o", out])
+                 "--brand", BRAND, "--single-file", "-o", out] + (["--style", style] if style else []))
         if r.returncode != 0 or not os.path.exists(out):
             log.fail(label, "build_deck.py 실패 — " + (r.stderr.strip().splitlines() or [""])[-1])
             continue
@@ -1250,6 +1255,19 @@ def check_sync(log):
         log.fail("내용 동기화", detail or "HTML 덱과 pptx/content.js 가 갈라졌다")
 
 
+def check_generated(log):
+    """원본에서 뽑는 생성 파일이 원본과 같은가 — 손으로 고치면 여기서 잡힌다.
+
+    · 카드 — LAYOUTS.md · COMPONENTS.md · examples/components/ (build_cards.py)
+    · 웹 템플릿 — assets/hct-web.css 가 고정한 판(v2.1.0)에서 뽑은 것인가 (sync_web_template.py)"""
+    for label, args in (("카드 생성물", ["build_cards.py", "--check"]),
+                        ("웹 템플릿 CSS", ["sync_web_template.py", "--check"])):
+        r = run([sys.executable, os.path.join(SCRIPTS, args[0])] + args[1:])
+        msg = (r.stdout.strip().splitlines() or r.stderr.strip().splitlines() or [""])[-1]
+        print(f"  {msg}")
+        (log.ok if r.returncode == 0 else log.fail)(label, msg)
+
+
 # ------------------------------------------------------------------ 배포
 
 def check_plugin(log):
@@ -1445,6 +1463,7 @@ def main():
         if "sync" in only:
             print("\n── HTML · PPTX 내용 동기화 ──")
             check_sync(log)
+            check_generated(log)
         if "version" in only:
             print("\n── 버전 올림 ──")
             check_version(log)

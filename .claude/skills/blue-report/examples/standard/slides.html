@@ -3,24 +3,24 @@
      속성: id(필수) · data-name(머리띠 이름) · data-notes(발표자 노트, ~한다 형) ·
            data-toc · data-sub(장 간지 목록 문구) · data-bd(본문 칸 배치 클래스) · class(bl-sl--dark 등) -->
 
-<section id="gist" data-name="보고 요지" data-bd="bl-gist"
-         data-notes="이 장 하나로 보고 전체를 말한다. 왼쪽이 결론과 결정 요청, 오른쪽이 그 결론을 받치는 세 줄이다. 시간이 없으면 이 장만 보이고 요청 두 건을 바로 묻는다. 62%는 시범 2건 실측이라 출처 칩을 눌러 범위를 같이 보여 준다.">
-  <div class="bl-gist-l">
-    <p class="bl-kicker">반복 업무 자동화 확산</p>
-    <h2 class="bl-title">반복 단계만 도구로<br><em>판단은 사람에게</em></h2>
-    <p class="bl-lede">시범 2건 실측 · 처리 시간 62% 단축<button type="button" class="bl-ev" data-ev="E2" data-claim="시범 2건 처리 시간 62% 단축">출처</button><br><strong>9월 안 결정 두 건이 4분기 일정의 전제</strong></p>
-    <div class="bl-ask">
-      <b>결정 요청</b>
-      <ol>
-        <li><span class="bl-mn">01</span><div><h3>부서별 조사 담당 1인 지정</h3><p>9월 2주 · 대상 업무 확정의 전제</p></div></li>
-        <li><span class="bl-mn">02</span><div><h3>도구 계정 12석 배정</h3><p>10월 착수분 · 분기 단위 재검토</p></div></li>
-      </ol>
-    </div>
-  </div>
-  <div class="bl-gist-r">
-    <div class="bl-gist-row"><span class="bl-gist-k">현황</span><div><h3>월 168시간이 반복 단계에 묶임</h3><p>정리 단계 62% · 3개 팀 9명 8주 기록<br>담당자 부재 시 업무 정지</p></div></div>
-    <div class="bl-gist-row"><span class="bl-gist-k">실행</span><div><h3>넉 달 동안 5건 순차 착수</h3><p>직접 수행 3건 · 전사 협조 2건<br>9월 조사 결과로 우선순위 확정</p></div></div>
-    <div class="bl-gist-row"><span class="bl-gist-k">판정</span><div><h3>12월 세 기준으로 확산 여부 결정</h3><p>적용 여부 · 기록 잔존 · 재사용 가능성<br>미달 과제는 중단 후 보고</p></div></div>
+<section id="gist" data-name="보고 요지" data-bd="bl-gist bl-gist--flow"
+         data-notes="이 장 하나로 보고 전체를 말한다. 위 한 줄이 결론, 가운데 세 단계가 그 근거와 순서, 아래 띠가 오늘 받을 결정이다. 시간이 없으면 제목과 아래 띠만 읽고 요청 두 건을 바로 묻는다. 62%는 시범 2건 실측이라 출처 칩을 눌러 범위를 같이 보여 준다.">
+  <header class="bl-gist-h">
+    <p class="bl-kicker">반복 업무 자동화 확산 · 보고 요지</p>
+    <h2 class="bl-title">반복 단계만 도구로, <em>판단은 사람에게</em></h2>
+    <p class="bl-lede">시범 2건 실측 · 처리 시간 <strong>62% 단축</strong><button type="button" class="bl-ev" data-ev="E2" data-claim="시범 2건 처리 시간 62% 단축">출처</button> · 9월 안 결정 두 건이 4분기 일정의 전제</p>
+  </header>
+  <ol class="bl-gist-steps">
+    <li class="is-key"><span class="bl-gist-k">현황</span><b class="bl-gist-v">168<small>시간/월</small></b><h3>반복 단계에 묶인 시간</h3><p>정리 단계 62% · 3개 팀 9명 8주 기록</p></li>
+    <li><span class="bl-gist-k">실행</span><b class="bl-gist-v">5<small>건</small></b><h3>넉 달 동안 순차 착수</h3><p>직접 수행 3건 · 전사 협조 2건</p></li>
+    <li><span class="bl-gist-k">판정</span><b class="bl-gist-v">12<small>월</small></b><h3>세 기준으로 확산 여부 결정</h3><p>적용 여부 · 기록 잔존 · 재사용 가능성</p></li>
+  </ol>
+  <div class="bl-gist-ask">
+    <b>결정 요청<small>9월 안 · 2건</small></b>
+    <ol>
+      <li><span class="bl-mn">01</span><h3>부서별 조사 담당 1인 지정</h3><p>9월 2주 · 대상 업무 확정의 전제</p></li>
+      <li><span class="bl-mn">02</span><h3>도구 계정 12석 배정</h3><p>10월 착수분 · 분기 단위 재검토</p></li>
+    </ol>
   </div>
 </section>
 

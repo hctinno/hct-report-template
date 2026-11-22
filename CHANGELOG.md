@@ -14,6 +14,34 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.52.0 — 2026-11-22
+
+**관리보드를 HCT 웹 디자인 템플릿 v2.1.0 으로 · 카드를 원본에서 뽑는다.** 웹 템플릿이 부품을 「구조 → 토큰 →
+할 것 / 하지 말 것 → 예시」 카드로 주고 그 카드를 코드에서 뽑듯이, 블루 리포트도 장 짜임과 부품을 카드로 준다.
+- 관리보드(`--deck manage`) 재작성 — `hctinno/HCT-WEB-DESIGN-TEMPLATE` v2.1.0 명세(앱 셸 · `hct-*` 부품 · 상태 색 이름).
+  `assets/hct-web.css`(새, 생성 파일) — `scripts/sync_web_template.py`(새)가 템플릿 DESIGN.md 의 토큰 · 부품 CSS 를
+  뽑는다(판 고정 2.1.0 · `--check`). `assets/hct-board.css`(새) — 템플릿 「6. 앱 셸」 표의 치수(사이드바 240 · 상단바 48 ·
+  본문 24×20 · 최대 폭 1440 · 1024 미만 서랍). 내용은 가상(AX 과제 8건 · 지표 · 상태 분포 · 할 일 · 일정).
+- `check_board.py` — `hct-web.css` 를 부르는 보드는 웹 템플릿 기준(글자 하한 11px · `hct-badge` 상태 · 새 막대 마크)으로
+  판정. `check_deck.py` 가 `hct-web.css` 를 계통 CSS 로 인식. 보관 보드 4종은 옛 `blue-web.css` 기준 그대로.
+- 짜임 카드 `LAYOUTS.md`(새, 생성) — 내용 모양별 12종(큰 금액 · 추세 + 구성 · 규칙 전후 · 구조 · 경로 · 1:1 비교 ·
+  분류 · 계획 · 화면 · 단계별 수치 · 요약 지도 · 점검 카드). 원본은 견본 덱 `examples/layouts/`(새 — 가상 내용) +
+  `cards.yaml`(판단하는 말).
+- 부품 카드 `COMPONENTS.md`(새, 생성) — 20종. 구조(클래스 순서) · 속성 · 토큰은 `live-catalog.html` · `blue-live.css` 에서
+  뽑고 판단하는 말만 `references/components.yaml`(새). 카드 마크업 그대로를 담은 대조 덱 `examples/components/`(생성)를
+  `verify_repo.py` 가 조립해 `check_live.py` 로 그린다.
+- `scripts/build_cards.py`(새) — 두 카드와 대조 덱 생성 · `--check`. `verify_repo.py` 에 「카드 생성물」 · 「웹 템플릿 CSS」 검사.
+- **시각 스타일 A · C** — 조립 목록 `style: a|c`(또는 `build_deck.py --style`). 본문 HTML · 부품 · 엔진 · 검사는
+  하나, 보이는 규칙만 `assets/blue-style.css`(새)가 토큰으로 덮는다. A 프레임형(지금 그대로 · 기본) · C 혼합형(밝은 띠 +
+  남색 선 · 300 ↔ 900 제목 · 어두운 간지 · 마무리 · 표지 광선 · 그라데이션 막대, 권장). 띠를 모두 걷은 B 안은 시안 비교 뒤 뺐다.
+  머리띠 마크 짝 규칙을 스타일별로(A 반대 · C 같음) — `build_deck.py` 가 달고 `check_live.py` 11번이 같은 규칙으로 본다.
+  `verify_repo.py` 가 기준 견본을 C 로도 조립해 검사. `DESIGN.md` 「2-1」.
+- 워터마크가 가려지지 않게 — 본문 뒤(z-index:-1)에서 본문 위로 올리고 섞기로 칠한다(밝은 장 곱하기 · 어두운 장 스크린).
+  카드 · 띠 · 표 바탕이 로고를 덮어 자르던 문제. 라이브 계통(`blue-live.css`) 전체 · 두 스타일 공통.
+- 보고 요지 흐름형(`bl-gist--flow` · 새) — 결론 한 줄 · 현황 → 실행 → 판정 3단 큰 수치 · 결정 요청 옅은 띠.
+  좌우 반반형은 무거운 남색 요청 상자가 결론보다 먼저 눈에 들어오고 근거 수치가 문장에 묻혔다. 기준 견본 `gist` 장을 흐름형으로.
+- 실제로 동작하는 사내 웹 앱은 관리보드 견본이 아니라 웹 디자인 템플릿(React + Tailwind)을 직접 쓴다 — 문서에 명시.
+
 ## 1.51.0 — 2026-11-21
 
 **본문만 쓰고 빌드가 틀을 씌운다.** 에이전트는 본문만 쓰고, 회사 틀은 손으로 망가뜨릴 수 없게 했다.
