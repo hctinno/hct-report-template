@@ -90,7 +90,7 @@ def doc(spec, pages):
      서버가 계산한 것을 그대로 옮긴 것이며, 템플릿은 합계·비율·순위를 다시
      계산하지 않는다. [data-field]·[data-metric-id] 가 렌더러가 채우는 자리다.
      ══════════════════════════════════════════════════════════════════ -->
-<div class="bd-doc{orient}" data-doc-title="{spec['title']}" data-doc-no="{spec['docNo']}"
+<div class="bd-doc{orient}" data-form="hct-standard" data-doc-title="{spec['title']}" data-doc-no="{spec['docNo']}"
      data-template-id="{spec['id']}">
 
 {chr(10).join(pages)}

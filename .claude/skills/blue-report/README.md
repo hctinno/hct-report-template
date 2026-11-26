@@ -22,22 +22,29 @@ blue-report/
 │  ├─ doc-minutes.html         회의록 2쪽
 │  ├─ deck-viewer.css          뷰어 껍데기 (디자인 시스템 아님)
 │  ├─ deck-viewer.js           넘김 · 축척 · 전체화면 발표 · 쪽번호 자동 · 노트
-│  ├─ board-manage.html        관리보드 (웹 보드)
+│  ├─ board-manage.html        관리보드 — HCT 웹 디자인 템플릿 v2.1.0 앱 셸
+│  ├─ hct-web.css              웹 디자인 템플릿 토큰 · hct-* 부품 (생성 파일 — sync_web_template.py)
+│  ├─ hct-board.css            관리보드 앱 셸 — 사이드바 240 · 상단바 48 · 본문 24×20
 │  ├─ blue-live.css            라이브 계통 — 배율 · 띠 · 부품 38종 · 움직임 12계열 · 아이콘 135종
 │  ├─ live-viewer.js           라이브 엔진 — 넘김 · 단계 · 쪽 이동 · 발표 · 레이저 · 대본 창 · 겹창 · 위젯
 │  ├─ live-standard.html       기준 덱 15장 — 새 보고서의 출발점
 │  ├─ live-patterns.html       패턴첩 63장 + 응용 견본 — 디자인 언어 용례(내용은 가상)
 │  ├─ blue-pattern.css         패턴 장(.xf) 본문 CSS — 패턴첩 장을 쓰는 덱이 함께 부른다
+│  ├─ blue-style.css           시각 스타일 C(혼합) — 조립 목록 style: c 일 때 빌드가 덧입힌다 (A 는 기본)
 │  ├─ live-catalog.html        라이브 부품 카탈로그 52장 — 그대로 · 고쳐 · 참고해 쓴다
-│  ├─ archive/                 보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
+│  ├─ archive/                 보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 4종 · 보드 4종 · 브리핑 · FCC/KC
 │  ├─ LICENSE-Lucide.txt       아이콘 저작권 고지 (ISC · MIT)
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
 ├─ MOTION.md                  효과 라이브러리 — 요청 시 고르는 연출 패턴 · 단일 효과 22종 · 단계 흐리게
 ├─ DESIGN.md                  본문 스타일 한 장 — 발표 덱을 만들 때 먼저, 처음부터 끝까지 읽는다
-├─ examples/                  본문만 쓴 견본 — standard(기준 덱 내용) · showcase(카탈로그 · 패턴첩 조립)
+├─ LAYOUTS.md                 짜임 카드 12종 — 내용 모양별 장 나누기 (생성 파일 — build_cards.py)
+├─ COMPONENTS.md              부품 카드 20종 — 구조 · 속성 · 토큰 · 복사용 HTML (생성 파일 — build_cards.py)
+├─ examples/                  본문만 쓴 견본 — standard · showcase · layouts(짜임 카드 원본) · components(부품 카드 대조, 생성)
 ├─ references/
 │  ├─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
+│  ├─ components.yaml          부품 카드의 판단하는 말(쓰는 곳 · 할 것 · 하지 말 것) — 마크업은 원본에서
 │  └─ decisions/                규격을 바꾼 근거(실측·대조) 원본. README.md 가 색인이다
+├─ docx/                       Word 판 생성기 — A4 문서 HTML → .docx (from_doc.js · 색 · 글꼴은 pptx/tokens.js)
 ├─ pptx/                       PowerPoint 판 생성기
 │  ├─ tokens.js                blue-report.css 의 토큰을 읽어 온다 (색 값 중복 없음)
 │  ├─ layouts.js               카드 · 칩 · 머리말 · 꼬리말 등 원자 helper
@@ -45,7 +52,9 @@ blue-report/
 │  ├─ content.js               용도별 덱 11종의 내용
 │  └─ build.js                 실행 진입점
 └─ scripts/
-   ├─ build_deck.py            발표 덱 조립 — 본문만 쓴 장 + 조립 목록 → 틀 · 표지 · 목차 · 간지까지 붙인 덱
+   ├─ build_deck.py            발표 덱 조립 — 본문만 쓴 장 + 조립 목록 → 틀 · 표지 · 목차 · 간지까지 붙인 덱 (--style a|c)
+   ├─ build_cards.py           짜임 카드 · 부품 카드 생성 (--check 는 어긋남 검사)
+   ├─ sync_web_template.py     웹 디자인 템플릿 DESIGN.md → assets/hct-web.css (--check 는 판 확인)
    ├─ donut.py                 도넛 SVG 생성 (각도 손계산 금지 · --live 는 라이브 덱용)
    ├─ palette.py               N단계 램프 생성 + 대비 검증
    ├─ check_deck.py            덱 자동 점검 17항목 + 슬라이드별 PNG
@@ -181,6 +190,30 @@ node pptx/build.js --brand brand.json --deck internal    # 한 종만
 PPTX 는 PC 에 설치된 폰트만 쓴다. 프리텐다드를 사내 배포하지 않았다면 `pptx/tokens.js` 의
 `F` 세 줄을 `'맑은 고딕'` 으로 되돌린다.
 
+### Word(.docx)로 만들기 — A4 문서
+
+A4 문서(회의록 · 사내 보고서 · 규정 · 매뉴얼 · 공지)는 HTML 원본 하나에서 Word 판을 뽑는다. PPTX 의 `content.js`
+처럼 내용을 따로 두지 않는다 — 갈라질 곳이 없다.
+
+```bash
+python3 scripts/doc_to_docx.py 회의록.html --brand brand/hct/brand.json -o 회의록.docx
+python3 scripts/check_docx.py 회의록.docx --html 회의록.html
+```
+
+| HTML 부품 | Word |
+|---|---|
+| `.bd-head` · `.bd-foot` | 머리글(로고 · 문서번호) · 바닥글(회사명 · 문서명 · 쪽번호 필드) |
+| `.bd-title` · `.bd-subtitle` · `.bd-h1` · `.bd-h2` | 스타일 제목 · 부제 · 제목 1 · 제목 2 |
+| `.bd-key` · `.bd-chip(--warn · --late)` | 문자 스타일 HCT 강조어 · HCT 칩(주의 · 위험) |
+| `.bd-meta` · `.bd-table` · `.bd-sign` · `.bd-figure` | 표 |
+| `.bd-list` · `.bd-list--legal` · `.bd-steps` · `.bd-toc` | 글머리 목록 · (1) 글자 번호 · 자동 번호 ①② · 점선 탭 |
+| `.bd-callout` | 테두리 · 음영 문단 |
+| `.x-kpis` · `.x-bars` (사내 보고서) | 표로 그린 수치 타일 · 막대 |
+
+쪽 나눔은 HTML 의 `.bd-page` 경계와 같다. 모르는 부품은 글자를 살려 문단으로 옮기고 「주의」를 낸다.
+검사(`check_docx.py`)는 글꼴(Pretendard) · 색(토큰) · 9pt 하한 · 머리글 로고 · 쪽번호 필드 · HTML 글자 누락 ·
+제목 수를 실패로, LibreOffice 렌더 쪽수 차이를 주의로 본다.
+
 #### 내용이 두 곳에 있다 — 합치지 않고 갈라짐을 검사한다
 
 덱 내용은 `assets/archive/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다.
@@ -240,6 +273,7 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | `archive/doc-policy.html` | 사규·규정 3쪽 — 조·항·호 · 부칙 · 개정 이력 · 결재란 |
 | `archive/doc-manual.html` | 매뉴얼·가이드 3쪽 — 목차 · 절차 단계 · 화면 캡처 자리 |
 | `archive/doc-notice.html` | 공지 1쪽 — 게시판용. 한 쪽을 넘기지 않는다 |
+| `archive/doc-report.html` | 사내 보고서 3쪽 — 요약(요청 상자) · 수치 타일 · 실적 표 · 막대 · 리스크 · 일정 · 요청 표 · 결재란 |
 
 **쪽번호와 문서명은 뷰어가 채운다.** `.bd-foot` 을 비워 두고 숫자를 적지 않는다.
 쪽을 넣거나 빼도 번호가 어긋나지 않으며, 손으로 적으면 `check_doc.py` 가 실패시킨다.
@@ -339,6 +373,7 @@ python3 scripts/to_pdf.py ./보고서.html -o ./보고서.pdf --notes
 | Pillow | 로고 변환 | `pip install Pillow` |
 | Playwright + Chromium | 렌더 점검 · PDF | `pip install playwright` → `playwright install chromium` (약 150MB) |
 | pptxgenjs | PPTX | `npm install` |
+| docx (npm) | Word(A4 문서) | `cd docx && npm install` |
 
 ```bash
 python3 scripts/ensure_deps.py          # 무엇이 있고 없는지만 본다
@@ -968,12 +1003,19 @@ rot  = 누적pct × 3.6 − 90              12시에서 시작
 | 용도 | `--deck` | 파일 | 특징 |
 |---|---|---|---|
 | 과제 실행보드 | `board` | `archive/board-task.html` | 가장 작은 견본. 레일 · KPI · 필터 표 · 메모 |
-| 관리보드 | `manage` | `board-manage.html` | 절 12 · 표 8 · 일정 격자 · 가로 막대 |
+| 관리보드 | `manage` | `board-manage.html` | **HCT 웹 디자인 템플릿 v2.1.0** 앱 셸 · `hct-*` 부품 · 지표 · 과제 표 · 상태 분포 · 일정 |
 | 실행보드 | `execboard` | `archive/board-exec.html` | 상태 알약 4단 순환 · 설비 진행판 · 주차 막대 |
 | 팀보드 | `teamboard` | `archive/board-team.html` | 칸반 4열 · 주차 격자 · 상세 겹칩 |
 | 점검보드 | `gapcheck` | `archive/board-gap.html` | 공백 부모 + 대응 자식 · 비율 띠 · 대조표 · 단계 목록 |
 
-뒤 네 벌은 사내에서 따로 만들어 쓰던 보드를 옮긴 것이다. 옮기며 드러난 것들.
+관리보드는 웹 디자인 템플릿 계통이다 — `hct-web.css`(템플릿 DESIGN.md 의 토큰 · 부품 CSS 를
+`scripts/sync_web_template.py` 가 뽑은 생성 파일, 판 고정 v2.1.0) + `hct-board.css`(템플릿 「6. 앱 셸」 표의
+치수를 옮긴 셸). 글자 하한 11px(템플릿 micro) · 상태 색은 템플릿 이름 그대로 · `check_board.py` 가
+`hct-web.css` 를 부르는 보드를 이 기준으로 판정한다. 템플릿 판을 올릴 때는
+`python3 scripts/sync_web_template.py --version <판>` 후 `PIN` 을 고친다. 실제 동작하는 웹 앱은 템플릿을 직접 쓴다.
+보관 보드 네 벌은 옛 `blue-web.css` 계통(하한 12.5px) 그대로다.
+
+보관 네 벌은 사내에서 따로 만들어 쓰던 보드를 옮긴 것이다. 옮기며 드러난 것들.
 
 - **같은 일을 하는 상자가 세 이름으로 흩어져 있었다** — `.pm-strip` · `.tf-strip`
   · `.branch`. 크기가 제각각인 이유도 이름이 달라서였다. 이름이 하나면 크기도 하나다.
@@ -1321,7 +1363,9 @@ python3 scripts/check_live.py 보고서.html --shots out/
 | 도넛 `.bl-donut` | `style="--bl-donut-size: 18rem"` · 범례 `li` 의 `data-v` | 도넛 크기(기본 15rem) · 손댈 때 가운데에 올릴 글자(없으면 범례 값). 가운데 숫자는 구멍에 맞춰 저절로 줄고 단위는 1rem 아래로 내려가지 않는다 |
 | 등장 · 차례 | `.bl-a` 의 `--i` · `--d` | 순번(80ms 씩) · 추가 지연(초) |
 
-기준 덱에 이미 있는 어휘 — 표지 `.bl-cover-k` · `.bl-sig` · 보고 요지 `.bl-gist` · `.bl-ask` ·
+기준 덱에 이미 있는 어휘 — 표지 `.bl-cover-k` · `.bl-sig` · 보고 요지 `.bl-gist`(좌우 반반형) · `.bl-ask` ·
+보고 요지 흐름형 `data-bd="bl-gist bl-gist--flow"` + `.bl-gist-h` · `.bl-gist-steps`(`li.is-key` · `.bl-gist-v`) · `.bl-gist-ask`
+(견본 `examples/standard` 장 `gist` — 수치가 있는 요지는 흐름형, 수치 없는 요지는 반반형) ·
 로드맵 `.bl-road` · 카드 `.bl-card` · 수치 `.bl-stat` · 막대 `.bl-bars` · 표 `.bl-tbl` ·
 결론 줄 `.bl-concl` — 은 `live-standard.html` 에서 가져온다.
 

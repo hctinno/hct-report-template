@@ -21,7 +21,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
        테두리 1px 와 미디어 질의 분기점은 예외다
     5. 장마다 data-notes 가 있는가 — 발표자 노트 없는 장은 대본 창이 빈다
     6~10. 지면 크롬 — 머리띠 · 꼬리띠 · 쪽번호 · 머리띠 브랜드 마크 · 워터마크가 장마다 있는가
-   11. 마크 배경 짝 — data-on 이 마크가 앉는 면과 맞는가 (머리띠 마크는 지면과 반대)
+   11. 마크 배경 짝 — data-on 이 마크가 앉는 면과 맞는가 (A 머리띠 마크는 지면과 반대 · C 는 같음)
    12. 브랜드 자리 — 산출물에 「COMPANY NAME」이 남지 않았는가 (assets/ 견본만 예외)
    13. 출처 칩 — .bl-ev 의 키(쉼표로 여럿)가 #bl-evidence 근거에 있고 근거마다 제목·등급·출처가
        있는가. 캡처(imgs)·하이라이트 상자(hl)·원문(doc)이 가리키는 것도 실제로 있는가
@@ -360,7 +360,7 @@ def _slices(html):
 # ---------------------------------------------------------------- 본문 맞춤 CSS
 
 # 계통 CSS 를 덱 안에 묶어 넣은 블록인지 — 토큰 정의가 있으면 계통 것이다.
-_SYS_SIGS = ("--br-page:", "--bl-fs-body:", "--bl-pattern:")
+_SYS_SIGS = ("--br-page:", "--bl-fs-body:", "--bl-pattern:", "--bl-style:")
 # 패턴 장 — 패턴첩(live-patterns.html)에서 옮겨 온 최종본 형태의 장. 장 태그에 xf 클래스가 있다.
 # 그 장의 본문 CSS 는 계통 파일(blue-pattern.css)이 맡아 색 · 치수 판정(2 · 4 · 28번)에서 뺀다.
 # 머리띠 · 꼬리띠 · 노트 · 단계 · 문체는 똑같이 본다.
@@ -763,6 +763,9 @@ def check_chrome(html, rep):
         rep.f("bl-sl 장을 찾지 못했다")
         return
 
+    # 시각 스타일(build_deck.py style) — A 는 띠가 지면과 반대 색, C 는 띠가 지면색이다
+    st = re.search(r'<main\b[^>]*\bclass="bl-deck\b[^>]*\bdata-style="([ac])"', html)
+    inverts = not st or st.group(1) == "a"
     miss_hd, miss_rf, miss_pg, miss_mark, miss_wm, wrong = [], [], [], [], [], []
     for n, (tag, body) in enumerate(sl, 1):
         dark = "bl-sl--dark" in tag
@@ -776,7 +779,7 @@ def check_chrome(html, rep):
         if not mark:
             miss_mark.append(n)
         else:
-            want = "light" if dark else "dark"     # 띠 색은 지면과 반대다
+            want = ("light" if dark else "dark") if inverts else ("dark" if dark else "light")
             if mark.group(1) != want:
                 wrong.append(f"{n}장 머리띠 마크 data-on=\"{mark.group(1)}\" — "
                              f"{'어두운' if dark else '밝은'} 장이므로 \"{want}\"")
@@ -804,7 +807,7 @@ def check_chrome(html, rep):
     verdict("워터마크", miss_wm)
 
     if wrong:
-        rep.f(f"마크 배경 짝 어긋남 {len(wrong)}건 — 띠 색은 지면과 반대다")
+        rep.f(f"마크 배경 짝 어긋남 {len(wrong)}건 — " + ("띠 색은 지면과 반대다" if inverts else "C 스타일은 띠가 지면색이다"))
         for w in wrong[:6]:
             print(f"        {w}")
     else:

@@ -1,0 +1,144 @@
+# 부품 카드 설명 — scripts/build_cards.py 가 이 파일과 assets/live-catalog.html(마크업 원본) ·
+# assets/blue-live.css(토큰 원본)로 COMPONENTS.md 와 대조 덱 examples/components/ 를 만든다.
+# 마크업 · 클래스 · 토큰은 원본에서 뽑으므로 여기에는 판단에 필요한 말만 적는다.
+# 항목: root(부품 최상위 클래스) · from(원본 파일 · 장 id) · name · when · do · dont
+
+- root: bl-kpis
+  from: catalog#kpi
+  name: 수치 타일 줄
+  when: 핵심 수치 3~5개를 한 줄로 — 현황 요약 · 실적
+  do: [한 줄에 3~5칸, 숫자는 크게 단위는 작게, 기준(기간 · 표본)을 라벨에]
+  dont: [6칸 이상, 칸마다 다른 색]
+
+- root: bl-bars
+  from: catalog#kpi
+  name: 가로 막대
+  when: 항목 몇 개의 크기 비교 — 순위 · 비중
+  do: [주인공 막대 하나만 강조색, 값은 막대 끝에, 눈금 상한을 라벨에]
+  dont: [모든 막대 다른 색, 0이 아닌 시작점]
+
+- root: bl-donut-box
+  from: catalog#kpi
+  name: 도넛 + 범례
+  when: 합이 100%인 구성 2~6조각
+  do: [반드시 scripts/donut.py --live 로 생성, 가운데 합계 · 핵심 비율]
+  dont: [각도 · dasharray 손으로 쓰기, 파이 차트, 7조각 이상]
+
+- root: bl-stack
+  from: catalog#stack
+  name: 100% 누적 가로 막대
+  when: 여러 대상의 구성비를 나란히 — 부서별 · 연도별 비중
+  do: [같은 조각 순서 · 같은 색, 행 끝에 핵심 조각 값]
+  dont: [행마다 조각 순서가 다름, 조각 7개 이상]
+
+- root: bl-stair
+  from: catalog#stair
+  name: 계단형 상승 열
+  when: 단계가 오를수록 커지는 값 — 성숙도 · 누적 효과
+  do: [마지막 단계만 주인공 색, 단계 이름은 짧게]
+  dont: [내려가는 값에 쓰기(→ 워터폴)]
+
+- root: bl-hero
+  from: catalog#hero
+  name: 히어로 띠
+  when: 장 하나를 대표하는 숫자 한 개를 가로 띠로
+  do: [숫자 하나 + 기준 한 줄]
+  dont: [한 장에 히어로 띠 둘]
+
+- root: bl-chev
+  from: catalog#chev
+  name: 쉐브론 띠
+  when: 3~5단계 순서 — 절차 · 추진 단계
+  do: [단계 이름은 명사 짧게, 지금 단계만 강조]
+  dont: [6단계 이상(→ 간트나 파이프라인)]
+
+- root: bl-gantt
+  from: catalog#gantt
+  name: 간트
+  when: 과제별 기간 · 상태 — 일정 · 로드맵
+  do: [오늘 선 하나, 상태는 완료 · 진행 · 계획(빗금) 세 가지로]
+  dont: [과제 10행 이상(→ 부록 표), 색을 과제마다 다르게]
+
+- root: bl-lanes
+  from: catalog#lanes
+  name: 이중 레인 연표
+  when: 두 흐름의 사건을 같은 시간축에 — 우리 · 시장, 계획 · 실적
+  do: [레인 둘, 같은 시간 눈금]
+  dont: [레인 셋 이상]
+
+- root: bl-org
+  from: catalog#org
+  name: 조직도
+  when: 보고 라인 · 위임 관계
+  do: [단계는 3단 이내, 이번 보고에서 바뀐 칸만 강조]
+  dont: [전사 조직 전부 그리기]
+
+- root: bl-orgtree
+  from: catalog#team
+  name: 작은 조직
+  when: TF · 팀 하나의 구성
+  do: [책임자 · 역할 이름까지]
+  dont: [인원 수만 나열]
+
+- root: bl-matrix
+  from: catalog#matrix
+  name: 역할 매트릭스
+  when: 과제 × 조직의 주도 · 참여 관계
+  do: [주도 칸만 짙게, 행 · 열 각 6개 이내]
+  dont: [모든 칸에 글자]
+
+- root: bl-vs
+  from: catalog#vs
+  name: 좌우 대비
+  when: 지양 · 지향, 지금 · 바뀐 뒤 두 패널
+  do: [두 패널 항목 순서를 맞춤, 오른쪽(지향)이 주인공]
+  dont: [항목 수가 다른 두 패널]
+
+- root: bl-decide
+  from: catalog#decide
+  name: 결정 요청 판
+  when: 승인 · 선택을 요청하는 장
+  do: [요청마다 무엇을 · 언제까지 · 안 하면, 도장(결정 표시)은 하나]
+  dont: [요청 4건 이상(→ 장을 나눔)]
+
+- root: bl-pipe
+  from: catalog#pipe
+  name: 파이프라인 열
+  when: 단계마다 무엇이 들고 나는지 — 처리 흐름
+  do: [단계마다 작은 그림 하나, 되먹임은 호 하나]
+  dont: [단계 7개 이상]
+
+- root: bl-tc
+  from: catalog#tcard
+  name: 상단 색띠 카드
+  when: 병렬 항목 3~5개를 카드로 — 과제 · 사례
+  do: [색띠는 계열 구분(data-c)에만, 카드 높이 같게]
+  dont: [상태를 색띠로 표시(→ 상태 알약)]
+
+- root: bl-hc
+  from: catalog#hcard
+  name: 색 머리 열 카드
+  when: 열마다 묶음이 다른 목록 — 영역별 준비 상태
+  do: [열 머리에 묶음 이름 · 개수]
+  dont: [열마다 다른 형식]
+
+- root: bl-tabset
+  from: catalog#tabs
+  name: 탭
+  when: 같은 형식의 사례 여러 개를 한 장에서 전환
+  do: [탭 3~6개, 발표 단계(data-at)와 묶기]
+  dont: [탭마다 형식이 다름, 탭 안에 탭]
+
+- root: bl-concl
+  from: examples/standard#steps
+  name: 결론 줄 · 장 결론 띠
+  when: 장(章)의 처음이나 끝, 결정 · 전환 장 — 장(章)마다 한 번
+  do: [장 결론은 조립 목록 takeaway 로(짙은 띠 .bl-concl--ch 로 붙음), 굵은 강조어 하나]
+  dont: [본문 장마다 붙이기(검사 29번 주의), 문장 두 줄 이상]
+
+- root: bl-ev
+  from: examples/standard#gist
+  name: 출처 칩
+  when: 수치 바로 옆 — 근거 패널로 연결
+  do: [data-ev 키를 evidence.json 에, data-claim 에 그 수치 문장]
+  dont: [근거 없는 키, 문단 끝에 몰아 달기]

@@ -44,6 +44,42 @@
 
 ---
 
+## ⓪ 에이전트 스킬 `hct-report` — Codex · Goose 등 (권장)
+
+GitHub 주소를 건네지 않고 쓰는 길이다. Codex 와 Goose 는 Agent Skills 표준을 읽는다 — `SKILL.md` 가 든
+폴더를 스킬 폴더에 두면, 에이전트가 요청을 보고 스스로 고른다. 로고 · 브랜드 · 틀 · 검사기가 폴더 안에 있어
+저장소 없이 돈다.
+
+**새 PC — GitHub 에서 바로 설치(권장).** 저장소의 `skills/hct-report/` 가 설치본이다.
+
+```bash
+gh skill install hctinno/hct-report-template hct-report --agent codex --scope user   # Codex (goose 면 --agent goose)
+gh skill install hctinno/hct-report-template hct-report --agent codex --scope user --force   # 새 판으로 바꿀 때
+npx skills add hctinno/hct-report-template --skill hct-report -g -a codex           # gh 가 없을 때
+```
+
+준비물은 Python 3.9+ · Node.js 18+ 둘. 설치 뒤 `python3 ~/.agents/skills/hct-report/scripts/ensure_deps.py --all` 로
+Chromium · npm 패키지를 미리 받아 두면 회사망에서 첫 사용이 막히지 않는다.
+
+**판을 올린 사람(저장소).** 원본(`.claude/skills/blue-report` · `agent-skill/hct-report` · `brand/hct`)을 고친 뒤
+
+```bash
+python3 scripts/build_hct_skill.py --publish       # skills/hct-report/ 를 다시 펼친다 — 함께 커밋한다(verify 가 원본과 대조)
+python3 scripts/build_hct_skill.py                 # 손으로 나눠 줄 zip — decks-out/hct-report-v<판>.zip
+python3 scripts/build_hct_skill.py --install       # 이 PC 의 ~/.agents/skills/hct-report 에 설치(기존 것은 백업)
+```
+
+| 에이전트 | 개인 | 프로젝트 · 공용 |
+|---|---|---|
+| Codex | `~/.agents/skills/hct-report/` | 저장소 `.agents/skills/` · `/etc/codex/skills/` |
+| Goose | `~/.agents/skills/hct-report/` | 프로젝트 `.agents/skills/` |
+
+에이전트는 `scripts/hct.py` 하나로 일한다 — `formats`(목적 × 형식 표) → `new`(뼈대) → `build`(형식들 + 검사).
+진입부(`SKILL.md` · `design/`)는 `agent-skill/hct-report/` 에, 엔진은 `.claude/skills/blue-report/` 에 있다.
+판올림 때 묶음을 다시 만들어 나눠 준다. 스킬 폴더 위치는 각 도구 문서에서 바뀔 수 있으니 설치 전에 확인한다.
+
+아래 ①~④는 저장소를 가져오게 하는 길이다. 스킬 설치가 막힌 환경에서만 쓴다.
+
 ## ① Claude 계정 지침 — 계정 전체에 한 번
 
 claude.ai → 좌측 하단 이니셜 → Settings → **Instructions for Claude** 에 아래를 더한다.

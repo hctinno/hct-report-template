@@ -1,0 +1,35 @@
+# 생성 파일 — scripts/build_cards.py
+title: 부품 카드 대조 덱
+body: slides.html
+evidence: evidence.json
+agenda: false
+dividers: false
+cover:
+  date: 대조
+  org: COMPONENTS.md
+  title: 부품 카드 <em>대조 덱</em>
+  message: 카드에 실린 마크업 그대로 — <b>그려지는지 검사</b>
+  notes: 생성 파일이다. build_cards.py 가 COMPONENTS.md 와 함께 만든다.
+chapters:
+- name: 부품
+  slides:
+  - c-bl-kpis
+  - c-bl-bars
+  - c-bl-donut-box
+  - c-bl-stack
+  - c-bl-stair
+  - c-bl-hero
+  - c-bl-chev
+  - c-bl-gantt
+  - c-bl-lanes
+  - c-bl-org
+  - c-bl-orgtree
+  - c-bl-matrix
+  - c-bl-vs
+  - c-bl-decide
+  - c-bl-pipe
+  - c-bl-tc
+  - c-bl-hc
+  - c-bl-tabset
+  - c-bl-concl
+  - c-bl-ev

@@ -14,6 +14,133 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.56.0 — 2026-11-26
+
+**회사 공식 문서 양식을 A4 기본으로.** 사내 규정 · 강령 원본(윤리강령 11쪽)을 재서 양식 정의 `forms/hct-official.json` 을 만들고
+A4 문서의 기본 양식으로 삼았다. HTML · PDF · Word 가 이 파일 하나로 함께 바뀐다. 블루 리포트 표준 A4 는 `hct-standard` 로 남아
+FCC/KC 대외 보고서(`data-form="hct-standard"`)가 쓴다 — 그 화면은 바꾸기 전과 픽셀 대조 동일.
+- **양식 짜임 선택지**(`build_form.py` · `doc-viewer.js` · `docx/from_doc.js` 가 같이 읽는다): 본문 · 제목 글꼴(`font.body/heading` —
+  HTML sans/serif, Word 글꼴 이름) · 양쪽 정렬 · 들여쓰기 · 머리말 `logo-title`(로고 + 가운데 문서명, 짧은 제목만 넓게 벌림) ·
+  위아래 띠(`header.bands`) · 꼬리말 없음 · 장 제목 `box`(위아래 선 + 번호 칸) · 장 번호 `roman`(1. → Ⅰ) · 글머리 표시 · 호 번호 `circled` ·
+  절차 번호 `decimal` · 목차 `plain` · 표지(`cover.mode` off · opt-in · always) · 쪽 흘림(`page.breaks: flow` — HTML 은 뷰어가 넘친 블록을
+  다음 쪽으로 옮기고 제목이 쪽 끝에 홀로 남지 않게 한다, Word 는 흘려 나눈다). 빠진 항목은 기본값(`DEFAULTS`)을 쓰고, Word 생성기는
+  `doc_to_docx.py` 가 기본값을 채워 넘긴 양식을 읽는다.
+- **양식 여럿을 한 CSS 에**: 기본 양식은 `:root`, 나머지는 `.bd-doc[data-form="<id>"]` 범위. 문서가 `data-form` 으로 고르고, Word 도 따른다.
+  뷰어는 양식 값을 `.bd-doc` 에서 읽는다. `hct.py form` 은 기본 양식과 다른 양식을 보여 준다.
+- **토큰**(`blue-report.css`): 회사 공식 문서 양식 색 4개 — `--br-form-band`(#3a8ec3) · `--br-form-band-2`(#f0da2c) · `--br-form-chapter`(#a4d6dd) ·
+  `--br-form-cover-bar`(#188cf9). 원본 이미지에서 잰 값이며 A4 양식의 틀에만 쓴다.
+- **명조 글꼴**: `assets/fonts/NotoSerifKR-{Regular,Bold}.subset.woff2`(SIL OFL 1.1, KS X 1001 + 로마 숫자 · 원문자) ·
+  `scripts/make_serif_subset.py`(npm @fontsource/noto-serif-kr 조각을 합쳐 자른다 · `--check`). 명조를 쓰는 양식만 `@font-face` 를 싣는다.
+  Word 는 「바탕」 · 「맑은 고딕」을 적는다(바탕은 재배포 불가라 HTML 에 넣지 않는다).
+- 견본: 규정 · 매뉴얼에 `data-doc-cover="yes"`(공식 양식에서 표지). FCC/KC 14종은 `build_fcc_templates.py` 가 `data-form="hct-standard"` 를 단다.
+- `check_docx.py`: 글꼴 두 벌(본문 · 제목)을 양식에서 읽고, 쪽번호 필드는 꼬리말에 `{page}` 가 있을 때만, 문서번호는 머리말에 쓸 때만 본다.
+  장 번호를 양식이 바꾸면(Ⅰ · 번호 칸) 번호를 빼고 대조, 목차 쪽번호를 감추는 양식이면 그것도 뺀다. 흘림 양식은 쪽수를 대조하지 않는다.
+- `verify_repo.py` 「A4 양식 정의」: 모든 양식 검사 · CSS 일치 · 명조 서브셋 글자(fontTools 가 있으면).
+- 아직 정하지 못한 것: 규정 · 강령 조문의 「~한다」 문체가 검사기의 개조식 규칙에 걸린다(회사 결정 필요 — `forms/README.md`).
+- **GitHub 에서 스킬 설치**: 저장소에 펼친 설치본 `skills/hct-report/`(`build_hct_skill.py --publish`)를 둔다. 새 PC 는
+  `gh skill install hctinno/hct-report-template hct-report --agent codex --scope user`(Goose 는 `--agent goose`, 새 판 `--force`) 한 줄.
+  verify 가 설치본이 원본과 같은지 대조한다(`--check-published`). `INSTALL.md` 에서 묶은 날짜를 빼 같은 판이면 같은 파일이 나오게 했다.
+
+## 1.55.0 — 2026-11-26
+
+**A4 양식을 정의 파일 하나로.** 회사 양식을 받아 반영할 수 있게, A4 문서의 양식 값을 CSS 와 Word 생성기에 따로 적지 않고
+`forms/<id>.json` 한 곳에 모았다. HTML · PDF 와 Word 가 같은 파일을 읽는다. 기본 양식(`hct-standard`)의 HTML 은 바꾸기 전과
+화면이 같다(A4 5종 · FCC/KC 견본 18쪽 픽셀 대조 동일).
+- `forms/hct-standard.json`(새) · `forms/README.md`(새): 지면 · 여백 · 글꼴(Word) · 표제 · 부제 · 장 · 절 · 본문 · 보조 크기와 색 역할 ·
+  간격 · 머리말 · 꼬리말 짜임(왼쪽 · 오른쪽 — 로고 · 문서번호 · 문서명 · 회사, 꼬리말 글 틀 `{company}` `{title}` `{docNo}` `{page}` `{pages}`) ·
+  문서 정보 표 · 표 · 상자 모서리 · 결재란(기본 칸 · 높이 · 선) · Word 번호 모양 · 쪽 나눔. 색은 토큰 이름, 길이는 px · pt · mm.
+- `scripts/build_form.py`(새): 양식 검사(hex · 없는 토큰 · 단위 없는 길이 · 본문 10.5pt · 보조 9pt 하한 · 모르는 머리말 항목 · 자리표시자)
+  후 `blue-doc.css` 의 `/* <form …> */` 생성 블록(--bd-* 변수)을 쓴다. `--check` 는 다르면 실패. `blue-doc.css` 는 양식 값을
+  직접 적지 않고 그 변수만 쓴다.
+- `assets/doc-viewer.js`: 머리말 · 꼬리말 짜임이 기본과 다른 양식이면 양식대로 다시 짠다(기본 양식이면 건드리지 않는다).
+- `docx/from_doc.js`: 여백 · 크기 · 색 · 머리말 · 꼬리말 · 문서 정보 표 · 표 · 결재란 · 번호를 양식에서 읽는다(치수 · hex 를 적지 않는다).
+  `doc_to_docx.py` 는 HTML 이 쓴 양식(`--bd-form`, 한 파일 HTML 은 안에 품고 있다)을 따른다 — HTML 과 Word 가 다른 양식을 쓰지 않는다.
+- `scripts/check_docx.py`: 글꼴 · 글자 하한을 양식에서 읽고, 여백이 양식과 같은지 본다.
+- `scripts/hct.py`: `form`(지금 양식 보기 · `--use` 로 바꾸기) 추가. `new document` 가 양식의 결재란 칸을 견본에 찍는다.
+- `verify_repo.py`: 「A4 양식 정의」 점검 — 양식 검사 · CSS 일치, 그리고 시험용 양식(`forms/_test/test-classic.json` — 가운데 표제 ·
+  격자 표 · 다른 여백 · 머리말 좌우 바꿈 · 「- n -」 쪽번호 · 결재 4칸)으로 바꾸면 HTML 과 Word 가 함께 바뀌는지 복사본에서 본다.
+
+## 1.54.0 — 2026-11-25
+
+**A4 문서를 Word 로도.** 회의록 · 사내 보고서 · 규정 · 매뉴얼 · 공지 5종이 HTML 원본 하나에서 Word(.docx)로도 나온다.
+그림으로 찍지 않고 글자 · 표 · 목록 · 상자를 전부 Word 글자와 표로 옮긴다 — Word 에서 고칠 수 있다.
+- `scripts/doc_to_docx.py`(새) · `docx/from_doc.js`(새, npm `docx`): `.bd-doc` HTML → manifest → .docx. 공통 부품 13가지를
+  Word 로 옮긴다 — 머리글(로고 · 문서번호) · 바닥글(회사명 · 문서명 · 쪽번호 필드 n / 전체) · 표제 · 부제 · 문서 정보 표 ·
+  제목 1 · 제목 2 · 본문 · 글머리 목록 · 규정 호 (1)(2) 글자 번호 · 표(머리글 행 반복) · 강조어 · 상태 칩(문자 스타일) ·
+  강조 상자 · 절차(자동 번호 ①②③) · 목차(점선 탭) · 그림 · 결재란. 사내 보고서의 수치 타일 · 가로 막대는 표로 그린다.
+  쪽 나눔은 HTML 의 쪽 경계와 같다. 색 · 글꼴은 `pptx/tokens.js`(= `blue-report.css` 토큰), 로고는 brand.json.
+  한글 · 숫자 사이 Word 자동 띄움을 끈다. 모르는 부품은 글자를 살려 문단으로 옮기고 「주의」를 낸다.
+- `scripts/check_docx.py`(새): Word 판 검사 — 필수 부품 · ZIP 폴더 항목 · 글꼴(Pretendard 만) · 색(토큰만) · 9pt 하한 ·
+  머리글 로고 · 바닥글 쪽번호 필드 · HTML 글자 누락(어절 순서 대조) · 제목 수를 실패로, LibreOffice 렌더 쪽수 차이 · 빈 문서번호를 주의로.
+- `scripts/hct.py`: 문서 보고의 `docx` 를 「없음」에서 「됨」으로. `build --formats docx` 가 HTML 검사 → Word 변환 →
+  `check_docx.py` 까지 하고, 실패가 있으면 완료로 치지 않는다. `check <파일>.docx [--html 원본]` 도 받는다.
+- `scripts/ensure_deps.py`: `need_node_modules(폴더, 패키지)` — Word 생성기 의존성(`docx/`)도 첫 실행에 스스로 받는다.
+- `scripts/check_deck.py`: 본문 폰트 점검이 **PC 에 Pretendard 가 설치돼 있으면 실패**하던 것을 고쳤다. 글꼴 목록 첫째
+  'Pretendard' 가 시스템 글꼴로 잡혀 내장 'Pretendard Variable' 이 한 번도 불리지 않았기 때문이다(Office 용으로
+  Pretendard 를 설치한 PC 에서 난다). 아직 안 불린 내장 글꼴은 직접 불러 본다 — 글꼴 파일이 없으면 여전히 실패한다.
+- `verify_repo.py`: 「A4 문서 → Word」 점검 추가 — 5종 변환 · `check_docx.py` 실패 0 · 모르는 부품 0. 에이전트 스킬 점검은
+  묶음 안에서 회의록 Word 를 만들어 검사까지 통과하는지, 없는 형식(현황판 xlsx)을 거절하는지 본다.
+- 에이전트 스킬 `hct-report`: 설명 · 순서 · `design/COMPONENTS.md`(A4 부품 → Word 대응표) · `RULES.md`(Word 판 규칙과 검사) ·
+  `BRAND.md`(Word 글꼴 · 크기, A4 로고 자리는 머리말 왼쪽으로 바로잡음)를 갱신. Word 가 필요해도 HTML 원본에 쓰고 `.docx` 를
+  직접 짜지 않게 한다. 같은 「월간 보고」라도 결재 · Word 면 문서 보고로 고르게 하고, 산출물 위치와 문서번호를 모를 때
+  쓰는 법(「문서번호 확인 필요」)을 적었다 — 하위 에이전트 시험 2건(회의록 Word · 보고서 PDF+Word)에서 나온 질문이다.
+
+## 1.53.0 — 2026-11-25
+
+**한 보고서를 HTML · PowerPoint 둘 다로.** PowerPoint 레이아웃 템플릿과 A4 사내 보고서를 더했다. 모두 기존 토큰 · 로고 · 검사기를 그대로 쓴다.
+- **에이전트 스킬 `hct-report`**(새) — Codex · Goose 등 Agent Skills 표준을 읽는 에이전트용. GitHub 주소 없이
+  `~/.agents/skills/hct-report` 에 설치하면 홀로 돈다. `scripts/build_hct_skill.py` 가 엔진(`.claude/skills/blue-report`) ·
+  브랜드(`brand/hct`) · 진입부(`agent-skill/hct-report/` — `SKILL.md` · `design/BRAND · COMPONENTS · RULES`)를 묶고 규격을
+  검사한다(`--install` 로 설치). 에이전트는 `scripts/hct.py` 하나로 일한다 — `formats`(목적 5 × 형식 표) · `new`(뼈대) ·
+  `build`(형식들 + 검사기 자동 선택) · `check`. 없는 조합(문서 보고 Word · 보드 엑셀 · 웹 게시)은 만들지 않고 대안을 내며
+  종료 코드 2. 본문에 적은 토큰 밖 색은 검사기가 주의로 내더라도 `hct.py` 가 실패로 막는다. 1.52.0 기준을 따른다 —
+  `new present` 가 `style: c`(혼합형 · 권장)를 넣고, 진입부가 짜임 · 부품 카드(`LAYOUTS.md` · `COMPONENTS.md`)로 이끌며
+  보고 요지는 흐름형(`bl-gist--flow`), 결정 요청 판은 「무엇을 · 언제까지 · 안 하면」을 채우게 한다.
+- `scripts/deck_to_pptx.py`(새) · `build_deck.py --pptx`: 라이브 HTML 덱에서 PowerPoint 판을 뽑는다. 표지 · 목차 · 장 간지 ·
+  마무리 · 부록 간지와 장 제목 · 리드 · 발표자 노트는 PowerPoint 글자(편집 가능), 본문 도식은 3840px 그림으로 HTML 과 같은
+  자리에. 제목이 본문 칸 안에 섞인 장(보고 요지)은 장 전체를 그림 한 장으로. 단계 전개 · 애니메이션은 펼친 끝 모습으로 찍는다.
+  내용은 HTML 한 곳에만 있다 — 두 판을 따로 고치지 않는다. 조립은 `pptx/from_deck.js` 가 template.js 레이아웃으로 한다.
+- `pptx/template.js`(새): PowerPoint 「홈 → 새 슬라이드」에서 고르는 레이아웃 6종(HCT 표지 · 장 간지 · 제목만 ·
+  제목+본문 · 2단 비교 · 마무리)과 쓰는 법 견본 11장. `build.js` 가 내용이 정해진 덱을 찍어 낸다면 이것은 빈 틀이다.
+  색 · 격자는 `tokens.js`, 로고 · 워터마크는 brand.json 에서 읽고, 테마 색 구성표와 글꼴(Pretendard)을 HCT 값으로 쓴다.
+  글자 하한 12pt(24px). 출력은 `decks-out/`.
+- `pptx/brand.js`(새): brand.json 읽기를 `build.js` 에서 떼어 두 생성기가 함께 쓴다. 동작 변화 없음.
+- `assets/archive/doc-report.html`(새) · `--deck a4report`: A4 사내 보고서 3쪽 — 요약(요청 상자) · 수치 타일 ·
+  실적 표 · 막대 · 리스크 · 추진 일정 · 요청 표 · 결재란. `blue-doc.css` 위에 `x-` 맞춤 부품 둘(수치 타일 · 가로 막대)만
+  더했다. `check_doc.py` 12항목 실패 0.
+- `verify_repo.py`: A4 문서 목록에 `doc-report.html` 추가. 「PPTX 템플릿」 점검 추가 — 레이아웃 수 · 견본 수 ·
+  토큰 밖 색 · 12pt 미만 글자 · 흘린 글자 · 테마 글꼴. 「HTML → PPTX」 점검 추가 — 조립 견본 standard 를 PowerPoint 로
+  옮겨 장 수 · 장 제목 · 발표자 노트가 HTML 과 맞는지와 같은 잣대(색 · 글자 크기 · 글꼴)를 본다. 「에이전트 스킬 hct-report」
+  점검 추가 — 묶음 규격 · 묶음 안에서 문서 보고 생성과 검사 · 없는 형식 거절.
+
+## 1.52.0 — 2026-11-22
+
+**관리보드를 HCT 웹 디자인 템플릿 v2.1.0 으로 · 카드를 원본에서 뽑는다.** 웹 템플릿이 부품을 「구조 → 토큰 →
+할 것 / 하지 말 것 → 예시」 카드로 주고 그 카드를 코드에서 뽑듯이, 블루 리포트도 장 짜임과 부품을 카드로 준다.
+- 관리보드(`--deck manage`) 재작성 — `hctinno/HCT-WEB-DESIGN-TEMPLATE` v2.1.0 명세(앱 셸 · `hct-*` 부품 · 상태 색 이름).
+  `assets/hct-web.css`(새, 생성 파일) — `scripts/sync_web_template.py`(새)가 템플릿 DESIGN.md 의 토큰 · 부품 CSS 를
+  뽑는다(판 고정 2.1.0 · `--check`). `assets/hct-board.css`(새) — 템플릿 「6. 앱 셸」 표의 치수(사이드바 240 · 상단바 48 ·
+  본문 24×20 · 최대 폭 1440 · 1024 미만 서랍). 내용은 가상(AX 과제 8건 · 지표 · 상태 분포 · 할 일 · 일정).
+- `check_board.py` — `hct-web.css` 를 부르는 보드는 웹 템플릿 기준(글자 하한 11px · `hct-badge` 상태 · 새 막대 마크)으로
+  판정. `check_deck.py` 가 `hct-web.css` 를 계통 CSS 로 인식. 보관 보드 4종은 옛 `blue-web.css` 기준 그대로.
+- 짜임 카드 `LAYOUTS.md`(새, 생성) — 내용 모양별 12종(큰 금액 · 추세 + 구성 · 규칙 전후 · 구조 · 경로 · 1:1 비교 ·
+  분류 · 계획 · 화면 · 단계별 수치 · 요약 지도 · 점검 카드). 원본은 견본 덱 `examples/layouts/`(새 — 가상 내용) +
+  `cards.yaml`(판단하는 말).
+- 부품 카드 `COMPONENTS.md`(새, 생성) — 20종. 구조(클래스 순서) · 속성 · 토큰은 `live-catalog.html` · `blue-live.css` 에서
+  뽑고 판단하는 말만 `references/components.yaml`(새). 카드 마크업 그대로를 담은 대조 덱 `examples/components/`(생성)를
+  `verify_repo.py` 가 조립해 `check_live.py` 로 그린다.
+- `scripts/build_cards.py`(새) — 두 카드와 대조 덱 생성 · `--check`. `verify_repo.py` 에 「카드 생성물」 · 「웹 템플릿 CSS」 검사.
+- **시각 스타일 A · C** — 조립 목록 `style: a|c`(또는 `build_deck.py --style`). 본문 HTML · 부품 · 엔진 · 검사는
+  하나, 보이는 규칙만 `assets/blue-style.css`(새)가 토큰으로 덮는다. A 프레임형(지금 그대로 · 기본) · C 혼합형(밝은 띠 +
+  남색 선 · 300 ↔ 900 제목 · 어두운 간지 · 마무리 · 표지 광선 · 그라데이션 막대, 권장). 띠를 모두 걷은 B 안은 시안 비교 뒤 뺐다.
+  머리띠 마크 짝 규칙을 스타일별로(A 반대 · C 같음) — `build_deck.py` 가 달고 `check_live.py` 11번이 같은 규칙으로 본다.
+  `verify_repo.py` 가 기준 견본을 C 로도 조립해 검사. `DESIGN.md` 「2-1」.
+- 워터마크가 가려지지 않게 — 본문 뒤(z-index:-1)에서 본문 위로 올리고 섞기로 칠한다(밝은 장 곱하기 · 어두운 장 스크린).
+  카드 · 띠 · 표 바탕이 로고를 덮어 자르던 문제. 라이브 계통(`blue-live.css`) 전체 · 두 스타일 공통.
+- 보고 요지 흐름형(`bl-gist--flow` · 새) — 결론 한 줄 · 현황 → 실행 → 판정 3단 큰 수치 · 결정 요청 옅은 띠.
+  좌우 반반형은 무거운 남색 요청 상자가 결론보다 먼저 눈에 들어오고 근거 수치가 문장에 묻혔다. 기준 견본 `gist` 장을 흐름형으로.
+- 실제로 동작하는 사내 웹 앱은 관리보드 견본이 아니라 웹 디자인 템플릿(React + Tailwind)을 직접 쓴다 — 문서에 명시.
+
 ## 1.51.0 — 2026-11-21
 
 **본문만 쓰고 빌드가 틀을 씌운다.** 에이전트는 본문만 쓰고, 회사 틀은 손으로 망가뜨릴 수 없게 했다.

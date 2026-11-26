@@ -2,7 +2,7 @@
 
 주식회사 에이치시티 사내 공용 발표 슬라이드 디자인 시스템. **블루 리포트**라 부른다.
 
-한 소스에서 **HTML · PDF · PowerPoint** 세 형식을 만들고, 규칙을 사람 눈이 아니라 스크립트가 판정한다.
+한 소스에서 **HTML · PDF · PowerPoint · Word(A4 문서)** 를 만들고, 규칙을 사람 눈이 아니라 스크립트가 판정한다.
 
 ---
 
@@ -81,7 +81,7 @@ claude.ai → Settings → Capabilities → Skills 에서 이 zip 을 올린다.
 | | 저장소 판 | 계정 스킬 묶음 |
 |---|---|---|
 | 브랜드 자산 | 루트의 `brand/hct/` 를 `../../../` 로 가리킨다 | 안에 넣는다 (`brand/hct/`) |
-| `pptx/node_modules` | 있다 | 뺀다 — `cd pptx && npm install` |
+| `pptx/node_modules` · `docx/node_modules` | 있다 | 뺀다 — 첫 실행에 스스로 받는다(`npm install`) |
 | `dist/` | 있다 | 뺀다 — 스킬이 읽지 않는다 |
 
 **판올림하면 묶음을 다시 떠서 다시 올린다.** 계정 스킬은 저장소를 보고 있지 않다.
@@ -180,8 +180,21 @@ html { font-size: clamp(10.5px, min(1vw, 1.78vh), 20px) }
 
 ```bash
 python3 .claude/skills/blue-report/scripts/build_deck.py .claude/skills/blue-report/examples/standard/deck.yaml \
-  --brand brand/hct/brand.json --single-file -o decks-out/견본.html
+  --brand brand/hct/brand.json --single-file -o decks-out/견본.html --pptx decks-out/견본.pptx
 ```
+
+**Codex · Goose 에서 스킬로 쓰기.** 새 PC 에서 `gh skill install hctinno/hct-report-template hct-report --agent codex --scope user`
+(Goose 는 `--agent goose`, 새 판은 `--force`). 설치본은 `skills/hct-report/` — 원본을 고치면 `build_hct_skill.py --publish` 로 다시 펼쳐
+함께 커밋한다. 자세한 것은 `docs/AGENT_WIRING.md` 「⓪」.
+
+**한 보고서를 HTML · PowerPoint 둘 다로.** `--pptx` 를 주면 방금 만든 HTML 에서 PowerPoint 판을 뽑는다
+(`scripts/deck_to_pptx.py`). 표지 · 목차 · 장 간지 · 마무리와 장 제목 · 리드 · 발표자 노트는 PowerPoint 글자로
+들어가 바로 고칠 수 있고, 본문 도식은 3840px 그림으로 HTML 과 같은 자리에 놓인다. 틀은 PowerPoint 레이아웃
+템플릿(`pptx/template.js`)과 같아 「새 슬라이드」로 장을 더해도 같은 모양이 나온다. 내용은 HTML 한 곳에만 있다.
+
+**A4 문서를 Word 로도.** 회의록 · 사내 보고서 · 규정 · 매뉴얼 · 공지는 `scripts/doc_to_docx.py`(또는 `hct.py build … --formats docx`)가
+같은 HTML 에서 Word 판을 뽑는다. 글자 · 표 · 목록 · 상자를 전부 Word 글자와 표로 옮겨 Word 에서 고칠 수 있고, 검사는
+`scripts/check_docx.py`(글꼴 · 색 토큰 · 9pt 하한 · 로고 · 쪽번호 필드 · HTML 글자 누락)가 한다.
 
 **고정은 크롬뿐이다.** 본문은 내용에 맞게 짠다 — 카탈로그 부품을 그대로 · 고쳐 쓰거나, 장 안
 `<style data-own>` 으로 새 도식 · 레이아웃 · 애니메이션을 만든다. 검사기 28번이 맞춤 CSS 가 크롬을
@@ -225,10 +238,15 @@ python3 .claude/skills/blue-report/scripts/build_deck.py .claude/skills/blue-rep
 
 | 파일 | 용도 | 특징 |
 |---|---|---|
-| `board-manage.html` | 관리보드 (대시보드형) | 절 12 · 표 8 · 일정 격자 · 가로 막대 |
+| `board-manage.html` | 관리보드 (대시보드형) | HCT 웹 디자인 템플릿 v2.1.0 앱 셸 · 지표 4칸 · 과제 표 · 상태 분포 · 할 일 · 일정 |
 
-보드는 `blue-report.css` + `blue-web.css` 두 파일을 함께 부른다. 글자 하한이
-12.5px 이고 `check_board.py` 가 11항목을 판정한다.
+관리보드는 **HCT 웹 디자인 템플릿 v2.1.0**(`hctinno/HCT-WEB-DESIGN-TEMPLATE`)의 명세로 짠다.
+`blue-report.css`(폰트 · 로고) + `hct-web.css`(템플릿 토큰 · `hct-*` 부품 — `scripts/sync_web_template.py` 가
+템플릿 DESIGN.md 에서 뽑는 생성 파일) + `hct-board.css`(앱 셸 — 사이드바 240 · 상단바 48 · 본문 24×20)
+세 벌을 부른다. 글자 하한 11px(템플릿 micro), `check_board.py` 14항목. 상태 색은 템플릿 이름 그대로
+(할 일 회색 · 진행 info · 검토 review · 막힘 danger · 완료 success).
+**실제로 동작하는 사내 웹 앱**은 이 견본이 아니라 웹 디자인 템플릿(React + Tailwind)을 직접 쓴다 —
+관리보드는 정적 현황판 견본이다. 보관 보드 4종(`archive/`)은 옛 `blue-web.css` 계통 그대로다.
 
 ---
 
@@ -266,7 +284,7 @@ python .claude/skills/blue-report/scripts/check_doc.py decks-out/회의록.html
 | 묶음 | `--deck` 이름 | 비고 |
 |---|---|---|
 | 고정 지면 덱 1920x1080 · 12종 | `internal` 사내 보고 · `weekly` 주간보고 · `ax` 1장 보고 · `team` 팀 주간 · `exec` 경영진 · `allhands` 전직원 · `sales` 제안 · `project` 프로젝트 · `training` 교육 · `strategy` 전략 · `report` 고밀도 · `catalog` 레이아웃 19종 | PPTX 빌드(`pptx/`)의 원본 |
-| A4 문서 3종 | `policy` 사규 · `manual` 매뉴얼 · `notice` 공지 | |
+| A4 문서 4종 | `policy` 사규 · `manual` 매뉴얼 · `notice` 공지 · `a4report` 사내 보고서 | |
 | 웹 보드 4종 | `board` 과제 · `execboard` 실행 · `teamboard` 팀 칸반 · `gapcheck` 점검 | |
 | 라이브 브리핑 | `live` | 기준 덱의 축소판 |
 | FCC/KC 보고서 14종 | `assets/archive/fcc-kc/` | 인증 시험 보고서 전용 |
@@ -397,17 +415,19 @@ HCT 브랜드 파랑은 로고 원본에서 측정한 `#2f4a9c` 다. 밝은 지�
   assets/blue-doc.css                    A4 문서 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/doc-minutes.html · doc-viewer.* 회의록과 A4 뷰어
   assets/blue-web.css                    웹 보드 파운데이션 — 토큰은 위 파일 것을 쓴다
-  assets/board-manage.html               관리보드
+  assets/board-manage.html               관리보드 (HCT 웹 디자인 템플릿 v2.1.0)
   assets/blue-live.css                   라이브 계통 파운데이션 — 토큰은 위 파일 것을 쓴다
   assets/live-standard.html              기준 덱 — 새 보고서의 출발점
   assets/live-patterns.html              패턴첩 63장 — 본문 디자인 기준(최종본 형태)
   assets/blue-pattern.css                패턴 장 본문 CSS
   assets/live-catalog.html               라이브 부품 카탈로그 52장 — 재사용·참고
   assets/live-viewer.js                  라이브 엔진
-  assets/archive/                        보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
+  assets/archive/                        보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 4종 · 보드 4종 · 브리핑 · FCC/KC
   scripts/check_deck.py                  슬라이드 17항목 자동 점검
   scripts/check_doc.py                   A4 문서 9항목 자동 점검
-  scripts/check_board.py                 웹 보드 11항목 자동 점검
+  scripts/check_board.py                 웹 보드 자동 점검 (관리보드는 웹 템플릿 기준 14항목)
+  scripts/build_cards.py                 짜임 카드(LAYOUTS.md) · 부품 카드(COMPONENTS.md) 생성
+  scripts/sync_web_template.py           웹 디자인 템플릿 → assets/hct-web.css
   scripts/apply_brand.py                 브랜드 일괄 적용
   scripts/to_pdf.py                      PDF 내보내기
   scripts/make_logo_variants.py          로고 두 벌 생성

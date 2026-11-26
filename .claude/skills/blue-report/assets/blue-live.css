@@ -325,6 +325,11 @@ html, body { margin: 0; padding: 0 }
   opacity: .065;
 }
 .bl-sl--dark .br-watermark { opacity: .10 }
+/* 가려지지 않는 워터마크 — 본문 뒤(z-index:-1)에 두면 카드 · 띠 · 표 바탕이 덮어 로고가 잘린다.
+   본문 위로 올리되 섞기로 칠한다: 밝은 지면은 곱하기(잉크가 종이에 스민 듯), 어두운 지면은 스크린.
+   불투명도가 낮고 pointer-events 가 없어 글자 · 클릭 · 대비 판정에 끼어들지 않는다. */
+.bl-sl .br-watermark { z-index: 4; mix-blend-mode: multiply }
+.bl-sl--dark .br-watermark { mix-blend-mode: screen }
 .bl-sl .br-watermark img { width: 100%; height: auto }
 .bl-sl .br-watermark .br-wordmark { font-size: 3.4rem !important }
 
@@ -613,6 +618,45 @@ body.present .bl-hud { display: none }
 .bl-gist-row h3 { margin: 0 0 .3rem; font: 800 var(--bl-fs-h3)/1.3 var(--br-font-kr) }
 .bl-gist-row p  { margin: 0; color: var(--br-text-2) }
 
+/* 보고 요지 — 흐름형(.bl-gist--flow). 결론 한 줄이 위에 서고, 그 결론을 받치는 세 단계가 큰 수치와 함께
+   왼쪽에서 오른쪽으로 흐르며, 결정 요청은 맨 아래 옅은 띠 한 줄이다.
+     위    눈썹 + 제목(주장 한 줄) + 맥락 한 줄                     .bl-gist-h
+     가운데 단계 3~4개 — 꼬리표 · 큰 수치(단위 작게) · 소제목 · 한 줄  .bl-gist-steps > li
+     아래  결정 요청 — 꼬리표 + 요청 1~3건(무엇 · 언제)           .bl-gist-ask
+   좌우 반반형(.bl-gist)과 달리 시선이 제목 → 수치 → 요청으로 한 번에 내려온다. 수치가 없는 요지는 반반형을 쓴다. */
+.bl-gist--flow { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto;
+                 gap: var(--bl-sp-4); align-content: stretch }
+.bl-gist-h { display: flex; flex-direction: column; gap: var(--bl-sp-2) }
+.bl-gist-h .bl-title { font-size: var(--bl-fs-div); line-height: 1.12 }
+.bl-gist-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--bl-sp-5);
+                 grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); align-content: center }
+.bl-gist-steps > li { position: relative; min-width: 0; display: flex; flex-direction: column; gap: .5rem;
+                      padding-top: var(--bl-sp-3); border-top: .2rem solid var(--br-hairline) }
+.bl-gist-steps > li.is-key { border-top-color: var(--br-mark) }
+/* 단계 사이 꺾쇠 — 순서가 정보다(현황 → 실행 → 판정) */
+.bl-gist-steps > li + li::before { content: ""; position: absolute; top: 4.4rem;
+  left: calc(var(--bl-sp-5) / -2 - .45rem); width: .9rem; height: .9rem;
+  border-top: .16rem solid var(--br-text-3); border-right: .16rem solid var(--br-text-3); transform: rotate(45deg) }
+.bl-gist-v { font: 800 var(--bl-fs-kpi-l)/1 var(--br-font-num); font-variant-numeric: tabular-nums;
+             letter-spacing: -.03em; color: var(--br-mark) }
+.bl-gist-v small { font-size: .36em; font-weight: 600; letter-spacing: 0; margin-left: .15em; color: var(--br-text-2) }
+.bl-gist-steps h3 { margin: 0; font: 800 var(--bl-fs-h3)/1.3 var(--br-font-kr) }
+.bl-gist-steps p  { margin: 0; color: var(--br-text-2) }
+.bl-gist-ask { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--bl-sp-4); align-items: center;
+               padding: var(--bl-sp-3) var(--bl-sp-4); background: var(--br-tint);
+               border-left: .22rem solid var(--br-navy); border-radius: var(--bl-r-s, .2rem) }
+.bl-gist-ask > b { font: 800 var(--bl-fs-body)/1.3 var(--br-font-kr); color: var(--br-navy); white-space: nowrap }
+.bl-gist-ask > b small { display: block; font-size: var(--bl-fs-min); font-weight: 600; color: var(--br-text-3) }
+.bl-gist-ask ol { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--bl-sp-2) var(--bl-sp-5);
+                  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)) }
+.bl-gist-ask li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 var(--bl-sp-2); align-items: baseline }
+.bl-gist-ask li .bl-mn { color: var(--br-mark) }
+.bl-gist-ask h3 { margin: 0; font: 700 var(--bl-fs-body)/1.35 var(--br-font-kr) }
+.bl-gist-ask p  { grid-column: 2; margin: 0; color: var(--br-text-2); font-size: var(--bl-fs-min) }
+.bl-sl--dark .bl-gist-steps > li { border-top-color: var(--br-dark-line) }
+.bl-sl--dark .bl-gist-v { color: var(--br-accent-on-dark) }
+.bl-sl--dark .bl-gist-v small, .bl-sl--dark .bl-gist-steps p { color: var(--br-on-dark-2) }
+
 .bl-ask { margin-top: var(--bl-sp-2); padding: var(--bl-sp-3); border-radius: .4rem;
           background: var(--br-cover); color: var(--br-on-dark) }
 .bl-ask > b { display: block; margin-bottom: var(--bl-sp-2);
@@ -809,6 +853,9 @@ body.present #bl-notes { display: none }
   .bl-cols, .bl-cols--3, .bl-cols--4, .bl-cols--sidebar { grid-template-columns: 1fr }
   .bl-gist { grid-template-columns: 1fr; gap: var(--bl-sp-3) }
   .bl-gist-l { padding-right: 0; border-right: 0 }
+  .bl-gist-steps { grid-template-columns: minmax(0, 1fr); gap: var(--bl-sp-3) }
+  .bl-gist-steps > li + li::before { display: none }
+  .bl-gist-ask { grid-template-columns: minmax(0, 1fr); gap: var(--bl-sp-2) }
   .bl-road-h, .bl-road-r { grid-template-columns: 9rem repeat(var(--bl-road-n), 1fr) 8rem }
   .bl-road-c { font-size: var(--bl-fs-min); overflow-wrap: anywhere }
   /* 좌우 여백 하나만 줄인다. 띠·본문·발표자 블록이 모두 --bl-gut 를 거쳐 따라온다 */

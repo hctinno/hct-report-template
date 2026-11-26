@@ -72,8 +72,10 @@ jobs:
           python -m pip install --quiet playwright pillow jsonschema pyyaml
           python -m playwright install --with-deps chromium
 
-      - name: PPTX 생성기 준비
-        run: npm install --silent --prefix .claude/skills/blue-report/pptx
+      - name: PPTX · Word 생성기 준비
+        run: |
+          npm install --silent --prefix .claude/skills/blue-report/pptx
+          npm install --silent --prefix .claude/skills/blue-report/docx
 
       # 스크립트가 스스로 설치하러 나가지 않게 막는다.
       # 위에서 이미 갖췄으므로, 빠진 것이 있으면 조용히 받지 말고 실패해야 한다.

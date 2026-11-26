@@ -48,13 +48,30 @@ from check_deck import (  # noqa: E402
 )
 
 MIN_FS = 12.5          # 웹 보드 글자 하한. 슬라이드 24px · A4 10.5pt 와 다르다
+# 관리보드(hct-web 계통)는 HCT 웹 디자인 템플릿의 글자 단계를 따른다 — micro 11px 이 가장 작다.
+# 그 아래는 원본 규격에도 없다. 보관 보드(blue-web 계통)는 위 12.5px 그대로.
+MIN_FS_WEB = 11.0
 WIDTHS = [1440, 400]   # 데스크톱과 가장 좁은 실사용 폭
 
 
 # ---------------------------------------------------------------- 정적 검사
 
+def is_web(html):
+    """관리보드(HCT 웹 디자인 템플릿 계통)인가 — hct-web.css 를 부르거나 그 사본이 들어 있다."""
+    return bool(re.search(r'href="[^"]*hct-web\.css"', html) or '--hct-web:' in html)
+
+
 def check_links(html, rep):
     """두 CSS 를 함께 불렀는가. blue-web.css 는 색을 선언하지 않는다."""
+    if is_web(html):
+        has_base = re.search(r'href="[^"]*blue-report\.css"', html) or "--br-page:" in html
+        has_shell = re.search(r'href="[^"]*hct-board\.css"', html) or ".hb-shell" in html
+        miss = [n for n, ok in (("blue-report.css(서체 · 로고)", has_base), ("hct-board.css(셸)", has_shell)) if not ok]
+        if miss:
+            rep.f("관리보드 CSS 누락 — " + " · ".join(miss))
+        else:
+            rep.o("CSS — blue-report.css · hct-web.css(웹 디자인 템플릿) · hct-board.css 를 함께 부른다")
+        return
     has_base = re.search(r'href="[^"]*blue-report\.css"', html) or "--br-page:" in html
     has_web = re.search(r'href="[^"]*blue-web\.css"', html) or "--bw-fs-body:" in html
     if has_base and has_web:
@@ -79,7 +96,7 @@ def check_literal_fs(html, rep):
     for m in re.finditer(r"font\s*:\s*[^;\"']*?\b([\d.]+)px", body):
         bad.append(m.group(0)[:40])
     if bad:
-        rep.f(f"리터럴 px 글자 크기 {len(bad)}건 — --bw-fs-* 로 바꾼다")
+        rep.f(f"리터럴 px 글자 크기 {len(bad)}건 — 토큰(--bw-fs-* · 관리보드는 rem 단계)으로 바꾼다")
         for b in bad[:8]:
             print(f"        {b}")
     else:
@@ -125,7 +142,7 @@ def check_raw_hex(html, rep):
 
 # ---------------------------------------------------------------- 렌더 검사
 
-PROBE = r"""() => {
+PROBE = r"""(minFs) => {
   const out = { small: [], marks: [], sticky: [], statusNoText: [] };
 
   // 12.5px 미만 글자. 자기 자신이 직접 가진 텍스트만 본다.
@@ -135,7 +152,7 @@ PROBE = r"""() => {
       .map(n => n.textContent.trim()).join(' ');
     if (!txt) return;
     const fs = parseFloat(getComputedStyle(el).fontSize);
-    if (fs < 12.5 - 0.01) out.small.push({ fs: Math.round(fs * 10) / 10, txt: txt.slice(0, 32) });
+    if (fs < minFs - 0.01) out.small.push({ fs: Math.round(fs * 10) / 10, txt: txt.slice(0, 32) });
   });
 
   // 데이터 마크. 채움으로 뜻을 나르는 것만 본다 — 테두리와 글자를 가진 칩은
@@ -150,7 +167,7 @@ PROBE = r"""() => {
   // .bw-stage-s 는 채움이 있어도 글자를 언제나 함께 지므로 뺀다. .bw-wk 는 값이
   // 배정된 칸(data-s)만 마크이고, 비어 있는 칸은 채널이라 지면 대비가 낮아도 된다.
   const MARKS = '.bw-bar,.bw-dot,.bw-meter>span,.bw-wk[data-s],.bw-tl-bar,.bw-tl-dot,'
-              + '.br-bar-h,.br-bar-v,circle';
+              + '.br-bar-h,.br-bar-v,circle,.hb-prog b,.hb-stack b,.hb-g-bar i';
   document.querySelectorAll(MARKS).forEach(el => {
     const cs = getComputedStyle(el);
     const c = el.tagName === 'circle' ? cs.stroke : cs.backgroundColor;
@@ -174,7 +191,7 @@ PROBE = r"""() => {
   });
 
   // 상태를 색으로만 말하지 않는가. 알약에 글자가 함께 있어야 한다.
-  document.querySelectorAll('.bw-s,.bw-dd').forEach(el => {
+  document.querySelectorAll('.bw-s,.bw-dd,.hct-badge').forEach(el => {
     if (!el.textContent.trim()) {
       out.statusNoText.push((el.className || '').toString().slice(0, 30));
     }
@@ -193,6 +210,7 @@ def check_render(path, rep, shots=None, seen_style=()):
     from playwright.sync_api import sync_playwright
 
     url = "file://" + os.path.abspath(path)
+    min_fs = MIN_FS_WEB if is_web(open(path, encoding="utf-8").read()) else MIN_FS
     overflow, small, marks, sticky, no_text, drawn = [], [], [], [], [], ""
     with sync_playwright() as pw:
         br = pw.chromium.launch(executable_path=chrome)
@@ -215,7 +233,7 @@ def check_render(path, rep, shots=None, seen_style=()):
                 rep.f(f"{w}px — 콘솔 예외 {len(errs)}건: {errs[0]}")
 
             if w == WIDTHS[0]:                    # 상세 검사는 넓은 폭에서 한 번만
-                d = pg.evaluate(PROBE)
+                d = pg.evaluate(PROBE, min_fs)
                 small, marks, sticky, no_text = (d["small"], d["marks"],
                                                  d["sticky"], d["statusNoText"])
                 drawn = pg.evaluate("() => document.body.innerHTML")
@@ -234,11 +252,11 @@ def check_render(path, rep, shots=None, seen_style=()):
         rep.o(f"가로 넘침 — {WIDTHS[0]}px·{WIDTHS[1]}px 두 폭 모두 없음")
 
     if small:
-        rep.f(f"{MIN_FS}px 미만 글자 {len(small)}건")
+        rep.f(f"{min_fs}px 미만 글자 {len(small)}건")
         for t in small[:8]:
             print(f"        {t['fs']}px — “{t['txt']}”")
     else:
-        rep.o(f"글자 크기 — {MIN_FS}px 미만 없음")
+        rep.o(f"글자 크기 — {min_fs}px 미만 없음" + (" (웹 디자인 템플릿 micro 단계 기준)" if min_fs == MIN_FS_WEB else ""))
 
     bad = []
     for m in marks:

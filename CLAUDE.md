@@ -21,14 +21,19 @@
 - 서브에이전트를 실행할 때는 프롬프트에 "보고는 한국어로 작성한다"를 명시한다.
 - **새 보고서는 본문만 쓰고 빌드가 틀을 씌운다.** `deck.yaml`(표지 정보 · 장 순서 · 장 id · 마무리 · 부록) +
   `slides.html`(장마다 `<section id>` 본문만) → `scripts/build_deck.py <deck.yaml> --brand brand/hct/brand.json
-  --single-file -o decks-out/…`. 머리띠·꼬리띠·쪽번호·로고·워터마크·폰트·진행선·발표 기능, 표지·목차·장 간지·
+  --single-file -o decks-out/…`. PowerPoint 도 필요하면 `--pptx decks-out/….pptx` — 같은 HTML 에서 뽑는다. 머리띠·꼬리띠·쪽번호·로고·워터마크·폰트·진행선·발표 기능, 표지·목차·장 간지·
   마무리·부록 간지는 빌드가 만든다 — 직접 쓰지 않는다. 견본은 `examples/standard/` · `examples/showcase/`.
   라이브러리 장은 `catalog:<id>` · `patterns:<id>` 로 부른다. 기준 덱 `live-standard.html` 을 복사하는 옛 방식은
   예비로만 쓴다. 고르는 양식은 넷이다 — 기준 덱(`standard`) · 부품 카탈로그(`livecatalog`) · 회의록(`minutes`) ·
   관리보드(`manage`). 그 밖은 `assets/archive/` 에 보관했다 — 사용자가 이름을 짚거나 PowerPoint 파일이 꼭
   필요할 때만 쓴다.
 - **발표 덱은 `.claude/skills/blue-report/DESIGN.md`(본문 스타일 한 장)를 먼저 읽고 그 규칙으로 짠다.**
-  일하는 방식 · 본문 파일 형식 · 조립 목록 · 위계 · 내용별 그릴 것 · 색 역할 · 금지가 이 한 장에 있다. 움직임은 절제 —
+  일하는 방식 · 본문 파일 형식 · 조립 목록 · 위계 · 내용별 그릴 것 · 색 역할 · 금지가 이 한 장에 있다.
+  시각 스타일은 둘 — A 프레임형(기본) · C 혼합형(권장). 조립 목록 `style:` 한 줄로 고르고 본문 HTML 은
+  같다(`DESIGN.md` 「2-1」 · `assets/blue-style.css`). 맞춤 CSS 를 스타일 이름으로 갈라 짜지 않는다 — 역할 토큰으로 짠다.
+  장 짜임은 `LAYOUTS.md`(짜임 카드 12종), 부품 규격은 `COMPONENTS.md`(부품 카드 20종)에서 고른다 — 둘 다
+  `scripts/build_cards.py` 가 원본에서 만드는 생성 파일이라 손으로 고치지 않는다(`verify_repo.py` 가 어긋남을 잡는다).
+  관리보드는 HCT 웹 디자인 템플릿 v2.1.0(`hct-*` 부품)으로 짜고, 실제로 동작하는 웹 앱은 그 템플릿을 직접 쓴다. 움직임은 절제 —
   효과는 사용자가 요청할 때만 `.claude/skills/blue-report/MOTION.md`(효과 라이브러리)에서 고른다
   (`check_live.py` 30번 — 장마다 등장 3종 · 반복 2종 넘으면 주의).
 - **고정 영역과 자유 영역을 나눈다.** 머리띠·꼬리띠·쪽번호·로고·워터마크·진행선·제목 형광 밴드·
