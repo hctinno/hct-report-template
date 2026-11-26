@@ -39,6 +39,8 @@
 
 /* 제목 — 가벼운 앞말 300 + 핵심구 900. 핵심구(<em>·<mark>·<b>·<strong>)가 없는 제목은 800 한 굵기 */
 .bl-deck[data-style="c"] .bl-title { font-weight: 300; letter-spacing: -.035em }
+/* 어두운 장(표지 · 간지 · 마무리)은 흰 글자가 번져 가늘어 보인다 — 앞말을 500 으로 올린다(핵심구 900 대비는 유지) */
+.bl-deck[data-style="c"] .bl-sl--dark .bl-title:has(em, mark, b, strong) { font-weight: 500 }
 .bl-deck[data-style="c"] .bl-title:not(:has(em, mark, b, strong)) { font-weight: 800 }
 .bl-deck[data-style="c"] :is(.bl-title, .bl-fin-l2) :is(em, mark, b, strong) {
   font-weight: 900; background: none; box-shadow: none; padding: 0; border-radius: 0; color: inherit
@@ -103,3 +105,7 @@
 .bl-deck[data-style="c"] .bl-card--risk { border-left-color: var(--br-alert-text) }
 .bl-deck[data-style="c"] .bl-sl--dark .bl-card { background: transparent; border-color: var(--br-dark-line) }
 .bl-deck[data-style="c"] .bl-stat-v { font-weight: 800 }
+/* 마무리 강조어 — C 는 형광 밴드를 쓰지 않는다. 밴드 대신 굵기 · 주인공 색 */
+.bl-deck[data-style="c"] .bl-fin-mk::before { display: none }
+.bl-deck[data-style="c"] .bl-bd .bl-fin-mk { font-weight: 900; color: var(--br-mark) }
+.bl-deck[data-style="c"] .bl-sl--dark .bl-bd .bl-fin-mk { color: var(--br-accent-on-dark) }
