@@ -1,0 +1,105 @@
+/* ════════════════════════════════════════════════════════════════════
+   시각 스타일 — A(프레임) · C(혼합)
+   ════════════════════════════════════════════════════════════════════
+   본문 HTML · 부품(bl-*) · 조립 방식 · 발표 엔진은 하나다. 스타일은 「보이는 규칙」만 바꾼다 —
+   조립 목록 deck.yaml 의 `style: a|c` 한 줄이 덱 본체 <main class="bl-deck" data-style> 를 달고
+   (html 이 아니라 덱에 단다 — 아티팩트 · 다른 문서에 끼워 넣어도 스타일이 남는다)
+   이 파일이 토큰과 몇 가지 규칙을 덮는다. A 는 기본값이라 이 파일을 부르지 않는다(blue-live.css 그대로).
+
+   A 프레임형  짙은 머리띠 · 꼬리띠가 장을 감싼다. 제목 한 굵기 + 형광 밴드. 카드 상자. 밝은 장 연속.
+               → 길 찾기 · 발표 도구가 앞에 선다. 화면 발표 · 회의 진행 · 근거 추적.
+   C 혼합형    A 의 구조(장 표시 · 진행 · 카드 · 장 결론 띠)는 두고 지면감을 더한다 — 밝은 띠 + 남색 선 한 줄 ·
+               제목 300 ↔ 900 대비(밴드 없음) · 간지 · 마무리는 어두운 장 · 표지 광선 · 그라데이션 막대.
+               → 정돈된 구조 + 한 장 한 메시지. 배포 · 경영진 보고 · 정하지 않았을 때.
+   (B 에디토리얼형 — 띠를 모두 걷은 안 — 은 시안 비교 뒤 쓰지 않기로 했다. 지면 갤러리의 보관 덱이 그 원형이다.)
+
+   규칙
+   · 색 · 글꼴 · 치수는 토큰만 — 새 hex 없음(check_live 가 같은 규칙으로 본다).
+   · 맞춤 CSS(<style data-own>)도 역할 토큰(--br-mark · --br-text-2 · --bl-band …)으로 짜면 두 스타일에서
+     저절로 맞는다. 스타일 이름([data-style])으로 분기하는 맞춤 CSS 는 쓰지 않는다.
+   · 머리띠 마크 data-on — A 는 띠가 지면과 반대라 반대, C 는 띠가 지면색이라 같다.
+     build_deck.py 가 스타일에 맞춰 달고 check_live.py 가 같은 규칙으로 본다.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* 계통 CSS 표지 — 한 파일로 묶여도 검사기가 덱의 맞춤 CSS 와 가른다(check_live _SYS_SIGS) */
+:root { --bl-style: "a c"; }
+
+
+/* ── C 혼합 ① 지면감 — 띠를 지면색으로 · 제목 굵기 대비 · 어두운 장 리듬 ───────────── */
+.bl-deck[data-style="c"] {
+  --bl-band:         var(--br-page);
+  --bl-band-ink:     var(--br-text);
+  --bl-band-sub:     var(--br-text-3);
+  --bl-band-inv:     var(--br-cover);
+  --bl-band-inv-ink: var(--br-on-dark);
+  --bl-band-inv-sub: var(--br-on-dark-2);
+  --bl-hi:  transparent;
+  --bl-hi2: transparent;
+}
+
+/* 제목 — 가벼운 앞말 300 + 핵심구 900. 핵심구(<em>·<mark>·<b>·<strong>)가 없는 제목은 800 한 굵기 */
+.bl-deck[data-style="c"] .bl-title { font-weight: 300; letter-spacing: -.035em }
+.bl-deck[data-style="c"] .bl-title:not(:has(em, mark, b, strong)) { font-weight: 800 }
+.bl-deck[data-style="c"] :is(.bl-title, .bl-fin-l2) :is(em, mark, b, strong) {
+  font-weight: 900; background: none; box-shadow: none; padding: 0; border-radius: 0; color: inherit
+}
+.bl-deck[data-style="c"] .bl-sl--dark .bl-title :is(em, mark) { color: var(--br-accent-on-dark) }
+/* 본문 안 형광 — 띠 대신 굵기와 주인공 색 */
+.bl-deck[data-style="c"] .bl-bd mark { background: none; box-shadow: none; padding: 0;
+  font-weight: 800; color: var(--br-mark) }
+.bl-deck[data-style="c"] .bl-sl--dark .bl-bd mark { color: var(--br-accent-on-dark) }
+
+/* 표지 — 딥네이비 위 우측에서 들어오는 청색 광선(알파만 — 새 색 없음) */
+.bl-deck[data-style="c"] .bl-sl--cover {
+  background:
+    radial-gradient(120% 90% at 78% 60%, color-mix(in srgb, var(--br-data-3) 42%, transparent) 0%, transparent 60%),
+    radial-gradient(80% 60% at 92% 40%, color-mix(in srgb, var(--br-data-3) 22%, transparent) 0%, transparent 55%),
+    var(--br-cover);
+}
+.bl-deck[data-style="c"] .bl-sl--cover .bl-hd,
+.bl-deck[data-style="c"] .bl-sl--cover .bl-rf { background: transparent }
+
+/* 어두운 장 리듬 — 장 간지 · 마무리는 build_deck.py 가 bl-sl--dark 로 짓는다. 간지 글자를 어두운 면에 맞춘다 */
+.bl-sl--dark .bl-chapter-k,
+.bl-sl--dark .bl-chapter-no,
+.bl-sl--dark .bl-chapter-toc > li > b { color: var(--br-accent-on-dark) }
+.bl-sl--dark .bl-chapter-toc-h { color: var(--br-on-dark-2); border-color: var(--br-dark-line) }
+.bl-sl--dark .bl-chapter-toc > li { border-color: var(--br-dark-line) }
+.bl-sl--dark .bl-chapter-toc p,
+.bl-sl--dark .bl-chapter--toc .bl-lede { color: var(--br-on-dark-2) }
+.bl-sl--dark .bl-chapter-main { border-color: var(--br-dark-line) }
+.bl-sl--dark .bl-chapter-nav > li { border-top-color: var(--br-dark-line); color: var(--br-on-dark-2) }
+.bl-sl--dark .bl-chapter-nav > li.is-on { border-top-color: var(--br-accent-on-dark); color: var(--br-on-dark) }
+.bl-sl--dark .bl-fin-rule { border-top-color: var(--br-dark-line) }
+
+/* 막대 — 주인공 계열은 그라데이션(지면 대비 2:1 이상인 data-3 → cobalt) */
+.bl-deck[data-style="c"] .bl-bar { background-image: var(--br-grad-bar) }   /* 단색(--br-chan-1)은 남긴다 — 대비 검산 대상 */
+.bl-deck[data-style="c"] .bl-bar-track { height: 1.2rem }
+
+
+/* ── C 혼합 ② 구조 — 밝은 띠 + 남색 선 · 카드 · 수치 ─────────────────────────────── */
+.bl-deck[data-style="c"] {
+  --bl-band-line: var(--br-hairline);
+  --bl-hd-h: 8.2%;  --bl-hd-min: 4rem;
+  --bl-rf-h: 6.8%;  --bl-rf-min: 3.3rem;
+}
+/* 머리띠 — 밝은 띠 + 아래 굵은 남색 선 한 줄(장의 머리라는 표시는 남긴다) */
+.bl-deck[data-style="c"] .bl-hd { border-bottom: .14rem solid var(--br-navy) }
+.bl-deck[data-style="c"] .bl-sl--dark .bl-hd { border-bottom-color: var(--br-dark-line) }
+.bl-deck[data-style="c"] .bl-code b { color: var(--br-mark) }
+.bl-deck[data-style="c"] .bl-sl--dark .bl-code b { color: var(--br-accent-on-dark) }
+/* 핵심구 — 굵기에 주인공 색을 더한다(밴드 대신) */
+.bl-deck[data-style="c"] .bl-sl:not(.bl-sl--dark) .bl-title :is(em, mark) { color: var(--br-mark) }
+/* 카드 — 상자는 두되 테두리를 걷고 옅은 바탕만 */
+.bl-deck[data-style="c"] .bl-card { border-color: transparent; background: var(--br-tint) }
+.bl-deck[data-style="c"] .bl-card--t1, .bl-deck[data-style="c"] .bl-card--t2,
+.bl-deck[data-style="c"] .bl-card--t3, .bl-deck[data-style="c"] .bl-card--t4 { border-top-style: solid }
+.bl-deck[data-style="c"] .bl-card--t1 { border-top-color: var(--br-cat-1) }
+.bl-deck[data-style="c"] .bl-card--t2 { border-top-color: var(--br-cat-2) }
+.bl-deck[data-style="c"] .bl-card--t3 { border-top-color: var(--br-cat-3) }
+.bl-deck[data-style="c"] .bl-card--t4 { border-top-color: var(--br-cat-4) }
+.bl-deck[data-style="c"] .bl-card--key  { border-left-color: var(--br-mark) }
+.bl-deck[data-style="c"] .bl-card--ok   { border-left-color: var(--br-ok-text) }
+.bl-deck[data-style="c"] .bl-card--risk { border-left-color: var(--br-alert-text) }
+.bl-deck[data-style="c"] .bl-sl--dark .bl-card { background: transparent; border-color: var(--br-dark-line) }
+.bl-deck[data-style="c"] .bl-stat-v { font-weight: 800 }

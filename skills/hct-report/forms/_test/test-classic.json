@@ -1,0 +1,135 @@
+{
+  "_설명": "시험용 양식 — 양식 정의만 바꿔서 HTML · PDF · Word 가 함께 바뀌는지 verify_repo 가 본다. 회사 양식이 아니다. 실제 양식은 forms/hct-standard.json 을 복사해 만든다.",
+  "id": "test-classic",
+  "name": "시험용 — 가운데 제목 · 격자 표",
+  "version": "1.0.0",
+  "page": {
+    "size": "A4",
+    "margin": {
+      "top": "20mm",
+      "right": "25mm",
+      "bottom": "20mm",
+      "left": "25mm"
+    },
+    "breaks": "authored",
+    "_breaks설명": "authored — 원본 HTML 의 쪽(.bd-page) 그대로(넘치면 검사 실패). flow — HTML · Word 모두 글을 이어 흘려 쪽을 저절로 나눈다(장 제목이 쪽 끝에 홀로 남지 않게)."
+  },
+  "font": {
+    "word": "Pretendard",
+    "_word설명": "Word 에 적는 글꼴 이름. HTML 은 blue-report.css 의 --br-font-kr(내장 Pretendard)을 쓴다."
+  },
+  "type": {
+    "title": {
+      "size": "20pt",
+      "weight": 700,
+      "color": "text",
+      "align": "center"
+    },
+    "subtitle": {
+      "size": "12pt",
+      "color": "text-2"
+    },
+    "h1": {
+      "size": "14pt",
+      "color": "text",
+      "bar": {
+        "width": "0px",
+        "color": "none"
+      }
+    },
+    "h2": {
+      "size": "12pt",
+      "color": "text"
+    },
+    "body": {
+      "size": "11pt",
+      "color": "text",
+      "lineHeight": 1.6
+    },
+    "small": {
+      "size": "9pt"
+    },
+    "key": {
+      "color": "navy"
+    }
+  },
+  "space": {
+    "titleAfter": "14px",
+    "subtitleAfter": "22px",
+    "h1Before": "24px",
+    "h1After": "12px",
+    "h2Before": "18px",
+    "h2After": "8px",
+    "paraAfter": "10px",
+    "listItemAfter": "6px",
+    "blockAfter": "12px"
+  },
+  "list": {
+    "marker": "•",
+    "textIndent": "20px",
+    "hang": "14px"
+  },
+  "numbering": {
+    "legal": "({n})",
+    "steps": "decimal",
+    "_설명": "규정 호 번호 — ({n}) 또는 circled(①②…⑳). 절차 번호 — decimalEnclosedCircle(①②, HTML 은 남색 원) 또는 decimal(1. 2.)"
+  },
+  "header": {
+    "left": "docNo",
+    "right": "logo",
+    "color": "text-3",
+    "rule": "hairline",
+    "padding": "10px",
+    "gap": "26px",
+    "logoHeight": "20px"
+  },
+  "footer": {
+    "left": "{company}",
+    "right": "- {page} -",
+    "color": "text-3",
+    "rule": "hairline",
+    "padding": "10px",
+    "gap": "22px"
+  },
+  "meta": {
+    "labelWidth": "96px",
+    "labelFill": "tint",
+    "labelColor": "text",
+    "topRule": {
+      "width": "1px",
+      "color": "text"
+    },
+    "rowRule": "card-line"
+  },
+  "table": {
+    "headFill": "tint",
+    "headColor": "text",
+    "headRule": {
+      "top": "1px",
+      "bottom": "1px",
+      "color": "text"
+    },
+    "rowRule": "text-3",
+    "cellPadding": {
+      "y": "8px",
+      "x": "10px"
+    }
+  },
+  "box": {
+    "radius": "10px"
+  },
+  "sign": {
+    "labels": [
+      "담당",
+      "팀장",
+      "본부장",
+      "대표"
+    ],
+    "labelFill": "tint",
+    "labelColor": "text",
+    "rule": "text-3",
+    "height": "56px",
+    "gap": "16px",
+    "_위치설명": "end — 마지막 쪽 꼬리말 바로 위(HTML) · 본문 끝(Word)"
+  }
+}

@@ -1,0 +1,32 @@
+# 짜임 견본 — LAYOUTS.md 의 카드 12종이 이 덱의 장이다. 내용 · 회사 · 수치는 가상.
+title: 짜임 견본 — 주간 기술 동향
+body: slides.html
+evidence: evidence.json
+agenda: false        # 요약 장(가치사슬 지도)이 목차를 겸한다
+dividers: false      # 짧은 브리핑 — 간지 없이 바로 본문
+
+cover:
+  date: 2026.11.21
+  org: 짜임 견본 · 가상
+  kicker: <b>LAYOUTS</b>내용 모양별 짜임 12종 · 내용은 가상
+  title: 주간 기술 동향 <em>짜임 견본</em>
+  message: 돈은 칩과 전력으로, <b>경쟁은 단가와 특화로</b>
+  notes: 짜임 견본 덱이다. 장마다 내용 모양이 다르고 짜임도 다르다. 짜임 카드는 LAYOUTS.md 에 있다.
+
+front: [l-map]
+
+chapters:
+  - name: 인프라
+    slides: [l-amount, l-trend, l-rule, l-structure, l-path]
+    takeaway: <b>인프라 결론</b>자금 → 칩 → 부품 → 전력이 한 방향으로 움직임 — 다음 병목은 변압기 등 장납기 설비
+  - name: 활용
+    slides: [l-versus, l-taxonomy, l-plan, l-screen, l-stages]
+    takeaway: <b>활용 결론</b>경쟁 축은 단가 · 업무 특화 — 성과는 써 본 비율이 아니라 업무별 실제 사용률로 판단
+  - name: 점검
+    slides: [l-watch]
+
+closing:
+  lead: 자금과 칩은 이미 움직였고
+  line: 남은 질문은
+  mark: 현장 사용률
+  sign: 2026년 11월 21일 기준 · 글로벌 5건 · 국내 5건 · 기관 · 기업 공식 발표

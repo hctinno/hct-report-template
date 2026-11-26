@@ -34,6 +34,7 @@
 """
 import argparse
 import glob
+import html as H
 import json
 import os
 import re
@@ -64,7 +65,7 @@ from apply_brand import LIVE as _LIVE_FILES  # noqa: E402
 EXPECTED_PPTX = len(DECKS) - 1
 
 # A4 문서. 슬라이드가 아니라 지면이 794x1123 이고 검사기가 다르다.
-DOCS = ["doc-minutes.html", "archive/doc-policy.html", "archive/doc-manual.html", "archive/doc-notice.html"]
+DOCS = ["doc-minutes.html", "archive/doc-policy.html", "archive/doc-manual.html", "archive/doc-notice.html", "archive/doc-report.html"]
 
 # dist/ 의 두 파일은 빌드 명령이 서로 다르다. 아래가 그 정본이다.
 DIST_BUILDS = [
@@ -313,6 +314,8 @@ def check_build(log, out_dir):
             log.warn(label, detail)
         else:
             log.ok(label, detail)
+        if name == "standard":
+            check_deck_pptx(log, out, os.path.join(out_dir, "build"))
 
 
 def check_pptx(log, out_dir):
@@ -330,6 +333,220 @@ def check_pptx(log, out_dir):
         return
     log.ok("PPTX 생성", f"{len(made)}종 — " + ", ".join(made))
     check_pptx_integrity(log, out_dir, made)
+    check_pptx_template(log, out_dir)
+    check_forms(log, out_dir)
+    check_docx_docs(log, out_dir)
+
+
+# 레이아웃 템플릿 — 사람이 PowerPoint 「새 슬라이드」에서 고르는 빈 틀(pptx/template.js).
+# 용도별 덱과 따로 만들어 개수 검사(EXPECTED_PPTX)에 섞이지 않게 한다.
+TEMPLATE_LAYOUTS = 6
+TEMPLATE_SLIDES = 11
+TEMPLATE_MIN_SZ = 1200   # 12pt = 24px. HTML 덱과 같은 하한
+
+
+def pptx_problems(path):
+    """PowerPoint 판 공통 점검 — 압축 · 폴더 항목 · 토큰 밖 색 · 12pt 미만 글자 · 흘린 글자 · 테마 글꼴.
+    레이아웃 템플릿과 HTML 덱에서 옮긴 판이 같은 잣대를 쓴다."""
+    css = open(os.path.join(SKILL, "assets", "blue-report.css"), encoding="utf-8").read()
+    root = css[css.index(":root"):]
+    allowed = {h.upper() for h in re.findall(r"--br-[a-z0-9-]+\s*:\s*#([0-9a-fA-F]{6})\b", root)} | {"FFFFFF"}
+    problems = []
+    with zipfile.ZipFile(path) as z:
+        bad = z.testzip()
+        if bad:
+            problems.append(f"압축 손상 {bad}")
+        names = z.namelist()
+        if any(n.endswith("/") for n in names):
+            problems.append("폴더 항목이 있다 (공동 편집에서 열리지 않음)")
+        layouts = [n for n in names if re.fullmatch(r"ppt/slideLayouts/slideLayout\d+\.xml", n)]
+        slides = [n for n in names if re.fullmatch(r"ppt/slides/slide\d+\.xml", n)]
+        off, small, leak = set(), set(), []
+        for n in names:
+            if not re.match(r"ppt/(slides|slideLayouts|charts|theme)/[^/]+\.xml$", n):
+                continue
+            x = z.read(n).decode("utf-8", "ignore")
+            if "/theme/" in n:   # 테마는 색 구성표만 본다. 효과 스타일의 기본 그림자는 Office 기본값이다
+                m = re.search(r"<a:clrScheme[\s\S]*?</a:clrScheme>", x)
+                x = m.group(0) if m else ""
+            off |= {v.upper() for v in re.findall(r'srgbClr val="([0-9A-Fa-f]{6})"', x)} - allowed
+            if "/slides/" in n or "/slideLayouts/" in n:
+                small |= {int(v) for v in re.findall(r'<a:(?:rPr|defRPr|endParaRPr)[^>]*\ssz="(\d+)"', x) if int(v) < TEMPLATE_MIN_SZ}
+                if re.search(r">\s*(undefined|null|NaN)\s*<", x):
+                    leak.append(n)
+        theme = z.read("ppt/theme/theme1.xml").decode("utf-8", "ignore")
+        if 'typeface="Pretendard"' not in theme:
+            problems.append("테마 글꼴이 Pretendard 가 아니다")
+    if off:
+        problems.append(f"토큰 밖 색 {sorted(off)}")
+    if small:
+        problems.append(f"12pt 미만 글자 {sorted(v / 100 for v in small)}pt")
+    if leak:
+        problems.append(f"흘린 글자(undefined 등) {leak}")
+    return problems, layouts, slides
+
+
+def check_deck_pptx(log, html_path, out_dir):
+    """HTML 덱 → PowerPoint(deck_to_pptx.py). 한 보고서를 두 판으로 낼 때 내용이 어긋나지 않는가.
+    장 수 · 장 제목 · 발표자 노트 · 본문 그림이 HTML 과 맞는지 보고, 공통 잣대(pptx_problems)를 건다."""
+    label = "HTML → PPTX"
+    out = os.path.join(out_dir, "deck.pptx")
+    r = run([sys.executable, os.path.join(SCRIPTS, "deck_to_pptx.py"), html_path, "--brand", BRAND, "-o", out])
+    if r.returncode != 0 or not os.path.exists(out):
+        log.fail(label, "deck_to_pptx.py 실패 — " + (r.stderr.strip().splitlines() or [""])[-1])
+        return
+    html = open(html_path, encoding="utf-8").read()
+    secs = re.findall(r'<section class="bl-sl[^"]*"[^>]*>', html)
+    want_notes = sum(1 for t in secs if re.search(r'data-notes="[^"]+"', t))
+    # 본문 칸 바로 아래 제목 — PowerPoint 에서 글자로 남아야 할 것
+    titles = [re.sub(r"<[^>]+>", "", t) for t in re.findall(r'<div class="bl-bd">\s*<h2 class="bl-title">(.*?)</h2>', html, re.S)]
+    problems, _, slides = pptx_problems(out)
+    with zipfile.ZipFile(out) as z:
+        notes = [n for n in z.namelist() if re.fullmatch(r"ppt/notesSlides/notesSlide\d+\.xml", n)
+                 and re.search(r"<a:t>[^<]{2,}</a:t>", z.read(n).decode("utf-8", "ignore"))]
+        texts = " ".join(re.sub(r"<[^>]+>", "", z.read(n).decode("utf-8", "ignore")) for n in slides)
+        pics = sum(z.read(n).decode("utf-8", "ignore").count("<p:pic>") for n in slides)
+    if len(slides) != len(secs):
+        problems.append(f"장 수 HTML {len(secs)} · PPTX {len(slides)}")
+    if len(notes) < want_notes:
+        problems.append(f"발표자 노트 {len(notes)}/{want_notes}")
+    squash = lambda t: re.sub(r"\s+", "", H.unescape(t))
+    lost = [t for t in titles if squash(t)[:12] not in squash(texts)]
+    if lost:
+        problems.append(f"글자로 옮기지 못한 제목 {len(lost)}건 — {lost[:2]}")
+    if problems:
+        log.fail(label, " · ".join(problems))
+    else:
+        log.ok(label, f"{len(slides)}장 · 제목 {len(titles)}건 글자로 · 노트 {len(notes)}장 · 본문 그림 포함 그림 {pics}개")
+
+
+def check_docx_docs(log, out_dir):
+    """A4 문서 5종 → Word(doc_to_docx.py). 글자 · 표가 Word 글자로 옮겨지고 회사 규칙(글꼴 · 색 토큰 ·
+    9pt 하한 · 머리글 로고 · 쪽번호 필드)을 지키며 HTML 글자가 하나도 빠지지 않는가(check_docx.py)."""
+    label = "A4 문서 → Word"
+    if not shutil.which("node"):
+        log.fail(label, "node 가 없다")
+        return
+    out = os.path.join(out_dir, "docx")
+    os.makedirs(out, exist_ok=True)
+    bad, made = [], []
+    for d in DOCS:
+        src = os.path.join(ASSETS, d)
+        dst = os.path.join(out, os.path.splitext(os.path.basename(d))[0] + ".docx")
+        r = run([sys.executable, os.path.join(SCRIPTS, "doc_to_docx.py"), src, "--brand", BRAND, "-o", dst])
+        if r.returncode != 0 or not os.path.exists(dst):
+            bad.append(f"{d} 변환 실패 — " + ((r.stdout + r.stderr).strip().splitlines() or [""])[-1])
+            continue
+        if "주의" in r.stdout:
+            bad.append(f"{d} 모르는 부품 — " + [ln for ln in r.stdout.splitlines() if "주의" in ln][0].strip())
+        r = run([sys.executable, os.path.join(SCRIPTS, "check_docx.py"), dst, "--html", src])
+        fails = [ln.strip() for ln in r.stdout.splitlines() if ln.strip().startswith("실패")]
+        if r.returncode != 0:
+            bad.append(f"{d} — " + (fails[0] if fails else "check_docx 실패"))
+            continue
+        warns = [ln.strip() for ln in r.stdout.splitlines() if ln.strip().startswith("주의")]
+        if warns:
+            log.warn(label, f"{d} — {warns[0]}")
+        made.append(os.path.basename(dst))
+    if bad:
+        log.fail(label, " · ".join(bad))
+    else:
+        log.ok(label, f"{len(made)}종 — 글자 누락 0 · 글꼴 · 색 토큰 · 머리글 로고 · 쪽번호 필드 통과")
+
+
+def check_forms(log, out_dir):
+    """A4 양식 정의(forms/*.json) — 양식이 규칙을 지키고 blue-doc.css 생성 블록이 기본 양식과 같은가.
+    그리고 양식만 바꿔도 HTML 과 Word 가 함께 바뀌는가(시험용 양식 _test/test-classic.json 으로 복사본에서)."""
+    label = "A4 양식 정의"
+    bf = os.path.join(SCRIPTS, "build_form.py")
+    r = run([sys.executable, bf, "--check"])
+    if r.returncode != 0:
+        log.fail(label, (r.stdout + r.stderr).strip().splitlines()[-1])
+        return
+    import importlib.util as ilu
+    if ilu.find_spec("fontTools") and ilu.find_spec("brotli"):
+        r = run([sys.executable, os.path.join(SCRIPTS, "make_serif_subset.py"), "--check"])
+        if r.returncode != 0:
+            log.fail(label, "명조 서브셋 — " + ((r.stdout + r.stderr).strip().splitlines() or [""])[0])
+            return
+    else:
+        log.warn(label, "명조 서브셋 글자 검사 건너뜀 — fontTools · brotli 없음")
+    forms_dir = os.path.join(SKILL, "forms")
+    bad = []
+    for root, _, files in os.walk(forms_dir):
+        for fn in files:
+            if fn.endswith(".json"):
+                r = run([sys.executable, "-c", "import sys,json; sys.path.insert(0, sys.argv[1]); import build_form as b; "
+                         "e=b.validate(json.load(open(sys.argv[2], encoding='utf-8'))); print('; '.join(e)); sys.exit(1 if e else 0)",
+                         SCRIPTS, os.path.join(root, fn)])
+                if r.returncode != 0:
+                    bad.append(f"{fn}: {r.stdout.strip()}")
+    if bad:
+        log.fail(label, " · ".join(bad))
+        return
+    # 양식 바꾸기 시험 — 스킬은 건드리지 않고 assets 복사본에 시험 양식을 쓴다
+    test = os.path.join(forms_dir, "_test", "test-classic.json")
+    work = os.path.join(out_dir, "form-switch")
+    shutil.rmtree(work, ignore_errors=True)
+    shutil.copytree(ASSETS, os.path.join(work, "assets"), ignore=shutil.ignore_patterns("archive"))
+    os.makedirs(os.path.join(work, "assets", "archive"))
+    shutil.copy(os.path.join(ASSETS, "archive", "doc-report.html"), os.path.join(work, "assets", "archive"))
+    r = run([sys.executable, bf, test, "--css", os.path.join(work, "assets", "blue-doc.css")])
+    src = os.path.join(work, "assets", "archive", "doc-report.html")
+    out = os.path.join(work, "report.docx")
+    r2 = run([sys.executable, os.path.join(SCRIPTS, "doc_to_docx.py"), src, "--brand", BRAND, "-o", out])
+    r3 = run([sys.executable, os.path.join(SCRIPTS, "check_docx.py"), out, "--html", src, "--no-render"])
+    problems = []
+    if r.returncode or r2.returncode:
+        problems.append("시험 양식 적용 · 변환 실패")
+    if "양식 test-classic" not in r2.stdout:
+        problems.append("Word 가 HTML 의 양식(--bd-form)을 따르지 않았다")
+    if r3.returncode != 0:
+        problems.append("시험 양식 Word 검사 실패 — " + next((ln.strip() for ln in r3.stdout.splitlines() if "실패" in ln), ""))
+    with zipfile.ZipFile(out) as z:
+        styles = z.read("word/styles.xml").decode("utf-8")
+    if 'w:jc w:val="center"' not in styles:
+        problems.append("양식의 가운데 표제가 Word 스타일에 없다")
+    # HTML 쪽 — 시험 양식의 가운데 표제 · 꼬리말 틀이 화면에 나오는가
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as pw:
+            b = pw.chromium.launch()
+            pg = b.new_page()
+            pg.goto("file://" + src)
+            align = pg.evaluate("getComputedStyle(document.querySelector('.bd-title')).textAlign")
+            foot = pg.evaluate("document.querySelector('.bd-foot').innerText")
+            b.close()
+        if align != "center":
+            problems.append(f"HTML 표제 정렬 {align} — 양식은 center")
+        if "- 1 -" not in foot:
+            problems.append(f"HTML 꼬리말이 양식 틀을 따르지 않았다 — {foot!r}")
+    except Exception as e:
+        problems.append(f"HTML 확인 실패 — {e}")
+    if problems:
+        log.fail(label, " · ".join(problems))
+    else:
+        log.ok(label, "기본 양식 검사 · CSS 일치 · 시험 양식으로 바꾸면 HTML 표제 · 꼬리말과 Word 여백 · 표제가 함께 바뀐다")
+
+
+def check_pptx_template(log, out_dir):
+    sub = os.path.join(out_dir, "template")
+    os.makedirs(sub, exist_ok=True)
+    r = run(["node", os.path.join(SKILL, "pptx", "template.js"), "--brand", BRAND, "--out", sub,
+             "--name", "template.pptx"])
+    path = os.path.join(sub, "template.pptx")
+    if r.returncode != 0 or not os.path.exists(path):
+        log.fail("PPTX 템플릿", (r.stderr.strip().splitlines() or ["template.js 실패"])[-1])
+        return
+    problems, layouts, slides = pptx_problems(path)
+    if len(layouts) < TEMPLATE_LAYOUTS:
+        problems.append(f"레이아웃 {len(layouts)}개 — {TEMPLATE_LAYOUTS}개 이상이어야 한다")
+    if len(slides) != TEMPLATE_SLIDES:
+        problems.append(f"견본 {len(slides)}장 — {TEMPLATE_SLIDES}장이어야 한다")
+    if problems:
+        log.fail("PPTX 템플릿", " · ".join(problems))
+    else:
+        log.ok("PPTX 템플릿", f"레이아웃 {len(layouts)}개 · 견본 {len(slides)}장 · 색 토큰 안 · 12pt 이상 · 테마 Pretendard")
 
 
 def check_pptx_integrity(log, out_dir, made):
@@ -1270,6 +1487,55 @@ def check_generated(log):
 
 # ------------------------------------------------------------------ 배포
 
+def check_agent_skill(log, out_dir):
+    """에이전트 스킬 hct-report(Codex · Goose 등)가 묶이고, 묶음 안에서 홀로 문서 보고 한 건을 만들어 검사까지 통과하는가.
+    묶음은 저장소 밖에서 돈다 — 저장소 경로에 기대면 여기서 깨진다."""
+    label = "에이전트 스킬 hct-report"
+    # GitHub 설치본(skills/hct-report) — gh skill install · npx skills add 가 받아 가는 자리. 원본과 같아야 한다
+    r = run([sys.executable, os.path.join(ROOT, "scripts", "build_hct_skill.py"), "--check-published"])
+    if r.returncode != 0:
+        log.fail(label, ((r.stdout + r.stderr).strip().splitlines() or [""])[0])
+        return
+    out = os.path.join(out_dir, "agent-skill")
+    r = run([sys.executable, os.path.join(ROOT, "scripts", "build_hct_skill.py"), "--out", out])
+    if r.returncode != 0:
+        log.fail(label, "묶기 실패 — " + ((r.stdout + r.stderr).strip().splitlines() or [""])[-1])
+        return
+    hct = os.path.join(out, "hct-report", "scripts", "hct.py")
+    # 묶음은 node_modules 를 빼고 묶는다(설치한 PC 에서 첫 실행에 받는다). CI 는 자동 설치를 막으므로
+    # 저장소에 이미 받아 둔 Word 생성기 의존성을 묶음 안에 이어 준다 — 묶음의 코드는 그대로 시험된다.
+    nm = os.path.join(SKILL, "docx", "node_modules")
+    if os.path.isdir(nm):
+        dst = os.path.join(out, "hct-report", "docx", "node_modules")
+        if not os.path.exists(dst):
+            os.symlink(nm, dst)
+    work = os.path.join(out, "work")
+    os.makedirs(work, exist_ok=True)
+    r = subprocess.run([sys.executable, hct, "new", "document", os.path.join(work, "doc"), "--kind", "minutes"],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        log.fail(label, "hct.py new 실패")
+        return
+    r = subprocess.run([sys.executable, hct, "build", os.path.join(work, "doc"), "--formats", "html"],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        log.fail(label, "hct.py build 실패 — " + ((r.stdout + r.stderr).strip().splitlines() or [""])[-1])
+        return
+    r = subprocess.run([sys.executable, hct, "build", os.path.join(work, "doc"), "--formats", "docx"],
+                       capture_output=True, text=True)
+    if r.returncode != 0 or not os.path.exists(os.path.join(work, "doc.docx")):
+        log.fail(label, "Word(docx) 생성 · 검사 실패 — " + ((r.stdout + r.stderr).strip().splitlines() or [""])[-1])
+        return
+    r = subprocess.run([sys.executable, hct, "new", "board", os.path.join(work, "board")],
+                       capture_output=True, text=True)
+    r = subprocess.run([sys.executable, hct, "build", os.path.join(work, "board"), "--formats", "xlsx"],
+                       capture_output=True, text=True)
+    if r.returncode != 2:
+        log.fail(label, "없는 형식(현황판 xlsx)을 거절하지 않았다")
+        return
+    log.ok(label, "규격 통과 · 묶음 안에서 문서 보고 HTML · Word 생성 · 검사 통과 · 없는 형식 거절")
+
+
 def check_plugin(log):
     """`plugin install` 이 성립하는 최소 조건을 본다."""
     mp = os.path.join(ROOT, ".claude-plugin", "marketplace.json")
@@ -1460,6 +1726,7 @@ def main():
         if "plugin" in only:
             print("\n── 배포 매니페스트 ──")
             check_plugin(log)
+            check_agent_skill(log, tmp)
         if "sync" in only:
             print("\n── HTML · PPTX 내용 동기화 ──")
             check_sync(log)

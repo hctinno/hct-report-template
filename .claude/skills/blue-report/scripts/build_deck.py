@@ -487,7 +487,10 @@ def main():
     ap.add_argument("--brand", help="brand.json — 주면 로고 · 워터마크까지 입힌다")
     ap.add_argument("--single-file", action="store_true", help="CSS · 폰트 · 뷰어를 한 파일에")
     ap.add_argument("--style", choices=STYLES, help="시각 스타일 — 조립 목록의 style 보다 앞선다 (a 프레임 · c 혼합)")
+    ap.add_argument("--pptx", help="같은 내용을 PowerPoint 로도 — 출력 .pptx 경로(--brand 필요). deck_to_pptx.py 를 부른다")
     a = ap.parse_args()
+    if a.pptx and not a.brand:
+        sys.exit("--pptx 는 --brand 와 함께 준다 — PowerPoint 레이아웃의 로고 · 워터마크가 brand.json 에서 온다")
 
     plan = load_plan(a.plan)
     global STYLE
@@ -527,6 +530,13 @@ def main():
     print(f"생성: {out}  ({n_sl}장 · 브랜드 {n}건)")
     if left:
         print(f"주의: 남은 자리표시자 {len(left)}건", file=sys.stderr)
+    if a.pptx:
+        # 내용은 HTML 한 곳에만 둔다. PowerPoint 판은 방금 만든 HTML 에서 뽑는다
+        import subprocess
+        r = subprocess.run([sys.executable, os.path.join(HERE, "deck_to_pptx.py"), out,
+                            "--brand", a.brand, "-o", a.pptx])
+        if r.returncode != 0:
+            sys.exit("PowerPoint 판 생성 실패")
     print("다음: python3 scripts/check_live.py " + a.out)
 
 

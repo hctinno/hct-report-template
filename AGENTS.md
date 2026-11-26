@@ -41,7 +41,7 @@ it, or when a `.pptx` file is required.** Never pick one on your own.
 | Group | `--deck` names | Note |
 |---|---|---|
 | fixed-page decks 1920x1080 — 12 | `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy` · `report` · `catalog` (19 layouts) | source for the PPTX build (`pptx/`) |
-| A4 documents — 3 | `policy` · `manual` · `notice` | |
+| A4 documents — 4 | `policy` · `manual` · `notice` · `a4report` | |
 | web boards — 4 | `board` · `execboard` · `teamboard` · `gapcheck` | |
 | live briefing | `live` | a smaller standard deck |
 | FCC/KC reports — 14 | `assets/archive/fcc-kc/` | certification test reports only |
@@ -63,6 +63,13 @@ ids, closing, appendix), `slides.html` (one `<section id>` per slide, body only)
 
     python3 .claude/skills/blue-report/scripts/build_deck.py <dir>/deck.yaml --brand brand/hct/brand.json --single-file -o decks-out/<name>.html
     python3 .claude/skills/blue-report/scripts/check_live.py decks-out/<name>.html --shots decks-out/shots
+
+Add `--pptx decks-out/<name>.pptx` to the build line to get a PowerPoint version from the same HTML
+(titles, ledes and notes as editable text; slide bodies as high-resolution images).
+
+A4 documents (minutes · internal report · policy · manual · notice) also come out as Word from the same HTML:
+`python3 .claude/skills/blue-report/scripts/doc_to_docx.py <doc>.html --brand brand/hct/brand.json -o <doc>.docx`, then
+`scripts/check_docx.py <doc>.docx --html <doc>.html` must report 0 failures. Text, tables and lists stay editable Word text.
 
 The build adds the top rail, footer, page numbers, logo, watermark, fonts, progress bar, controls and
 presenter engine, and generates the cover, agenda, chapter dividers, closing and appendix divider. Never
@@ -180,7 +187,7 @@ number-then-Enter jump, and a control bar that appears only at the very bottom e
 
 `check_board.py` additionally re-checks the **rendered** DOM for banned endings, because board content often lives in JavaScript data that a source scan cannot see.
 
-`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the A4 documents with `check_doc.py` and the boards with `check_board.py` (archived ones included), checks the three live decks and their branded outputs with `check_live.py`, presses through the live engine (paging, steps, page-number jump, present mode, laser, overlays, evidence tabs, document, video, tabs, presenter popup and its in-page fallback — 40 checks on the catalog source and its single-file output), checks the FCC/KC templates with the A4 rules, builds the PPTX files, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
+`verify_repo.py` builds the decks and runs `check_deck.py` on each, checks the A4 documents with `check_doc.py` and the boards with `check_board.py` (archived ones included), checks the three live decks and their branded outputs with `check_live.py`, presses through the live engine (paging, steps, page-number jump, present mode, laser, overlays, evidence tabs, document, video, tabs, presenter popup and its in-page fallback — 40 checks on the catalog source and its single-file output), checks the FCC/KC templates with the A4 rules, builds the PPTX files, converts the five A4 documents to Word and checks them with `check_docx.py`, re-derives `dist/` and compares it against what is committed, scans Korean text for mojibake, validates the plugin manifests, compares HTML and `pptx/content.js` for drift, and verifies the skill version was bumped when the skill folder changed. It exits 1 if anything fails. `.github/workflows/verify.yml` runs the same single command, so local and CI results cannot diverge.
 
 If you change `assets/`, rebuild `dist/` and commit it: `build_single_file.py` three times —
 once with no arguments, once with `--artifact --brand brand/hct/brand.json`, and once with

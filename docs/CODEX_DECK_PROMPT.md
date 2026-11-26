@@ -21,7 +21,7 @@ docs/CODEX_DECK_PROMPT.md 를 읽고 그대로 수행해라. 용도는 사내 �
 |---|---|
 | 용도 | 사내 월간 · 주간 · AX 주간 · 팀 압축 주간 · 경영진 · 전직원 · 외부 제안 · 프로젝트 · 교육 · 전략 · 고밀도 · A4 문서 · 웹 보드 |
 | 주제 | 덱 제목과 내용 |
-| 형식 | HTML(기본) · PDF · PPTX. 여러 개 가능. 보드는 HTML 만 |
+| 형식 | HTML(기본) · PDF · PPTX · Word(A4 문서만). 여러 개 가능. 보드는 HTML 만 |
 
 저장소가 아직 없는 PC라면 먼저 받는다. 폴더 이름과 위치는 아무래도 좋다.
 **기본 브랜치가 `main` 이 아니라 `full/main` 이므로 브랜치를 적을 때 주의한다.**
@@ -97,7 +97,7 @@ evidence.json   출처 칩 근거(선택)
 ```
 
 ```bash
-python .claude/skills/blue-report/scripts/build_deck.py decks-out/<보고서>/deck.yaml --brand brand/hct/brand.json --single-file -o decks-out/<보고서>.html
+python .claude/skills/blue-report/scripts/build_deck.py decks-out/<보고서>/deck.yaml --brand brand/hct/brand.json --single-file -o decks-out/<보고서>.html --pptx decks-out/<보고서>.pptx
 python .claude/skills/blue-report/scripts/check_live.py decks-out/<보고서>.html --shots decks-out/<보고서>-shots
 ```
 
@@ -110,6 +110,8 @@ python .claude/skills/blue-report/scripts/check_live.py decks-out/<보고서>.ht
 - 맞는 부품이 없으면 장 안 `<style data-own>` 으로 새로 짠다 — 선택자는 `#장id` · `x-` 접두어,
   색은 `var(--br-*)` · `var(--bl-*)` 토큰, 치수는 `rem`. 견본은 카탈로그 `own` 장.
 - 실패가 0 이 될 때까지 본문 파일을 고치고 다시 빌드한다. `--shots` 로 남은 장별 PNG 를 눈으로 넘겨 본다.
+- **형식에 PPTX 가 있으면 `--pptx` 를 붙인다.** 같은 HTML 에서 PowerPoint 판을 뽑으므로 내용을 두 번 쓰지 않는다 —
+  표지 · 목차 · 장 간지 · 마무리와 장 제목 · 리드 · 노트는 글자(편집 가능), 본문 도식은 고해상도 그림이다.
 
 옛 방식(기준 덱 `live-standard.html` 을 복사해 내용만 바꾸기)도 그대로 돌지만 예비다.
 
@@ -139,7 +141,7 @@ HCT 웹 디자인 템플릿 v2.1.0 명세로 짠다 — `blue-report.css` · `hc
 | 묶음 | `--deck` 이름 | 비고 |
 |---|---|---|
 | 고정 지면 덱 1920x1080 · 12종 | `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy` · `report` · `catalog` | PPTX 빌드의 원본 · 검사기 `check_deck.py` |
-| A4 문서 3종 | `policy` · `manual` · `notice` | |
+| A4 문서 4종 | `policy` · `manual` · `notice` · `a4report`(사내 보고서) | |
 | 웹 보드 4종 | `board` · `execboard` · `teamboard` · `gapcheck` | |
 | 라이브 브리핑 | `live` | |
 | FCC/KC 보고서 14종 | `assets/archive/fcc-kc/` | 인증 시험 보고서 전용 |
@@ -202,6 +204,10 @@ python .claude/skills/blue-report/scripts/to_pdf.py decks-out/deck.html
 
 # PowerPoint — 보관 고정 지면 덱 내용(pptx/content.js)으로 만든다
 node .claude/skills/blue-report/pptx/build.js --brand brand/hct/brand.json --out decks-out
+
+# PowerPoint 레이아웃 템플릿 — 사람이 PowerPoint 에서 직접 쓰는 빈 틀.
+# 「홈 → 새 슬라이드」에 HCT 레이아웃 6종(표지 · 장 간지 · 제목만 · 제목+본문 · 2단 비교 · 마무리)과 견본 11장
+node .claude/skills/blue-report/pptx/template.js --brand brand/hct/brand.json --out decks-out
 ```
 
 PPTX 는 HTML 덱과 내용을 따로 들고 있다. **HTML 쪽이 기준이므로 내용을 바꿀 때는
@@ -261,17 +267,20 @@ python scripts/verify_repo.py
 
 ### 5-1. HTML 덱은 발표에 쓴다
 
-만든 HTML 을 넘길 때 조작법을 함께 알린다. 모르면 발표를 못 한다.
+만든 HTML 을 넘길 때 조작법을 함께 알린다. 모르면 발표를 못 한다. 라이브 덱의 단축키는
+PowerPoint 슬라이드 쇼를 따른다(정본은 `assets/live-viewer.js` 의 `KEYMAP`).
 
-| 키 · 버튼 | 하는 일 |
+| 키 | 하는 일 |
 |---|---|
-| `F` · 「발표」 | 전체화면 발표 모드 — 버튼과 노트가 사라진다 |
-| `←` `→` `Space` · 클릭 | 슬라이드 넘김 |
-| `Esc` | 발표 모드 나가기 |
-| `N` · 「노트」 | 발표자 노트 |
-| 「목록」 | 전 슬라이드 세로 나열 (검수용, 발표용 아님) |
+| `F5` / `Shift+F5` | 처음부터 발표 / 이 장부터 발표 · 다시 누르면 끝 |
+| `Alt+F5` | 발표자 보기 — 대본 · 타이머 · 다음 장 |
+| `→` `Space` `Enter` / `←` | 다음(단계 먼저) / 이전 |
+| 숫자 + `Enter` | 그 쪽으로 (`a` 를 먼저 누르면 부록 쪽) |
+| `M` · `X` · `V` | 이 장 노트 · 단계 모두 펼치기 · 가로 보기 |
+| `P` · `L` · `B` · `W` | 펜 · 레이저 · 검은 화면 · 흰 화면 |
+| `F1` · `?` | 단축키 전부 |
 
-**「목록」을 발표용으로 안내하지 않는다.** 세로 스크롤이라 발표가 되지 않는다.
+보관한 고정 지면 덱(`assets/archive/deck-*.html`)은 뷰어가 달라 조작법이 다르다 — 그 덱의 도움말을 따른다.
 
 ### 6. 보고 형식
 

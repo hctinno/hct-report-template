@@ -1,6 +1,6 @@
 ---
 name: blue-report
-description: "사내 보고서·발표 덱·회의록·현황판을 회사 공용 양식으로 만든다. \"보고서 템플릿\", \"사내 보고서 템플릿\", \"회사 양식\", \"우리 템플릿\", \"HCT 템플릿\", \"블루 리포트\", \"AX 리포트 스타일\", \"딥 코발트 리포트\", \"Deep Cobalt\" 중 무엇으로 부르든 이 스킬을 쓴다. 사용자가 보고서·슬라이드·덱·발표자료·회의록·보드·대시보드·현황판을 요청하면서 템플릿·양식·서식을 활용하라고 하면 반드시 사용한다. 고르는 양식은 넷이다 — **보고서·발표는 DESIGN.md(본문 스타일 한 장)를 읽고 본문만 써서 scripts/build_deck.py 로 조립한다** — 머리띠·꼬리띠·로고·워터마크·폰트·진행선·표지·목차·장 간지는 빌드가 만들고 본문 디자인·레이아웃·애니메이션은 내용에 맞게 새로 짠다(기준 덱 live-standard.html 은 그 견본), 라이브 부품 카탈로그(52장, --deck livecatalog)는 그대로 쓰거나 고쳐 쓰거나 참고하는 부품첩이다, 회의록은 A4 문서(--deck minutes), 고쳐 가며 쓰는 현황판은 관리보드(--deck manage). 머리띠·꼬리띠·로고·워터마크가 장마다 붙어 있고 검사기가 그것을 강제한다. 고정 지면 덱 12종·A4 문서 3종·웹 보드 4종·FCC/KC 보고서는 assets/archive/ 에 보관했다 — 사용자가 이름을 짚거나 PowerPoint 파일이 꼭 필요할 때만 쓴다. 코발트·딥네이비 팔레트, 도넛·막대 차트 규칙, 개조식 문체를 강제하고 HTML·PDF·PPTX 로 내보낸다. 기준 덱은 사내 발표 덱 짜임새(표지 발표자 블록·보고 요지·로드맵·출처 칩과 근거 패널)를 갖는다. 뷰어는 단계 전개·펼침·가로 보기·메모·발표 모드·레이저·대본 창·숫자 점프와 근거·원문·영상 겹창, 탭·장면·노선도·시뮬레이션 위젯을 지원한다."
+description: "사내 보고서·발표 덱·회의록·현황판을 회사 공용 양식으로 만든다. \"보고서 템플릿\", \"사내 보고서 템플릿\", \"회사 양식\", \"우리 템플릿\", \"HCT 템플릿\", \"블루 리포트\", \"AX 리포트 스타일\", \"딥 코발트 리포트\", \"Deep Cobalt\" 중 무엇으로 부르든 이 스킬을 쓴다. 사용자가 보고서·슬라이드·덱·발표자료·회의록·보드·대시보드·현황판을 요청하면서 템플릿·양식·서식을 활용하라고 하면 반드시 사용한다. 고르는 양식은 넷이다 — **보고서·발표는 DESIGN.md(본문 스타일 한 장)를 읽고 본문만 써서 scripts/build_deck.py 로 조립한다** — 머리띠·꼬리띠·로고·워터마크·폰트·진행선·표지·목차·장 간지는 빌드가 만들고 본문 디자인·레이아웃·애니메이션은 내용에 맞게 새로 짠다(기준 덱 live-standard.html 은 그 견본), 라이브 부품 카탈로그(52장, --deck livecatalog)는 그대로 쓰거나 고쳐 쓰거나 참고하는 부품첩이다, 회의록은 A4 문서(--deck minutes), 고쳐 가며 쓰는 현황판은 관리보드(--deck manage). 머리띠·꼬리띠·로고·워터마크가 장마다 붙어 있고 검사기가 그것을 강제한다. 고정 지면 덱 12종·A4 문서 4종·웹 보드 4종·FCC/KC 보고서는 assets/archive/ 에 보관했다 — 사용자가 이름을 짚거나 PowerPoint 파일이 꼭 필요할 때만 쓴다. 코발트·딥네이비 팔레트, 도넛·막대 차트 규칙, 개조식 문체를 강제하고 HTML·PDF·PPTX·Word(A4 문서) 로 내보낸다. 기준 덱은 사내 발표 덱 짜임새(표지 발표자 블록·보고 요지·로드맵·출처 칩과 근거 패널)를 갖는다. 뷰어는 단계 전개·펼침·가로 보기·메모·발표 모드·레이저·대본 창·숫자 점프와 근거·원문·영상 겹창, 탭·장면·노선도·시뮬레이션 위젯을 지원한다."
 ---
 
 # 블루 리포트
@@ -50,7 +50,7 @@ C 혼합형(권장). 본문 HTML 은 같다(`DESIGN.md` 「2-1」). 관리보드
 | 묶음 | `--deck` 이름 | 비고 |
 |---|---|---|
 | 고정 지면 덱 1920x1080 · 12종 | `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy` · `report` · `catalog`(레이아웃 19종) | PPTX 빌드(`pptx/`)의 원본. PowerPoint 가 필요하면 여기서 |
-| A4 문서 3종 | `policy`(사규) · `manual`(매뉴얼) · `notice`(공지) | |
+| A4 문서 4종 | `policy`(사규) · `manual`(매뉴얼) · `notice`(공지) · `a4report`(사내 보고서) | |
 | 웹 보드 4종 | `board` · `execboard` · `teamboard` · `gapcheck` | |
 | 라이브 브리핑 | `live` | 기준 덱의 축소판 |
 | FCC/KC 보고서 14종 | `assets/archive/fcc-kc/` | 인증 시험 보고서 전용 |
@@ -120,6 +120,9 @@ python3 scripts/apply_brand.py --brand brand.json --deck internal --single-file 
    — 머리띠 · 꼬리띠 · 쪽번호 · 로고 · 워터마크 · 폰트 · 진행선 · 발표 기능, 표지 · 목차 · 장 간지 · 마무리 ·
    부록 간지를 빌드가 만든다. 문서명은 조립 목록 `title` 이 그대로 꼬리띠에 들어간다.
 5. `python3 scripts/check_live.py <결과>.html --shots out/` 실패 0, `out/` 의 장별 PNG 를 눈으로 넘겨 본다.
+6. PowerPoint 도 필요하면 4번에 `--pptx <결과>.pptx` 를 더한다 — 같은 HTML 에서 뽑으므로 두 판이 어긋나지 않는다.
+   표지 · 목차 · 장 간지 · 마무리와 장 제목 · 리드 · 노트는 PowerPoint 글자(편집 가능), 본문 도식은 고해상도 그림.
+   이미 만든 HTML 이면 `python3 scripts/deck_to_pptx.py <결과>.html --brand <brand.json> -o <결과>.pptx`.
 
 **예비 — 기준 덱 복사:** `live-standard.html` 을 복사해 내용만 바꾸고 `apply_brand.py --deck <파일>
 --title "문서명" --single-file` 로 묶어도 된다. 이때는 고정 영역 마크업을 직접 지켜야 하고, `--title` 을 빼면
@@ -215,6 +218,23 @@ node pptx/build.js --brand <brand.json> --out <폴더> [--deck internal]
 ```bash
 python3 <pptx 스킬>/scripts/office/validate.py 결과.pptx
 ```
+
+## 5-1. Word 판이 필요하면 (A4 문서)
+
+회의록 · 사내 보고서 · 규정 · 매뉴얼 · 공지를 Word 로 고쳐 써야 하는 사람이 있을 때. 원본은 A4 HTML 하나다.
+
+```bash
+python3 scripts/doc_to_docx.py <문서>.html --brand <brand.json> -o <문서>.docx
+python3 scripts/check_docx.py <문서>.docx --html <문서>.html      # 실패 0 이어야 완료
+```
+
+A4 문서의 기본 양식은 회사 공식 문서 양식(`forms/hct-official.json` — 규정 · 강령 원본을 잰 것)이고, FCC/KC 대외 보고서는
+`data-form="hct-standard"` 로 블루 리포트 표준 A4 를 쓴다. 양식 값(여백 · 글자 크기 · 색 역할 · 머리말 · 꼬리말 · 표 · 결재란 · 번호 모양)은 `forms/<id>.json` 하나에 있고
+HTML · PDF(`blue-doc.css` 생성 블록 — `scripts/build_form.py`)와 Word(`docx/from_doc.js`)가 함께 읽는다. 바꾸는 법은 `forms/README.md`.
+`scripts/hct.py build <폴더> --formats docx` 는 이 두 줄을 대신 한다. 글자 · 표 · 목록 · 상자는 전부 Word 글자와
+표로 옮겨 Word 에서 고칠 수 있다(그림으로 찍지 않는다). 장 · 절 제목은 Word 제목 1 · 제목 2, 강조어 · 칩은
+문자 스타일(HCT 강조어 · HCT 칩 …), 절차는 Word 자동 번호(①②③), 쪽번호는 필드다. 색 · 글꼴은 `pptx/tokens.js`
+(= `blue-report.css` 토큰), 로고 · 회사명은 brand.json 을 읽는다. 생성기는 `docx/from_doc.js`(npm `docx`, 첫 실행에 저절로 받는다).
 
 ## 6. 만들고 나면 반드시 점검한다
 

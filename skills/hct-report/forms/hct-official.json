@@ -1,0 +1,220 @@
+{
+  "_설명": "회사 공식 문서 양식 — 사내 규정 · 강령 원본(윤리강령, HWP)을 잰 값. HTML · PDF(blue-doc.css 생성 블록)와 Word(docx/from_doc.js)가 이 파일을 읽는다. 색은 blue-report.css 토큰 이름, 길이는 px · pt · mm.",
+  "_출처": "윤리강령 원본 11쪽(A4, 150dpi 이미지)에서 잰 값 — 머리말 띠 · 로고 · 문서명 위치, 본문 글자 높이 · 줄 간격 · 들여쓰기, 장 제목 상자 크기 · 색, 표지 문서명 · 막대 · 회사명 위치.",
+  "id": "hct-official",
+  "name": "HCT 공식 문서 (규정 · 강령 양식)",
+  "version": "1.0.0",
+  "page": {
+    "size": "A4",
+    "margin": {
+      "top": "12.5mm",
+      "right": "10mm",
+      "bottom": "15mm",
+      "left": "20mm"
+    },
+    "_margin설명": "원본은 왼쪽 20mm · 오른쪽 10mm(제본 여백으로 보인다). 머리말은 위 12.5mm 에서 시작한다.",
+    "breaks": "flow",
+    "_breaks설명": "authored — 원본 HTML 의 쪽(.bd-page) 그대로(넘치면 검사 실패). flow — HTML · Word 모두 글을 이어 흘려 쪽을 저절로 나눈다(장 제목이 쪽 끝에 홀로 남지 않게)."
+  },
+  "font": {
+    "body": {
+      "web": "serif",
+      "word": "바탕"
+    },
+    "heading": {
+      "web": "sans",
+      "word": "맑은 고딕"
+    },
+    "_설명": "본문은 명조(원본 HWP 바탕 계열). HTML · PDF 는 내장 Noto Serif KR, Word 는 「바탕」. 장 제목 · 목차 장 줄은 굵은 고딕."
+  },
+  "type": {
+    "title": {
+      "size": "20pt",
+      "weight": 700,
+      "color": "text",
+      "align": "center",
+      "font": "body"
+    },
+    "subtitle": {
+      "size": "12pt",
+      "color": "text-2",
+      "font": "body"
+    },
+    "h1": {
+      "size": "13pt",
+      "color": "text",
+      "font": "heading",
+      "style": "box",
+      "numeral": "roman",
+      "box": {
+        "numberWidth": "10mm",
+        "fill": "form-chapter",
+        "rule": {
+          "width": "1pt",
+          "color": "text"
+        },
+        "height": "10.6mm"
+      }
+    },
+    "h2": {
+      "size": "12pt",
+      "color": "text",
+      "weight": 400,
+      "font": "body"
+    },
+    "body": {
+      "size": "12pt",
+      "color": "text",
+      "lineHeight": 1.75,
+      "align": "justify",
+      "font": "body"
+    },
+    "small": {
+      "size": "9pt"
+    },
+    "key": {
+      "color": "text"
+    }
+  },
+  "space": {
+    "titleAfter": "6mm",
+    "subtitleAfter": "8mm",
+    "h1Before": "12mm",
+    "h1After": "8mm",
+    "h2Before": "7mm",
+    "h2After": "0px",
+    "paraAfter": "0px",
+    "listItemAfter": "0px",
+    "blockAfter": "4mm",
+    "indent": "5mm",
+    "_indent설명": "장 제목 상자 밖 본문(항목 · 문단 · 목록 · 목차)을 왼쪽에서 띄우는 거리 — 원본 「1. 항목」이 본문 왼쪽에서 5mm"
+  },
+  "list": {
+    "marker": "-",
+    "textIndent": "9mm",
+    "hang": "4.5mm",
+    "_설명": "「- 세부」 — 표시는 항목보다 4.5mm 안(본문 왼쪽 9.5mm), 이어지는 줄은 본문 왼쪽 14mm"
+  },
+  "numbering": {
+    "legal": "circled",
+    "steps": "decimal",
+    "_설명": "규정 호 번호 — ({n}) 또는 circled(①②…⑳). 절차 번호 — decimalEnclosedCircle(①②, HTML 은 남색 원) 또는 decimal(1. 2.)"
+  },
+  "header": {
+    "layout": "logo-title",
+    "left": "logo",
+    "right": "none",
+    "center": "title",
+    "color": "text",
+    "rule": "none",
+    "padding": "3.6mm",
+    "gap": "11.8mm",
+    "logoHeight": "10mm",
+    "title": {
+      "size": "16pt",
+      "weight": 700,
+      "letterSpacing": "1.6em",
+      "font": "body",
+      "spaceUpTo": 6
+    },
+    "bands": {
+      "top": [
+        {
+          "color": "form-band",
+          "width": "1.6mm"
+        }
+      ],
+      "bottom": [
+        {
+          "color": "form-band-2",
+          "width": "0.8mm"
+        },
+        {
+          "gap": "0.6mm"
+        },
+        {
+          "color": "form-band",
+          "width": "1.4mm"
+        }
+      ]
+    }
+  },
+  "footer": {
+    "left": "",
+    "right": "",
+    "color": "text-3",
+    "rule": "none",
+    "padding": "0px",
+    "gap": "0px",
+    "_설명": "원본에는 꼬리말 · 쪽번호가 없다"
+  },
+  "meta": {
+    "labelWidth": "28mm",
+    "labelFill": "form-chapter",
+    "labelColor": "text",
+    "topRule": {
+      "width": "1pt",
+      "color": "text"
+    },
+    "rowRule": "text-3"
+  },
+  "table": {
+    "headFill": "form-chapter",
+    "headColor": "text",
+    "headRule": {
+      "top": "1pt",
+      "bottom": "1px",
+      "color": "text"
+    },
+    "rowRule": "text-3",
+    "cellPadding": {
+      "y": "2mm",
+      "x": "2.5mm"
+    }
+  },
+  "box": {
+    "radius": "0px"
+  },
+  "sign": {
+    "labels": [
+      "담당",
+      "팀장",
+      "본부장"
+    ],
+    "labelFill": "form-chapter",
+    "labelColor": "text",
+    "rule": "text",
+    "height": "18mm",
+    "gap": "0px"
+  },
+  "toc": {
+    "style": "plain",
+    "itemAfter": "4mm",
+    "_설명": "원본 목차 — 장 줄은 굵은 고딕(Ⅰ.), 항목은 들여 쓴 명조, 점선 · 쪽번호 없음"
+  },
+  "cover": {
+    "mode": "opt-in",
+    "_mode설명": "off — 표지 없음. opt-in — 문서가 data-doc-cover=\"yes\" 일 때만(규정 · 매뉴얼 견본). always — 모든 문서",
+    "title": {
+      "size": "38pt",
+      "weight": 400,
+      "letterSpacing": "0.6em",
+      "font": "body",
+      "top": "11mm",
+      "spaceUpTo": 6
+    },
+    "bar": {
+      "color": "form-cover-bar",
+      "width": "73%",
+      "thickness": "2mm",
+      "gap": "2.5mm"
+    },
+    "company": {
+      "size": "32pt",
+      "font": "body",
+      "bottom": "26mm",
+      "text": "(주)에이치시티",
+      "_text설명": "표지 아래 회사명 — {company} 는 brand.json 의 회사명. 원본 표지는 「(주)에이치시티」"
+    }
+  }
+}

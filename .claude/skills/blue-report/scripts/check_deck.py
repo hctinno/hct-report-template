@@ -219,10 +219,19 @@ ASSETS = os.path.normpath(
 # 스타일·폰트가 말이 아니라 실제로 붙었는지 본다.
 # document.fonts.check() 는 쓰지 않는다 — CSS 가 404 난 문서에서도 true 를
 # 돌려준다(실측). 등록된 FontFace 의 status 를 직접 본다.
-STYLE_PROBE = r"""(names) => {
+# PC 에 Pretendard 가 설치돼 있으면 글꼴 목록 첫째 'Pretendard' 가 시스템 글꼴로 잡혀
+# 내장 'Pretendard Variable' 은 한 번도 불리지 않는다(status 'unloaded'). 그대로 두면
+# Office 용으로 Pretendard 를 설치한 PC 에서만 「폰트가 붙지 않았다」가 난다.
+# 그래서 아직 안 불린 내장 글꼴은 직접 불러 본다 — 파일이 없으면 'error' 로 떨어진다.
+STYLE_PROBE = r"""async (names) => {
   const rs = getComputedStyle(document.documentElement);
   const tokens = {};
   names.forEach(n => { tokens[n] = rs.getPropertyValue(n).trim(); });
+  for (const f of [...document.fonts]) {
+    if (/Pretendard/i.test(f.family) && f.status === 'unloaded') {
+      try { await f.load(); } catch (e) { /* 파일 없음 — status 가 error 로 남는다 */ }
+    }
+  }
   const face = [...document.fonts].find(
       f => /Pretendard/i.test(f.family) && f.status === 'loaded');
   return {tokens, font: face ? face.family : ''};

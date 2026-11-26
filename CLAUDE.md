@@ -21,7 +21,7 @@
 - 서브에이전트를 실행할 때는 프롬프트에 "보고는 한국어로 작성한다"를 명시한다.
 - **새 보고서는 본문만 쓰고 빌드가 틀을 씌운다.** `deck.yaml`(표지 정보 · 장 순서 · 장 id · 마무리 · 부록) +
   `slides.html`(장마다 `<section id>` 본문만) → `scripts/build_deck.py <deck.yaml> --brand brand/hct/brand.json
-  --single-file -o decks-out/…`. 머리띠·꼬리띠·쪽번호·로고·워터마크·폰트·진행선·발표 기능, 표지·목차·장 간지·
+  --single-file -o decks-out/…`. PowerPoint 도 필요하면 `--pptx decks-out/….pptx` — 같은 HTML 에서 뽑는다. 머리띠·꼬리띠·쪽번호·로고·워터마크·폰트·진행선·발표 기능, 표지·목차·장 간지·
   마무리·부록 간지는 빌드가 만든다 — 직접 쓰지 않는다. 견본은 `examples/standard/` · `examples/showcase/`.
   라이브러리 장은 `catalog:<id>` · `patterns:<id>` 로 부른다. 기준 덱 `live-standard.html` 을 복사하는 옛 방식은
   예비로만 쓴다. 고르는 양식은 넷이다 — 기준 덱(`standard`) · 부품 카탈로그(`livecatalog`) · 회의록(`minutes`) ·

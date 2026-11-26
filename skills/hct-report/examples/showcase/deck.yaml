@@ -1,0 +1,31 @@
+# 부품 카탈로그 전체 견본 — 라이브러리 장을 id 로 불러 한 덱으로 조립한다.
+# 기준 덱 본문 + 카탈로그를 합친 「합본」이 필요하면 이 파일 chapters 에 standard 예시의 장을 더한다.
+
+title: 블루 리포트 부품 견본
+cover:
+  date: 견본
+  org: 부품 카탈로그 · 패턴첩
+  title: 블루 리포트 <em>부품 견본</em>
+  message: 고르는 부품 · 고쳐 쓰는 장 · <b>틀은 그대로</b>
+
+chapters:
+  - name: 카드와 표기
+    lede: 색띠 카드 · 색 머리 열 · 칩과 번호 원 · 결론 띠
+    slides: [catalog:tcard, catalog:focusrow, catalog:hcard, catalog:marks]
+  - name: 시간과 조직
+    lede: 연표 · 단계 연혁 · 간트 · 조직도 · 역할 매트릭스
+    slides: [catalog:lanes, catalog:history, catalog:gantt, catalog:org, catalog:matrix, catalog:team]
+  - name: 수치와 차트
+    lede: 수치 타일 · 도넛 · 누적 막대 · 워터폴 · 와플 · 히트맵 · 개념 곡선
+    slides: [catalog:kpi, catalog:stack, catalog:sc, catalog:rack, catalog:waffle, catalog:heat, catalog:stair, catalog:chev, catalog:hero]
+  - name: 흐름과 결정
+    lede: 좌우 대비 · 대기열 · 결정 요청 · 파이프라인 · 흐름도 · 바통
+    slides: [catalog:vs, catalog:years, catalog:simq, catalog:decide, catalog:pipe, catalog:flow, catalog:net, catalog:baton]
+  - name: 화면과 시연
+    lede: 탭 · 코치 마크 · 화면 목업 · 캡처 주석 · 노선도 · 근거 · 원문 · 영상
+    slides: [catalog:tabs, catalog:coach, catalog:explorer, catalog:portal, catalog:shot, catalog:fig, catalog:route, catalog:simg, catalog:media, catalog:own]
+  - name: 디자인 언어 용례
+    lede: 패턴첩에서 고른 본문 문법
+    slides: [patterns:pt-three-zone, patterns:pt-chevron3, patterns:pt-hub, patterns:pt-roadmap-gantt, patterns:pt-applied]
+
+appendix: [catalog:qa, catalog:raci, catalog:monthly, catalog:icons, catalog:motion, catalog:keys]

@@ -16,6 +16,7 @@
 
 ```bash
 python3 scripts/build_deck.py 보고서/deck.yaml --brand <brand.json> --single-file -o decks-out/보고서.html
+#   PowerPoint 도 함께 → 위 줄 끝에 --pptx decks-out/보고서.pptx (본문은 그림, 제목 · 리드 · 노트는 글자)
 python3 scripts/check_live.py decks-out/보고서.html --shots decks-out/shots   # 실패 0 까지 고친다
 ```
 

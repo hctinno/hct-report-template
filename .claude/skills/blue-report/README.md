@@ -32,7 +32,7 @@ blue-report/
 │  ├─ blue-pattern.css         패턴 장(.xf) 본문 CSS — 패턴첩 장을 쓰는 덱이 함께 부른다
 │  ├─ blue-style.css           시각 스타일 C(혼합) — 조립 목록 style: c 일 때 빌드가 덧입힌다 (A 는 기본)
 │  ├─ live-catalog.html        라이브 부품 카탈로그 52장 — 그대로 · 고쳐 · 참고해 쓴다
-│  ├─ archive/                 보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 3종 · 보드 4종 · 브리핑 · FCC/KC
+│  ├─ archive/                 보관 양식 — 고정 지면 덱 12종(PPTX 원본) · A4 4종 · 보드 4종 · 브리핑 · FCC/KC
 │  ├─ LICENSE-Lucide.txt       아이콘 저작권 고지 (ISC · MIT)
 │  └─ brand.example.json       회사명·연락처·로고 설정 견본
 ├─ MOTION.md                  효과 라이브러리 — 요청 시 고르는 연출 패턴 · 단일 효과 22종 · 단계 흐리게
@@ -44,6 +44,7 @@ blue-report/
 │  ├─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문
 │  ├─ components.yaml          부품 카드의 판단하는 말(쓰는 곳 · 할 것 · 하지 말 것) — 마크업은 원본에서
 │  └─ decisions/                규격을 바꾼 근거(실측·대조) 원본. README.md 가 색인이다
+├─ docx/                       Word 판 생성기 — A4 문서 HTML → .docx (from_doc.js · 색 · 글꼴은 pptx/tokens.js)
 ├─ pptx/                       PowerPoint 판 생성기
 │  ├─ tokens.js                blue-report.css 의 토큰을 읽어 온다 (색 값 중복 없음)
 │  ├─ layouts.js               카드 · 칩 · 머리말 · 꼬리말 등 원자 helper
@@ -189,6 +190,30 @@ node pptx/build.js --brand brand.json --deck internal    # 한 종만
 PPTX 는 PC 에 설치된 폰트만 쓴다. 프리텐다드를 사내 배포하지 않았다면 `pptx/tokens.js` 의
 `F` 세 줄을 `'맑은 고딕'` 으로 되돌린다.
 
+### Word(.docx)로 만들기 — A4 문서
+
+A4 문서(회의록 · 사내 보고서 · 규정 · 매뉴얼 · 공지)는 HTML 원본 하나에서 Word 판을 뽑는다. PPTX 의 `content.js`
+처럼 내용을 따로 두지 않는다 — 갈라질 곳이 없다.
+
+```bash
+python3 scripts/doc_to_docx.py 회의록.html --brand brand/hct/brand.json -o 회의록.docx
+python3 scripts/check_docx.py 회의록.docx --html 회의록.html
+```
+
+| HTML 부품 | Word |
+|---|---|
+| `.bd-head` · `.bd-foot` | 머리글(로고 · 문서번호) · 바닥글(회사명 · 문서명 · 쪽번호 필드) |
+| `.bd-title` · `.bd-subtitle` · `.bd-h1` · `.bd-h2` | 스타일 제목 · 부제 · 제목 1 · 제목 2 |
+| `.bd-key` · `.bd-chip(--warn · --late)` | 문자 스타일 HCT 강조어 · HCT 칩(주의 · 위험) |
+| `.bd-meta` · `.bd-table` · `.bd-sign` · `.bd-figure` | 표 |
+| `.bd-list` · `.bd-list--legal` · `.bd-steps` · `.bd-toc` | 글머리 목록 · (1) 글자 번호 · 자동 번호 ①② · 점선 탭 |
+| `.bd-callout` | 테두리 · 음영 문단 |
+| `.x-kpis` · `.x-bars` (사내 보고서) | 표로 그린 수치 타일 · 막대 |
+
+쪽 나눔은 HTML 의 `.bd-page` 경계와 같다. 모르는 부품은 글자를 살려 문단으로 옮기고 「주의」를 낸다.
+검사(`check_docx.py`)는 글꼴(Pretendard) · 색(토큰) · 9pt 하한 · 머리글 로고 · 쪽번호 필드 · HTML 글자 누락 ·
+제목 수를 실패로, LibreOffice 렌더 쪽수 차이를 주의로 본다.
+
 #### 내용이 두 곳에 있다 — 합치지 않고 갈라짐을 검사한다
 
 덱 내용은 `assets/archive/deck-*.html` 과 `pptx/content.js` 두 곳에 따로 있다.
@@ -248,6 +273,7 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | `archive/doc-policy.html` | 사규·규정 3쪽 — 조·항·호 · 부칙 · 개정 이력 · 결재란 |
 | `archive/doc-manual.html` | 매뉴얼·가이드 3쪽 — 목차 · 절차 단계 · 화면 캡처 자리 |
 | `archive/doc-notice.html` | 공지 1쪽 — 게시판용. 한 쪽을 넘기지 않는다 |
+| `archive/doc-report.html` | 사내 보고서 3쪽 — 요약(요청 상자) · 수치 타일 · 실적 표 · 막대 · 리스크 · 일정 · 요청 표 · 결재란 |
 
 **쪽번호와 문서명은 뷰어가 채운다.** `.bd-foot` 을 비워 두고 숫자를 적지 않는다.
 쪽을 넣거나 빼도 번호가 어긋나지 않으며, 손으로 적으면 `check_doc.py` 가 실패시킨다.
@@ -347,6 +373,7 @@ python3 scripts/to_pdf.py ./보고서.html -o ./보고서.pdf --notes
 | Pillow | 로고 변환 | `pip install Pillow` |
 | Playwright + Chromium | 렌더 점검 · PDF | `pip install playwright` → `playwright install chromium` (약 150MB) |
 | pptxgenjs | PPTX | `npm install` |
+| docx (npm) | Word(A4 문서) | `cd docx && npm install` |
 
 ```bash
 python3 scripts/ensure_deps.py          # 무엇이 있고 없는지만 본다

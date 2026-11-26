@@ -9,6 +9,7 @@
     need_fonttools()       # 폰트 서브셋
     need_browser()         # 렌더 점검 · PDF
     need_node_modules(d)   # PPTX
+    need_node_modules(DOCX_DIR, "docx")   # Word
 
 자동 설치를 원하지 않으면 환경변수 BLUE_REPORT_NO_INSTALL=1 을 준다.
 그때는 설치하지 않고 실행할 명령을 알려준 뒤 멈춘다.
@@ -25,6 +26,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(HERE)
 PPTX_DIR = os.path.join(SKILL, "pptx")
+DOCX_DIR = os.path.join(SKILL, "docx")
 
 # Playwright 가 설치한 것 외에 시스템에 있을 수 있는 브라우저
 BROWSER_HINTS = [
@@ -130,17 +132,18 @@ def need_browser():
     return p
 
 
-def need_node_modules(directory=PPTX_DIR):
-    """PPTX 생성에 필요한 npm 패키지를 갖춘다."""
-    if os.path.isdir(os.path.join(directory, "node_modules", "pptxgenjs")):
+def need_node_modules(directory=PPTX_DIR, pkg="pptxgenjs"):
+    """PPTX(pptx/ · pptxgenjs) · Word(docx/ · docx) 생성에 필요한 npm 패키지를 갖춘다."""
+    what = "Word" if pkg == "docx" else "PPTX"
+    if os.path.isdir(os.path.join(directory, "node_modules", pkg)):
         return
     if not shutil.which("npm"):
         sys.exit("[준비 필요] npm 이 없다. Node.js 를 설치한다 — https://nodejs.org")
     if _no_install():
-        sys.exit(f"[준비 필요] PPTX 생성기 의존성이 없다.\n  실행: cd {directory} && npm install")
-    _run(["npm", "install", "--silent", "--prefix", directory], "PPTX 생성기 의존성 설치")
-    if not os.path.isdir(os.path.join(directory, "node_modules", "pptxgenjs")):
-        sys.exit(f"[준비 실패] npm install 후에도 pptxgenjs 가 없다: {directory}")
+        sys.exit(f"[준비 필요] {what} 생성기 의존성이 없다.\n  실행: cd {directory} && npm install")
+    _run(["npm", "install", "--silent", "--prefix", directory], f"{what} 생성기 의존성 설치")
+    if not os.path.isdir(os.path.join(directory, "node_modules", pkg)):
+        sys.exit(f"[준비 실패] npm install 후에도 {pkg} 가 없다: {directory}")
 
 
 STATUS = [
@@ -149,6 +152,7 @@ STATUS = [
     ("Playwright (렌더 점검 · PDF)", lambda: importlib.util.find_spec("playwright") is not None),
     ("Chromium (렌더 점검 · PDF)", lambda: find_browser() is not None),
     ("pptxgenjs (PPTX)", lambda: os.path.isdir(os.path.join(PPTX_DIR, "node_modules", "pptxgenjs"))),
+    ("docx (Word)", lambda: os.path.isdir(os.path.join(DOCX_DIR, "node_modules", "docx"))),
 ]
 
 
@@ -157,6 +161,7 @@ def main():
     args = sys.argv[1:]
     if "--all" in args:
         need_pillow(); need_fonttools(); need_browser(); need_node_modules()
+        need_node_modules(DOCX_DIR, "docx")
         print("전부 준비됨")
         return
     print("의존성 상태")
