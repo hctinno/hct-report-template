@@ -181,7 +181,7 @@
       'h1{margin:0 0 4px;font:600 13px/1.3 system-ui,sans-serif;letter-spacing:.14em;' +
         'text-transform:uppercase;color:#8fa4bd}' +
       '#t{font:600 28px/1 ui-monospace,Menlo,monospace;color:#fff;margin:0 0 18px}' +
-      '#cur{white-space:pre-wrap;border-left:3px solid #2f4a9c;padding-left:14px;margin-bottom:22px}' +
+      '#cur{white-space:pre-wrap;border-left:3px solid #0054a4;padding-left:14px;margin-bottom:22px}' +
       '#nxt{white-space:pre-wrap;color:#8fa4bd;border-left:3px solid #2b3852;padding-left:14px}' +
       'h2{margin:0 0 6px;font:600 11px/1 system-ui,sans-serif;letter-spacing:.14em;' +
         'text-transform:uppercase;color:#8fa4bd}' +

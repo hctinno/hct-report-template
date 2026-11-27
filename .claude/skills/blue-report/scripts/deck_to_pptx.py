@@ -153,6 +153,8 @@ def extract(html, work):
             sys.exit("라이브 덱 엔진(blDeck)이 없다 — build_deck.py 나 apply_brand.py 로 만든 라이브 덱을 준다")
         pg.add_style_tag(content=FREEZE_CSS)
         title = pg.evaluate("() => (document.querySelector('.bl-rf-name')||{}).textContent || document.title")
+        # 시각 스타일 — data-style 이 없으면 A(옛 빌드). H 는 PowerPoint 레이아웃도 사선 패널 판으로 고른다
+        style = pg.evaluate("() => (document.querySelector('main.bl-deck')||{dataset:{}}).dataset.style || 'a'")
         n = pg.evaluate("() => document.querySelectorAll('.bl-sl').length")
         for k in range(n):
             pg.evaluate("(k) => blDeck.go(k)", k)
@@ -168,7 +170,7 @@ def extract(html, work):
                 pg.evaluate(RESTORE_JS, k)
             slides.append(info)
         br.close()
-    return {"title": (title or "").strip(), "view": VIEW, "slides": slides}
+    return {"title": (title or "").strip(), "style": style, "view": VIEW, "slides": slides}
 
 
 def main():

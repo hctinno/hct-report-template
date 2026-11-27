@@ -43,7 +43,11 @@ function build(m, brand, out) {
   pres.company = brand.company.replace(/&/g, '&amp;');
   pres.title = m.title || brand.docTitle || brand.company;
   pres.theme = { headFontFace: F.kr, bodyFontFace: F.kr };
-  T.defineLayouts(pres, brand);
+  const style = m.style || 'a';
+  const H = style === 'h';
+  // 스타일 H — 표지 · 간지 · 마무리 글이 밝은 지면에 앉는다. 강조색도 HTML 과 같게(딥 블루)
+  const EM = H ? C.deep : C.cobalt;
+  T.defineLayouts(pres, brand, { style });
   const dir = path.dirname(path.resolve(out.manifest));
 
   let section = null;
@@ -59,13 +63,13 @@ function build(m, brand, out) {
     if (s.kind === 'cover') {
       sl = add(LAYOUT.cover);
       if (s.kicker) sl.addText(s.kicker, { placeholder: 'eyebrow' });
-      sl.addText(rich(s.title, C.accentOnDark), { placeholder: 'title' });
-      if (s.message && s.message.length) sl.addText(rich(s.message, C.onDark), { placeholder: 'subtitle' });
+      sl.addText(rich(s.title, H ? C.deep : C.accentOnDark), { placeholder: 'title' });
+      if (s.message && s.message.length) sl.addText(rich(s.message, H ? C.text : C.onDark), { placeholder: 'subtitle' });
       if (s.meta) sl.addText(s.meta, { placeholder: 'meta' });
     } else if (s.kind === 'agenda') {
       sl = add(LAYOUT.titleOnly);
       sl.addText('CONTENTS', { placeholder: 'eyebrow' });
-      sl.addText(rich(s.title, C.cobalt), { placeholder: 'title' });
+      sl.addText(rich(s.title, EM), { placeholder: 'title' });
       const gap = Math.min(150, (BODY_BOTTOM - 284) / Math.max(1, s.items.length));
       s.items.forEach((it, i) => {
         const y = 284 + i * gap;
@@ -76,9 +80,14 @@ function build(m, brand, out) {
     } else if (s.kind === 'chapter') {
       sl = add(LAYOUT.section);
       sl.addText(s.no || '', { placeholder: 'number' });
-      sl.addText(rich(s.title, C.accentOnDark), { placeholder: 'title' });
+      sl.addText(rich(s.title, H ? C.deep : C.accentOnDark), { placeholder: 'title' });
       if (s.lede) sl.addText(s.lede, { placeholder: 'desc' });
-      if (s.items && s.items.length) {
+      if (s.items && s.items.length && H) {
+        // H — 오른쪽 열(패널 밖 밝은 지면)에 「이 장에서」
+        txt(sl, [{ text: '이 장에서', options: { bold: true, color: C.text, breakLine: true } },
+          ...s.items.map((it, i) => ({ text: `${it.no || String(i + 1).padStart(2, '0')}  ${it.t}`, options: { breakLine: i < s.items.length - 1 } }))],
+        { x: X(1060), y: X(500), w: X(W - 1060 - PAD.side), h: X(Math.min(440, 60 + s.items.length * 42)), fontSize: 14, color: C.text2Hi, paraSpaceAfter: 4, fit: 'shrink' });
+      } else if (s.items && s.items.length) {
         txt(sl, [{ text: '이 장에서', options: { bold: true, color: C.onDark, breakLine: true } },
           // 번호는 HTML 간지와 같게 — 덱 전체에서 몇째 장인지(04 · 05 …)
           ...s.items.map((it, i) => ({ text: `${it.no || String(i + 1).padStart(2, '0')}  ${it.t}`, options: { breakLine: i < s.items.length - 1 } }))],
@@ -86,15 +95,15 @@ function build(m, brand, out) {
       }
     } else if (s.kind === 'closing') {
       sl = add(LAYOUT.closing);
-      sl.addText([{ text: s.l1, options: { breakLine: true, bold: false } }, ...rich(s.l2, C.accentOnDark)], { placeholder: 'title' });
+      sl.addText([{ text: s.l1, options: { breakLine: true, bold: false, color: H ? C.cobalt : undefined } }, ...rich(s.l2, H ? C.deep : C.accentOnDark)], { placeholder: 'title' });
       const c = [s.ty, s.sig].filter(Boolean).join('  ·  ');
       if (c) sl.addText(c, { placeholder: 'contact' });
     } else {
       sl = add(LAYOUT.titleOnly);
       if (s.kind === 'content') {
         if (s.name) sl.addText(s.name, { placeholder: 'eyebrow' });
-        sl.addText(rich(s.title, C.cobalt), { placeholder: 'title' });
-        if (s.lede && s.lede.length) sl.addText(rich(s.lede, C.navy), { placeholder: 'lede' });
+        sl.addText(rich(s.title, EM), { placeholder: 'title' });
+        if (s.lede && s.lede.length) sl.addText(rich(s.lede, H ? C.text : C.navy), { placeholder: 'lede' });
       }
       if (s.image) placeImage(sl, s, dir);
     }

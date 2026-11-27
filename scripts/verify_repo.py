@@ -285,11 +285,11 @@ def check_build(log, out_dir):
     if not plans:
         log.fail("조립 견본", "examples/*/deck.yaml 이 없다")
         return
-    # 시각 스타일 C 는 기준 견본(standard)으로 한 번 더 조립한다 — 같은 본문 · 다른 스타일
+    # 기본 스타일은 H 다. 시각 스타일 A · C 는 기준 견본(standard)으로 한 번씩 더 조립한다 — 같은 본문 · 다른 스타일
     runs = [(p, None) for p in plans]
     std = os.path.join(ex_root, "standard", "deck.yaml")
     if os.path.exists(std):
-        runs += [(std, "c")]
+        runs += [(std, "a"), (std, "c")]
     for plan, style in runs:
         name = os.path.basename(os.path.dirname(plan)) + (f" · 스타일 {style.upper()}" if style else "")
         label = f"조립 견본 {name}"

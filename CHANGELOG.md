@@ -14,6 +14,29 @@ claude plugin marketplace update hct-tools   # 최신판 받기
 
 ---
 
+## 1.57.0 — 2026-11-28
+
+**스타일 H(사선 패널형)를 기본 시각 스타일로.** 2016 CI 서식의 기운과 최신 덱 구조를 합친 새 스타일이다. 조립 목록에
+`style:` 을 적지 않으면 H 로 조립한다. A(프레임) · C(혼합)는 `style: a` · `style: c` 로 그대로 쓴다.
+- **H 의 틀**(`blue-style.css` 「H」 · `build_deck.py`): 표지 · 마무리는 밝은 지면 + 같은 오른쪽 사선 패널(딥 블루 그라데이션 —
+  요소 자기 상자 기준 한 가지 조리법), 장 간지 · 부록 간지는 그 거울상(왼쪽 패널 · 큰 번호 300). 사선 기울기는 하나(가로 이동 =
+  세로 높이 × 0.3)이고 패널과 본문 장 머리 탭에만 쓴다 — 본문 상자는 직각. 로고는 장마다 하나, 워터마크는 모든 장 같은 크기 · 자리.
+  마무리는 밝은 지면. 빌드가 `bl-sl--panel`(오른쪽) · `bl-sl--panel-l`(왼쪽)을 달고 마크 · 워터마크의 `data-on` 을 패널에 맞춘다.
+- **발표 화면 대비(H 전용)**: 회의실 프로젝터가 흰색 · 옅은 회색 · 연하늘을 가르지 못하는 문제 — 옅은 면(`--br-tint`)을 흰 카드 +
+  CI 테두리로, 보조 글자 · 괘선을 진하게(`--br-text-2-hi` · `--br-text-3-hi` · `--br-line-hi`), 물린 비교 막대는 회색 대신 중간 파랑.
+- **CI 블루 교체(전 스타일)**: `--br-cobalt` · `--br-cat-1` · `--br-data-2` 를 `#2f4a9c` → `#0054a4`(2016 CI). 지면 대비 7.10:1.
+  `--br-deep` `#08275e` 추가. `blue-pattern.css` · 뷰어도 같이. **로고를 2016 CI 판으로**(`brand/hct/`).
+- **`make_logo_variants.py`**: 투명 배경 PNG 를 넣으면 투명 화소가 검정이 되어 통째로 잉크로 잡히던 버그 — 흰 바탕에 먼저 합성한다.
+- **새 부품 넷**(부품 카드 20 → 24종): 작은 막대 `bl-spark`(지난 값 속 빈 막대 · 음수 · 미확인 「?」) · 아이콘 카드 `bl-icards`(카드 안
+  가운데 정렬 · 머리띠형) · 비교 막대 `bl-cmpbars`(지난 값 속 빈 · 지금 값 꽉 찬) · 직선 연표 `bl-tline`(위아래 번갈아 · 큰 사건 채운 점).
+  같은 대상은 덱 전체에서 같은 `data-c` — 실전 견본 `examples/hct-analysis/`(에이치시티 기업 분석 20장).
+- **PowerPoint**: `pptx/panel.js` 가 H 패널 · 머리 탭을 CSS 와 같은 조리법으로 PNG 로 그리고(외부 모듈 없음), `template.js` 에 H 레이아웃
+  6종(`--style h` 기본 · `--style a` 옛 판). `deck_to_pptx.py` 가 덱의 스타일을 읽어 `from_deck.js` 가 그 레이아웃 · 글자색으로 조립한다.
+- **검사**: `check_live.py` — H 의 패널 장 마크 · 워터마크 짝, 패널(::before 그라데이션) 위 글자를 대비 판정에서 뺀다, 새 부품 라벨 계열.
+  `verify_repo.py` — 기본(H) 견본 넷 + 기준 견본을 A · C 로 한 번씩 더 조립. `check_deck.py` 허용 hex 에 CI 블루 · 딥 블루.
+- 문서: `DESIGN.md` 「2-1」 세 스타일 표 · H 규칙 · 발표 화면 대비 · 카드 가운데 정렬 · 대상별 색. `CLAUDE.md` · `AGENTS.md` ·
+  `docs/CODEX_DECK_PROMPT.md` · `SKILL.md` · `brand/hct/README.md` · 결정 기록 `references/decisions/스타일H_2026-11.md`.
+
 ## 1.56.0 — 2026-11-26
 
 **회사 공식 문서 양식을 A4 기본으로.** 사내 규정 · 강령 원본(윤리강령 11쪽)을 재서 양식 정의 `forms/hct-official.json` 을 만들고

@@ -30,6 +30,10 @@
 | [탭](#bl-tabset) | `.bl-tabset` | 같은 형식의 사례 여러 개를 한 장에서 전환 |
 | [결론 줄 · 장 결론 띠](#bl-concl) | `.bl-concl` | 장(章)의 처음이나 끝, 결정 · 전환 장 — 장(章)마다 한 번 |
 | [출처 칩](#bl-ev) | `.bl-ev` | 수치 바로 옆 — 근거 패널로 연결 |
+| [작은 막대](#bl-spark) | `.bl-spark` | 수치 카드 · 관전 카드 안에서 추세 3~6점 — 큰 수치 밑 근거 그림 |
+| [아이콘 카드](#bl-icards) | `.bl-icards` | 대상 3~5개를 한 줄로 — 사업 분야 · 요인 · 관전 지표 |
+| [비교 막대](#bl-cmpbars) | `.bl-cmpbars` | 같은 구간의 지난 값과 지금 값 — 분기 전년 비교 · 연도 추이 |
+| [직선 연표](#bl-tline) | `.bl-tline` | 사건 5~8개를 시간 순으로 — 투자 · 인증 · 계약 이력 |
 
 ---
 
@@ -645,4 +649,111 @@
 
 ```html
 <button type="button" class="bl-ev" data-ev="E2" data-claim="시범 2건 처리 시간 62% 단축">출처</button>
+```
+
+---
+
+<a id="bl-spark"></a>
+## 작은 막대 · `.bl-spark`
+
+| 항목 | 내용 |
+|---|---|
+| 쓰는 곳 | 수치 카드 · 관전 카드 안에서 추세 3~6점 — 큰 수치 밑 근거 그림 |
+| 구조(클래스) | `.bl-spark` → `.bl-spark-c` |
+| 속성 | — |
+| 토큰 | `--bl-fs-lbl` `--bl-r-xs` `--br-alert-text` `--br-card` `--br-font-kr` `--br-font-num` `--br-text` `--br-text-2` |
+| 할 것 | 지금 값 하나만 .is-on(꽉 찬 막대) · 지난 값은 속 빈 막대 그대로 · 음수는 .is-neg + 묶음 --bot · 아직 모르는 값은 .is-unk(물음표 칸) |
+| 하지 말 것 | 회색 면으로 지난 값 칠하기 · 7점 이상(→ 비교 막대 · 간트) · 장의 주인공으로 쓰기(→ 비교 막대) |
+| 원본 | `examples/hct-analysis#watch` — 대조 덱 `examples/components` 장 `c-bl-spark` |
+
+복사용 HTML(내용만 바꾼다 — 클래스 · 속성 이름은 그대로):
+
+```html
+<div class="bl-spark" aria-label="2026 분기 매출 억원 · 4분기 미확인">
+  <div class="bl-spark-c" style="--v: .82"><b>247</b><i></i><span>1Q</span></div>
+  <div class="bl-spark-c" style="--v: .85"><b>256</b><i></i><span>2Q</span></div>
+  <div class="bl-spark-c is-on" style="--v: .92"><b>276</b><i></i><span>3Q</span></div>
+  <div class="bl-spark-c is-unk"><b>?</b><i></i><span>4Q</span></div>
+</div>
+```
+
+---
+
+<a id="bl-icards"></a>
+## 아이콘 카드 · `.bl-icards`
+
+| 항목 | 내용 |
+|---|---|
+| 쓰는 곳 | 대상 3~5개를 한 줄로 — 사업 분야 · 요인 · 관전 지표 |
+| 구조(클래스) | `.bl-icards` → `.bl-mid` → `.bl-icard` → `.bl-icard-i` → `.bl-i` → `.bl-i--radio-tower` → `.bl-icard-k` → `.bl-i--zap` → `.bl-i--circuit-board` → `.bl-i--shield-check` → `.bl-i--microscope` |
+| 속성 | `data-c` |
+| 토큰 | `--bl-fs-body` `--bl-fs-h3` `--bl-fs-lbl` `--bl-fs-sm` `--bl-i` `--bl-r-s` `--bl-sp-3` `--bl-sp-4` `--br-accent-on-dark` `--br-card` `--br-deep` `--br-font-kr` `--br-font-num` `--br-mark` `--br-navy` `--br-on-dark` `--br-on-dark-2` `--br-text` `--br-text-2` `--br-track` `--br-warn-text` |
+| 할 것 | 카드 안은 가운데 정렬 · 대상마다 data-c 고정(덱 전체에서 같은 번호) · 강조 하나만 .is-on · 번호 · 이름 띠가 필요하면 .bl-icards--head |
+| 하지 말 것 | 카드마다 왼쪽 정렬 긴 문장 · 같은 대상에 장마다 다른 색 · 6개 이상 |
+| 원본 | `examples/hct-analysis#fields` — 대조 덱 `examples/components` 장 `c-bl-icards` |
+
+복사용 HTML(내용만 바꾼다 — 클래스 · 속성 이름은 그대로):
+
+```html
+<div class="bl-icards bl-mid" style="--n: 5">
+  <div class="bl-icard is-on" data-c="1"><span class="bl-icard-i"><i class="bl-i bl-i--radio-tower"></i></span><h3>정보통신</h3><p class="bl-icard-k">EMC · RF · SAR · OTA</p><hr><p>통신기기 시험 · 매출 회복의 축</p></div>
+  <div class="bl-icard" data-c="2"><span class="bl-icard-i"><i class="bl-i bl-i--zap"></i></span><h3>배터리 · ESS</h3><p class="bl-icard-k">안전성 시험</p><hr><p>2026 배터리 안전성 인증 의무화 수혜</p></div>
+  <div class="bl-icard" data-c="3"><span class="bl-icard-i"><i class="bl-i bl-i--circuit-board"></i></span><h3>자동차 전장</h3><p class="bl-icard-k">고전압 EMC</p><hr><p>국내 완성차 3사 · 스텔란티스 공인 시험소</p></div>
+  <div class="bl-icard" data-c="6"><span class="bl-icard-i"><i class="bl-i bl-i--shield-check"></i></span><h3>방산 · 우주</h3><p class="bl-icard-k">신뢰성 · 방사선 시험</p><hr><p>F-35 정비 장비 교정 · CMMC 레벨 1</p></div>
+  <div class="bl-icard" data-c="4"><span class="bl-icard-i"><i class="bl-i bl-i--microscope"></i></span><h3>의료기기 · 보안</h3><p class="bl-icard-k">성능 · 사이버보안</p><hr><p>IoT · 의료기기 보안 KOLAS 인정</p></div>
+</div>
+```
+
+---
+
+<a id="bl-cmpbars"></a>
+## 비교 막대 · `.bl-cmpbars`
+
+| 항목 | 내용 |
+|---|---|
+| 쓰는 곳 | 같은 구간의 지난 값과 지금 값 — 분기 전년 비교 · 연도 추이 |
+| 구조(클래스) | `.bl-cmpbars` → `.bl-cmpbars-g` → `.bl-cmpbars-bs` → `.bl-cmpbars-b` |
+| 속성 | — |
+| 토큰 | `--bl-fs-body` `--bl-fs-lbl` `--bl-r-xs` `--bl-sp-4` `--br-alert-text` `--br-card` `--br-font-kr` `--br-font-num` `--br-mark` `--br-text` `--br-text-2` |
+| 할 것 | 지난 값은 속 빈 막대 · 지금 값은 .is-now 꽉 찬 막대 · 묶음 아래 한 줄(영업이익 등) · 범례 .bl-cmpbars-lg |
+| 하지 말 것 | 회색 막대로 비교 대상 표시 — 발표 화면에서 흰색과 구분 안 됨 · 묶음 6개 이상 |
+| 원본 | `examples/hct-analysis#quarters` — 대조 덱 `examples/components` 장 `c-bl-cmpbars` |
+
+복사용 HTML(내용만 바꾼다 — 클래스 · 속성 이름은 그대로):
+
+```html
+<div class="bl-cmpbars" style="--n: 3">
+  <div class="bl-cmpbars-g"><div class="bl-cmpbars-bs"><div class="bl-cmpbars-b" style="--v: .86"><b>257</b><i></i></div><div class="bl-cmpbars-b is-now" style="--v: .82"><b>247</b><i></i></div></div><h3>1분기</h3><p>영업 14억 → <b>4억</b></p></div>
+  <div class="bl-cmpbars-g"><div class="bl-cmpbars-bs"><div class="bl-cmpbars-b" style="--v: .97"><b>292</b><i></i></div><div class="bl-cmpbars-b is-now" style="--v: .85"><b>256</b><i></i></div></div><h3>2분기</h3><p>영업 50억 → <b class="is-neg">−4억</b></p></div>
+  <div class="bl-cmpbars-g"><div class="bl-cmpbars-bs"><div class="bl-cmpbars-b" style="--v: .94"><b>281</b><i></i></div><div class="bl-cmpbars-b is-now" style="--v: .92"><b>276</b><i></i></div></div><h3>3분기</h3><p>영업 45억 → <b>25억</b></p></div>
+</div>
+```
+
+---
+
+<a id="bl-tline"></a>
+## 직선 연표 · `.bl-tline`
+
+| 항목 | 내용 |
+|---|---|
+| 쓰는 곳 | 사건 5~8개를 시간 순으로 — 투자 · 인증 · 계약 이력 |
+| 구조(클래스) | `.bl-tline` → `.bl-mid` → `.bl-tline-s` |
+| 속성 | `data-c` |
+| 토큰 | `--bl-fs-body` `--bl-fs-lbl` `--br-card` `--br-deep` `--br-font-kr` `--br-font-num` `--br-mark` `--br-navy` `--br-text-2` |
+| 할 것 | 사건은 위아래 번갈아 · 큰 사건만 .is-big 채운 점 · 점 색은 대상 data-c · 범례 .bl-tline-lg |
+| 하지 말 것 | 사선 · 곡선 연결 · 사건 9개 이상(→ 이중 레인 연표 · 간트) |
+| 원본 | `examples/hct-analysis#invest` — 대조 덱 `examples/components` 장 `c-bl-tline` |
+
+복사용 HTML(내용만 바꾼다 — 클래스 · 속성 이름은 그대로):
+
+```html
+<div class="bl-tline bl-mid" style="--n: 7">
+  <div class="bl-tline-s" data-c="1"><i></i><div><b>2025-01</b><h3>일본 인증기관 자격</h3><p>J-MIC · JATE 국내 최초</p></div></div>
+  <div class="bl-tline-s" data-c="4"><i></i><div><b>2025-10</b><h3>사이버보안 KOLAS</h3><p>IoT · 의료기기 보안</p></div></div>
+  <div class="bl-tline-s"><i></i><div><b>2025-11</b><h3>100% 무상증자</h3><p>주주가치 제고</p></div></div>
+  <div class="bl-tline-s is-big" data-c="5"><i></i><div><b>2026 초</b><h3>미국 법인 증설</h3><p>시험 챔버 · 시설</p></div></div>
+  <div class="bl-tline-s is-big" data-c="3"><i></i><div><b>2026-05</b><h3>M솔루션센터 준공</h3><p>차량 전장 EMC</p></div></div>
+  <div class="bl-tline-s"><i></i><div><b>2026-07</b><h3>대진반도체 MOU</h3><p>반도체 교정 협력</p></div></div>
+  <div class="bl-tline-s is-big" data-c="4"><i></i><div><b>2026-08</b><h3>휴믹 흡수합병</h3><p>CRO 통합</p></div></div>
+</div>
 ```

@@ -2580,6 +2580,112 @@ body:not(.present) .bl-rf-name { min-width: 0; max-width: calc(50% - var(--bl-hu
   .bl-hud [data-pg], .bl-hud .bl-hud-sep { display: none }
 }
 
+/* ── 2026-11 에이치시티 분석 덱에서 온 부품 넷 — 작은 막대 · 아이콘 카드 · 비교 막대 · 직선 연표 ─────
+   발표 화면 대비가 기준이다(회의실 프로젝터는 흰 · 옅은 회색 · 연하늘을 가르지 못한다).
+   지난 값은 회색 면이 아니라 속 빈 막대(흰 바탕 + 주인공 색 테두리), 지금 값은 꽉 찬 막대.
+   색은 --c(data-c 계열색) 하나 — 같은 대상은 덱 전체에서 같은 data-c 번호를 쓴다. */
+
+/* 작은 막대 — 수치 카드 · 관전 카드 안에 3~6개. --v 는 0~1(양수 칸 높이에 대한 비율) ·
+   음수가 있으면 묶음에 --bot(음수 칸 높이 비율, 0~1)을 준다 */
+.bl-spark { --h: 4.4rem; --bot: 0; --lab: 1.5rem;
+            display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: .6rem;
+            max-width: 17rem; margin: 0 auto; width: 100% }
+.bl-spark-c { --c2: var(--c); position: relative;
+              height: calc(var(--lab) * 2 + var(--h) * (1 + var(--bot))) }
+.bl-spark-c::after { content: ""; position: absolute; left: -.3rem; right: -.3rem; height: .12rem;
+                     top: calc(var(--lab) + var(--h)); background: var(--br-text) }
+.bl-spark-c > i { position: absolute; left: 0; right: 0; height: calc(var(--h) * var(--v, .5));
+                  bottom: calc(var(--lab) + var(--h) * var(--bot)); border-radius: var(--bl-r-xs) var(--bl-r-xs) 0 0;
+                  background: var(--br-card); box-shadow: inset 0 0 0 .13rem var(--c2) }
+.bl-spark-c > b { position: absolute; left: -.4rem; right: -.4rem; text-align: center;
+                  bottom: calc(var(--lab) + var(--h) * var(--bot) + var(--h) * var(--v, .5) + .15rem);
+                  font: 700 var(--bl-fs-lbl)/1.2 var(--br-font-num); color: var(--br-text-2); white-space: nowrap }
+.bl-spark-c > span { position: absolute; left: -.4rem; right: -.4rem; bottom: 0; text-align: center;
+                     font: 600 var(--bl-fs-lbl)/1.4 var(--br-font-kr); color: var(--br-text-2) }
+.bl-spark-c.is-on > i { background: var(--c2); box-shadow: none }
+.bl-spark-c.is-on > b { color: var(--br-text); font-weight: 900 }
+.bl-spark-c.is-neg { --c2: var(--br-alert-text) }
+.bl-spark-c.is-neg > i { bottom: auto; top: calc(var(--lab) + var(--h)); border-radius: 0 0 var(--bl-r-xs) var(--bl-r-xs) }
+.bl-spark-c.is-neg > b { bottom: calc(var(--lab) + var(--h) * var(--bot) + .15rem); color: var(--br-alert-text) }
+.bl-spark-c.is-unk > i { --v: .75; background: var(--br-card); box-shadow: none; border: .13rem dashed var(--c) }
+.bl-spark-c.is-unk > b { color: var(--c) }
+
+/* 아이콘 카드 — 대상 3~5개를 한 줄로. 카드 안은 가운데 정렬(오른쪽 빈자리를 남기지 않는다).
+   .is-on 카드 하나만 깊은 면 · 머리띠형(.bl-icards--head)은 번호 · 이름을 계열색 띠에 */
+.bl-icards { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: var(--bl-sp-3) }
+.bl-icard { --c: var(--br-mark); display: flex; flex-direction: column; align-items: center; text-align: center;
+            gap: .5rem; padding: var(--bl-sp-4) var(--bl-sp-3) var(--bl-sp-3); min-width: 0;
+            background: var(--br-card); border: .1rem solid var(--c); border-top-width: .5rem; border-radius: var(--bl-r-s) }
+.bl-icard-i { display: grid; place-items: center; width: 4.4rem; height: 4.4rem; flex: none; margin-bottom: .4rem;
+              border-radius: 50%; box-shadow: inset 0 0 0 .1rem var(--c); color: var(--c); font-size: 2rem }
+.bl-icard h3 { margin: 0; font: 800 var(--bl-fs-h3)/1.3 var(--br-font-kr); color: var(--br-text) }
+.bl-icard-k { margin: 0; font: 700 var(--bl-fs-lbl)/1.3 var(--br-font-kr); color: var(--c) }
+.bl-icard-v { margin: .4rem 0 0; font: 800 var(--bl-fs-stat)/1 var(--br-font-num); letter-spacing: -.03em; color: var(--c) }
+.bl-icard-v small { font-size: .45em; font-weight: 700; margin-left: .1em }
+.bl-icard p { margin: 0; font-size: var(--bl-fs-sm); line-height: 1.5; color: var(--br-text-2) }
+.bl-icard > hr { width: 2.2rem; height: 0; margin: .5rem 0; border: 0; border-top: .16rem solid var(--c) }
+.bl-icard.is-on { background: var(--br-deep, var(--br-navy)); border-color: var(--br-deep, var(--br-navy)); color: var(--br-on-dark) }
+.bl-icard.is-on :is(h3, .bl-icard-v) { color: var(--br-on-dark) }
+.bl-icard.is-on :is(.bl-icard-k, p) { color: var(--br-on-dark-2) }
+.bl-icard.is-on .bl-icard-i { color: var(--br-on-dark); box-shadow: inset 0 0 0 .1rem var(--br-on-dark-2) }
+.bl-icard.is-on > hr { border-top-color: var(--br-accent-on-dark) }
+.bl-icards--head .bl-icard { padding: 0; border-top-width: .1rem; overflow: hidden }
+.bl-icards--head .bl-icard > header { align-self: stretch; padding: .7rem 1rem; background: var(--c); color: var(--br-card);
+                                      font: 800 var(--bl-fs-body)/1.2 var(--br-font-num) }
+.bl-icards--head .bl-icard > :not(header) { margin-left: var(--bl-sp-3); margin-right: var(--bl-sp-3) }
+.bl-icards--head .bl-icard > :last-child { margin-bottom: var(--bl-sp-3) }
+
+/* 비교 막대 — 묶음마다 지난 값(속 빈) · 지금 값(꽉 찬) 두 막대. --v 는 0~1(눈금 상한에 대한 비율) */
+.bl-cmpbars { --h: 15rem; display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: var(--bl-sp-4) }
+.bl-cmpbars-g { --c: var(--br-mark); display: grid; grid-template-rows: var(--h) auto auto; justify-items: center }
+.bl-cmpbars-bs { display: flex; gap: .7rem; align-items: flex-end; height: 100%; border-bottom: .14rem solid var(--br-text); padding: 0 .6rem }
+.bl-cmpbars-b { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 5.2rem; height: 100% }
+.bl-cmpbars-b > b { font: 700 var(--bl-fs-body)/1.3 var(--br-font-num); color: var(--br-text-2) }
+.bl-cmpbars-b > i { width: 100%; height: calc((var(--h) - 2rem) * var(--v, .5)); margin-top: .3rem;
+                    border-radius: var(--bl-r-xs) var(--bl-r-xs) 0 0; background: var(--br-card); box-shadow: inset 0 0 0 .14rem var(--c) }
+.bl-cmpbars-b.is-now > b { color: var(--br-text); font-weight: 900 }
+.bl-cmpbars-b.is-now > i { background: var(--c); box-shadow: none }
+.bl-cmpbars-g > h3 { margin: .6rem 0 0; font: 800 var(--bl-fs-body)/1.3 var(--br-font-kr) }
+.bl-cmpbars-g > p { margin: .3rem 0 0; display: flex; gap: 1.2rem; font-size: var(--bl-fs-lbl); color: var(--br-text-2) }
+.bl-cmpbars-g > p b { color: var(--br-text) }
+.bl-cmpbars-g > p .is-neg { color: var(--br-alert-text) }
+.bl-cmpbars-lg { display: flex; gap: 1.6rem; margin-top: var(--bl-sp-2); font-size: var(--bl-fs-lbl); color: var(--br-text) }
+.bl-cmpbars-lg i { display: inline-block; width: 1.1rem; height: 1.1rem; margin-right: .45rem; vertical-align: -.15rem;
+                   border-radius: .15rem; box-shadow: inset 0 0 0 .14rem var(--br-mark); background: var(--br-card) }
+.bl-cmpbars-lg i.is-now { background: var(--br-mark); box-shadow: none }
+
+/* 직선 연표 — 사건 5~8개를 가로선 위아래로 번갈아. 사선 없음. .is-big 은 채운 점 · data-c 로 대상 색 */
+.bl-tline { --c: var(--br-mark); position: relative; display: grid; grid-template-columns: repeat(var(--n, 7), minmax(0, 1fr));
+            grid-template-rows: 1fr 2.4rem 1fr; min-height: 22rem }
+.bl-tline::before { content: ""; position: absolute; left: calc(50% / var(--n, 7)); right: calc(50% / var(--n, 7));
+                    top: 50%; height: .3rem; margin-top: -.15rem; border-radius: .15rem; background: var(--br-mark) }
+.bl-tline-s { --c: var(--br-mark); display: contents }
+.bl-tline-s > i { grid-row: 2; justify-self: center; align-self: center; position: relative; z-index: 1;
+                  width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--br-card); box-shadow: 0 0 0 .22rem var(--c) }
+.bl-tline-s.is-big > i { background: var(--c) }
+.bl-tline-s > div { grid-row: 1; align-self: end; text-align: center; padding: 0 .3rem 1rem; border-bottom: .1rem solid var(--c);
+                    margin: 0 auto; width: max-content; max-width: 100% }
+.bl-tline-s:nth-child(even) > div { grid-row: 3; align-self: start; padding: 1rem .3rem 0; border-bottom: 0; border-top: .1rem solid var(--c) }
+.bl-tline-s > div > b { display: block; font: 800 var(--bl-fs-lbl)/1.2 var(--br-font-num); color: var(--c) }
+.bl-tline-s > div > h3 { margin: .3rem 0 0; font: 800 var(--bl-fs-body)/1.3 var(--br-font-kr) }
+.bl-tline-s.is-big > div > h3 { color: var(--br-deep, var(--br-navy)) }
+.bl-tline-s > div > p { margin: .2rem 0 0; font-size: var(--bl-fs-lbl); color: var(--br-text-2) }
+.bl-tline-s:nth-child(1) > *, .bl-tline-s:nth-child(1) > i { grid-column: 1 }
+.bl-tline-s:nth-child(2) > * { grid-column: 2 } .bl-tline-s:nth-child(3) > * { grid-column: 3 }
+.bl-tline-s:nth-child(4) > * { grid-column: 4 } .bl-tline-s:nth-child(5) > * { grid-column: 5 }
+.bl-tline-s:nth-child(6) > * { grid-column: 6 } .bl-tline-s:nth-child(7) > * { grid-column: 7 }
+.bl-tline-s:nth-child(8) > * { grid-column: 8 }
+.bl-tline-lg { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.6rem; font-size: var(--bl-fs-lbl); color: var(--br-text) }
+.bl-tline-lg span { --c: var(--br-mark) }
+.bl-tline-lg i { display: inline-block; width: 1rem; height: 1rem; margin-right: .45rem; border-radius: 50%; background: var(--c); vertical-align: -.1rem }
+
+@media (max-width: 900px) {
+  .bl-icards, .bl-cmpbars { grid-template-columns: 1fr }
+  .bl-tline { grid-template-columns: 1fr; grid-template-rows: none; min-height: 0 }
+  .bl-tline::before { display: none }
+  .bl-tline-s { display: block } .bl-tline-s > * { grid-column: auto !important }
+}
+
 /* @icons:start — scripts/make_icons.py 가 쓴다. 손으로 고치지 않는다 */
 /* 아이콘 — Lucide 1.52.0 (lucide-static) 에서 135개.
    쓰는 법   <i class="bl-i bl-i--server" aria-hidden="true"></i>

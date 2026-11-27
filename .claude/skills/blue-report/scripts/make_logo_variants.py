@@ -94,7 +94,15 @@ def split_symbol(alpha_img, min_gap=4):
 
 
 def build(path, out_dir, name):
-    src = Image.open(path).convert("RGB")
+    raw = Image.open(path)
+    if raw.mode in ("RGBA", "LA", "P"):
+        # 투명 배경 PNG — 그대로 RGB 로 바꾸면 투명 화소가 검정이 되어 통째로 잉크로 잡힌다.
+        # 흰 바탕에 먼저 합성해 「흰 배경 로고」와 같은 입력으로 만든다.
+        rgba = raw.convert("RGBA")
+        base = Image.new("RGBA", rgba.size, (255, 255, 255, 255))
+        src = Image.alpha_composite(base, rgba).convert("RGB")
+    else:
+        src = raw.convert("RGB")
     crop = autocrop(src)
     cw, ch = crop.size
     cp = crop.load()

@@ -142,3 +142,32 @@
   when: 수치 바로 옆 — 근거 패널로 연결
   do: [data-ev 키를 evidence.json 에, data-claim 에 그 수치 문장]
   dont: [근거 없는 키, 문단 끝에 몰아 달기]
+
+# ── 2026-11 에이치시티 분석 덱에서 온 부품 넷 — 발표 화면 대비(지난 값은 속 빈 막대) · 같은 대상은 같은 data-c ──
+- root: bl-spark
+  from: examples/hct-analysis#watch
+  name: 작은 막대
+  when: 수치 카드 · 관전 카드 안에서 추세 3~6점 — 큰 수치 밑 근거 그림
+  do: [지금 값 하나만 .is-on(꽉 찬 막대), 지난 값은 속 빈 막대 그대로, 음수는 .is-neg + 묶음 --bot, 아직 모르는 값은 .is-unk(물음표 칸)]
+  dont: [회색 면으로 지난 값 칠하기, 7점 이상(→ 비교 막대 · 간트), 장의 주인공으로 쓰기(→ 비교 막대)]
+
+- root: bl-icards
+  from: examples/hct-analysis#fields
+  name: 아이콘 카드
+  when: 대상 3~5개를 한 줄로 — 사업 분야 · 요인 · 관전 지표
+  do: [카드 안은 가운데 정렬, 대상마다 data-c 고정(덱 전체에서 같은 번호), 강조 하나만 .is-on, 번호 · 이름 띠가 필요하면 .bl-icards--head]
+  dont: [카드마다 왼쪽 정렬 긴 문장, 같은 대상에 장마다 다른 색, 6개 이상]
+
+- root: bl-cmpbars
+  from: examples/hct-analysis#quarters
+  name: 비교 막대
+  when: 같은 구간의 지난 값과 지금 값 — 분기 전년 비교 · 연도 추이
+  do: [지난 값은 속 빈 막대 · 지금 값은 .is-now 꽉 찬 막대, 묶음 아래 한 줄(영업이익 등), 범례 .bl-cmpbars-lg]
+  dont: [회색 막대로 비교 대상 표시 — 발표 화면에서 흰색과 구분 안 됨, 묶음 6개 이상]
+
+- root: bl-tline
+  from: examples/hct-analysis#invest
+  name: 직선 연표
+  when: 사건 5~8개를 시간 순으로 — 투자 · 인증 · 계약 이력
+  do: [사건은 위아래 번갈아, 큰 사건만 .is-big 채운 점, 점 색은 대상 data-c · 범례 .bl-tline-lg]
+  dont: [사선 · 곡선 연결, 사건 9개 이상(→ 이중 레인 연표 · 간트)]
