@@ -46,7 +46,7 @@
   /* 숫자 점프 — 누른 숫자를 화면 구석에 보여 준다. 무엇을 눌렀는지 안 보이면
      오타를 알아채지 못하고 엉뚱한 장으로 간다. */
   #jump{position:fixed;right:24px;bottom:64px;z-index:10;padding:8px 16px;
-        background:rgba(12,18,30,.92);border:1px solid #2f4a9c;border-radius:6px;
+        background:rgba(12,18,30,.92);border:1px solid #0054a4;border-radius:6px;
         color:#fff;font:600 22px/1 ui-monospace,Menlo,monospace;letter-spacing:.12em}
   #jump[hidden]{display:none}
 

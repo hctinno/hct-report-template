@@ -1,0 +1,46 @@
+# 실전 견본 — 에이치시티(HCT) 기업 분석. 기본 스타일 H(사선 패널)로 조립한다.
+#   python3 scripts/build_deck.py examples/hct-analysis/deck.yaml --brand <brand.json> --single-file -o decks-out/hct.html --pptx decks-out/hct.pptx
+# 2026-11 에 공개 자료로 쓴 덱이다. 수치는 출처 칩(evidence.json)의 등급 · 날짜와 함께 읽는다 — 사내 참고용 · 투자 권유 아님.
+# 이 덱이 쓰는 2026-11 부품: 작은 막대(bl-spark) · 아이콘 카드(bl-icards) · 비교 막대(bl-cmpbars) · 직선 연표(bl-tline).
+# 대상별 색: 정보통신 data-c 1 · 배터리 2 · 전장 3 · 바이오 · 의료 4 · 해외 5 · 방산 6 — 덱 전체에서 같은 번호.
+
+title: 에이치시티(HCT) 기업 분석
+body: slides.html
+evidence: evidence.json
+
+cover:
+  date: 2026-11
+  org: 기업 분석 보고서 · 공개 자료 기반
+  kicker: <b>KOSDAQ 072990</b>시험인증 · 교정
+  title: 에이치시티 <em>기업 분석</em>
+  message: 선투자 2년차 — <b>부진한 상반기 뒤 3분기 흑자 전환</b>
+  presenter: {team: 경영지원실, name: 사내 참고용, role: 투자 권유 아님}
+
+front: [gist]
+
+chapters:
+  - name: 회사와 사업
+    title: 회사와 <em>사업</em>
+    lede: 무엇을 하는 회사인가
+    slides: [overview, segments, fields]
+  - name: 실적
+    title: 실적 <em>흐름</em>
+    lede: 얼마나 벌고 있는가
+    slides: [annual, quarters, rebound]
+  - name: 성장 · 경쟁
+    title: 성장과 <em>경쟁</em>
+    lede: 어디에 돈을 넣었고 누구와 겨루는가
+    slides: [invest, market]
+  - name: 판단
+    title: <em>판단</em>
+    lede: 리스크와 기회 · 4분기 관전 포인트
+    slides: [risk, watch]
+    takeaway: <b>판단</b> · 2027 실적이 선투자의 회수를 증명해야 하는 해 — 4분기는 그 첫 신호
+
+closing:
+  lead: 선투자 2년차
+  line: 이제는 회수를
+  mark: 증명할 차례
+  sign: 2026-11 · 공개 자료 기반 · 사내 참고용 · 투자 권유 아님
+
+appendix: [sources]

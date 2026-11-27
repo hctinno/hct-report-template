@@ -38,7 +38,7 @@ blue-report/
 ├─ MOTION.md                  효과 라이브러리 — 요청 시 고르는 연출 패턴 · 단일 효과 22종 · 단계 흐리게
 ├─ DESIGN.md                  본문 스타일 한 장 — 발표 덱을 만들 때 먼저, 처음부터 끝까지 읽는다
 ├─ LAYOUTS.md                 짜임 카드 12종 — 내용 모양별 장 나누기 (생성 파일 — build_cards.py)
-├─ COMPONENTS.md              부품 카드 20종 — 구조 · 속성 · 토큰 · 복사용 HTML (생성 파일 — build_cards.py)
+├─ COMPONENTS.md              부품 카드 24종 — 구조 · 속성 · 토큰 · 복사용 HTML (생성 파일 — build_cards.py)
 ├─ examples/                  본문만 쓴 견본 — standard · showcase · layouts(짜임 카드 원본) · components(부품 카드 대조, 생성)
 ├─ references/
 │  ├─ rules.md                 차트 계산법 · 레이아웃 체크리스트 · 문체 규칙 전문

@@ -21,7 +21,7 @@ check_deck.py 를 그대로 쓸 수 없다. 저쪽은 1920x1080 고정 지면과
        테두리 1px 와 미디어 질의 분기점은 예외다
     5. 장마다 data-notes 가 있는가 — 발표자 노트 없는 장은 대본 창이 빈다
     6~10. 지면 크롬 — 머리띠 · 꼬리띠 · 쪽번호 · 머리띠 브랜드 마크 · 워터마크가 장마다 있는가
-   11. 마크 배경 짝 — data-on 이 마크가 앉는 면과 맞는가 (A 머리띠 마크는 지면과 반대 · C 는 같음)
+   11. 마크 배경 짝 — data-on 이 마크가 앉는 면과 맞는가 (A 머리띠 마크는 지면과 반대 · C · H 는 같음 · H 표지 · 마무리는 패널 위)
    12. 브랜드 자리 — 산출물에 「COMPANY NAME」이 남지 않았는가 (assets/ 견본만 예외)
    13. 출처 칩 — .bl-ev 의 키(쉼표로 여럿)가 #bl-evidence 근거에 있고 근거마다 제목·등급·출처가
        있는가. 캡처(imgs)·하이라이트 상자(hl)·원문(doc)이 가리키는 것도 실제로 있는가
@@ -91,7 +91,9 @@ NOTE_CLS = ("bl-note", "bl-src", "bl-chip", "bl-eyebrow", "bl-stat-t", "bl-rf",
             # 본문을 담는 그릇(카드 · 행)은 넣지 않는다 — 넣으면 그 안 본문까지 하한이 풀린다.
             "bl-lbl", "bl-cap", "bl-mini", "bl-axis", "bl-dl", "bl-leg", "bl-num", "bl-pill",
             "bl-badge", "bl-delta", "bl-asof", "bl-pgref", "bl-stamp", "bl-conf", "bl-seg",
-            "bl-fig-ab", "bl-replay", "bl-shot-open", "bl-route-st", "bl-sc-pick")
+            "bl-fig-ab", "bl-replay", "bl-shot-open", "bl-route-st", "bl-sc-pick",
+            # 2026-11 부품 — 작은 막대의 값 · 축 · 아이콘 카드 꼬리표 · 비교 막대 · 직선 연표의 날짜 · 한 줄 라벨
+            "bl-spark", "bl-icard-k", "bl-cmpbars-g", "bl-cmpbars-lg", "bl-tline-s", "bl-tline-lg")
 # 16:9 한 벌, 좁은 폭 한 벌, 휴대폰 폭 한 벌. 좁은 쪽 둘은 루트가 하한(10.5px)에
 # 걸리는 구간이다 — 글자는 그대로고 가로 자리만 줄어 겹침·넘침이 여기서 난다.
 VIEWS = [(1600, 900), (760, 900), (400, 800)]
@@ -172,6 +174,16 @@ INK_PROBE = r"""() => {
       const pr = p.getBoundingClientRect();
       const over = cx >= pr.left && cx <= pr.right && cy >= pr.top && cy <= pr.bottom;
       if (!over) continue;
+      // 스타일 H 사선 패널(장의 ::before 그라데이션) — 글자 가운데가 패널 안이면 그림 바탕이라 판정하지 않는다.
+      // 패널 모양은 blue-style.css 「H」 와 같다: 오른쪽 패널 50.8% + 사선(위 16.9% 더) · 왼쪽 패널 그 거울상
+      if (p.classList && (p.classList.contains('bl-sl--panel') || p.classList.contains('bl-sl--panel-l')) &&
+          getComputedStyle(p, '::before').backgroundImage !== 'none') {
+        const t = (cy - pr.top) / pr.height, w = pr.width;
+        const inPanel = p.classList.contains('bl-sl--panel')
+          ? cx >= pr.left + w * (0.508 + 0.16875 * (1 - t))
+          : cx <= pr.left + w * (0.492 - 0.16875 * t);
+        if (inPanel) return;
+      }
       if (ps.backgroundImage && ps.backgroundImage !== 'none') return;
       const c = rgba(ps.backgroundColor);
       if (!c) return;
@@ -764,11 +776,15 @@ def check_chrome(html, rep):
         return
 
     # 시각 스타일(build_deck.py style) — A 는 띠가 지면과 반대 색, C 는 띠가 지면색이다
-    st = re.search(r'<main\b[^>]*\bclass="bl-deck\b[^>]*\bdata-style="([ac])"', html)
+    st = re.search(r'<main\b[^>]*\bclass="bl-deck\b[^>]*\bdata-style="([ach])"', html)
     inverts = not st or st.group(1) == "a"
+    style_h = bool(st) and st.group(1) == "h"
     miss_hd, miss_rf, miss_pg, miss_mark, miss_wm, wrong = [], [], [], [], [], []
     for n, (tag, body) in enumerate(sl, 1):
         dark = "bl-sl--dark" in tag
+        # H — 오른쪽 사선 패널 장(표지 · 마무리)은 마크 · 워터마크가 짙은 패널 위에 앉는다
+        if style_h and re.search(r'\bbl-sl--panel(?![\w-])', tag):
+            dark = True
         if not re.search(r'class="[^"]*\bbl-hd\b', body):       miss_hd.append(n)
         if not re.search(r'class="[^"]*\bbl-rf\b', body):       miss_rf.append(n)
         if not re.search(r'class="[^"]*\bbl-pg\b', body):       miss_pg.append(n)
@@ -807,7 +823,7 @@ def check_chrome(html, rep):
     verdict("워터마크", miss_wm)
 
     if wrong:
-        rep.f(f"마크 배경 짝 어긋남 {len(wrong)}건 — " + ("띠 색은 지면과 반대다" if inverts else "C 스타일은 띠가 지면색이다"))
+        rep.f(f"마크 배경 짝 어긋남 {len(wrong)}건 — " + ("띠 색은 지면과 반대다" if inverts else "C · H 스타일은 띠가 지면색이다 · H 의 표지 · 마무리는 패널 위"))
         for w in wrong[:6]:
             print(f"        {w}")
     else:

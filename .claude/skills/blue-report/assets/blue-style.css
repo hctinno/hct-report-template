@@ -1,8 +1,8 @@
 /* ════════════════════════════════════════════════════════════════════
-   시각 스타일 — A(프레임) · C(혼합)
+   시각 스타일 — H(사선 패널 · 기본) · A(프레임) · C(혼합)
    ════════════════════════════════════════════════════════════════════
    본문 HTML · 부품(bl-*) · 조립 방식 · 발표 엔진은 하나다. 스타일은 「보이는 규칙」만 바꾼다 —
-   조립 목록 deck.yaml 의 `style: a|c` 한 줄이 덱 본체 <main class="bl-deck" data-style> 를 달고
+   조립 목록 deck.yaml 의 `style: h|a|c` 한 줄이 덱 본체 <main class="bl-deck" data-style> 를 달고
    (html 이 아니라 덱에 단다 — 아티팩트 · 다른 문서에 끼워 넣어도 스타일이 남는다)
    이 파일이 토큰과 몇 가지 규칙을 덮는다. A 는 기본값이라 이 파일을 부르지 않는다(blue-live.css 그대로).
 
@@ -11,6 +11,9 @@
    C 혼합형    A 의 구조(장 표시 · 진행 · 카드 · 장 결론 띠)는 두고 지면감을 더한다 — 밝은 띠 + 남색 선 한 줄 ·
                제목 300 ↔ 900 대비(밴드 없음) · 간지 · 마무리는 어두운 장 · 표지 광선 · 그라데이션 막대.
                → 정돈된 구조 + 한 장 한 메시지. 배포 · 경영진 보고 · 정하지 않았을 때.
+   H 사선 패널형 2016 CI 서식의 기운 + 최신 덱 구조. 표지 · 마무리는 같은 오른쪽 사선 패널(딥 블루 그라데이션),
+               간지는 그 거울상(왼쪽). 사선은 패널과 머리 탭에만 — 본문 상자는 직각. 밝은 마무리. 발표 화면 대비
+               (옅은 면 금지 · 진한 보조 글자 · 흰 카드 + CI 테두리). → 기본값. 회의실 화면 발표 · 대외 보고.
    (B 에디토리얼형 — 띠를 모두 걷은 안 — 은 시안 비교 뒤 쓰지 않기로 했다. 지면 갤러리의 보관 덱이 그 원형이다.)
 
    규칙
@@ -22,7 +25,7 @@
    ════════════════════════════════════════════════════════════════════ */
 
 /* 계통 CSS 표지 — 한 파일로 묶여도 검사기가 덱의 맞춤 CSS 와 가른다(check_live _SYS_SIGS) */
-:root { --bl-style: "a c"; }
+:root { --bl-style: "h a c"; }
 
 
 /* ── C 혼합 ① 지면감 — 띠를 지면색으로 · 제목 굵기 대비 · 어두운 장 리듬 ───────────── */
@@ -103,3 +106,173 @@
 .bl-deck[data-style="c"] .bl-card--risk { border-left-color: var(--br-alert-text) }
 .bl-deck[data-style="c"] .bl-sl--dark .bl-card { background: transparent; border-color: var(--br-dark-line) }
 .bl-deck[data-style="c"] .bl-stat-v { font-weight: 800 }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   H 사선 패널형 — 기본값
+   ════════════════════════════════════════════════════════════════════
+   규칙 (2026-11 시안 확정 · references/decisions 참고)
+   · 사선은 기울기 하나(가로 이동 = 세로 높이 × 0.3) — 표지 · 마무리 오른쪽 패널, 간지 · 부록 간지 왼쪽 패널,
+     본문 장 머리 탭에만. 카드 · 표 · 띠 같은 본문 상자는 직각(모서리 --bl-r-*).
+   · 표지와 마무리 패널은 같은 요소 · 같은 그라데이션, 간지는 그 거울상. 그라데이션은 요소 자기 상자 기준.
+   · 로고는 장마다 하나 — 오른쪽 위. 워터마크는 모든 장 같은 크기 · 같은 자리(밝은 지면 곱하기 6.5% · 패널 위 스크린 16%).
+   · 마무리는 밝은 지면(전면 어둠 금지). 큰 서수는 300 비례 숫자, 작은 라벨은 800.
+   · 발표 화면 대비 — 옅은 면(--br-tint)으로 가르지 않는다. 흰 카드 + CI 2선 · 진한 보조 글자 · 진한 괘선. */
+.bl-deck[data-style="h"] {
+  --bl-band:         transparent;
+  --bl-band-ink:     var(--br-text);
+  --bl-band-sub:     var(--br-text-2-hi);
+  --bl-band-line:    var(--br-line-hi);
+  --bl-band-inv:     transparent;
+  --bl-band-inv-ink: var(--br-on-dark);
+  --bl-band-inv-sub: var(--br-on-dark-2);
+  --bl-hi:  transparent;
+  --bl-hi2: transparent;
+  --bl-hd-h: 8.5%;  --bl-hd-min: 4rem;
+  --bl-rf-h: 6.4%;  --bl-rf-min: 3.2rem;
+  /* 발표 화면 대비 — 보조 글자 · 괘선을 올리고 옅은 면을 흰 카드로 */
+  --br-text-2:   var(--br-text-2-hi);
+  --br-text-3:   var(--br-text-3-hi);
+  --br-hairline: var(--br-line-hi);
+  --br-card-line: var(--br-line-hi);
+  --br-chip-line: var(--br-line-hi);
+  --br-tint:     var(--br-card);
+  --br-mark-mute: var(--br-data-4);    /* 물린 비교 막대 — 회색 대신 중간 파랑(지면 대비 2.81:1) */
+  /* 패널 — 깊은 면 한 가지 조리법. 패널 자기 상자 기준(표지 · 마무리 · 간지가 같은 색으로 읽힌다) */
+  --x-h-slope: 16.875%;   /* 1080 × 0.3 ÷ 1920 — 슬라이드 폭에 대한 사선 가로 이동 */
+}
+.bl-deck[data-style="h"] .bl-sl { background: var(--br-card) }
+
+/* 깊은 면 — 본문 결론 띠 · 강조 카드도 같은 조리법 */
+.bl-deck[data-style="h"] .bl-sl--panel::before,
+.bl-deck[data-style="h"] .bl-sl--panel-l::before {
+  content: ""; position: absolute; top: 0; bottom: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(110% 95% at var(--x-cx, 72%) 62%, color-mix(in srgb, var(--br-cobalt) 88%, transparent) 0%, transparent 62%),
+    radial-gradient(60% 55% at var(--x-cx2, 84%) 44%, color-mix(in srgb, var(--br-data-3) 30%, transparent) 0%, transparent 60%),
+    var(--br-deep);
+}
+/* 오른쪽 패널(표지 · 마무리) — 위 67.7% 에서 아래 50.8% 로 내려오는 사선 */
+.bl-deck[data-style="h"] .bl-sl--panel::before {
+  left: 50.8%; right: 0;
+  clip-path: polygon(34.3% 0, 100% 0, 100% 100%, 0 100%);
+}
+/* 왼쪽 패널(간지 · 부록 간지) — 오른쪽 패널의 거울상 */
+.bl-deck[data-style="h"] .bl-sl--panel-l::before {
+  left: 0; width: 49.2%; --x-cx: 28%; --x-cx2: 40%;
+  clip-path: polygon(0 0, 100% 0, 65.7% 100%, 0 100%);
+}
+/* 패널 옆 실선 하나 — 같은 기울기 */
+.bl-deck[data-style="h"] .bl-sl--panel::after,
+.bl-deck[data-style="h"] .bl-sl--panel-l::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: color-mix(in srgb, var(--br-cobalt) 35%, transparent);
+}
+.bl-deck[data-style="h"] .bl-sl--panel::after   { clip-path: polygon(64.3% 0, 64.4% 0, 47.5% 100%, 47.4% 100%) }
+.bl-deck[data-style="h"] .bl-sl--panel-l::after { clip-path: polygon(52.4% 0, 52.5% 0, 35.6% 100%, 35.5% 100%) }
+.bl-deck[data-style="h"] :is(.bl-sl--panel, .bl-sl--panel-l) > :is(.bl-hd, .bl-bd, .bl-rf, .bl-sig) { position: relative; z-index: 1 }
+
+/* ── 머리띠 — 밝은 지면 · 왼쪽 사선 머리 탭 · 아래 진한 괘선 · 로고 하나 ───────────── */
+.bl-deck[data-style="h"] .bl-hd { border-bottom: 1px solid var(--br-line-hi) }
+.bl-deck[data-style="h"] .bl-sl:not(.bl-sl--panel):not(.bl-sl--panel-l) .bl-code {
+  align-self: stretch; display: flex; align-items: center; gap: var(--bl-sp-1);
+  margin-left: calc(-1 * var(--bl-gut)); padding: 0 3.4rem 0 var(--bl-gut);
+  background:
+    radial-gradient(110% 95% at 86% 40%, color-mix(in srgb, var(--br-cobalt) 88%, transparent) 0%, transparent 62%),
+    var(--br-deep);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 1.46rem) 100%, 0 100%);
+  color: var(--br-on-dark-2);
+}
+.bl-deck[data-style="h"] .bl-sl:not(.bl-sl--panel):not(.bl-sl--panel-l) .bl-code b { color: var(--br-on-dark) }
+/* 패널 장 — 탭 없이 글자만. 간지 · 부록 간지의 머리 글자는 왼쪽 패널 위 */
+.bl-deck[data-style="h"] :is(.bl-sl--panel-l) .bl-code,
+.bl-deck[data-style="h"] :is(.bl-sl--panel-l) .bl-code b { color: var(--br-on-dark-2) }
+.bl-deck[data-style="h"] :is(.bl-sl--panel, .bl-sl--panel-l) .bl-hd { border-bottom-color: transparent }
+.bl-deck[data-style="h"] .bl-sl--panel .bl-code b { color: var(--br-mark) }
+
+/* ── 꼬리띠 — 밝은 지면 · 문서명 왼쪽 · 쪽번호 오른쪽(CI) ─────────────────────── */
+.bl-deck[data-style="h"] .bl-rf { border-top-color: transparent }
+.bl-deck[data-style="h"] .bl-pg { color: var(--br-mark); font-weight: 700 }
+.bl-deck[data-style="h"] .bl-sl--panel .bl-pg { color: var(--br-on-dark) }
+
+/* ── 제목 — 300 ↔ 900 · 핵심구는 딥 블루 ─────────────────────────────────── */
+.bl-deck[data-style="h"] .bl-title { font-weight: 300; letter-spacing: -.035em }
+.bl-deck[data-style="h"] .bl-title:not(:has(em, mark, b, strong)) { font-weight: 800 }
+.bl-deck[data-style="h"] :is(.bl-title, .bl-fin-l2) :is(em, mark, b, strong) {
+  font-weight: 900; background: none; box-shadow: none; padding: 0; border-radius: 0; color: var(--br-deep)
+}
+.bl-deck[data-style="h"] .bl-bd mark { background: none; box-shadow: none; padding: 0; font-weight: 800; color: var(--br-mark) }
+.bl-deck[data-style="h"] .bl-sl--dark :is(.bl-title, .bl-bd) :is(em, mark) { color: var(--br-accent-on-dark) }
+
+/* ── 본문 상자 — 직각 · 흰 카드 + CI 테두리(발표 화면 대비) ───────────────────── */
+.bl-deck[data-style="h"] .bl-card { border: .1rem solid var(--br-mark); border-radius: var(--bl-r-s) }
+.bl-deck[data-style="h"] .bl-sl--dark .bl-card { border-color: var(--br-dark-line) }
+.bl-deck[data-style="h"] .bl-card--key { border-left-width: .3rem }
+.bl-deck[data-style="h"] .bl-bar { background-image: var(--br-grad-bar) }
+.bl-deck[data-style="h"] .bl-stat-v { font-weight: 800 }
+/* 결론 띠 — 깊은 면 */
+.bl-deck[data-style="h"] .bl-concl {
+  background: radial-gradient(110% 95% at 86% 40%, color-mix(in srgb, var(--br-cobalt) 88%, transparent) 0%, transparent 62%), var(--br-deep);
+  color: var(--br-on-dark); border-left-color: var(--br-accent-on-dark)
+}
+.bl-deck[data-style="h"] .bl-concl b { color: var(--br-accent-on-dark) }
+/* 숫자 — 비례 숫자(고정폭 숫자의 빈틈 없이) */
+.bl-deck[data-style="h"] :is(.bl-chapter-no, .bl-stat-v, .bl-gist-v, .bl-kpi-v) { font-variant-numeric: normal }
+
+/* ── 워터마크 — 모든 장 같은 크기 · 같은 자리 ──────────────────────────────── */
+.bl-deck[data-style="h"] .bl-sl .br-watermark {
+  width: 37.5rem; max-width: none; right: 5rem; bottom: 5.42rem; opacity: .065; mix-blend-mode: multiply
+}
+.bl-deck[data-style="h"] .bl-sl--panel .br-watermark { opacity: .16; mix-blend-mode: screen }
+
+/* ── 표지 — 밝은 지면 왼쪽 글 · 오른쪽 패널 ─────────────────────────────────── */
+.bl-deck[data-style="h"] .bl-sl--cover .bl-bd { align-items: flex-start; text-align: left; padding-right: 54% }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-cover-k { color: var(--br-mark) }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-title { font-weight: 300; color: var(--br-text); line-height: 1.12 }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-tag { color: var(--br-text-2) }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-cover-rule { width: 3.75rem; border-top: .16rem solid var(--br-mark); margin: var(--bl-sp-4) 0 var(--bl-sp-3) }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-cover-one { color: var(--br-text-2) }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-cover-one b { color: var(--br-text) }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-sig { right: auto; left: var(--bl-gut); justify-items: start; text-align: left }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-sig span { color: var(--br-mark) }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-sig b { color: var(--br-text) }
+.bl-deck[data-style="h"] .bl-sl--cover .bl-sig em { color: var(--br-text-2) }
+
+/* ── 간지 — 왼쪽 패널에 장 번호 · 오른쪽에 제목과 「이 장에서」 ───────────────────── */
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter--toc {
+  /* 오른쪽 열은 패널 위 끝(49.2%) · 실선(52.5%) 오른쪽에서 시작한다 */
+  grid-template-columns: minmax(0, 46%) minmax(0, 1fr); column-gap: 7rem;
+  grid-template-rows: auto auto auto auto; align-content: center; row-gap: var(--bl-sp-2)
+}
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter-main { display: contents }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter-k { grid-column: 1; grid-row: 1; align-self: end;
+  color: var(--br-on-cover-2); letter-spacing: .22em; font-weight: 800 }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter-no { grid-column: 1; grid-row: 2 / span 3; align-self: start;
+  font-size: 13rem; font-weight: 300; color: var(--br-on-dark); letter-spacing: -.05em }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter--toc .bl-title { grid-column: 2; grid-row: 1; font-size: 3.6rem }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter--toc .bl-lede { grid-column: 2; grid-row: 2 }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter-side { grid-column: 2; grid-row: 3; margin-top: var(--bl-sp-2) }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter-toc-h { color: var(--br-text-2) }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter--toc .bl-chapter-nav { grid-column: 2; grid-row: 4; margin-top: var(--bl-sp-3) }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter-nav > li { border-top: .16rem solid var(--br-mark); color: var(--br-text-2) }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter-nav > li.is-on { border-top: .4rem solid var(--br-deep); color: var(--br-text); font-weight: 800 }
+
+/* ── 부록 간지 — 왼쪽 패널에 + · 오른쪽에 제목 ─────────────────────────────────── */
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-apxdiv { grid-template-columns: minmax(0, 46%) 1fr; gap: 7rem }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-apxdiv > b { color: var(--br-on-dark); font-weight: 300; font-size: 13rem }
+
+/* ── 마무리 — 밝은 지면 왼쪽 글 · 표지와 같은 오른쪽 패널 ─────────────────────── */
+.bl-deck[data-style="h"] .bl-sl--closing .bl-fin { align-items: flex-start; text-align: left; padding-right: 54% }
+.bl-deck[data-style="h"] .bl-sl--closing .bl-fin-l1 { color: var(--br-mark); font-size: var(--bl-fs-lede); font-weight: 700 }
+.bl-deck[data-style="h"] .bl-sl--closing .bl-fin-l2 { font-weight: 300; font-size: 4.8rem; line-height: 1.15 }
+.bl-deck[data-style="h"] .bl-sl--closing .bl-fin-l2 .bl-fin-w { color: inherit }
+.bl-deck[data-style="h"] .bl-sl--closing .bl-fin-mk { color: var(--br-deep); font-weight: 900 }
+.bl-deck[data-style="h"] .bl-sl--closing .bl-fin-mk::before { display: none }
+.bl-deck[data-style="h"] .bl-sl--closing .bl-fin-rule { width: 3.75rem; border-top: .16rem solid var(--br-mark) }
+.bl-deck[data-style="h"] .bl-sl--closing .bl-fin-ty { color: var(--br-deep) }
+/* 간지 · 부록 간지 꼬리띠 문서명은 왼쪽 패널 위 */
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-rf-name { color: var(--br-on-dark-2) }
+/* 「이 장에서」가 긴 간지(압축 목록) — 제목 · 간격을 줄여 한 화면에 */
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter--toc:has(.bl-chapter-toc--compact) { row-gap: var(--bl-sp-1) }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter--toc:has(.bl-chapter-toc--compact) .bl-title { font-size: 3rem }
+.bl-deck[data-style="h"] .bl-sl--panel-l .bl-chapter--toc:has(.bl-chapter-toc--compact) .bl-chapter-nav { margin-top: var(--bl-sp-2) }

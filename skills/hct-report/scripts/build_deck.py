@@ -140,12 +140,23 @@ def title_of(inner):
     return plain(m.group(1)) if m else ""
 
 
-STYLES = ("a", "c")
-STYLE = "a"     # main() 이 조립 목록 style · --style 로 정한다
+STYLES = ("h", "a", "c")
+STYLE = "h"     # main() 이 조립 목록 style · --style 로 정한다. 없으면 h(기본)
+
+
+def panel_side(classes):
+    """스타일 H 의 사선 패널 쪽 — 표지 · 마무리는 오른쪽(마크 · 워터마크가 패널 위), 간지 · 부록 간지는 왼쪽."""
+    if STYLE != "h":
+        return ""
+    if "bl-sl--panel" in classes:
+        return "r"
+    if "bl-sl--panel-l" in classes:
+        return "l"
+    return ""
 
 
 def band_inverts():
-    """머리띠가 지면과 반대 색인가 — A 는 그렇고(짙은 띠), C 는 띠가 지면색이다."""
+    """머리띠가 지면과 반대 색인가 — A 는 그렇고(짙은 띠), C · H 는 띠가 지면색이다."""
     return STYLE == "a"
 
 
@@ -156,6 +167,8 @@ def wrap(classes, attrs, code, name, inner, apx=False):
     어두운 장은 그 반대다(마크가 앉는 곳은 지면이 아니라 띠다).
     C 는 띠가 지면색이라 마크도 지면과 같은 쪽이다."""
     dark = "bl-sl--dark" in classes
+    # H — 마크와 워터마크는 오른쪽 위 · 아래에 앉는다. 오른쪽 패널 장(표지 · 마무리)은 둘 다 짙은 패널 위다
+    on_dark = dark or panel_side(classes) == "r"
     cls = " ".join(dict.fromkeys(["bl-sl"] + [c for c in classes if c != "bl-sl"]))
     keep = {k: v for k, v in attrs.items()
             if k not in ("class", "data-name", "data-code", "data-toc", "data-sub", "data-bd", "data-apx")}
@@ -168,10 +181,10 @@ def wrap(classes, attrs, code, name, inner, apx=False):
         bd = " ".join(["bl-bd"] + attrs.get("data-bd", "").split())
         inner = f'\n    <div class="{bd}">{inner.rstrip()}\n    </div>\n'
     head = (f'\n    <header class="bl-hd">\n      <span class="bl-code"><b>{code}</b>{name}</span>\n'
-            f'      <span class="bl-sp"></span>\n      {MARK_PH.format(on=("light" if dark else "dark") if band_inverts() else ("dark" if dark else "light"))}\n'
+            f'      <span class="bl-sp"></span>\n      {MARK_PH.format(on=("light" if dark else "dark") if band_inverts() else ("dark" if on_dark else "light"))}\n'
             f'    </header>')
     return (f'  <section class="{cls}"{at}>{head}{inner.rstrip()}\n    {FOOT}\n'
-            f'    {WM_PH.format(on="dark" if dark else "light")}\n  </section>\n')
+            f'    {WM_PH.format(on="dark" if on_dark else "light")}\n  </section>\n')
 
 
 # ── 구조용 장 — 조립 목록에서 만든다 ─────────────────────────────────────────
@@ -189,7 +202,8 @@ def cover_slide(c, title):
     inner = (f'\n    <div class="bl-bd bl-bd--center">{kick}\n      <h1 class="bl-title">{c.get("title", title)}{tag}</h1>'
              f'{msg}\n    </div>{sig}\n')
     n = c.get("notes", "표지에서는 제목과 시점만 말한다. 목차는 다음 장에서 짚는다.")
-    return wrap(["bl-sl--dark", "bl-sl--cover"], {"data-notes": n},
+    cls = ["bl-sl--cover", "bl-sl--panel"] if STYLE == "h" else ["bl-sl--dark", "bl-sl--cover"]
+    return wrap(cls, {"data-notes": n},
                 c.get("date", "") or "보고", c.get("org", "") or plain(title), inner)
 
 
@@ -231,7 +245,8 @@ def chapter_slide(k, ch, chapters, rows):
       <ol class="bl-chapter-nav" aria-label="장 진행">{nav}</ol>
     </div>
 '''
-    return wrap(["bl-sl--chapter"] + ([] if STYLE == "a" else ["bl-sl--dark"]), {"data-notes": ch.get(
+    cls = ["bl-sl--chapter"] + {"a": [], "c": ["bl-sl--dark"], "h": ["bl-sl--panel-l"]}[STYLE]
+    return wrap(cls, {"data-notes": ch.get(
         "notes", "장 간지는 제목과 오른쪽 목록만 읽고 넘어간다. 아래 칸이 지금 몇째 장인지 알려 준다.")},
         f"CH {k:02d}", ch["name"], inner)
 
@@ -246,7 +261,8 @@ def closing_slide(c, code):
       {f'<p class="bl-fin-sig">{c["sign"]}</p>' if c.get("sign") else ""}
     </div>
 '''
-    return wrap([] if STYLE == "a" else ["bl-sl--dark"], {"data-notes": c.get("notes", "마지막 한 문장만 남기고 끝낸다. 질문을 받는다.")},
+    cls = {"a": [], "c": ["bl-sl--dark"], "h": ["bl-sl--closing", "bl-sl--panel"]}[STYLE]   # H 마무리는 밝은 지면 · 표지와 같은 패널
+    return wrap(cls, {"data-notes": c.get("notes", "마지막 한 문장만 남기고 끝낸다. 질문을 받는다.")},
                 code, "마무리", inner)
 
 
@@ -254,7 +270,7 @@ def apxdiv_slide(names):
     sub = " · ".join(names)
     inner = (f'\n    <div class="bl-bd bl-apxdiv">\n      <b aria-hidden="true">+</b>\n'
              f'      <div><h2 class="bl-title">부록</h2><p class="bl-lede">{sub}</p></div>\n    </div>\n')
-    return wrap(["bl-sl--dark", "bl-sl--apxdiv"],
+    return wrap(["bl-sl--apxdiv", "bl-sl--panel-l"] if STYLE == "h" else ["bl-sl--dark", "bl-sl--apxdiv"],
                 {"data-notes": "여기부터 부록이다. 질문이 나올 때만 연다. a 를 누르고 부록 쪽번호를 치면 바로 간다."},
                 "부록", sub, inner)
 
@@ -411,7 +427,7 @@ class Deck:
                  '<link rel="stylesheet" href="blue-live.css">',
                  '<link rel="stylesheet" href="blue-pattern.css">']
         if STYLE != "a":
-            links.append('<link rel="stylesheet" href="blue-style.css">')
+            links.append('<link rel="stylesheet" href="blue-style.css">')   # c · h
         evjson = json.dumps(self.ev, ensure_ascii=False, indent=1).replace("</", "<\\/")
         hud = HUD
         style_attr = "" if STYLE == "a" else f' data-style="{STYLE}"'
@@ -486,7 +502,7 @@ def main():
     ap.add_argument("-o", "--out", required=True, help="출력 HTML")
     ap.add_argument("--brand", help="brand.json — 주면 로고 · 워터마크까지 입힌다")
     ap.add_argument("--single-file", action="store_true", help="CSS · 폰트 · 뷰어를 한 파일에")
-    ap.add_argument("--style", choices=STYLES, help="시각 스타일 — 조립 목록의 style 보다 앞선다 (a 프레임 · c 혼합)")
+    ap.add_argument("--style", choices=STYLES, help="시각 스타일 — 조립 목록의 style 보다 앞선다 (h 사선 패널 · 기본 / a 프레임 / c 혼합)")
     ap.add_argument("--pptx", help="같은 내용을 PowerPoint 로도 — 출력 .pptx 경로(--brand 필요). deck_to_pptx.py 를 부른다")
     a = ap.parse_args()
     if a.pptx and not a.brand:
@@ -494,7 +510,7 @@ def main():
 
     plan = load_plan(a.plan)
     global STYLE
-    STYLE = (a.style or str(plan.get("style", "a"))).lower()
+    STYLE = (a.style or str(plan.get("style", "h"))).lower()
     if STYLE not in STYLES:
         die(f"style 은 {' · '.join(STYLES)} 중 하나다 — 받은 값: {STYLE}")
     deck = Deck(plan, os.path.dirname(os.path.abspath(a.plan)))

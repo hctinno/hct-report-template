@@ -47,11 +47,13 @@ const LAYOUT = {
 function args() {
   const a = process.argv.slice(2);
   const get = (k, d) => { const i = a.indexOf(k); return i >= 0 ? a[i + 1] : d; };
-  return { brand: get('--brand'), out: get('--out', 'decks-out'), name: get('--name', 'HCT_레이아웃_템플릿.pptx') };
+  return { brand: get('--brand'), out: get('--out', 'decks-out'), name: get('--name', 'HCT_레이아웃_템플릿.pptx'),
+           style: get('--style', 'h') };
 }
 
 /* ── 레이아웃 정의 ──────────────────────────────────────────────────────── */
-function defineLayouts(pres, brand) {
+function defineLayouts(pres, brand, opts = {}) {
+  if ((opts.style || 'h') === 'h') return defineLayoutsH(pres, brand, opts);
   const Cs = pres.SchemeColor;
   const logoH = X(brand.logoHeight || 40);
   const markLight = brand.logoPathOnLight
@@ -126,6 +128,92 @@ function defineLayouts(pres, brand) {
     ],
   });
   return { colW, BODY_Y, BODY_H };
+}
+
+/* ── 스타일 H 레이아웃 — 밝은 지면 · 사선 패널(그림) · 머리 탭(그림) · 고정 워터마크 ──────────────
+   패널 · 탭은 panel.js 가 blue-style.css 「H」 와 같은 조리법으로 그린 PNG 다. 레이아웃 이름 · 자리표시자
+   이름은 A/C 와 같다 — from_deck.js · 견본이 그대로 쓴다. 글자 색만 밝은 지면에 맞춘다. */
+function defineLayoutsH(pres, brand, opts) {
+  const P = require('./panel').writePanels(fs.mkdtempSync(path.join(require('os').tmpdir(), 'blue-report-h-')));
+  const Cs = pres.SchemeColor;
+  const full = (p) => ({ image: { path: p, x: 0, y: 0, w: X(W), h: X(H) } });
+  const logoH = X(brand.logoHeight || 40);
+  const mark = (dark) => {
+    const p = dark ? brand.logoPath : brand.logoPathOnLight;
+    return p ? { image: { path: p, x: X(W - PAD.side) - logoH * brand.logoRatio, y: X(26), w: logoH * brand.logoRatio, h: logoH } }
+      : { text: { text: brand.wordmark, options: { x: X(W - PAD.side - 420), y: X(26), w: X(420), h: X(40), align: 'right', fontSize: 14, bold: true, color: dark ? C.onDark : C.cobalt, margin: 0 } } };
+  };
+  // 워터마크 — 모든 장 같은 크기 · 같은 자리(폭 720 · 오른쪽 96 · 아래 104). 밝은 지면 6.5% · 패널 위 16%
+  const wm = (dark) => {
+    const src = dark ? brand.watermarkPath : brand.watermarkPathOnLight;
+    if (!src) return [];
+    const ratio = (dark ? brand.watermarkRatio : brand.watermarkRatioOnLight) || brand.logoRatio;
+    const w = 720, h = w / ratio;
+    return [{ image: { path: src, x: X(W - 96 - w), y: X(H - 104 - h), w: X(w), h: X(h), transparency: dark ? 84 : 93 } }];
+  };
+  const ph = (name, type, o) => ({ placeholder: { options: Object.assign({ name, type, margin: 0, valign: 'top' }, o), text: '' } });
+  const foot = { text: { text: brand.company, options: { x: X(PAD.side), y: X(FOOT_Y), w: X(900), h: X(34), fontSize: MIN_PT, color: C.text2Hi, margin: 0, valign: 'middle' } } };
+  const slideNumber = { x: X(W - PAD.side - 120), y: X(FOOT_Y), w: X(120), h: X(34), fontSize: MIN_PT, bold: true, color: C.cobalt, align: 'right', margin: 0 };
+  const TAB = require('./panel').TAB;
+  const lightBase = () => [
+    { image: { path: P.tab, x: 0, y: 0, w: X(TAB.w), h: X(TAB.h) } },
+    { line: { x: X(TAB.w - 20), y: X(TAB.h), w: X(W - TAB.w + 20), h: 0, line: { color: C.lineHi, width: 0.75 } } },
+    ...wm(false), mark(false), foot,
+    ph('eyebrow', 'body', { x: X(PAD.side), y: X(0), w: X(TAB.w - PAD.side - 40), h: X(TAB.h), fontSize: 13, bold: true, color: C.onDark, valign: 'middle' }),
+    ph('title', 'title', { x: X(PAD.side), y: X(PAD.top + 46), w: X(CW), h: X(78), fontSize: 27, bold: false, color: Cs.text1, align: 'left', valign: 'middle' }),
+    ph('lede', 'body', { x: X(PAD.side), y: X(PAD.top + 132), w: X(CW), h: X(44), fontSize: 14, color: C.text2Hi, valign: 'middle' }),
+    ph('source', 'body', { x: X(PAD.side), y: X(FOOT_Y - 48), w: X(CW), h: X(34), fontSize: MIN_PT, color: C.text3Hi, valign: 'middle' }),
+  ];
+  const BODY_Y = PAD.top + 200, BODY_H = FOOT_Y - 64 - BODY_Y;
+  const LEFT_W = 880;   // 패널 왼쪽 글 폭 — 패널이 아래로 50.8% 까지 내려온다
+
+  // 표지 · 마무리 — 같은 오른쪽 패널. 글은 밝은 지면 왼쪽
+  pres.defineSlideMaster({
+    title: LAYOUT.cover, background: { color: C.card },
+    objects: [
+      full(P.r), ...wm(true), mark(true),
+      ph('eyebrow', 'body', { x: X(PAD.side), y: X(300), w: X(LEFT_W), h: X(44), fontSize: 15, bold: true, color: C.cobalt, valign: 'middle' }),
+      ph('title', 'title', { x: X(PAD.side), y: X(360), w: X(LEFT_W), h: X(250), fontSize: 44, bold: false, color: Cs.text1, align: 'left', valign: 'top' }),
+      ph('subtitle', 'body', { x: X(PAD.side), y: X(640), w: X(LEFT_W), h: X(60), fontSize: 16, color: C.text2Hi, valign: 'middle' }),
+      ph('meta', 'body', { x: X(PAD.side), y: X(900), w: X(LEFT_W), h: X(44), fontSize: MIN_PT, color: C.text2Hi, valign: 'middle' }),
+      { text: { text: `© ${brand.copyrightYear} ${brand.company}`, options: { x: X(W - PAD.side - 700), y: X(FOOT_Y), w: X(700), h: X(34), fontSize: MIN_PT, color: C.onCover2, align: 'right', margin: 0, valign: 'middle' } } },
+    ],
+  });
+  // 간지 — 왼쪽 패널(표지의 거울상)에 장 번호, 오른쪽에 제목
+  pres.defineSlideMaster({
+    title: LAYOUT.section, background: { color: C.card },
+    objects: [
+      full(P.l), ...wm(false), mark(false),
+      { text: { text: 'CHAPTER', options: { x: X(PAD.side), y: X(230), w: X(500), h: X(40), fontSize: 13, bold: true, color: C.onCover2, charSpacing: 4, margin: 0 } } },
+      ph('number', 'body', { x: X(PAD.side), y: X(280), w: X(640), h: X(260), fontSize: 120, bold: false, color: Cs.background1, valign: 'top' }),
+      ph('title', 'title', { x: X(1060), y: X(300), w: X(W - 1060 - PAD.side), h: X(110), fontSize: 36, bold: false, color: Cs.text1, align: 'left', valign: 'bottom' }),
+      ph('desc', 'body', { x: X(1060), y: X(420), w: X(W - 1060 - PAD.side), h: X(50), fontSize: 15, color: C.text2Hi, valign: 'middle' }),
+    ],
+  });
+  pres.defineSlideMaster({ title: LAYOUT.titleOnly, background: { color: C.card }, objects: lightBase(), slideNumber });
+  pres.defineSlideMaster({
+    title: LAYOUT.titleBody, background: { color: C.card }, slideNumber,
+    objects: [...lightBase(), ph('body', 'body', { x: X(PAD.side), y: X(BODY_Y), w: X(CW), h: X(BODY_H), fontSize: 16, color: Cs.text1 })],
+  });
+  const colW = (CW - 48) / 2;
+  pres.defineSlideMaster({
+    title: LAYOUT.twoCol, background: { color: C.card }, slideNumber,
+    objects: [...lightBase(),
+      ph('leftHead', 'body', { x: X(PAD.side + 36), y: X(BODY_Y), w: X(colW - 72), h: X(72), fontSize: 16, bold: true, color: C.text2Hi, valign: 'middle' }),
+      ph('rightHead', 'body', { x: X(PAD.side + colW + 48 + 36), y: X(BODY_Y), w: X(colW - 72), h: X(72), fontSize: 16, bold: true, color: C.cobalt, valign: 'middle' }),
+      ph('left', 'body', { x: X(PAD.side + 36), y: X(BODY_Y + 100), w: X(colW - 72), h: X(BODY_H - 120), fontSize: 15, color: Cs.text1 }),
+      ph('right', 'body', { x: X(PAD.side + colW + 48 + 36), y: X(BODY_Y + 100), w: X(colW - 72), h: X(BODY_H - 120), fontSize: 15, color: Cs.text1 }),
+    ],
+  });
+  pres.defineSlideMaster({
+    title: LAYOUT.closing, background: { color: C.card },
+    objects: [
+      full(P.r), ...wm(true), mark(true),
+      ph('title', 'title', { x: X(PAD.side), y: X(260), w: X(LEFT_W), h: X(300), fontSize: 40, bold: false, color: Cs.text1, align: 'left', valign: 'bottom' }),
+      ph('contact', 'body', { x: X(PAD.side), y: X(590), w: X(LEFT_W), h: X(60), fontSize: 14, color: C.text2Hi, valign: 'middle' }),
+    ],
+  });
+  return { colW, BODY_Y, BODY_H, style: 'h', LEFT_W };
 }
 
 /* ── 견본에 쓰는 원자 부품. 전부 토큰 색만 ── */
@@ -330,7 +418,7 @@ async function main() {
   pres.company = brand.company.replace(/&/g, '&amp;');
   pres.title = `${brand.company} 레이아웃 템플릿`;
   pres.theme = { headFontFace: F.kr, bodyFontFace: F.kr };
-  const g = defineLayouts(pres, brand);
+  const g = defineLayouts(pres, brand, { style: a.style });
   samples(pres, brand, g);
   fs.mkdirSync(a.out, { recursive: true });
   const file = path.join(a.out, a.name);

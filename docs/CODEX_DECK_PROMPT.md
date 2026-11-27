@@ -70,8 +70,8 @@ brand/hct/brand.json
 스킬 `README.md` 「6-3」, 색 역할 상세는 `references/design-language.md`, 차트 규칙은 `references/rules.md`.
 사용자가 애니메이션 · 효과를 요청하면 **`.claude/skills/blue-report/MOTION.md`** 에서 고른다.
 장을 짤 때는 카드 두 장을 연다 — **`LAYOUTS.md`**(짜임 카드 12종 · 내용 모양별 구조 · 주인공 · 할 것 / 하지 말 것 ·
-복사용 본문)와 **`COMPONENTS.md`**(부품 카드 20종 · 클래스 구조 · 속성 · 토큰 · 복사용 HTML). 생성 파일이므로 고치지 않는다.
-시각 스타일은 조립 목록 `style:` 한 줄 — `a` 프레임형 · `c` 혼합형(정하지 않았으면 `c`). 본문 HTML 은 같고,
+복사용 본문)와 **`COMPONENTS.md`**(부품 카드 24종 · 클래스 구조 · 속성 · 토큰 · 복사용 HTML). 생성 파일이므로 고치지 않는다.
+시각 스타일은 조립 목록 `style:` 한 줄 — `h` 사선 패널형(기본 · 적지 않으면 이것) · `a` 프레임형 · `c` 혼합형. 본문 HTML 은 같고,
 맞춤 CSS 는 역할 토큰으로만 짠다(`DESIGN.md` 「2-1」).
 
 ### 2. 덱 고르기와 만들기
