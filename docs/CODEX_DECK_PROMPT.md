@@ -121,7 +121,11 @@ python .claude/skills/blue-report/scripts/check_live.py decks-out/<보고서>.ht
 
 | 파일 | `--deck` 이름 | 용도 | 쪽수 |
 |---|---|---|---|
-| `doc-minutes.html` | `minutes` | 회의록 | 4 |
+| `doc-minutes.html` | `minutes` | 회의록 — 목적 · 안건 표 · 안건별 논의 · 결정 · 후속 조치 · 확인란 | 4 |
+
+A4 문서는 모두 같은 규칙이다 — 짜임 · 부품 쓰임의 기준 견본은 종합 계획서 `a4plan`(아래 보관 양식 표).
+결론 · 결정 요청을 첫 쪽에, 장 「1. 제목」 · 절 「1.1 제목」, 왼쪽 시작선 하나, 표 합계 · 비율 맞춤, 그림은 실제 이미지,
+제목은 쪽 끝에 남기지 않는다(`check_doc.py` 「쪽 끝 제목」이 실패로 잡는다). 규칙 전문은 `agent-skill/hct-report/design/RULES.md` 「3」.
 
 #### 관리보드 — 웹 보드
 
@@ -141,7 +145,7 @@ HCT 웹 디자인 템플릿 v2.1.0 명세로 짠다 — `blue-report.css` · `hc
 | 묶음 | `--deck` 이름 | 비고 |
 |---|---|---|
 | 고정 지면 덱 1920x1080 · 12종 | `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy` · `report` · `catalog` | PPTX 빌드의 원본 · 검사기 `check_deck.py` |
-| A4 문서 4종 | `policy` · `manual` · `notice` · `a4report`(사내 보고서) | |
+| A4 문서 5종 | `policy` · `manual` · `notice` · `a4report`(사내 보고서) · `a4plan`(종합 계획서 · 20쪽) | |
 | 웹 보드 4종 | `board` · `execboard` · `teamboard` · `gapcheck` | |
 | 라이브 브리핑 | `live` | |
 | FCC/KC 보고서 14종 | `assets/archive/fcc-kc/` | 인증 시험 보고서 전용 |

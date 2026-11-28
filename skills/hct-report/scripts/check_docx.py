@@ -221,6 +221,26 @@ def main():
                 fails.append(f"HTML 글자 {len(lost)}개가 Word 에 없다(또는 순서가 다르다): {' '.join(lost[:8])}")
             else:
                 passes.append(f"HTML 글자 {len(words)}어절 모두 Word 에 있음")
+            # 제목은 문단이어야 하고 「다음 문단과 함께」가 걸려 있어야 한다 — 표 안 제목이나 keepNext 없는 제목은
+            # Word · LibreOffice · 한컴에서 제목만 쪽 끝에 남는다
+            outside = re.sub(r"<w:tbl>.*?</w:tbl>", "", doc, flags=re.S)
+            heads = [p for p in re.findall(r"<w:p[ >].*?</w:p>", outside, flags=re.S)
+                     if re.search(r'<w:pStyle w:val="Heading[12]"/>', p)]
+            in_tbl = len(re.findall(r'<w:pStyle w:val="Heading[12]"/>', doc)) - len(heads)
+            def style_keeps(sid):
+                m = re.search(r'<w:style [^>]*w:styleId="%s".*?</w:style>' % sid, styles, flags=re.S)
+                return bool(m and re.search(r"<w:keepNext(/>| )", m.group(0)))
+            keep_style = {sid: style_keeps(sid) for sid in ("Heading1", "Heading2")}
+            def keeps(p):
+                if re.search(r"<w:keepNext(/>| )", p):
+                    return True
+                sid = re.search(r'<w:pStyle w:val="(Heading[12])"/>', p).group(1)
+                return keep_style[sid]
+            no_keep = [re.sub(r"<[^>]+>", "", p)[:20] for p in heads if not keeps(p)]
+            if in_tbl or no_keep:
+                fails.append(f"제목 쪽 끝 방지 — 표 안 제목 {in_tbl}개 · 다음 문단과 함께 없는 제목 {len(no_keep)}개 {' '.join(no_keep[:4])}")
+            else:
+                passes.append(f"제목 쪽 끝 방지 — 제목 {len(heads)}개 모두 문단 · 다음 문단과 함께")
             d1 = len(re.findall(r'<w:pStyle w:val="Heading1"/>', doc))
             d2 = len(re.findall(r'<w:pStyle w:val="Heading2"/>', doc))
             if (d1, d2) != (h1, h2):

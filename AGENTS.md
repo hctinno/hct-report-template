@@ -41,7 +41,7 @@ it, or when a `.pptx` file is required.** Never pick one on your own.
 | Group | `--deck` names | Note |
 |---|---|---|
 | fixed-page decks 1920x1080 — 12 | `internal` · `weekly` · `ax` · `team` · `exec` · `allhands` · `sales` · `project` · `training` · `strategy` · `report` · `catalog` (19 layouts) | source for the PPTX build (`pptx/`) |
-| A4 documents — 4 | `policy` · `manual` · `notice` · `a4report` | |
+| A4 documents — 5 | `policy` · `manual` · `notice` · `a4report` · `a4plan` (20-page plan, every component) | |
 | web boards — 4 | `board` · `execboard` · `teamboard` · `gapcheck` | |
 | live briefing | `live` | a smaller standard deck |
 | FCC/KC reports — 14 | `assets/archive/fcc-kc/` | certification test reports only |

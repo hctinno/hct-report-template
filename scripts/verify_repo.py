@@ -65,7 +65,8 @@ from apply_brand import LIVE as _LIVE_FILES  # noqa: E402
 EXPECTED_PPTX = len(DECKS) - 1
 
 # A4 문서. 슬라이드가 아니라 지면이 794x1123 이고 검사기가 다르다.
-DOCS = ["doc-minutes.html", "archive/doc-policy.html", "archive/doc-manual.html", "archive/doc-notice.html", "archive/doc-report.html"]
+DOCS = ["doc-minutes.html", "archive/doc-policy.html", "archive/doc-manual.html", "archive/doc-notice.html", "archive/doc-report.html",
+        "archive/doc-plan.html"]
 
 # dist/ 의 두 파일은 빌드 명령이 서로 다르다. 아래가 그 정본이다.
 DIST_BUILDS = [

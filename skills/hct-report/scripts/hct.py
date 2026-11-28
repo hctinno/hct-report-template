@@ -60,7 +60,8 @@ PURPOSES = {
                   "minutes": "회의록 (안건 · 결정 · 액션아이템)",
                   "policy": "규정 · 사규 (조 · 항 · 호 · 개정 이력 · 결재란)",
                   "manual": "매뉴얼 · 가이드 (목차 · 절차 · 화면 캡처)",
-                  "notice": "공지 (1쪽)"},
+                  "notice": "공지 (1쪽)",
+                  "plan": "종합 계획서 · 연간 계획 (표지 · 목차 · 부품 전부 · 20쪽 안팎 — A4 짜임의 기준 견본)"},
         "formats": {
             "html": ("ok", "화면 열람 · 브라우저 인쇄"),
             "pdf": ("ok", "결재 · 배포 기본. A4"),
@@ -103,7 +104,7 @@ PURPOSES = {
 
 # 목적 · 종류 → 저장소 견본 파일
 DOC_KINDS = {"report": "archive/doc-report.html", "minutes": "doc-minutes.html", "policy": "archive/doc-policy.html",
-             "manual": "archive/doc-manual.html", "notice": "archive/doc-notice.html"}
+             "manual": "archive/doc-manual.html", "notice": "archive/doc-notice.html", "plan": "archive/doc-plan.html"}
 BOARD_KINDS = {"manage": "board-manage.html", "task": "archive/board-task.html", "exec": "archive/board-exec.html",
                "team": "archive/board-team.html", "gap": "archive/board-gap.html"}
 FCC_KINDS = {"a": "archive/fcc-kc/templates/tpl-a-executive.html", "b": "archive/fcc-kc/templates/tpl-b-dashboard.html",

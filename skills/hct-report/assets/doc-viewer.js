@@ -77,22 +77,61 @@
     if (sign) sign.parentNode.removeChild(sign);
     var over = function (pg) { var b = pg.querySelector('.bd-body'); return b.scrollHeight > b.clientHeight + 1; };
     var isHead = function (n) { return n && /\bbd-h[12]\b/.test(n.className || ''); };
+    var isPara = function (n) { return n && /\bbd-p\b/.test(n.className || ''); };
+    // 쪽 끝에 남기지 않는 것 — 장 · 절 제목, 그리고 제목 바로 뒤의 도입 문단(「제목 → 한 줄 설명 → 표」를 한 덩어리로)
+    var stranded = function () {
+      var l = body.lastElementChild;
+      if (!l || body.children.length <= 1) return false;
+      return isHead(l) || (isPara(l) && isHead(l.previousElementSibling));
+    };
+    // 긴 표 — 한 쪽에 다 못 들어가면 행 단위로 나누고 다음 쪽에 머리 행을 되풀이한다(Word 와 같은 방식).
+    // 이 쪽에 3행 이상, 다음 쪽에 2행 이상 남을 때만 나눈다 — 아니면 표를 통째로 넘긴다
+    var splitTable = function (tbl) {
+      var tb = tbl.tBodies && tbl.tBodies[0];
+      if (!tb || tb.rows.length < 5) return null;
+      var moved = [];
+      while (over(cur) && tb.rows.length > 3) moved.unshift(tb.removeChild(tb.lastElementChild));
+      if (over(cur) || moved.length < 2) {
+        moved.forEach(function (r) { tb.appendChild(r); });
+        return null;
+      }
+      var rest = tbl.cloneNode(false);
+      if (tbl.tHead) rest.appendChild(tbl.tHead.cloneNode(true));
+      var nb = document.createElement('tbody');
+      moved.forEach(function (r) { nb.appendChild(r); });
+      rest.appendChild(nb);
+      rest.classList.add('bd-table--cont');
+      return rest;
+    };
     var newPage = function () {
       var p = tpl.cloneNode(true);
       cur.parentNode.insertBefore(p, cur.nextSibling);
       cur = p; body = p.querySelector('.bd-body');
       return p;
     };
-    blocks.forEach(function (blk) {
+    var queue = blocks.slice();
+    while (queue.length) {
+      var blk = queue.shift();
       body.appendChild(blk);
-      if (over(cur) && body.children.length > 1) {
+      if (!over(cur)) continue;
+      var isTbl = blk.tagName === 'TABLE';
+      if (isTbl) {
+        var rest = splitTable(blk);
+        if (rest) { newPage(); queue.unshift(rest); continue; }
+      }
+      if (body.children.length > 1) {
         var carry = [blk];
         body.removeChild(blk);
-        while (isHead(body.lastElementChild) && body.children.length > 1) carry.unshift(body.removeChild(body.lastElementChild));
+        while (stranded()) carry.unshift(body.removeChild(body.lastElementChild));
         newPage();
         carry.forEach(function (c) { body.appendChild(c); });
+        // 새 쪽에서도 넘치는 표(한 쪽보다 긴 표)는 여기서 나눈다
+        if (isTbl && over(cur)) {
+          var rest2 = splitTable(blk);
+          if (rest2) { newPage(); queue.unshift(rest2); }
+        }
       }
-    });
+    }
     if (sign) {
       var foot = cur.querySelector('.bd-foot');
       cur.insertBefore(sign, foot);
@@ -109,7 +148,8 @@
     pages = Array.prototype.slice.call(document.querySelectorAll('.bd-page'));
   }
 
-  // 표지 — 양식 cover.enabled. 첫 쪽의 머리말을 그대로 쓰고 문서명 · 막대 · 회사명을 얹는다
+  // 표지 — 양식 cover. 오른쪽 위 로고 · 문서명 · 부제 · 두 줄 선 · 아래 문서 정보 줄 · 회사명(가운데 정렬).
+  // 머리말 · 꼬리말은 자리만 두고 숨긴다(blue-doc.css .bd-cover) — 본문 높이가 다른 쪽과 같다
   if (COVER && !doc.querySelector('.bd-cover')) {
     var first = pages[0];
     var cv = el('section', 'bd-page bd-cover');
@@ -117,10 +157,17 @@
     if (fh) cv.appendChild(fh.cloneNode(true));
     var cb = el('div', 'bd-body');
     var fco = first.querySelector('.bd-company');
-    var ct = el('div', 'bd-cover-title', title);
-    if (title.replace(/\s/g, '').length > (parseInt(cssStr('--bd-cover-title-max'), 10) || 6)) ct.className += ' is-long';
-    cb.appendChild(ct);
-    cb.appendChild(el('div', 'bd-cover-bar'));
+    var fmark = first.querySelector('.bd-head .br-mark');
+    if (fmark) { var lg = el('div', 'bd-cover-logo'); lg.appendChild(fmark.cloneNode(true)); cb.appendChild(lg); }
+    cb.appendChild(el('div', 'bd-cover-title', title));
+    var fsub = first.querySelector('.bd-subtitle');
+    if (fsub && fsub.textContent.trim()) cb.appendChild(el('div', 'bd-cover-sub', fsub.textContent.trim()));
+    cb.appendChild(el('div', 'bd-cover-rule'));
+    var mv = { docNo: docno, dept: doc.dataset.docDept || '', date: doc.dataset.docDate || '' };
+    var meta = (cssStr('--bd-cover-meta') || '{docNo}').split(' · ').map(function (part) {
+      return part.replace(/\{(\w+)\}/g, function (m, k) { return mv[k] || ''; }).trim();
+    }).filter(Boolean).join(' · ');
+    if (meta) cb.appendChild(el('div', 'bd-cover-meta', meta));
     cb.appendChild(el('div', 'bd-cover-company', (cssStr('--bd-cover-company') || '{company}').replace('{company}', fco ? fco.textContent : '')));
     cv.appendChild(cb);
     var ff = first.querySelector('.bd-foot');
@@ -128,7 +175,9 @@
     first.parentNode.insertBefore(cv, first);
     pages.unshift(cv);
   }
-  var total = pages.length;
+  // 쪽번호는 본문부터 센다 — 표지는 번호 · 머리말 · 꼬리말이 없다
+  var numbered = pages.filter(function (pg) { return !pg.classList.contains('bd-cover'); });
+  var total = numbered.length;
 
   // 장 번호 — 양식 type.h1.numeral 이 roman 이면 「1. 요약」을 「Ⅰ 요약」으로. 상자 모양(box)이면 번호 칸 · 제목 칸으로 나눈다
   var H1_BOX = getComputedStyle(document.querySelector('.bd-h1') || document.body).display === 'flex';
@@ -175,7 +224,8 @@
     }
   });
 
-  pages.forEach(function (pg, n) {
+  pages.forEach(function (pg) {
+    var n = numbered.indexOf(pg);
     pg.querySelectorAll('.bd-pn').forEach(function (el) {
       el.textContent = el.textContent === '{pages}' ? total : (n + 1);
     });

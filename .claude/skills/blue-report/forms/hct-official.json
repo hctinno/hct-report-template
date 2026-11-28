@@ -42,32 +42,34 @@
     },
     "h1": {
       "size": "13pt",
-      "color": "text",
+      "color": "deep",
       "font": "heading",
       "style": "box",
       "numeral": "roman",
       "box": {
         "numberWidth": "10mm",
-        "fill": "form-chapter",
+        "fill": "deep",
         "rule": {
           "width": "1pt",
-          "color": "text"
+          "color": "deep"
         },
-        "height": "10.6mm"
+        "height": "10.6mm",
+        "numberColor": "card"
       }
     },
     "h2": {
       "size": "12pt",
       "color": "text",
-      "weight": 400,
+      "weight": 700,
       "font": "body"
     },
     "body": {
-      "size": "12pt",
+      "size": "11pt",
       "color": "text",
       "lineHeight": 1.75,
       "align": "justify",
-      "font": "body"
+      "font": "body",
+      "_설명": "1.58 — 본문 11pt(원본 12pt 에서 한 단계 줄임). 표 · 문서 정보 표도 이 크기를 따른다"
     },
     "small": {
       "size": "9pt"
@@ -86,14 +88,14 @@
     "paraAfter": "0px",
     "listItemAfter": "0px",
     "blockAfter": "4mm",
-    "indent": "5mm",
-    "_indent설명": "장 제목 상자 밖 본문(항목 · 문단 · 목록 · 목차)을 왼쪽에서 띄우는 거리 — 원본 「1. 항목」이 본문 왼쪽에서 5mm"
+    "indent": "0px",
+    "_indent설명": "1.58 — 0. 절 제목 · 문단 · 표 · 막대 · 상자 · 그림이 모두 같은 왼쪽 선에서 시작한다(원본은 본문만 5mm 들여 써 표 · 상자와 시작선이 갈렸다). 목록만 표시를 걸어 들여 쓴다"
   },
   "list": {
     "marker": "-",
-    "textIndent": "9mm",
-    "hang": "4.5mm",
-    "_설명": "「- 세부」 — 표시는 항목보다 4.5mm 안(본문 왼쪽 9.5mm), 이어지는 줄은 본문 왼쪽 14mm"
+    "textIndent": "5mm",
+    "hang": "4mm",
+    "_설명": "「- 세부」 — 표시는 왼쪽 선에서 1mm, 글과 이어지는 줄은 5mm(1.58 — 본문 시작선 0 기준)"
   },
   "numbering": {
     "legal": "circled",
@@ -101,72 +103,70 @@
     "_설명": "규정 호 번호 — ({n}) 또는 circled(①②…⑳). 절차 번호 — decimalEnclosedCircle(①②, HTML 은 남색 원) 또는 decimal(1. 2.)"
   },
   "header": {
-    "layout": "logo-title",
-    "left": "logo",
-    "right": "none",
-    "center": "title",
+    "_설명": "1.58 — 머리말을 H 계열로: 왼쪽 문서명(딥 블루 · 본문 글꼴) · 오른쪽 로고 · 아래 두 줄 선(굵은 딥 블루 + 가는 CI). 사선 없음. 이전 판(파랑 · 노랑 이중 띠 · 가운데 문서명)은 git 기록에 있다",
+    "layout": "split",
+    "left": "title",
+    "right": "logo",
+    "center": "none",
     "color": "text",
     "rule": "none",
-    "padding": "3.6mm",
-    "gap": "11.8mm",
-    "logoHeight": "10mm",
+    "padding": "2.6mm",
+    "gap": "9mm",
+    "logoHeight": "8mm",
     "title": {
-      "size": "16pt",
+      "size": "12pt",
       "weight": 700,
-      "letterSpacing": "1.6em",
+      "letterSpacing": "0.02em",
       "font": "body",
-      "spaceUpTo": 6
+      "spaceUpTo": 0,
+      "color": "deep"
     },
     "bands": {
-      "top": [
-        {
-          "color": "form-band",
-          "width": "1.6mm"
-        }
-      ],
+      "top": [],
       "bottom": [
         {
-          "color": "form-band-2",
-          "width": "0.8mm"
+          "color": "deep",
+          "width": "0.6mm"
         },
         {
-          "gap": "0.6mm"
+          "gap": "0.5mm"
         },
         {
-          "color": "form-band",
-          "width": "1.4mm"
+          "color": "cobalt",
+          "width": "0.25mm"
         }
       ]
     }
   },
   "footer": {
-    "left": "",
-    "right": "",
-    "color": "text-3",
-    "rule": "none",
-    "padding": "0px",
-    "gap": "0px",
-    "_설명": "원본에는 꼬리말 · 쪽번호가 없다"
+    "_설명": "1.58 — 꼬리말을 새로 둔다: 위 가는 딥 블루 선 · 왼쪽 「회사명 · 문서명」 · 오른쪽 쪽번호. 글꼴은 본문(바탕)과 같다",
+    "left": "{company} · {title}",
+    "right": "{page} / {pages}",
+    "color": "text-2",
+    "rule": "deep",
+    "padding": "2.6mm",
+    "gap": "6mm",
+    "font": "body"
   },
   "meta": {
     "labelWidth": "28mm",
-    "labelFill": "form-chapter",
-    "labelColor": "text",
+    "labelFill": "tint",
+    "labelColor": "deep",
     "topRule": {
       "width": "1pt",
-      "color": "text"
+      "color": "deep"
     },
-    "rowRule": "text-3"
+    "rowRule": "form-rule"
   },
   "table": {
-    "headFill": "form-chapter",
-    "headColor": "text",
+    "headFill": "tint",
+    "headColor": "deep",
     "headRule": {
       "top": "1pt",
       "bottom": "1px",
-      "color": "text"
+      "color": "deep"
     },
-    "rowRule": "text-3",
+    "rowRule": "form-rule",
     "cellPadding": {
       "y": "2mm",
       "x": "2.5mm"
@@ -181,9 +181,9 @@
       "팀장",
       "본부장"
     ],
-    "labelFill": "form-chapter",
-    "labelColor": "text",
-    "rule": "text",
+    "labelFill": "tint",
+    "labelColor": "deep",
+    "rule": "text-3",
     "height": "18mm",
     "gap": "0px"
   },
@@ -194,27 +194,54 @@
   },
   "cover": {
     "mode": "opt-in",
-    "_mode설명": "off — 표지 없음. opt-in — 문서가 data-doc-cover=\"yes\" 일 때만(규정 · 매뉴얼 견본). always — 모든 문서",
+    "_mode설명": "off — 표지 없음. opt-in — 문서가 data-doc-cover=\"yes\" 일 때만(규정 · 매뉴얼 · 계획서). always — 모든 문서",
+    "_설명": "1.58 — 가운데 정렬 표지: 오른쪽 위 로고 · 문서명 · 부제 · 두 줄 선(머리말과 같은 딥 블루 + CI 블루) · 아래 문서 정보 줄 · 회사명. 머리말 · 꼬리말 · 쪽번호 없음",
+    "logo": {
+      "height": "11mm"
+    },
     "title": {
-      "size": "38pt",
-      "weight": 400,
-      "letterSpacing": "0.6em",
+      "size": "26pt",
+      "weight": 700,
+      "letterSpacing": "0em",
       "font": "body",
-      "top": "11mm",
+      "top": "40mm",
+      "color": "deep",
       "spaceUpTo": 6
     },
-    "bar": {
-      "color": "form-cover-bar",
-      "width": "73%",
-      "thickness": "2mm",
-      "gap": "2.5mm"
+    "subtitle": {
+      "size": "12pt",
+      "color": "text-2",
+      "gap": "4mm"
+    },
+    "rule": {
+      "width": "60%",
+      "gap": "10mm",
+      "thick": {
+        "color": "deep",
+        "width": "0.6mm"
+      },
+      "space": "0.5mm",
+      "thin": {
+        "color": "cobalt",
+        "width": "0.25mm"
+      }
+    },
+    "meta": {
+      "size": "10.5pt",
+      "color": "text-2",
+      "text": "{docNo} · {dept} · {date}",
+      "_text설명": "문서 정보 줄 — {docNo} 는 data-doc-no, {dept} 는 data-doc-dept, {date} 는 data-doc-date. 빈 칸은 빠진다"
     },
     "company": {
-      "size": "32pt",
+      "size": "13pt",
+      "weight": 700,
       "font": "body",
-      "bottom": "26mm",
-      "text": "(주)에이치시티",
-      "_text설명": "표지 아래 회사명 — {company} 는 brand.json 의 회사명. 원본 표지는 「(주)에이치시티」"
+      "color": "deep",
+      "gap": "5mm",
+      "bottom": "10mm",
+      "text": "{company}",
+      "_text설명": "표지 아래 회사명 — {company} 는 brand.json 의 회사명(꼬리말과 같은 이름)"
     }
-  }
+  },
+  "_팔레트": "1.58 — B 딥 블루 모노: 면은 옅은 회청(tint) 하나, 글자 · 굵은 선은 딥 블루, 가는 괘선 form-rule, 장 번호 칸은 딥 블루 면 + 흰 숫자. 청록(form-chapter)은 쓰지 않는다"
 }

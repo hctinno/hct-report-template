@@ -24,4 +24,4 @@ GitHub CLI(`gh`)가 없으면 `npx skills add hctinno/hct-report-template --skil
 
 준비물 — Python 3.9+, Node.js 18+(PPTX). 첫 실행에 Chromium(약 150MB) · npm 패키지를 받는다.
 
-판 1.57.0 · 원본 저장소 `hctinno/hct-report-template` — 고칠 일이 생기면 설치본이 아니라 저장소를 고친다.
+판 1.58.0 · 원본 저장소 `hctinno/hct-report-template` — 고칠 일이 생기면 설치본이 아니라 저장소를 고친다.
