@@ -71,13 +71,17 @@ DEFAULTS = {
     "numbering": {"legal": "({n})", "steps": "decimalEnclosedCircle"},
     "page": {"breaks": "authored"},
     "header": {"layout": "split", "center": "none",
-               "title": {"size": "9pt", "weight": 700, "letterSpacing": "0em", "font": "heading", "spaceUpTo": 6},
+               "title": {"size": "9pt", "weight": 700, "letterSpacing": "0em", "font": "heading", "spaceUpTo": 6, "color": "text"},
                "bands": {"top": [], "bottom": []}},
     "toc": {"style": "leader", "itemAfter": "9px"},
     "cover": {"mode": "off",
-              "title": {"size": "40pt", "weight": 400, "letterSpacing": "1em", "font": "body", "top": "10mm", "spaceUpTo": 6},
-              "bar": {"color": "cobalt", "width": "70%", "thickness": "2mm", "gap": "3mm"},
-              "company": {"size": "28pt", "font": "body", "bottom": "25mm", "text": "{company}"}},
+              "logo": {"height": "11mm"},
+              "title": {"size": "26pt", "weight": 700, "letterSpacing": "0em", "font": "body", "top": "40mm", "color": "deep", "spaceUpTo": 6},
+              "subtitle": {"size": "12pt", "color": "text-2", "gap": "4mm"},
+              "rule": {"width": "60%", "gap": "10mm", "thick": {"color": "deep", "width": "0.6mm"}, "space": "0.5mm",
+                       "thin": {"color": "cobalt", "width": "0.25mm"}},
+              "meta": {"size": "10.5pt", "color": "text-2", "text": "{docNo} · {dept} · {date}"},
+              "company": {"size": "13pt", "weight": 700, "font": "body", "color": "deep", "gap": "5mm", "bottom": "10mm", "text": "{company}"}},
 }
 
 
@@ -177,6 +181,8 @@ def validate(spec):
     for k in ("left", "right", "center"):
         if spec["header"].get(k, "none") not in ("logo", "docNo", "title", "company", "none"):
             errs.append(f"header.{k} 는 logo · docNo · title · company · none")
+    if spec["footer"].get("font", "body") not in ("body", "heading"):
+        errs.append("footer.font 는 body · heading")
     for k in ("left", "right"):
         v = spec["footer"].get(k, "")
         if not isinstance(v, str) or '"' in v or "\\" in v:
@@ -257,6 +263,7 @@ def css_block(spec, active=True):
         ("--bd-fs-body", t["body"]["size"], "본문 — 하한"), ("--bd-c-text", color(t["body"]["color"]), ""),
         ("--bd-lh", str(t["body"]["lineHeight"]), "본문 행간"), ("--bd-align", t["body"]["align"], "본문 정렬"),
         ("--bd-ff-body", font_of("body"), ""),
+        ("--bd-font-num", "var(--bd-ff-body)", "숫자(표 · 쪽번호 · 목차 쪽 · 막대 값) — 본문과 같은 글꼴. Word 도 본문 글꼴로 낸다"),
         ("--bd-fs-small", t["small"]["size"], "표 안 보조 · 각주 · 쪽번호 (본문 아님)"),
         ("--bd-c-key", color(t["key"]["color"]), "강조어"),
         ("--bd-sp-title", s["titleAfter"], ""), ("--bd-sp-subtitle", s["subtitleAfter"], ""),
@@ -288,6 +295,7 @@ def css_block(spec, active=True):
         ("--bd-numeral", f'"{t["h1"]["numeral"]}"', "장 번호 — keep(쓴 그대로) · roman(1. → Ⅰ)"),
         ("--bd-cover", f'"{spec["cover"]["mode"]}"', "표지 — off · opt-in(data-doc-cover=\"yes\" 문서만) · always. doc-viewer.js 가 첫 쪽 앞에 만든다"),
         ("--bd-cover-company", f'"{spec["cover"]["company"]["text"]}"', "표지 회사명 — {company} 는 brand.json 회사명"),
+        ("--bd-cover-meta", f'"{spec["cover"]["meta"]["text"]}"', "표지 문서 정보 줄 — {docNo} {dept} {date}, 빈 칸은 빠진다"),
         ("--bd-breaks", f'"{spec["page"]["breaks"]}"', "쪽 나눔 — authored(원본 쪽 그대로) · flow(이어 흘려 저절로)"),
         ("--bd-head-title-max", str(h["title"]["spaceUpTo"]), "머리말 문서명 — 이 글자 수까지만 넓게 벌린다"),
         ("--bd-cover-title-max", str(spec["cover"]["title"]["spaceUpTo"]), "표지 문서명 — 이 글자 수까지만 넓게 벌린다"),
@@ -299,7 +307,16 @@ def css_block(spec, active=True):
 
     # ── 짜임 선택지 — 양식이 고른 것만 쓴다. 기본 양식이면 아무것도 붙지 않는다 ─────────
     rules = []
-    if h["layout"] == "logo-title" or top_h or bot_h:
+    if h["layout"] == "split" and (top_h or bot_h):
+        # 좌우 머리말 + 아래 · 위 띠 — 문서명(왼쪽 또는 오른쪽)을 header.title 글꼴 · 크기 · 색으로
+        ht = h["title"]
+        rules.append(f"""/* 머리말 — 좌우(문서명 · 로고) · 위아래 띠 */
+.bd-doc .bd-head {{ display:flex; justify-content:space-between; align-items:center; border-bottom:0;
+  padding:calc({top_h:g}px + var(--bd-head-pad)) 0 calc({bot_h:g}px + var(--bd-head-pad));
+  background:{top_bg} top / 100% {top_h:g}px no-repeat, {bot_bg} bottom / 100% {bot_h:g}px no-repeat; }}
+.bd-doc .bd-head .bd-doctitle {{ font:{ht['weight']} {ht['size']}/1 var(--bd-font-{ht['font']}); color:{color(ht.get('color', 'text'))};
+  letter-spacing:{ht['letterSpacing']}; white-space:nowrap; }}""")
+    elif h["layout"] == "logo-title" or top_h or bot_h:
         ht = h["title"]
         rules.append(f"""/* 머리말 — 로고 · 가운데 문서명 · 위아래 띠 */
 .bd-doc .bd-head {{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; border-bottom:0;
@@ -312,14 +329,18 @@ def css_block(spec, active=True):
 .bd-doc .bd-head .bd-head-title.is-long {{ letter-spacing:.04em; margin-right:0; }}""")
     if not (f["left"] or f["right"]):
         rules.append("/* 꼬리말 없음 */\n.bd-doc .bd-foot { display:none; }")
+    elif f.get("font") in ("body", "heading"):
+        rules.append(f"/* 꼬리말 글꼴 — 본문과 같은 계열 */\n.bd-doc .bd-foot {{ font-family:var(--bd-font-{f['font']}); }}")
     if t["h1"]["style"] == "box":
         bx = t["h1"]["box"]
-        rules.append(f"""/* 장 제목 — 번호 칸 · 제목 칸 상자 */
-.bd-doc .bd-h1 {{ display:flex; align-items:stretch; padding:0; border-left:0; min-height:{bx['height']};
+        # 1.58 — 표가 아니라 문단 하나: 위아래 선 사이에 번호 꼬리표 · 제목. Word 도 문단으로 그려
+        # 어떤 프로그램에서 열어도 「다음 문단과 함께」가 지켜진다(표는 프로그램마다 달라 제목만 쪽 끝에 남았다)
+        rules.append(f"""/* 장 제목 — 위아래 선 · 번호 꼬리표 · 제목(문단 하나) */
+.bd-doc .bd-h1 {{ display:flex; align-items:center; padding:5pt 0; border-left:0; min-height:0;
   border-top:{bx['rule']['width']} solid {color(bx['rule']['color'])}; border-bottom:{bx['rule']['width']} solid {color(bx['rule']['color'])}; }}
-.bd-doc .bd-h1 .bd-h1-n {{ flex:0 0 {bx['numberWidth']}; display:flex; align-items:center; justify-content:center;
-  background:{color(bx['fill'])}; border-right:{bx['rule']['width']} solid {color(bx['rule']['color'])}; }}
-.bd-doc .bd-h1 .bd-h1-t {{ display:flex; align-items:center; padding:0 3mm; letter-spacing:.08em; }}""")
+.bd-doc .bd-h1 .bd-h1-n {{ flex:none; display:inline-flex; align-items:center; justify-content:center; padding:.5mm 2.2mm; margin-right:3mm;
+  background:{color(bx['fill'])};{(' color:' + color(bx['numberColor']) + ';') if bx.get('numberColor') else ''} }}
+.bd-doc .bd-h1 .bd-h1-t {{ letter-spacing:.08em; }}""")
     if lst["marker"] != "•":
         rules.append(f"""/* 목록 표시 「{lst['marker']}」 */
 .bd-doc .bd-list:not(.bd-list--legal) {{ list-style:none; }}
@@ -343,16 +364,21 @@ def css_block(spec, active=True):
 .bd-doc .bd-toc li.bd-toc--sub .bd-toc-t {{ font-family:var(--bd-font-body); color:var(--bd-c-text); }}""")
     if spec["cover"]["mode"] != "off":
         c = spec["cover"]
-        rules.append(f"""/* 표지 — doc-viewer.js 가 첫 쪽 앞에 만든다 */
-.bd-doc .bd-cover .bd-body {{ display:flex; flex-direction:column; align-items:center; }}
-.bd-doc .bd-cover .bd-cover-title {{ margin:{c['title']['top']} 0 0; font:{c['title']['weight']} {c['title']['size']}/1.2 var(--bd-font-{c['title']['font']});
-  letter-spacing:{c['title']['letterSpacing']}; margin-right:-{c['title']['letterSpacing']}; color:var(--bd-c-text);
-  white-space:nowrap; text-align:center; }}
-.bd-doc .bd-cover .bd-cover-title.is-long {{ letter-spacing:.04em; margin-right:0; white-space:normal; font-size:calc({c['title']['size']} * .6); }}
-.bd-doc .bd-cover .bd-cover-bar {{ width:{c['bar']['width']}; height:{c['bar']['thickness']}; margin-top:{c['bar']['gap']};
-  border-radius:999px; background:{color(c['bar']['color'])}; }}
-.bd-doc .bd-cover .bd-cover-company {{ margin:auto 0 {c['company']['bottom']}; font:400 {c['company']['size']}/1.2 var(--bd-font-{c['company']['font']});
-  color:var(--bd-c-text); letter-spacing:.02em; }}""")
+        r, t = c["rule"], c["title"]
+        t1, sp, t2 = px(r["thick"]["width"]), px(r["space"]), px(r["thin"]["width"])
+        rules.append(f"""/* 표지 — doc-viewer.js 가 첫 쪽 앞에 만든다. 가운데 정렬 · 오른쪽 위 로고 · 두 줄 선 */
+.bd-doc .bd-cover .bd-body {{ display:flex; flex-direction:column; align-items:center; text-align:center; }}
+.bd-doc .bd-cover .bd-cover-logo {{ align-self:flex-end; }}
+.bd-doc .bd-cover .bd-cover-logo .br-mark {{ position:static; margin:0; }}
+.bd-doc .bd-cover .bd-cover-logo img {{ height:{c['logo']['height']}; width:auto; display:block; }}
+.bd-doc .bd-cover .bd-cover-title {{ margin:{t['top']} 0 0; max-width:85%; font:{t['weight']} {t['size']}/1.3 var(--bd-font-{t['font']});
+  letter-spacing:{t['letterSpacing']}; color:{color(t.get('color', 'text'))}; }}
+.bd-doc .bd-cover .bd-cover-sub {{ margin-top:{c['subtitle']['gap']}; max-width:85%; font:400 {c['subtitle']['size']}/1.6 var(--bd-font-body); color:{color(c['subtitle']['color'])}; }}
+.bd-doc .bd-cover .bd-cover-rule {{ width:{r['width']}; height:{t1 + sp + t2:g}px; margin-top:{r['gap']};
+  background:linear-gradient(to bottom, {color(r['thick']['color'])} 0 {t1:g}px, transparent {t1:g}px {t1 + sp:g}px, {color(r['thin']['color'])} {t1 + sp:g}px {t1 + sp + t2:g}px); }}
+.bd-doc .bd-cover .bd-cover-meta {{ margin-top:auto; font:400 {c['meta']['size']}/1.6 var(--bd-font-body); color:{color(c['meta']['color'])}; }}
+.bd-doc .bd-cover .bd-cover-company {{ margin:{c['company']['gap']} 0 {c['company']['bottom']}; font:{c['company']['weight']} {c['company']['size']}/1.2 var(--bd-font-{c['company']['font']});
+  color:{color(c['company']['color'])}; }}""")
     out.extend(r.replace(".bd-doc ", scope + " ") for r in rules)
     return "\n".join(out)
 

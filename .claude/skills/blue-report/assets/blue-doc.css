@@ -51,20 +51,21 @@
   --bd-c-subtitle: var(--br-text-2);
   --bd-ff-subtitle: var(--bd-font-body);
   --bd-fs-h1: 13pt;  /* 장 제목 */
-  --bd-c-h1: var(--br-text);
+  --bd-c-h1: var(--br-deep);
   --bd-ff-h1: var(--bd-font-heading);
   --bd-h1-bar-w: 0px;  /* 장 제목 왼쪽 표시 — 0 이면 없음 */
   --bd-c-h1-bar: transparent;
   --bd-h1-pad: 0px;
   --bd-fs-h2: 12pt;  /* 절 제목 */
   --bd-c-h2: var(--br-text);
-  --bd-fw-h2: 400;
+  --bd-fw-h2: 700;
   --bd-ff-h2: var(--bd-font-body);
-  --bd-fs-body: 12pt;  /* 본문 — 하한 */
+  --bd-fs-body: 11pt;  /* 본문 — 하한 */
   --bd-c-text: var(--br-text);
   --bd-lh: 1.75;  /* 본문 행간 */
   --bd-align: justify;  /* 본문 정렬 */
   --bd-ff-body: var(--bd-font-body);
+  --bd-font-num: var(--bd-ff-body);  /* 숫자(표 · 쪽번호 · 목차 쪽 · 막대 값) — 본문과 같은 글꼴. Word 도 본문 글꼴로 낸다 */
   --bd-fs-small: 9pt;  /* 표 안 보조 · 각주 · 쪽번호 (본문 아님) */
   --bd-c-key: var(--br-text);  /* 강조어 */
   --bd-sp-title: 6mm;
@@ -76,67 +77,65 @@
   --bd-sp-para: 0px;
   --bd-sp-li: 0px;
   --bd-sp-block: 4mm;
-  --bd-indent: 5mm;  /* 본문 들여쓰기 — 절 제목 · 문단 · 목록 · 목차 */
-  --bd-list-pad: 9mm;  /* 목록 글 시작(들여쓰기 기준) */
-  --bd-list-hang: 4.5mm;  /* 목록 표시 — 글보다 이만큼 왼쪽 */
-  --bd-head-left: "logo";  /* 머리말 — logo · docNo · title · company · none (doc-viewer.js 가 읽는다) */
-  --bd-head-right: "none";
-  --bd-head-center: "title";
-  --bd-head-layout: "logo-title";  /* split(좌우) · logo-title(로고 · 가운데 문서명) */
-  --bd-foot-left: "";  /* 꼬리말 글 틀 — {company} {title} {docNo} {page} {pages}. 둘 다 비면 꼬리말 없음 */
-  --bd-foot-right: "";
+  --bd-indent: 0px;  /* 본문 들여쓰기 — 절 제목 · 문단 · 목록 · 목차 */
+  --bd-list-pad: 5mm;  /* 목록 글 시작(들여쓰기 기준) */
+  --bd-list-hang: 4mm;  /* 목록 표시 — 글보다 이만큼 왼쪽 */
+  --bd-head-left: "title";  /* 머리말 — logo · docNo · title · company · none (doc-viewer.js 가 읽는다) */
+  --bd-head-right: "logo";
+  --bd-head-center: "none";
+  --bd-head-layout: "split";  /* split(좌우) · logo-title(로고 · 가운데 문서명) */
+  --bd-foot-left: "{company} · {title}";  /* 꼬리말 글 틀 — {company} {title} {docNo} {page} {pages}. 둘 다 비면 꼬리말 없음 */
+  --bd-foot-right: "{page} / {pages}";
   --bd-c-head: var(--br-text);  /* 머리말 */
   --bd-c-head-rule: transparent;
-  --bd-head-pad: 3.6mm;
-  --bd-head-gap: 11.8mm;
-  --bd-logo-h: 10mm;
-  --bd-c-foot: var(--br-text-3);  /* 꼬리말 */
-  --bd-c-foot-rule: transparent;
-  --bd-foot-pad: 0px;
-  --bd-foot-gap: 0px;
+  --bd-head-pad: 2.6mm;
+  --bd-head-gap: 9mm;
+  --bd-logo-h: 8mm;
+  --bd-c-foot: var(--br-text-2);  /* 꼬리말 */
+  --bd-c-foot-rule: var(--br-deep);
+  --bd-foot-pad: 2.6mm;
+  --bd-foot-gap: 6mm;
   --bd-meta-k-w: 28mm;  /* 문서 정보 표 */
-  --bd-c-meta-k-bg: var(--br-form-chapter);
-  --bd-c-meta-k: var(--br-text);
+  --bd-c-meta-k-bg: var(--br-tint);
+  --bd-c-meta-k: var(--br-deep);
   --bd-meta-top-w: 1pt;
-  --bd-c-meta-top: var(--br-text);
-  --bd-c-meta-rule: var(--br-text-3);
-  --bd-c-th-bg: var(--br-form-chapter);  /* 표 */
-  --bd-c-th: var(--br-text);
+  --bd-c-meta-top: var(--br-deep);
+  --bd-c-meta-rule: var(--br-form-rule);
+  --bd-c-th-bg: var(--br-tint);  /* 표 */
+  --bd-c-th: var(--br-deep);
   --bd-th-top-w: 1pt;
   --bd-th-bottom-w: 1px;
-  --bd-c-th-rule: var(--br-text);
-  --bd-c-td-rule: var(--br-text-3);
+  --bd-c-th-rule: var(--br-deep);
+  --bd-c-td-rule: var(--br-form-rule);
   --bd-cell-py: 2mm;
   --bd-cell-px: 2.5mm;
-  --bd-c-sign-k-bg: var(--br-form-chapter);  /* 결재란 */
-  --bd-c-sign-k: var(--br-text);
-  --bd-c-sign-rule: var(--br-text);
+  --bd-c-sign-k-bg: var(--br-tint);  /* 결재란 */
+  --bd-c-sign-k: var(--br-deep);
+  --bd-c-sign-rule: var(--br-text-3);
   --bd-sign-h: 18mm;
   --bd-sign-gap: 0px;
   --bd-numeral: "roman";  /* 장 번호 — keep(쓴 그대로) · roman(1. → Ⅰ) */
   --bd-cover: "opt-in";  /* 표지 — off · opt-in(data-doc-cover="yes" 문서만) · always. doc-viewer.js 가 첫 쪽 앞에 만든다 */
-  --bd-cover-company: "(주)에이치시티";  /* 표지 회사명 — {company} 는 brand.json 회사명 */
+  --bd-cover-company: "{company}";  /* 표지 회사명 — {company} 는 brand.json 회사명 */
+  --bd-cover-meta: "{docNo} · {dept} · {date}";  /* 표지 문서 정보 줄 — {docNo} {dept} {date}, 빈 칸은 빠진다 */
   --bd-breaks: "flow";  /* 쪽 나눔 — authored(원본 쪽 그대로) · flow(이어 흘려 저절로) */
-  --bd-head-title-max: 6;  /* 머리말 문서명 — 이 글자 수까지만 넓게 벌린다 */
+  --bd-head-title-max: 0;  /* 머리말 문서명 — 이 글자 수까지만 넓게 벌린다 */
   --bd-cover-title-max: 6;  /* 표지 문서명 — 이 글자 수까지만 넓게 벌린다 */
 }
-/* 머리말 — 로고 · 가운데 문서명 · 위아래 띠 */
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-head { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; border-bottom:0;
-  padding:calc(6.04724px + var(--bd-head-pad)) 0 calc(10.5827px + var(--bd-head-pad));
-  background:linear-gradient(to bottom, var(--br-form-band) 0px 6.04724px) top / 100% 6.04724px no-repeat, linear-gradient(to bottom, var(--br-form-band-2) 0px 3.02362px, transparent 3.02362px 5.29134px, var(--br-form-band) 5.29134px 10.5827px) bottom / 100% 10.5827px no-repeat; }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-head > :first-child { justify-self:start; }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-head > :last-child { justify-self:end; }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-head .bd-head-title { font:700 16pt/1 var(--bd-font-body); color:var(--bd-c-text);
-  letter-spacing:1.6em; margin-right:-1.6em; white-space:nowrap; }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-head .bd-head-title.is-long { letter-spacing:.04em; margin-right:0; }
-/* 꼬리말 없음 */
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-foot { display:none; }
-/* 장 제목 — 번호 칸 · 제목 칸 상자 */
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-h1 { display:flex; align-items:stretch; padding:0; border-left:0; min-height:10.6mm;
-  border-top:1pt solid var(--br-text); border-bottom:1pt solid var(--br-text); }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-h1 .bd-h1-n { flex:0 0 10mm; display:flex; align-items:center; justify-content:center;
-  background:var(--br-form-chapter); border-right:1pt solid var(--br-text); }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-h1 .bd-h1-t { display:flex; align-items:center; padding:0 3mm; letter-spacing:.08em; }
+/* 머리말 — 좌우(문서명 · 로고) · 위아래 띠 */
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-head { display:flex; justify-content:space-between; align-items:center; border-bottom:0;
+  padding:calc(0px + var(--bd-head-pad)) 0 calc(5.10236px + var(--bd-head-pad));
+  background:none top / 100% 0px no-repeat, linear-gradient(to bottom, var(--br-deep) 0px 2.26772px, transparent 2.26772px 4.15748px, var(--br-cobalt) 4.15748px 5.10236px) bottom / 100% 5.10236px no-repeat; }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-head .bd-doctitle { font:700 12pt/1 var(--bd-font-body); color:var(--br-deep);
+  letter-spacing:0.02em; white-space:nowrap; }
+/* 꼬리말 글꼴 — 본문과 같은 계열 */
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-foot { font-family:var(--bd-font-body); }
+/* 장 제목 — 위아래 선 · 번호 꼬리표 · 제목(문단 하나) */
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-h1 { display:flex; align-items:center; padding:5pt 0; border-left:0; min-height:0;
+  border-top:1pt solid var(--br-deep); border-bottom:1pt solid var(--br-deep); }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-h1 .bd-h1-n { flex:none; display:inline-flex; align-items:center; justify-content:center; padding:.5mm 2.2mm; margin-right:3mm;
+  background:var(--br-deep); color:var(--br-card); }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-h1 .bd-h1-t { letter-spacing:.08em; }
 /* 목록 표시 「-」 */
 :is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-list:not(.bd-list--legal) { list-style:none; }
 :is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-list:not(.bd-list--legal) > li { position:relative; }
@@ -153,16 +152,19 @@
 :is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-toc .bd-toc-t { font-family:var(--bd-font-heading); color:var(--bd-c-text); }
 :is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-toc li.bd-toc--sub { padding-left:5mm; }
 :is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-toc li.bd-toc--sub .bd-toc-t { font-family:var(--bd-font-body); color:var(--bd-c-text); }
-/* 표지 — doc-viewer.js 가 첫 쪽 앞에 만든다 */
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-body { display:flex; flex-direction:column; align-items:center; }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-title { margin:11mm 0 0; font:400 38pt/1.2 var(--bd-font-body);
-  letter-spacing:0.6em; margin-right:-0.6em; color:var(--bd-c-text);
-  white-space:nowrap; text-align:center; }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-title.is-long { letter-spacing:.04em; margin-right:0; white-space:normal; font-size:calc(38pt * .6); }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-bar { width:73%; height:2mm; margin-top:2.5mm;
-  border-radius:999px; background:var(--br-form-cover-bar); }
-:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-company { margin:auto 0 26mm; font:400 32pt/1.2 var(--bd-font-body);
-  color:var(--bd-c-text); letter-spacing:.02em; }
+/* 표지 — doc-viewer.js 가 첫 쪽 앞에 만든다. 가운데 정렬 · 오른쪽 위 로고 · 두 줄 선 */
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-body { display:flex; flex-direction:column; align-items:center; text-align:center; }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-logo { align-self:flex-end; }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-logo .br-mark { position:static; margin:0; }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-logo img { height:11mm; width:auto; display:block; }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-title { margin:40mm 0 0; max-width:85%; font:700 26pt/1.3 var(--bd-font-body);
+  letter-spacing:0em; color:var(--br-deep); }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-sub { margin-top:4mm; max-width:85%; font:400 12pt/1.6 var(--bd-font-body); color:var(--br-text-2); }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-rule { width:60%; height:5.10236px; margin-top:10mm;
+  background:linear-gradient(to bottom, var(--br-deep) 0 2.26772px, transparent 2.26772px 4.15748px, var(--br-cobalt) 4.15748px 5.10236px); }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-meta { margin-top:auto; font:400 10.5pt/1.6 var(--bd-font-body); color:var(--br-text-2); }
+:is(.bd-doc:not([data-form]), .bd-doc[data-form="hct-official"]) .bd-cover .bd-cover-company { margin:5mm 0 10mm; font:700 13pt/1.2 var(--bd-font-body);
+  color:var(--br-deep); }
 /* 양식 hct-standard */
 .bd-doc[data-form="hct-standard"] {
   --bd-form: "hct-standard";  /* 양식 id */
@@ -195,6 +197,7 @@
   --bd-lh: 1.65;  /* 본문 행간 */
   --bd-align: left;  /* 본문 정렬 */
   --bd-ff-body: var(--bd-font-body);
+  --bd-font-num: var(--bd-ff-body);  /* 숫자(표 · 쪽번호 · 목차 쪽 · 막대 값) — 본문과 같은 글꼴. Word 도 본문 글꼴로 낸다 */
   --bd-fs-small: 9pt;  /* 표 안 보조 · 각주 · 쪽번호 (본문 아님) */
   --bd-c-key: var(--br-navy);  /* 강조어 */
   --bd-sp-title: 14px;
@@ -246,6 +249,7 @@
   --bd-numeral: "keep";  /* 장 번호 — keep(쓴 그대로) · roman(1. → Ⅰ) */
   --bd-cover: "off";  /* 표지 — off · opt-in(data-doc-cover="yes" 문서만) · always. doc-viewer.js 가 첫 쪽 앞에 만든다 */
   --bd-cover-company: "{company}";  /* 표지 회사명 — {company} 는 brand.json 회사명 */
+  --bd-cover-meta: "{docNo} · {dept} · {date}";  /* 표지 문서 정보 줄 — {docNo} {dept} {date}, 빈 칸은 빠진다 */
   --bd-breaks: "authored";  /* 쪽 나눔 — authored(원본 쪽 그대로) · flow(이어 흘려 저절로) */
   --bd-head-title-max: 6;  /* 머리말 문서명 — 이 글자 수까지만 넓게 벌린다 */
   --bd-cover-title-max: 6;  /* 표지 문서명 — 이 글자 수까지만 넓게 벌린다 */
@@ -282,8 +286,10 @@
   border-top:1px solid var(--bd-c-foot-rule);
   font:400 var(--bd-fs-small)/1 var(--br-font-kr); color:var(--bd-c-foot);
 }
-.bd-foot .bd-pageno { font-family:var(--br-font-num); font-weight:600; }
-.bd-head .bd-docno  { font-family:var(--br-font-num); font-weight:600; }
+.bd-foot .bd-pageno { font-family:var(--bd-font-num, var(--br-font-num)); font-weight:600; }
+/* 표지 — 머리말 · 꼬리말 · 쪽번호를 두지 않는다(자리는 남겨 본문 높이가 같다). 쪽번호는 본문 첫 쪽이 1 */
+.bd-cover .bd-head, .bd-cover .bd-foot { visibility:hidden; }
+.bd-head .bd-docno  { font-family:var(--bd-font-num, var(--br-font-num)); font-weight:600; }
 .bd-company { font-weight:600; color:var(--br-text-2); }
 
 /* 브랜드 마크는 슬라이드와 같은 `.br-mark` 자리표시자를 쓴다.
@@ -334,7 +340,7 @@
 .bd-list--legal > li { counter-increment:bd-legal; padding-left:34px; text-indent:-34px; }
 .bd-list--legal > li::before {
   content:"(" counter(bd-legal) ") "; display:inline-block; width:34px; text-indent:0;
-  font-family:var(--br-font-num); font-weight:600; color:var(--br-navy);
+  font-family:var(--bd-font-num, var(--br-font-num)); font-weight:600; color:var(--br-navy);
 }
 
 /* ── 표 ──────────────────────────────────────────────────────────────────
@@ -346,7 +352,7 @@
   border-top:var(--bd-th-top-w) solid var(--bd-c-th-rule); border-bottom:var(--bd-th-bottom-w) solid var(--bd-c-th-rule);
 }
 .bd-table td { padding:var(--bd-cell-py) var(--bd-cell-px); border-bottom:1px solid var(--bd-c-td-rule); vertical-align:top; }
-.bd-table .num { font-family:var(--br-font-num); font-weight:600; text-align:right;
+.bd-table .num { font-family:var(--bd-font-num, var(--br-font-num)); font-weight:600; text-align:right;
                  font-variant-numeric:tabular-nums; }
 .bd-table--grid th, .bd-table--grid td { border:1px solid var(--bd-c-td-rule); }
 .bd-table--grid th { border-color:var(--bd-c-th-rule); }
@@ -358,8 +364,8 @@
   font:600 var(--bd-fs-small)/1.5 var(--br-font-kr); white-space:nowrap;
   border:1px solid var(--br-chip-line); color:var(--br-text-2); background:var(--br-card);
 }
-.bd-chip--warn { background:var(--br-warn-bg);  border-color:var(--br-warn-line);  color:var(--br-warn-text); }
-.bd-chip--late { background:var(--br-alert-bg); border-color:var(--br-coral);      color:var(--br-alert-text); }
+.bd-chip--warn { background:var(--br-card); border-color:var(--br-alert-line); color:var(--br-alert-text); }   /* 1.58 — 면 없이 테두리 · 글자만 */
+.bd-chip--late { background:var(--br-card); border-color:var(--br-alert-text); color:var(--br-alert-text); }
 
 /* ── 목차 ────────────────────────────────────────────────────────────────
    장 제목과 쪽번호 사이를 점선으로 잇는다. 쪽번호는 손으로 적는다 —
@@ -369,7 +375,7 @@
 .bd-toc li:last-child { margin-bottom:0; }
 .bd-toc .bd-toc-t { font-weight:700; color:var(--br-navy); }
 .bd-toc .bd-toc-d { flex:1; border-bottom:1px dotted var(--br-chip-line); }
-.bd-toc .bd-toc-p { font-family:var(--br-font-num); font-weight:600; color:var(--br-navy); }
+.bd-toc .bd-toc-p { font-family:var(--bd-font-num, var(--br-font-num)); font-weight:600; color:var(--br-navy); }
 .bd-toc li.bd-toc--sub { padding-left:20px; }
 .bd-toc li.bd-toc--sub .bd-toc-t { font-weight:400; color:var(--br-text-2); }
 
@@ -382,13 +388,13 @@
   content:counter(bd-step); position:absolute; left:0; top:0;
   width:26px; height:26px; border-radius:var(--br-r-pill);
   background:var(--br-navy); color:var(--br-on-dark);
-  font:700 10pt/26px var(--br-font-num); text-align:center;
+  font:700 10pt/26px var(--bd-font-num, var(--br-font-num)); text-align:center;
 }
 .bd-step .bd-step-t { display:block; font-weight:700; color:var(--br-navy); margin-bottom:4px; }
 
 /* ── 화면 캡처·도해 자리 ─────────────────────────────────────────────────
    .bd-figure-box 를 실제 <img> 로 갈아 끼운다. 자리를 비워 두지 않는다. */
-.bd-figure { border:1px solid var(--br-card-line); border-radius:var(--bd-r-box);
+.bd-figure { border:1px solid var(--bd-c-td-rule); border-radius:var(--bd-r-box);
              background:var(--br-page); margin:0 0 12px; overflow:hidden; }
 .bd-figure .bd-figure-box {
   height:150px; display:flex; align-items:center; justify-content:center;
@@ -401,14 +407,40 @@
 }
 
 /* 주의 상자 — 매뉴얼의 경고, 사규의 단서 조항에 쓴다. */
-.bd-callout {
-  border:1px solid var(--br-warn-line); background:var(--br-warn-bg); color:var(--br-warn-text);
-  border-radius:var(--bd-r-box); padding:12px 16px; margin:0 0 12px;
+.bd-callout {   /* 1.58 — 가는 회청 테두리 + 아주 옅은 면. 색은 머리 글자에만(왼쪽 색 띠 · 색 면 없음) */
+  border:1px solid var(--br-form-rule); background:var(--br-page); color:var(--bd-c-text);
+  border-radius:0; padding:12px 16px; margin:0 0 12px;
 }
 
-.bd-callout--danger { border-color:var(--br-coral); background:var(--br-alert-bg); color:var(--br-alert-text); }
-.bd-callout--info   { border-color:var(--br-cobalt); background:var(--br-page); color:var(--br-navy); }
-.bd-callout .bd-callout-k { display:block; font-weight:700; margin-bottom:4px; }
+.bd-callout--danger { border-color:var(--br-alert-line); }
+.bd-callout .bd-callout-k { display:block; font-weight:700; margin-bottom:4px; color:var(--br-alert-text); }
+.bd-callout--danger .bd-callout-k { color:var(--br-alert-text); }
+.bd-callout--info .bd-callout-k   { color:var(--br-deep); }
+
+/* 수치 표 — 핵심 지표 3~4개. 카드 격자가 아니라 표와 같은 짜임(머리 칸 · 값 칸 · 표 선)이라 문서 안에서 튀지 않는다.
+   좋은 증감은 본문색, 나쁜 증감만 .is-bad(빨강). Word 는 docx/from_doc.js kpis() 가 같은 모양으로 그린다 */
+.bd-kpis { display:grid; grid-template-columns:repeat(auto-fit, minmax(0, 1fr)); gap:0; margin:0 0 var(--bd-sp-block);
+           border-top:var(--bd-th-top-w) solid var(--bd-c-th-rule); border-bottom:1px solid var(--bd-c-td-rule); }
+.bd-kpi + .bd-kpi { border-left:1px solid var(--bd-c-td-rule); }
+.bd-kpi-k { font-weight:700; color:var(--bd-c-th); background:var(--bd-c-th-bg); padding:var(--bd-cell-py) var(--bd-cell-px);
+            border-bottom:var(--bd-th-bottom-w) solid var(--bd-c-th-rule); }
+.bd-kpi-v { font:700 14pt/1.2 var(--bd-font-num, var(--br-font-num)); color:var(--bd-c-text); margin:0; padding:8px var(--bd-cell-px) 2px;
+            font-variant-numeric:tabular-nums; }
+.bd-kpi-v small { font:400 var(--bd-fs-body)/1 var(--bd-ff-body); color:var(--br-text-2); margin-left:3px; }
+.bd-kpi-d { color:var(--br-text-2); padding:0 var(--bd-cell-px) 8px; }
+.bd-kpi-d b { margin-right:6px; color:var(--bd-c-text); }
+.bd-kpi-d b.is-bad { color:var(--br-alert-text); }
+
+/* 가로 막대 — 항목 비교. 주인공 하나만 .is-main(CI 블루), 나머지 회청. 너비는 최댓값 대비 % 로 손으로 적는다 */
+.bd-bars { margin:4px 0 var(--bd-sp-block); }
+.bd-bars-t { font-weight:700; margin:0 0 2px; }
+.bd-bars-s { color:var(--br-text-2); margin:0 0 10px; }
+.bd-bar  { display:grid; grid-template-columns:112px 1fr 56px; align-items:center; gap:10px; margin-bottom:8px; }
+.bd-bar-k { color:var(--br-text-2); white-space:nowrap; }
+.bd-bar-t { height:16px; background:var(--br-track); border-radius:var(--br-r-bar); position:relative; overflow:hidden; }
+.bd-bar-f { position:absolute; inset:0 auto 0 0; background:var(--br-mark-mute); border-radius:var(--br-r-bar); }
+.bd-bar-f.is-main { background:var(--br-cobalt); }
+.bd-bar-v { font:700 var(--bd-fs-body)/1 var(--bd-font-num, var(--br-font-num)); text-align:right; font-variant-numeric:tabular-nums; }
 
 /* 서명란 — 결재·확인이 필요한 문서에 쓴다.
    .bd-body 안이 아니라 .bd-page 직계로 둔다. .bd-page 가 세로 flex 이고

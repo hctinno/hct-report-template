@@ -23,7 +23,7 @@
   .bd-toc                       점선 탭 목차
   .bd-figure                    1칸 표 (그림 · 자리 + 캡션)
   .bd-sign                      결재란 표
-  .x-kpis · .x-bars (보고서)    수치 타일 표 · 막대 표 (Word 에 없는 부품이라 표로 그린다)
+  .bd-kpis · .bd-bars          수치 표 · 막대 표 (Word 에 없는 부품이라 표로 그린다. 옛 x- 이름도 읽는다)
 
 모르는 부품은 글자를 잃지 않게 문단으로 옮기고 경고를 남긴다. 경고가 있으면 결과를 열어 본다.
 
@@ -56,6 +56,14 @@ VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "met
 
 # ── 작은 DOM ──────────────────────────────────────────────────────────────
 # 표준 라이브러리만 쓴다. Word 변환에는 브라우저가 필요 없다.
+# 옛 이름(x-, 보고서 견본 한 장의 맞춤 부품) → 공용 부품 이름(blue-doc.css)
+CLASS_ALIAS = {
+    "x-kpis": "bd-kpis", "x-kpi-k": "bd-kpi-k", "x-kpi-v": "bd-kpi-v", "x-kpi-d": "bd-kpi-d", "x-bad": "is-bad",
+    "x-bars": "bd-bars", "x-bars-t": "bd-bars-t", "x-bars-s": "bd-bars-s", "x-bar": "bd-bar", "x-bar-k": "bd-bar-k",
+    "x-bar-f": "bd-bar-f", "x-bar-v": "bd-bar-v", "x-main": "is-main",
+}
+
+
 class Node:
     __slots__ = ("tag", "attrs", "children", "parent", "text")
 
@@ -68,7 +76,8 @@ class Node:
         return (self.attrs.get("class") or "").split()
 
     def has(self, c):
-        return c in self.cls
+        # 1.58 — 수치 표 · 막대가 공용 부품(bd-kpis · bd-bars)이 됐다. 옛 견본의 x- 이름도 그대로 읽는다
+        return c in self.cls or (c in CLASS_ALIAS and CLASS_ALIAS[c] in self.cls)
 
     def els(self):
         return [c for c in self.children if c.tag]
@@ -359,6 +368,8 @@ def extract(path):
     out = {"title": doc.attrs.get("data-doc-title") or plain(title_el),
            "docNo": doc.attrs.get("data-doc-no") or "",
            "cover": doc.attrs.get("data-doc-cover") or "",
+           "dept": doc.attrs.get("data-doc-dept") or "", "date": doc.attrs.get("data-doc-date") or "",
+           "subtitle": plain(doc.find(lambda n: n.has("bd-subtitle"))) if doc.find(lambda n: n.has("bd-subtitle")) is not None else "",
            "company": company, "pages": []}
     for pg in pages:
         blocks = []

@@ -4,166 +4,154 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>사내 보고서 템플릿</title>
-
 <!-- 폰트는 blue-report.css 의 @font-face 가 assets/fonts/ 에서 불러온다. 바깥 링크 없음 -->
 <link rel="stylesheet" href="../blue-report.css">
 <link rel="stylesheet" href="../blue-doc.css">
 <link rel="stylesheet" href="../doc-viewer.css">
-<!-- 이 문서에만 있는 부품 둘(수치 타일 · 가로 막대). 색은 --br-* 토큰만, 클래스는 x- 접두어 -->
-<style data-own>
-.x-kpis { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin:0 0 12px; }
-.x-kpi  { background:var(--br-page); border-radius:var(--bd-r-box); padding:12px 14px; }
-.x-kpi-k { font-weight:700; color:var(--br-text-2); }
-.x-kpi-v { font:800 22pt/1.15 var(--br-font-num); color:var(--br-navy); margin:6px 0 4px;
-           font-variant-numeric:tabular-nums; letter-spacing:var(--br-ls-tight); }
-.x-kpi-v small { font:700 var(--bd-fs-body)/1 var(--br-font-kr); color:var(--br-text-2); margin-left:2px; letter-spacing:0; }
-.x-kpi-d { font-weight:600; color:var(--br-text-2); }
-.x-kpi-d b { display:block; color:var(--br-ok-text); }
-.x-kpi-d b.x-bad { color:var(--br-alert-text); }
-
-.x-bars { margin:4px 0 12px; }
-.x-bars-t { font-weight:700; margin:0 0 2px; }
-.x-bars-s { color:var(--br-text-2); margin:0 0 10px; }
-.x-bar  { display:grid; grid-template-columns:112px 1fr 56px; align-items:center; gap:10px; margin-bottom:8px; }
-.x-bar-k { color:var(--br-text-2); white-space:nowrap; }
-.x-bar-t { height:16px; background:var(--br-track); border-radius:var(--br-r-bar); position:relative; overflow:hidden; }
-.x-bar-f { position:absolute; inset:0 auto 0 0; background:var(--br-text-3); border-radius:var(--br-r-bar); }
-.x-bar-f.x-main { background:var(--br-cobalt); }
-.x-bar-v { font:700 var(--bd-fs-body)/1 var(--br-font-num); text-align:right; font-variant-numeric:tabular-nums; }
-</style>
 </head>
-
 <body>
-<div class="bd-doc" data-doc-title="3분기 시험인증 사업 실적 보고" data-doc-no="PLN-RPT-2026-031">
-
-<!-- 1쪽 ─────────────────────────────────────────────────────────────────
-     교체: 표제 · 문서 정보 6칸 · 요약(결론 · 요청) · 핵심 지표 4개
-     요약은 결론부터. 요청 사항이 있으면 첫 쪽 상자에 적는다 — 끝까지 읽어야
-     요청을 알 수 있는 보고서는 결재가 늦는다.
-     수치 타일의 증감 색은 방향이 아니라 좋고 나쁨이다 — 리드타임 감소는 개선이라 초록(b),
-     재시험률 증가는 악화라 빨강(b.x-bad).
+<!-- ══════════════════════════════════════════════════════════════════
+     사내 보고서(a4report) — 분기 실적 · 현황 보고. 결재 · 배포용 A4 4쪽 안팎.
+     짜임: 표제 · 문서 정보 · 결정 요청 → 요약(결론 · 요약 표) → 지표 → 실적 · 요인 → 수익성 → 리스크 → 일정 → 요청 → 결재란.
+     쪽 나눔은 양식(page.breaks: flow)이 한다 — <section> 은 원고를 장 단위로 묶는 칸일 뿐 쪽 경계가 아니다.
+     제목만 쪽 끝에 남거나 긴 표가 넘치면 뷰어가 넘기고 나눈다. 짜임 · 규칙의 기준 견본은 종합 계획서(a4plan).
      수치 · 부서명 · 문구는 사용법 견본이다. 실제 내용으로 바꾼다.
+     ══════════════════════════════════════════════════════════════════ -->
+<div class="bd-doc" data-doc-title="3분기 시험인증 사업 실적 보고" data-doc-no="PLN-RPT-2026-031">
+<!-- 1. 표제 · 문서 정보 · 결정 요청 · 요약
+     요약은 결론부터 — 결재자가 첫 쪽만 읽고도 무엇을 결정해야 하는지 안다.
+     결정 요청은 첫 쪽 안내 상자에. 요약 표는 목표 대비 실적을 한눈에
      ══════════════════════════════════════════════════════════════════ -->
 <section class="bd-page">
   <div class="bd-head"><div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div><span class="bd-docno"></span></div>
   <div class="bd-body">
 
     <h1 class="bd-title">3분기 시험인증 사업 실적 보고</h1>
-    <p class="bd-subtitle">목표 대비 104% 달성 · 4분기 EMC 챔버 2기 증설 승인 요청</p>
-
+    <p class="bd-subtitle">매출 80억 원 · 목표 대비 104% · 4분기 EMC 챔버 2기 증설 승인 요청</p>
     <div class="bd-meta">
-      <div class="bd-meta-k">보고 일자</div><div>2026.11.24(화)</div>
+      <div class="bd-meta-k">보고 일자</div><div>2026.10.20(화)</div>
       <div class="bd-meta-k">보고 대상</div><div>경영회의</div>
       <div class="bd-meta-k">작성 부서</div><div>경영기획팀</div>
       <div class="bd-meta-k">작성자</div><div>기획 A</div>
       <div class="bd-meta-k">기준 기간</div><div>2026.07.01 ~ 09.30</div>
-      <div class="bd-meta-k">데이터</div><div>사내 ERP 집계 · 10.31 기준</div>
+      <div class="bd-meta-k">기준 자료</div><div>사내 ERP · LIMS 집계 · 10.15 마감</div>
     </div>
-
-    <h2 class="bd-h1">1. 요약</h2>
     <div class="bd-callout bd-callout--info">
-      <span class="bd-callout-k">요청 사항</span>
-      EMC 챔버 2기 증설 투자 승인 — 11월 27일 경영회의 상정
+      <span class="bd-callout-k">결정 요청</span>
+      EMC 챔버 2기 증설 투자 32억 원 승인 — 10월 27일 경영회의 상정. 승인 시 2027년 4월 가동
     </div>
+    <h2 class="bd-h1">1. 요약</h2>
     <ul class="bd-list">
-      <li>매출 312억 원으로 <span class="bd-key">목표 대비 104%</span> — 모빌리티(+24%) · 국방 부문이 성장 견인</li>
-      <li>재시험률 4.1%로 목표 3.5% 초과 — 신규 시험원 투입 라인에 집중</li>
-      <li>배터리 시험 평균 대기 23일 — 챔버 가동률 96%로 증설 없이는 4분기 수주 제한</li>
+      <li><span class="bd-key">목표 초과</span> — 매출 80억 원으로 목표 77억 원 대비 104%, 전년 동기 대비 +8.6%</li>
+      <li><span class="bd-key">성장 견인</span> — 모빌리티 매출 25억 원(목표 대비 119%), 완성차 전장 EMC 물량 증가</li>
+      <li><span class="bd-key">병목 심화</span> — 챔버 가동률 96%로 신규 물량 수용 한계. 배터리 · 국방은 대기로 목표 90%</li>
+      <li><span class="bd-key">품질 악화</span> — 재시험률 4.5%로 전 분기 대비 0.5%p 상승, 신규 시험원 투입 라인에 집중</li>
     </ul>
+    <table class="bd-table">
+      <thead><tr><th>지표</th><th class="num">3분기 목표</th><th class="num">3분기 실적</th><th class="num">달성률</th><th>판정</th></tr></thead>
+      <tbody>
+        <tr><td>매출(억 원)</td><td class="num">77</td><td class="num">80</td><td class="num">104%</td><td><span class="bd-chip">달성</span></td></tr>
+        <tr><td>신규 수주(건)</td><td class="num">1,250</td><td class="num">1,284</td><td class="num">103%</td><td><span class="bd-chip">달성</span></td></tr>
+        <tr><td>평균 납기(일)</td><td class="num">9.5</td><td class="num">9.4</td><td class="num">—</td><td><span class="bd-chip">달성</span></td></tr>
+        <tr><td>재시험률(%)</td><td class="num">3.8</td><td class="num">4.5</td><td class="num">—</td><td><span class="bd-chip bd-chip--late">미달</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="bd-foot"><span><span class="bd-company">COMPANY NAME</span> · <span class="bd-doctitle"></span></span><span class="bd-pageno"></span></div>
+</section>
+<!-- 2. 핵심 지표 · 사업부별 실적 · 성장 요인
+     지표 증감 색은 방향이 아니라 좋고 나쁨 — 납기 감소는 개선이라 본문색(b), 재시험률 증가는 악화라 빨강(b.is-bad).
+     표는 머리에 단위, 숫자 오른쪽 정렬(.num), 합계 행은 굵게(.bd-key). 상태는 칩 글자로 — 색만으로 가르지 않는다.
+     막대는 주인공 하나만 .is-main, 너비는 최댓값 대비 %
+     ══════════════════════════════════════════════════════════════════ -->
+<section class="bd-page">
+  <div class="bd-head"><div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div><span class="bd-docno"></span></div>
+  <div class="bd-body">
 
     <h2 class="bd-h1">2. 핵심 지표</h2>
-    <div class="x-kpis">
-      <div class="x-kpi"><div class="x-kpi-k">매출</div><div class="x-kpi-v">312<small>억 원</small></div><div class="x-kpi-d"><b>▲ 8.4%</b>전년 동기 대비</div></div>
-      <div class="x-kpi"><div class="x-kpi-k">신규 수주</div><div class="x-kpi-v">1,284<small>건</small></div><div class="x-kpi-d"><b>▲ 112건</b>전 분기 대비</div></div>
-      <div class="x-kpi"><div class="x-kpi-k">평균 리드타임</div><div class="x-kpi-v">9.6<small>일</small></div><div class="x-kpi-d"><b>▼ 1.2일</b>단축 · 개선</div></div>
-      <div class="x-kpi"><div class="x-kpi-k">재시험률</div><div class="x-kpi-v">4.1<small>%</small></div><div class="x-kpi-d"><b class="x-bad">▲ 0.6%p</b>목표 3.5% 초과</div></div>
+    <div class="bd-kpis">
+      <div class="bd-kpi"><div class="bd-kpi-k">매출</div><div class="bd-kpi-v">80<small>억 원</small></div><div class="bd-kpi-d"><b>▲ 8.6%</b>전년 동기 대비</div></div>
+      <div class="bd-kpi"><div class="bd-kpi-k">신규 수주</div><div class="bd-kpi-v">1,284<small>건</small></div><div class="bd-kpi-d"><b>▲ 78건</b>전 분기 대비</div></div>
+      <div class="bd-kpi"><div class="bd-kpi-k">평균 납기</div><div class="bd-kpi-v">9.4<small>일</small></div><div class="bd-kpi-d"><b>▼ 0.5일</b>전 분기 대비 단축</div></div>
+      <div class="bd-kpi"><div class="bd-kpi-k">재시험률</div><div class="bd-kpi-v">4.5<small>%</small></div><div class="bd-kpi-d"><b class="is-bad">▲ 0.5%p</b>목표 3.8% 초과</div></div>
     </div>
-
-  </div>
-  <div class="bd-foot"><span><span class="bd-company">COMPANY NAME</span> · <span class="bd-doctitle"></span></span><span class="bd-pageno"></span></div>
-</section>
-
-<!-- 2쪽 ─────────────────────────────────────────────────────────────────
-     교체: 부문별 실적 표 · 성장 요인 막대
-     표는 머리글에 단위를 적고 숫자는 오른쪽 정렬(.num). 상태는 칩 글자로 말한다 —
-     색만으로 달성 · 미달을 가르지 않는다.
-     막대는 주인공 하나만 코발트(.x-main), 나머지는 회색. 너비는 최댓값 대비 비율.
-     ══════════════════════════════════════════════════════════════════ -->
-<section class="bd-page">
-  <div class="bd-head"><div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div><span class="bd-docno"></span></div>
-  <div class="bd-body">
-
     <h2 class="bd-h1">3. 사업부별 실적</h2>
     <table class="bd-table">
-      <thead><tr>
-        <th style="width:34%">사업부</th><th style="width:16%">목표(억 원)</th>
-        <th style="width:16%">실적(억 원)</th><th style="width:14%">달성률</th><th style="width:20%">상태</th>
-      </tr></thead>
+      <thead><tr><th>사업부</th><th class="num">목표(억 원)</th><th class="num">실적(억 원)</th><th class="num">달성률</th><th class="num">전년 동기 대비</th><th>상태</th></tr></thead>
       <tbody>
-        <tr><td>시험인증(ICT)</td><td class="num">120</td><td class="num">118</td><td class="num">98%</td><td><span class="bd-chip bd-chip--warn">소폭 미달</span></td></tr>
-        <tr><td><span class="bd-key">모빌리티</span></td><td class="num">80</td><td class="num">96</td><td class="num">120%</td><td><span class="bd-chip">초과 달성</span></td></tr>
-        <tr><td>교정</td><td class="num">60</td><td class="num">61</td><td class="num">102%</td><td><span class="bd-chip">달성</span></td></tr>
-        <tr><td>배터리 · 국방</td><td class="num">40</td><td class="num">37</td><td class="num">93%</td><td><span class="bd-chip bd-chip--late">미달</span></td></tr>
-        <tr><td><span class="bd-key">합계</span></td><td class="num">300</td><td class="num">312</td><td class="num">104%</td><td><span class="bd-chip">달성</span></td></tr>
+        <tr><td>시험인증(ICT)</td><td class="num">31</td><td class="num">30</td><td class="num">97%</td><td class="num">+1%</td><td><span class="bd-chip bd-chip--warn">소폭 미달</span></td></tr>
+        <tr><td><span class="bd-key">모빌리티</span></td><td class="num">21</td><td class="num">25</td><td class="num">119%</td><td class="num">+21%</td><td><span class="bd-chip">초과 달성</span></td></tr>
+        <tr><td>교정</td><td class="num">15</td><td class="num">16</td><td class="num">107%</td><td class="num">+7%</td><td><span class="bd-chip">달성</span></td></tr>
+        <tr><td>배터리 · 국방</td><td class="num">10</td><td class="num">9</td><td class="num">90%</td><td class="num">+8%</td><td><span class="bd-chip bd-chip--late">미달</span></td></tr>
+        <tr><td><span class="bd-key">합계</span></td><td class="num">77</td><td class="num">80</td><td class="num">104%</td><td class="num">+8.6%</td><td><span class="bd-chip">달성</span></td></tr>
       </tbody>
     </table>
     <ul class="bd-list">
-      <li>4개 사업부 중 3개 목표 달성 — 배터리 · 국방은 챔버 대기로 수주 일부 이월</li>
-      <li>ICT는 단말 출시 감소로 정체 — 4분기 신규 단말 인증 6건 예정</li>
+      <li>모빌리티 초과분 4억 원이 ICT · 배터리 미달분 2억 원을 메우고 전사 목표 달성</li>
+      <li>배터리 · 국방은 수요가 아니라 시험 능력 부족 — 대기 23일로 수주 1억 원 4분기 이월</li>
+      <li>ICT는 단말 출시 감소로 정체, 9월 신규 단말 인증 6건 수주로 4분기 회복 예상</li>
     </ul>
-
     <h2 class="bd-h1">4. 성장 요인</h2>
-    <div class="x-bars">
-      <p class="x-bars-t">모빌리티 부문이 성장 견인</p>
-      <p class="x-bars-s">사업부별 전년 대비 매출 증가율(%)</p>
-      <div class="x-bar"><span class="x-bar-k">모빌리티</span><span class="x-bar-t"><span class="x-bar-f x-main" style="width:100%"></span></span><span class="x-bar-v">+24%</span></div>
-      <div class="x-bar"><span class="x-bar-k">배터리 · 국방</span><span class="x-bar-t"><span class="x-bar-f" style="width:46%"></span></span><span class="x-bar-v">+11%</span></div>
-      <div class="x-bar"><span class="x-bar-k">교정</span><span class="x-bar-t"><span class="x-bar-f" style="width:25%"></span></span><span class="x-bar-v">+6%</span></div>
-      <div class="x-bar"><span class="x-bar-k">시험인증(ICT)</span><span class="x-bar-t"><span class="x-bar-f" style="width:13%"></span></span><span class="x-bar-v">+3%</span></div>
+    <div class="bd-bars">
+      <p class="bd-bars-t">모빌리티 부문이 성장 견인</p>
+      <p class="bd-bars-s">사업부별 전년 동기 대비 매출 증가율(%)</p>
+      <div class="bd-bar"><span class="bd-bar-k">모빌리티</span><span class="bd-bar-t"><span class="bd-bar-f is-main" style="width:100%"></span></span><span class="bd-bar-v">+21%</span></div>
+      <div class="bd-bar"><span class="bd-bar-k">배터리 · 국방</span><span class="bd-bar-t"><span class="bd-bar-f" style="width:38%"></span></span><span class="bd-bar-v">+8%</span></div>
+      <div class="bd-bar"><span class="bd-bar-k">교정</span><span class="bd-bar-t"><span class="bd-bar-f" style="width:33%"></span></span><span class="bd-bar-v">+7%</span></div>
+      <div class="bd-bar"><span class="bd-bar-k">시험인증(ICT)</span><span class="bd-bar-t"><span class="bd-bar-f" style="width:5%"></span></span><span class="bd-bar-v">+1%</span></div>
     </div>
     <ul class="bd-list">
-      <li>완성차 3사 전장부품 EMC 물량 증가</li>
-      <li>고전압 EMC 챔버 가동 이후 신규 고객 12곳 확보</li>
+      <li>완성차 3사 전장부품 EMC 물량 증가 — 모빌리티 신규 고객 5곳</li>
+      <li>고전압 EMC 챔버 가동 이후 부품사 직거래 비중 38% → 44%</li>
     </ul>
-
   </div>
   <div class="bd-foot"><span><span class="bd-company">COMPANY NAME</span> · <span class="bd-doctitle"></span></span><span class="bd-pageno"></span></div>
 </section>
-
-<!-- 3쪽 ─────────────────────────────────────────────────────────────────
-     교체: 리스크 · 추진 일정 · 요청 사항 · 결재란
-     요청 사항 표는 담당과 기한이 빈 줄을 남기지 않는다.
-     결재란(.bd-sign)은 마지막 쪽 꼬리말 바로 위. 결재 없는 보고면 지운다.
+<!-- 3. 수익성 · 리스크 · 추진 일정 · 요청 사항 · 결재란
+     리스크는 영향 · 가능성을 칩으로, 가장 큰 것 하나는 경고 상자로 따로 쓴다.
+     요청 사항 표는 결정 주체와 기한이 빈 줄을 남기지 않는다. 결재란(.bd-sign)은 문서 끝 — 결재 없는 보고면 지운다
      ══════════════════════════════════════════════════════════════════ -->
 <section class="bd-page">
   <div class="bd-head"><div class="br-mark" data-on="light"><!-- 로고 자리: apply_brand.py 가 brand.json 의 logo(다크용)·logoOnLight(밝은면용)로 교체한다 --><span class="br-wordmark">COMPANY NAME</span></div><span class="bd-docno"></span></div>
   <div class="bd-body">
 
-    <h2 class="bd-h1">5. 리스크</h2>
-    <div class="bd-callout bd-callout--danger">
-      <span class="bd-callout-k">배터리 시험 대기 장기화</span>
-      평균 대기 23일로 경쟁사 대비 1주 이상 길어 고객 이탈 우려 — 12월까지 미해소 시 1분기 수주 10% 감소 추정
-    </div>
-
-    <h2 class="bd-h1">6. 추진 일정</h2>
-    <div class="bd-steps">
-      <div class="bd-step"><span class="bd-step-t">현황 진단 · 10월 2주 완료</span>가동률 · 대기 데이터 분석</div>
-      <div class="bd-step"><span class="bd-step-t">개선안 확정 · 10월 4주 완료</span>투자안 2건 비교 — 챔버 2기 증설안 채택</div>
-      <div class="bd-step"><span class="bd-step-t">투자 승인 · 11월 27일</span>경영회의 상정</div>
-      <div class="bd-step"><span class="bd-step-t">설치 · 시운전 · 12월</span>챔버 2기 설치 후 2027년 1월 정상 가동 · 대기 10일 이내 목표</div>
-    </div>
-
-    <h2 class="bd-h1">7. 요청 사항</h2>
+    <h2 class="bd-h1">5. 수익성</h2>
     <table class="bd-table bd-table--grid">
-      <thead><tr>
-        <th style="width:52%">내용</th><th style="width:24%">담당</th><th style="width:24%">기한</th>
-      </tr></thead>
+      <thead><tr><th>구분</th><th class="num">2분기</th><th class="num">3분기</th><th class="num">증감</th><th>비고</th></tr></thead>
       <tbody>
-        <tr><td>EMC 챔버 2기 증설 투자 승인</td><td>경영지원본부</td><td class="num">11.27</td></tr>
-        <tr><td>신규 시험원 교육 커리큘럼 확정</td><td>품질보증팀</td><td class="num">12.05</td></tr>
+        <tr><td>매출(억 원)</td><td class="num">76.0</td><td class="num">80.0</td><td class="num">+4.0</td><td>모빌리티 +3.1</td></tr>
+        <tr><td>영업이익(억 원)</td><td class="num">9.7</td><td class="num">10.6</td><td class="num">+0.9</td><td>가동률 상승 효과</td></tr>
+        <tr><td>영업이익률(%)</td><td class="num">12.8</td><td class="num">13.3</td><td class="num">+0.5%p</td><td>재시험 비용 0.4억 원 반영</td></tr>
       </tbody>
     </table>
-
+    <h2 class="bd-h1">6. 리스크</h2>
+    <table class="bd-table">
+      <thead><tr><th>리스크</th><th style="width:12%">영향</th><th style="width:12%">가능성</th><th>대응</th><th style="width:16%">담당</th></tr></thead>
+      <tbody>
+        <tr><td><span class="bd-key">배터리 시험 대기 장기화</span></td><td><span class="bd-chip bd-chip--late">높음</span></td><td><span class="bd-chip bd-chip--late">높음</span></td><td>2교대 운영 · 챔버 증설</td><td>배터리 · 국방</td></tr>
+        <tr><td>경쟁 기관 단가 인하</td><td><span class="bd-chip bd-chip--late">높음</span></td><td><span class="bd-chip bd-chip--warn">중간</span></td><td>연간 단가 계약 · 납기 약정</td><td>영업팀</td></tr>
+        <tr><td>재시험률 상승</td><td><span class="bd-chip bd-chip--warn">중간</span></td><td><span class="bd-chip bd-chip--warn">중간</span></td><td>짝 시험제 · 항목별 자격</td><td>품질보증팀</td></tr>
+      </tbody>
+    </table>
+    <div class="bd-callout bd-callout--danger">
+      <span class="bd-callout-k">배터리 시험 대기 장기화</span>
+      평균 대기 23일로 경쟁 기관보다 1주 이상 길어 고객 이탈 우려 — 12월까지 미해소 시 1분기 수주 약 10% 감소 추정
+    </div>
+    <h2 class="bd-h1">7. 추진 일정</h2>
+    <div class="bd-steps">
+      <div class="bd-step"><span class="bd-step-t">현황 진단 · 10월 2주 완료</span>가동률 · 대기 데이터 분석, 병목 설비 2곳 확인</div>
+      <div class="bd-step"><span class="bd-step-t">투자안 비교 · 10월 3주 완료</span>증설안 · 외부 위탁안 비교 — 챔버 2기 증설안 채택</div>
+      <div class="bd-step"><span class="bd-step-t">투자 승인 · 10월 27일</span>경영회의 상정</div>
+      <div class="bd-step"><span class="bd-step-t">발주 · 설치 · 12월 ~ 2027년 3월</span>2027년 4월 정상 가동, 대기 12일 이내 목표</div>
+    </div>
+    <h2 class="bd-h1">8. 요청 사항</h2>
+    <table class="bd-table bd-table--grid">
+      <thead><tr><th style="width:50%">내용</th><th style="width:22%">결정 주체</th><th style="width:14%">기한</th><th style="width:14%">상태</th></tr></thead>
+      <tbody>
+        <tr><td>EMC 챔버 2기 증설 투자 32억 원 승인</td><td>경영회의</td><td class="num">10.27</td><td><span class="bd-chip">상정</span></td></tr>
+        <tr><td>배터리 시험실 2교대 운영 인력 3명 충원</td><td>경영지원본부</td><td class="num">11.10</td><td><span class="bd-chip bd-chip--warn">검토 중</span></td></tr>
+      </tbody>
+    </table>
   </div>
   <div class="bd-sign">
     <div><div class="bd-sign-k">작성</div><div class="bd-sign-v"></div></div>
@@ -172,15 +160,12 @@
   </div>
   <div class="bd-foot"><span><span class="bd-company">COMPANY NAME</span> · <span class="bd-doctitle"></span></span><span class="bd-pageno"></span></div>
 </section>
-
 </div><!-- /.bd-doc -->
-
 <div id="bd-hud">
   <span id="bd-pos"></span>
   <span>A4 · 인쇄하면 그대로</span>
   <button id="bd-print">인쇄 · PDF</button>
 </div>
-
 <script src="../doc-viewer.js"></script>
 </body>
 </html>

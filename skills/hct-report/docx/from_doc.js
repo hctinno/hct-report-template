@@ -172,7 +172,7 @@ function table(b) {
             left: NONE, right: NONE };
       void last;
       return cell([para(textRuns(c.runs, head ? { bold: true, color: tok(TBL.headColor) } : (c.num ? { font: NUMFONT, bold: true } : {})),
-        { alignment: c.num && !head ? AlignmentType.RIGHT : AlignmentType.LEFT, spacing: { after: 0 } })],
+        { alignment: c.num ? AlignmentType.RIGHT : AlignmentType.LEFT, spacing: { after: 0 } })],   // 숫자 열은 머리도 오른쪽(HTML .num 과 같다)
       { width: { size: w, type: WidthType.DXA }, columnSpan: span > 1 ? span : undefined, margins, borders,
         shading: head && tok(TBL.headFill) ? fill(tok(TBL.headFill)) : undefined, verticalAlign: VerticalAlign.TOP });
     });
@@ -184,9 +184,9 @@ function table(b) {
 }
 
 /** 표 뒤 간격. Word 는 표에 아래 여백이 없어 빈 문단으로 준다(높이 = px). */
-function gap(px) {
+function gap(px, keepNext = false) {
   return para([], { spacing: { before: 0, after: 0, line: Math.max(px * PX, 20), lineRule: LineRuleType.EXACT },
-    style: 'HctGap' });
+    style: 'HctGap', keepNext });
 }
 
 function meta(b) {
@@ -232,16 +232,17 @@ function list(b) {
 }
 
 function callout(b) {
-  const tone = { warn: [T.warnLine, T.warnBg, T.warnText], danger: [T.coral, T.alertBg, T.alertText],
-    info: [T.cobalt, T.page, T.navy] }[b.kind] || [T.warnLine, T.warnBg, T.warnText];
-  const [ln, bg, fg] = tone;
+  // 1.58 — 가는 회청 테두리 + 아주 옅은 면(HTML .bd-callout 과 같다). 색은 머리 글자에만, 본문은 본문색
+  const tone = { warn: [hex('form-rule'), T.alertText], danger: [hex('alert-line'), T.alertText],
+    info: [hex('form-rule'), hex('deep')] }[b.kind] || [hex('form-rule'), T.alertText];
+  const [ln, kc] = tone, bg = T.page, fg = tok(TY.body.color);
   const side = (space) => ({ style: BorderStyle.SINGLE, size: 6, color: ln, space });
   // 같은 테두리를 가진 문단은 Word 가 한 상자로 묶는다 — 라벨 문단과 본문 문단을 한 상자에
   const border = { top: side(9), bottom: side(9), left: side(12), right: side(12) };
   const base = { border, shading: fill(bg), indent: { left: 12 * 20 + 20, right: 12 * 20 + 20 } };
   const out = [];
   if (b.label) {
-    out.push(para([new TextRun({ text: b.label, bold: true, color: fg })],
+    out.push(para([new TextRun({ text: b.label, bold: true, color: kc })],
       Object.assign({}, base, { spacing: { after: 4 * PX }, keepNext: true })));
   }
   out.push(para(textRuns(b.runs, { color: fg }), Object.assign({}, base, { spacing: { after: 0 } })));
@@ -270,14 +271,15 @@ function toc(b) {
   if (TOC.style === 'plain') {
     // 점선 · 쪽번호 없이 — 장 줄은 굵은 제목 글꼴, 항목은 들여 쓴 본문 글꼴
     return b.items.map((it, k) => para([new TextRun(it.sub ? { text: it.title } : { text: it.title, bold: true, font: HFONT })],
-      { indent: { left: IND + (it.sub ? dxa('5mm') : 0) }, alignment: AlignmentType.LEFT,
+      // 목차는 한 덩어리 — HTML 뷰어처럼 쪽 사이에서 갈라지지 않게 마지막 줄까지 다음 줄과 붙인다
+      { indent: { left: IND + (it.sub ? dxa('5mm') : 0) }, alignment: AlignmentType.LEFT, keepNext: k < b.items.length - 1, keepLines: true,
         spacing: { after: k === b.items.length - 1 ? 12 * PX : dxa(TOC.itemAfter) } }));
   }
   return b.items.map((it, k) => para([
     new TextRun({ text: it.title, bold: !it.sub, color: it.sub ? T.text2 : T.navy }),
     new TextRun({ text: '\t' }),
     new TextRun({ text: it.page, bold: true, color: T.navy, font: NUMFONT }),
-  ], { indent: { left: IND + (it.sub ? 20 * PX : 0) },
+  ], { indent: { left: IND + (it.sub ? 20 * PX : 0) }, keepNext: k < b.items.length - 1, keepLines: true,
     tabStops: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }],
     spacing: { after: k === b.items.length - 1 ? 12 * PX : 9 * PX } }));
 }
@@ -303,11 +305,11 @@ function figure(b) {
   if (b.caption && b.caption.length) {
     rows.push(new TableRow({ cantSplit: true, children: [cell([para(textRuns(b.caption, { color: T.text2 }), { spacing: { after: 0 } })],
       { width: { size: W, type: WidthType.DXA }, margins: { top: 8 * PX, bottom: 8 * PX, left: 12 * PX, right: 12 * PX },
-        borders: { top: line(T.line), bottom: NONE, left: NONE, right: NONE } })] }));
+        borders: { top: line(tok(TBL.rowRule)), bottom: NONE, left: NONE, right: NONE } })] }));
   }
   return [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], layout: TableLayoutType.FIXED,
-    borders: { top: line(T.line), bottom: line(T.line), left: line(T.line), right: line(T.line),
-      insideHorizontal: line(T.line), insideVertical: NONE }, rows }), gap(12)];
+    borders: { top: line(tok(TBL.rowRule)), bottom: line(tok(TBL.rowRule)), left: line(tok(TBL.rowRule)), right: line(tok(TBL.rowRule)),
+      insideHorizontal: line(tok(TBL.rowRule)), insideVertical: NONE }, rows }), gap(12)];
 }
 
 function sign(b) {
@@ -336,30 +338,34 @@ function sign(b) {
       new TableRow({ cantSplit: true, height: { value: dxa(SIGN.height), rule: HeightRule.EXACT }, children: body })] })];
 }
 
-/** 보고서 수치 타일 — Word 에 없는 부품이라 표로 그린다. 칸 사이 10px 는 빈 칸. */
+/** 보고서 수치 타일 — 문서의 다른 표와 같은 짜임으로: 칸 위 머리 줄(지표 이름 · 머리 칸 색) · 아래 값(수치 · 증감 · 기준).
+ *  면 · 빈 칸 없이 표 선만 — HTML 의 .x-kpis 와 같다. 글자 순서도 HTML 과 같게 지표마다 한 칸에 이름 → 값. */
 function kpis(b) {
   const n = Math.max(b.items.length, 1);
-  const G = 10 * PX;
-  const cw = Math.floor((W - G * (n - 1)) / n);
-  const ws = [];
-  for (let i = 0; i < n; i++) { ws.push(cw); if (i < n - 1) ws.push(G); }
-  ws[ws.length - 1] += W - ws.reduce((a, x) => a + x, 0);
-  const cells = [];
-  b.items.forEach((it, i) => {
-    const p0 = { spacing: { after: 0 } };
-    cells.push(cell([
-      para([new TextRun({ text: it.k, bold: true, color: T.text2 })], p0),
-      para([new TextRun({ text: it.v, bold: true, color: T.navy, size: hp(22), font: NUMFONT }),
-        new TextRun({ text: it.unit || '', bold: true, color: T.text2 })],
-      { spacing: { before: 6 * PX, after: 4 * PX, line: 240, lineRule: LineRuleType.AUTO } }),
-      para([new TextRun({ text: it.delta, bold: true, color: it.bad ? T.alertText : T.okText })], p0),
-      para([new TextRun({ text: it.note, color: T.text2 })], p0),
-    ], { width: { size: cw, type: WidthType.DXA }, shading: fill(T.page),
-      margins: { top: 12 * PX, bottom: 12 * PX, left: 14 * PX, right: 14 * PX } }));
-    if (i < n - 1) cells.push(cell([], { width: { size: G, type: WidthType.DXA } }));
-  });
+  const cw = Math.floor(W / n);
+  const ws = new Array(n).fill(cw);
+  ws[n - 1] += W - cw * n;
+  const thRule = tok(TBL.headRule.color), tdRule = tok(TBL.rowRule);
+  const px = dxa(TBL.cellPadding.x), py = dxa(TBL.cellPadding.y);
+  const ind = { left: px, right: px };
+  const cells = b.items.map((it, i) => cell([
+    // 머리 줄 — 문단 음영 · 아래 선으로 표 머리 칸과 같게(칸 좌우 여백 0, 글은 들여쓰기로)
+    para([new TextRun({ text: it.k, bold: true, color: tok(TBL.headColor) })],
+      { indent: ind, alignment: AlignmentType.LEFT, shading: tok(TBL.headFill) ? fill(tok(TBL.headFill)) : undefined,
+        // 음영을 칸 끝까지 — 머리 칸 색의 가는 좌우 · 위 선을 여백만큼 띄워 그 사이를 음영이 채우게 한다
+        border: { bottom: Object.assign({}, line(thRule, TBL.headRule.bottom), { space: Math.round(py / 20) }),
+                  top: Object.assign({}, line(tok(TBL.headFill) || 'FFFFFF', 0.5), { space: Math.round(py / 20) }),
+                  left: Object.assign({}, line(tok(TBL.headFill) || 'FFFFFF', 0.5), { space: Math.round(px / 20) }),
+                  right: Object.assign({}, line(tok(TBL.headFill) || 'FFFFFF', 0.5), { space: Math.round(px / 20) }) },
+        spacing: { before: 0, after: 0 } }),
+    para([new TextRun({ text: it.v, bold: true, size: hp(14) }), new TextRun({ text: ' ' + (it.unit || ''), color: T.text2 })],
+      { indent: ind, alignment: AlignmentType.LEFT, spacing: { before: 8 * PX, after: 2 * PX, line: 240, lineRule: LineRuleType.AUTO } }),
+    para([new TextRun({ text: it.delta + '  ', bold: true, color: it.bad ? T.alertText : tok(TY.body.color) }),
+      new TextRun({ text: it.note, color: T.text2 })], { indent: ind, alignment: AlignmentType.LEFT, spacing: { before: 0, after: 8 * PX } }),
+  ], { width: { size: ws[i], type: WidthType.DXA }, margins: { top: 0, bottom: 0, left: 0, right: 0 },
+    borders: { top: line(thRule, TBL.headRule.top), bottom: line(tdRule), left: i ? line(tdRule) : NONE, right: NONE } }));
   return [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: ws, layout: TableLayoutType.FIXED,
-    borders: NO_BORDERS, rows: [new TableRow({ cantSplit: true, children: cells })] }), gap(12)];
+    rows: [new TableRow({ cantSplit: true, children: cells })] }), gap(12)];
 }
 
 /** 보고서 가로 막대 — 막대 칸 안의 2칸 표(채움 · 트랙). 값을 고치면 너비는 손으로 맞춘다. */
@@ -376,7 +382,7 @@ function bars(b) {
     const pct = Math.max(0, Math.min(100, Number(it.pct) || 0));
     const fw = Math.round((BW * pct) / 100);
     const parts = [];
-    if (fw >= 30) parts.push([fw, it.main ? T.cobalt : T.text3]);
+    if (fw >= 30) parts.push([fw, it.main ? T.cobalt : hex('mark-mute')]);
     if (BW - fw >= 30) parts.push([BW - parts.reduce((a, p) => a + p[0], 0), T.track]);
     const bar = new Table({ width: { size: BW, type: WidthType.DXA }, columnWidths: parts.map((p) => p[0]),
       layout: TableLayoutType.FIXED, borders: NO_BORDERS,
@@ -437,42 +443,26 @@ function h1(b, first, pb) {
     const runs = sn && sn.changed ? [{ t: `${sn.num}. ${sn.title}` }] : b.runs;
     return [para(textRuns(runs), Object.assign({ heading: D.HeadingLevel.HEADING_1, spacing: sp }, pb))];
   }
+  // 1.58 — 표가 아니라 문단 하나(HTML 과 같은 모양): 위아래 선 · 번호 꼬리표(글자 음영) · 제목.
+  // 문단이라 MS Word · LibreOffice · 한컴 어디서나 「다음 문단과 함께」가 지켜져 제목만 쪽 끝에 남지 않는다
   const bx = TY.h1.box;
-  const rule = line(tok(bx.rule.color), bx.rule.width);
-  const NW = dxa(bx.numberWidth);
-  const out = [];
-  // 상자 앞 간격 — 표에는 앞 간격이 없어 빈 문단으로 준다(쪽 첫 줄이면 0)
-  if (!first) out.push(gap(dxa(SP.h1Before) / PX));
-  if (pb.pageBreakBefore) out.push(para([new D.PageBreak()], { spacing: { before: 0, after: 0, line: 20, lineRule: LineRuleType.EXACT } }));
-  const hPara = (children, o) => para(children, Object.assign({ heading: D.HeadingLevel.HEADING_1,
-    spacing: { before: 0, after: 0 }, keepNext: true, border: {}, indent: { left: 0 } }, o));
-  const cells = [];
-  if (!sn) {
-    // 번호를 못 뗀 제목(「제1장 총칙」 등) — HTML 처럼 번호 칸 없이 위아래 선만
-    out.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], layout: TableLayoutType.FIXED, borders: NO_BORDERS,
-      rows: [new TableRow({ cantSplit: true, height: { value: dxa(bx.height), rule: HeightRule.ATLEAST }, children: [
-        cell([hPara(textRuns(b.runs, { characterSpacing: 20 }))], { width: { size: W, type: WidthType.DXA },
-          verticalAlign: VerticalAlign.CENTER, margins: { left: 0, right: 0, top: 0, bottom: 0 },
-          borders: { top: rule, bottom: rule, left: NONE, right: NONE } })] })] }));
-    out.push(gap(dxa(SP.h1After) / PX));
-    return out;
+  const rw = Math.max(2, Math.round(ptOf(bx.rule.width) * 8));
+  const rule = { style: BorderStyle.SINGLE, size: rw, color: tok(bx.rule.color), space: 5 };
+  const size = hpOf(TY.h1.size);
+  const runs = [];
+  if (sn) {
+    runs.push(new TextRun({ text: '\u2002' + sn.num + '\u2002', bold: true, font: HFONT, size,
+      color: tok(bx.numberColor || TY.h1.color), shading: tok(bx.fill) ? fill(tok(bx.fill)) : undefined }));
+    runs.push(new TextRun({ text: '\u2003', size }));
   }
-  cells.push(cell([para([new TextRun({ text: sn ? sn.num : '', bold: true, font: HFONT, size: hpOf(TY.h1.size), color: tok(TY.h1.color) })],
-    { alignment: AlignmentType.CENTER, spacing: { before: 0, after: 0 }, keepNext: true })],
-  { width: { size: NW, type: WidthType.DXA }, shading: tok(bx.fill) ? fill(tok(bx.fill)) : undefined,
-    verticalAlign: VerticalAlign.CENTER, borders: { top: rule, bottom: rule, left: NONE, right: rule } }));
-  cells.push(cell([hPara(textRuns(sn ? [{ t: sn.title }] : b.runs, { characterSpacing: 20 }))],
-    { width: { size: W - NW, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER,
-      margins: { left: dxa('3mm'), right: dxa('3mm'), top: 0, bottom: 0 },
-      borders: { top: rule, bottom: rule, left: rule, right: NONE } }));
-  out.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [NW, W - NW], layout: TableLayoutType.FIXED,
-    borders: NO_BORDERS, rows: [new TableRow({ cantSplit: true, height: { value: dxa(bx.height), rule: HeightRule.ATLEAST }, children: cells })] }));
-  out.push(gap(dxa(SP.h1After) / PX));
-  return out;
+  runs.push(...textRuns(sn ? [{ t: sn.title }] : b.runs, { characterSpacing: 20 }));
+  return [para(runs, Object.assign({ heading: D.HeadingLevel.HEADING_1, keepNext: true, keepLines: true,
+    alignment: AlignmentType.LEFT, indent: { left: 0 }, border: { top: rule, bottom: rule },
+    spacing: { before: first ? 0 : dxa(SP.h1Before), after: dxa(SP.h1After) } }, pb))];
 }
 
 /** 블록 → Word 요소. brk 는 「앞에서 쪽 나눔」 — HTML 의 쪽과 같은 자리에서 넘긴다. */
-function blocks(b, first, brk) {
+function blocks(b, first, brk, afterHead = false) {
   const pb = brk ? { pageBreakBefore: true } : {};
   const top = first ? { before: 0 } : {};
   const ind = IND ? { indent: { left: IND } } : {};
@@ -482,7 +472,9 @@ function blocks(b, first, brk) {
     case 'h1': return h1(b, first, pb);
     case 'h2': return [para(textRuns(b.runs), Object.assign({ heading: D.HeadingLevel.HEADING_2,
       spacing: first ? { before: 0, after: dxa(SP.h2After) } : undefined }, pb))];
-    case 'p': return [para(textRuns(b.runs), Object.assign({ spacing: Object.assign({ after: dxa(SP.paraAfter) }, top) }, ind, pb))];
+    // 제목 바로 뒤의 도입 문단은 다음 블록과 붙인다 — HTML 뷰어와 같이 「제목 → 한 줄 설명 → 표」를 한 덩어리로
+    case 'p': return [para(textRuns(b.runs), Object.assign({ spacing: Object.assign({ after: dxa(SP.paraAfter) }, top),
+      keepNext: afterHead, keepLines: true }, ind, pb))];
     default: {
       const els = ({ meta, list, table, callout, steps, toc, figure, sign, kpis, bars })[b.t];
       if (!els) {
@@ -498,32 +490,59 @@ function blocks(b, first, brk) {
 }
 
 // ── 표지 ──────────────────────────────────────────────────────────────────
-// 양식 cover.enabled — 문서명(글자 사이 벌림) · 밑 막대 · 아래쪽 회사명. 한 칸 표 두 줄로 쪽을 채운다
+// 양식 cover — 오른쪽 위 로고 · 문서명 · 부제 · 두 줄 선 · 아래 문서 정보 줄 · 회사명(가운데 정렬). HTML 뷰어와 같은 짜임.
+// 한 칸 표 두 줄(높이 고정)로 쪽을 채운다 — 아래 줄은 아래 맞춤이라 회사명이 쪽 아래에 앉는다
 function coverPage() {
   const c = COVER;
-  const titleLong = (man.title || '').replace(/\s/g, '').length > (c.title.spaceUpTo || 6);
-  const tSize = ptOf(c.title.size) * (titleLong ? 0.6 : 1);
-  const ls = titleLong ? 0.04 : parseFloat(c.title.letterSpacing);
-  const barW = /%$/.test(c.bar.width) ? Math.round((W * parseFloat(c.bar.width)) / 100) : dxa(c.bar.width);
-  const side = Math.max(0, Math.round((W - barW) / 2));
+  const t = c.title, r = c.rule;
+  const tSize = ptOf(t.size);
   const bodyH = PAGE_H - (dxa(MG.top) + headBlock) - (dxa(MG.bottom) + footBlock);
-  const row1H = dxa(c.title.top) + Math.round(tSize * 20 * 1.3) + dxa(c.bar.gap) + dxa(c.bar.thickness) + 200;
-  const titleP = para([new TextRun({ text: man.title || '', size: hp(tSize), bold: c.title.weight >= 600,
-    font: c.title.font === 'heading' ? HFONT : FONT, characterSpacing: Math.round(ls * tSize * 20) })],
-  { alignment: AlignmentType.CENTER, spacing: { before: dxa(c.title.top), after: 0, line: 240, lineRule: LineRuleType.AUTO } });
-  const barP = para([], { indent: { left: side, right: side },
-    border: { bottom: { style: BorderStyle.SINGLE, size: Math.min(96, Math.round(ptOf(c.bar.thickness) * 8)), color: tok(c.bar.color), space: 0 } },
-    spacing: { before: 0, after: 0, line: dxa(c.bar.gap), lineRule: LineRuleType.EXACT } });
-  const companyP = para([new TextRun({ text: String(c.company.text || '{company}').replace('{company}', VALUES.company),
-    size: hpOf(c.company.size), font: c.company.font === 'heading' ? HFONT : FONT })],
-  { alignment: AlignmentType.CENTER, spacing: { before: 0, after: dxa(c.company.bottom), line: 240, lineRule: LineRuleType.AUTO } });
+  const ruleW = /%$/.test(r.width) ? Math.round((W * parseFloat(r.width)) / 100) : dxa(r.width);
+  const side = Math.max(0, Math.round((W - ruleW) / 2));
+  const kids = [];
+  // 로고 — 오른쪽 위
+  if (brand.logoPathOnLight) {
+    const buf = fs.readFileSync(brand.logoPathOnLight);
+    const ratio = (buf.readUInt32BE(16) / buf.readUInt32BE(20)) || 3;
+    const h = Math.round(dxa(c.logo.height) / PX);
+    kids.push(para([new ImageRun({ type: 'png', data: buf, transformation: { width: Math.round(h * ratio), height: h },
+      altText: { title: VALUES.company || '로고', description: `${VALUES.company} 로고`, name: 'cover-logo' } })],
+    { alignment: AlignmentType.RIGHT, spacing: { before: 0, after: 0 } }));
+  }
+  kids.push(para([new TextRun({ text: man.title || '', size: hp(tSize), bold: t.weight >= 600, color: tok(t.color || 'text'),
+    font: t.font === 'heading' ? HFONT : FONT })],
+  { alignment: AlignmentType.CENTER, indent: { left: Math.round(W * 0.075), right: Math.round(W * 0.075) },
+    spacing: { before: dxa(t.top), after: 0, line: 312, lineRule: LineRuleType.AUTO } }));
+  if (man.subtitle) {
+    kids.push(para([new TextRun({ text: man.subtitle, size: hpOf(c.subtitle.size), color: tok(c.subtitle.color) })],
+      { alignment: AlignmentType.CENTER, spacing: { before: dxa(c.subtitle.gap), after: 0 } }));
+  }
+  // 두 줄 선 — 굵은 선 문단 + (간격) + 가는 선 문단, 폭은 rule.width
+  const bline = (st) => ({ style: BorderStyle.SINGLE, size: Math.min(96, Math.max(2, Math.round(ptOf(st.width) * 8))), color: tok(st.color), space: 0 });
+  kids.push(para([], { indent: { left: side, right: side }, border: { bottom: bline(r.thick) },
+    spacing: { before: 0, after: 0, line: dxa(r.gap), lineRule: LineRuleType.EXACT } }));
+  kids.push(para([], { indent: { left: side, right: side }, border: { bottom: bline(r.thin) },
+    spacing: { before: 0, after: 0, line: Math.max(20, dxa(r.space)), lineRule: LineRuleType.EXACT } }));
+  const row1H = (brand.logoPathOnLight ? dxa(c.logo.height) + 60 : 0) + dxa(t.top) + Math.round(tSize * 20 * 1.3 * 2)
+    + (man.subtitle ? dxa(c.subtitle.gap) + Math.round(ptOf(c.subtitle.size) * 20 * 1.6) : 0) + dxa(r.gap) + dxa(r.space) + 300;
+  const mv = { docNo: VALUES.docNo, dept: man.dept || '', date: man.date || '' };
+  const metaTxt = String(c.meta.text || '{docNo}').split(' · ')
+    .map((p) => p.replace(/\{(\w+)\}/g, (m, k) => mv[k] || '').trim()).filter(Boolean).join(' · ');
+  const bottom = [];
+  if (metaTxt) bottom.push(para([new TextRun({ text: metaTxt, size: hpOf(c.meta.size), color: tok(c.meta.color) })],
+    { alignment: AlignmentType.CENTER, spacing: { before: 0, after: dxa(c.company.gap) } }));
+  bottom.push(para([new TextRun({ text: String(c.company.text || '{company}').replace('{company}', VALUES.company),
+    size: hpOf(c.company.size), bold: (c.company.weight || 400) >= 600, color: tok(c.company.color || 'text'),
+    font: c.company.font === 'heading' ? HFONT : FONT })],
+  { alignment: AlignmentType.CENTER, spacing: { before: 0, after: dxa(c.company.bottom), line: 240, lineRule: LineRuleType.AUTO } }));
   const noB = { top: NONE, bottom: NONE, left: NONE, right: NONE };
+  const m0 = { top: 0, bottom: 0, left: 0, right: 0 };
   return [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], layout: TableLayoutType.FIXED, borders: NO_BORDERS,
     rows: [
-      new TableRow({ height: { value: row1H, rule: HeightRule.EXACT }, children: [cell([titleP, barP], { width: { size: W, type: WidthType.DXA }, borders: noB })] }),
+      new TableRow({ height: { value: row1H, rule: HeightRule.EXACT }, children: [cell(kids, { width: { size: W, type: WidthType.DXA }, borders: noB, margins: m0 })] }),
       // 머리글이 계산보다 조금만 커도 표지가 두 쪽으로 넘친다 — 남는 높이의 88% 만 쓴다
       new TableRow({ height: { value: Math.max(1000, Math.round((bodyH - row1H) * 0.88)), rule: HeightRule.EXACT },
-        children: [cell([companyP], { width: { size: W, type: WidthType.DXA }, borders: noB, verticalAlign: VerticalAlign.BOTTOM })] }),
+        children: [cell(bottom, { width: { size: W, type: WidthType.DXA }, borders: noB, margins: m0, verticalAlign: VerticalAlign.BOTTOM })] }),
     ] })];
 }
 
@@ -545,6 +564,13 @@ function headItem(kind, style) {
     return [new TextRun({ text: brand.wordmark || VALUES.company, bold: true, color: tok(TY.key.color), size: hp(11) })];
   }
   if (kind === 'none' || !VALUES[kind]) return [];
+  if (kind === 'title' && HD.layout === 'split') {
+    // 좌우 머리말의 문서명 — header.title 의 글꼴 · 크기 · 굵기 · 색(HTML 의 .bd-head .bd-doctitle 과 같다)
+    const ht = HD.title || {};
+    return [new TextRun({ text: VALUES.title, bold: (ht.weight || 700) >= 600, size: hp(ptOf(ht.size || '9pt')),
+      color: tok(ht.color || 'text'), font: ht.font === 'body' ? FONT : HFONT,
+      characterSpacing: Math.round(parseFloat(ht.letterSpacing || '0') * ptOf(ht.size || '9pt') * 20) })];
+  }
   return [new TextRun(Object.assign({ text: VALUES[kind], bold: kind === 'docNo', font: NUMFONT }, style))];
 }
 /** 바닥글 글 틀 → TextRun[]. {company} 는 굵게(머리말 · 꼬리말의 회사명 표시), {page} {pages} 는 필드 */
@@ -555,7 +581,7 @@ function pattern(tpl, style) {
     if (!m) { out.push(new TextRun(Object.assign({}, style, { text: part }))); continue; }
     const k = m[1];
     if (k === 'page') out.push(new TextRun(Object.assign({}, style, { children: [PageNumber.CURRENT], bold: true, font: NUMFONT })));
-    else if (k === 'pages') out.push(new TextRun(Object.assign({}, style, { children: [PageNumber.TOTAL_PAGES], bold: true, font: NUMFONT })));
+    else if (k === 'pages') out.push(new TextRun(Object.assign({}, style, { children: [PageNumber.TOTAL_PAGES_IN_SECTION], bold: true, font: NUMFONT })));
     else if (k === 'company') out.push(new TextRun(Object.assign({}, style, { text: VALUES.company, bold: true, color: tok('text-2') })));
     else out.push(new TextRun(Object.assign({}, style, { text: VALUES[k] || '' })));
   }
@@ -611,6 +637,7 @@ function headerParas() {
 }
 function footerPara() {
   const st = { size: SMALL, color: tok(FT.color) };
+  if (FT.font === 'body' || FT.font === 'heading') st.font = FT.font === 'body' ? FONT : HFONT;   // 꼬리말 글꼴 — 양식 footer.font
   return para([...pattern(FT.left, st), new TextRun({ text: '\t' }), ...pattern(FT.right, st)],
     { tabStops: [{ type: TabStopType.RIGHT, position: W }], border: rule(FT.rule, 'top'),
       spacing: { after: 0, line: 240, lineRule: LineRuleType.AUTO } });
@@ -643,13 +670,20 @@ const footBlock = HAS_FOOT ? dxa(FT.padding) + dxa(FT.gap) + 1 * PX : 0;
 // 쪽 나눔 — 양식 page.breaks 가 authored 면 HTML 의 쪽 경계에서, flow 면 Word 가 흘려 나눈다
 const body = [];
 const withCover = (COVER.mode === 'always' && man.cover !== 'no') || (COVER.mode === 'opt-in' && man.cover === 'yes');
-if (withCover) body.push(...coverPage());
+const cover = withCover ? coverPage() : null;
+let prevT = '';
 man.pages.forEach((pg, pi) => {
   pg.blocks.forEach((b, bi) => {
-    const pageStart = bi === 0 && (pi > 0 ? !FLOW : withCover);
-    body.push(...blocks(b, bi === 0 && (pi === 0 || !FLOW), pageStart));
+    // 표지는 따로 구역을 두므로 본문 첫 블록 앞에 쪽 나눔을 넣지 않는다
+    const pageStart = bi === 0 && pi > 0 && !FLOW;
+    body.push(...blocks(b, bi === 0 && (pi === 0 || !FLOW), pageStart, prevT === 'h1' || prevT === 'h2'));
+    prevT = b.t;
   });
 });
+
+const PAGE_PROPS = { size: { width: PAGE_W, height: PAGE_H },
+  margin: { top: dxa(MG.top) + headBlock, bottom: dxa(MG.bottom) + footBlock, left: dxa(MG.left), right: dxa(MG.right),
+    header: dxa(MG.top), footer: dxa(MG.bottom) } };
 
 const doc = new Document({
   creator: VALUES.company,
@@ -678,8 +712,8 @@ const doc = new Document({
     characterStyles: [
       { id: 'HctKey', name: 'HCT 강조어', basedOn: 'DefaultParagraphFont', quickFormat: true, run: { bold: true, color: tok(TY.key.color) } },
       { id: 'HctChip', name: 'HCT 칩', basedOn: 'DefaultParagraphFont', quickFormat: true, run: chipRun(T.card, T.chipLine, T.text2) },
-      { id: 'HctChipWarn', name: 'HCT 칩 주의', basedOn: 'DefaultParagraphFont', quickFormat: true, run: chipRun(T.warnBg, T.warnLine, T.warnText) },
-      { id: 'HctChipLate', name: 'HCT 칩 위험', basedOn: 'DefaultParagraphFont', quickFormat: true, run: chipRun(T.alertBg, T.coral, T.alertText) },
+      { id: 'HctChipWarn', name: 'HCT 칩 주의', basedOn: 'DefaultParagraphFont', quickFormat: true, run: chipRun(T.card, hex('alert-line'), T.alertText) },
+      { id: 'HctChipLate', name: 'HCT 칩 위험', basedOn: 'DefaultParagraphFont', quickFormat: true, run: chipRun(T.card, T.alertText, T.alertText) },
     ],
   },
   numbering: { config: [
@@ -695,14 +729,21 @@ const doc = new Document({
       style: { paragraph: { indent: { left: IND + 40 * PX, hanging: 40 * PX }, tabStops: [{ type: TabStopType.LEFT, position: IND + 40 * PX }] },
         run: STEP_FORMAT === LevelFormat.DECIMAL ? { bold: true, color: tok(TY.body.color) } : { bold: true, color: tok(TY.key.color), size: hp(14) } } }] },
   ] },
-  sections: [{
-    properties: { page: { size: { width: PAGE_W, height: PAGE_H },
-      margin: { top: dxa(MG.top) + headBlock, bottom: dxa(MG.bottom) + footBlock, left: dxa(MG.left), right: dxa(MG.right),
-        header: dxa(MG.top), footer: dxa(MG.bottom) } } },
-    headers: { default: new Header({ children: headerParas() }) },
-    footers: { default: new Footer({ children: HAS_FOOT ? [footerPara()] : [para([])] }) },
-    children: body,
-  }],
+  // 표지는 따로 구역 — 머리말 · 꼬리말 없음. 본문 구역은 쪽번호 1부터, 전체 쪽수는 본문 구역 쪽수(HTML 뷰어와 같다)
+  sections: [
+    ...(cover ? [{
+      properties: { page: PAGE_PROPS },
+      headers: { default: new Header({ children: [para([])] }) },
+      footers: { default: new Footer({ children: [para([])] }) },
+      children: cover,
+    }] : []),
+    {
+      properties: { page: Object.assign({ pageNumbers: { start: 1 } }, PAGE_PROPS) },
+      headers: { default: new Header({ children: headerParas() }) },
+      footers: { default: new Footer({ children: HAS_FOOT ? [footerPara()] : [para([])] }) },
+      children: body,
+    },
+  ],
 });
 
 Packer.toBuffer(doc).then((buf) => {

@@ -208,7 +208,7 @@ python3 scripts/check_docx.py 회의록.docx --html 회의록.html
 | `.bd-meta` · `.bd-table` · `.bd-sign` · `.bd-figure` | 표 |
 | `.bd-list` · `.bd-list--legal` · `.bd-steps` · `.bd-toc` | 글머리 목록 · (1) 글자 번호 · 자동 번호 ①② · 점선 탭 |
 | `.bd-callout` | 테두리 · 음영 문단 |
-| `.x-kpis` · `.x-bars` (사내 보고서) | 표로 그린 수치 타일 · 막대 |
+| `.bd-kpis` · `.bd-bars` (공용 · 1.58) | 표 짜임 수치 표 · 가로 막대 — 나쁜 증감 `is-bad`, 주인공 막대 `is-main` |
 
 쪽 나눔은 HTML 의 `.bd-page` 경계와 같다. 모르는 부품은 글자를 살려 문단으로 옮기고 「주의」를 낸다.
 검사(`check_docx.py`)는 글꼴(Pretendard) · 색(토큰) · 9pt 하한 · 머리글 로고 · 쪽번호 필드 · HTML 글자 누락 ·
@@ -240,8 +240,14 @@ python3 scripts/check_content_sync.py --deck internal
 
 ### A4 문서판 — 슬라이드가 아닌 문서
 
-회의록 · 사규 · 매뉴얼 · 공지는 발표 슬라이드가 아니라 **A4 세로 문서**다.
+회의록 · 사규 · 매뉴얼 · 공지 · 보고서 · 계획서는 발표 슬라이드가 아니라 **A4 세로 문서**다.
 지면 794×1123px(210×297mm @96dpi)이고 인쇄하면 그대로 A4 한 장이다.
+
+**견본 6종(1.58 전면 개편)** — `minutes` 회의록 · `notice` 공지(1쪽) · `a4report` 사내 보고서 · `policy` 규정(표지) ·
+`manual` 매뉴얼(표지 · 화면 그림) · `a4plan` 종합 계획서(표지 · 20쪽 · 부품 전부). **짜임과 부품 쓰임의 기준은 `a4plan`** —
+결론 · 결정 요청을 첫 쪽에, 장 「1. 제목」 · 절 「1.1 제목」, 왼쪽 시작선 하나, 표 합계 · 비율 맞춤, 수치 표 `bd-kpis` · 막대
+`bd-bars`, 그림은 실제 이미지, 제목은 쪽 끝에 남기지 않는다(`check_doc.py` 「쪽 끝 제목」). 규칙 전문은
+`agent-skill/hct-report/design/RULES.md` 「3」.
 
 ```bash
 cp assets/doc-minutes.html ./회의록.html
@@ -273,7 +279,8 @@ python3 scripts/check_doc.py ./회의록.html --shots out/
 | `archive/doc-policy.html` | 사규·규정 3쪽 — 조·항·호 · 부칙 · 개정 이력 · 결재란 |
 | `archive/doc-manual.html` | 매뉴얼·가이드 3쪽 — 목차 · 절차 단계 · 화면 캡처 자리 |
 | `archive/doc-notice.html` | 공지 1쪽 — 게시판용. 한 쪽을 넘기지 않는다 |
-| `archive/doc-report.html` | 사내 보고서 3쪽 — 요약(요청 상자) · 수치 타일 · 실적 표 · 막대 · 리스크 · 일정 · 요청 표 · 결재란 |
+| `archive/doc-report.html` | 사내 보고서 3쪽 — 요약(요청 상자) · 수치 표 · 실적 표 · 막대 · 리스크 · 일정 · 요청 표 · 결재란 |
+| `archive/doc-plan.html` | 종합 계획서 20쪽 안팎(`a4plan`) — 표지 · 요약 표 · 목차 · 수치 표 · 표(합계 · 격자 · 넓은 표 · 칩) · 막대 · 그림 · 절차 · 조문 · 상자 3종 · 결재란 · 부록. A4 부품을 다 쓴 기준 견본 |
 
 **쪽번호와 문서명은 뷰어가 채운다.** `.bd-foot` 을 비워 두고 숫자를 적지 않는다.
 쪽을 넣거나 빼도 번호가 어긋나지 않으며, 손으로 적으면 `check_doc.py` 가 실패시킨다.

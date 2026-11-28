@@ -54,6 +54,7 @@ DOCS = {
     "manual":  ARCHIVE + "doc-manual.html",            # 매뉴얼·가이드 (목차 · 절차 단계 · 캡처)
     "notice":  ARCHIVE + "doc-notice.html",            # 공지 (1쪽 완결)
     "a4report": ARCHIVE + "doc-report.html",           # 사내 보고서 (요약 · 지표 · 실적 · 리스크 · 요청 · 결재란 · 3쪽)
+    "a4plan":  ARCHIVE + "doc-plan.html",              # 종합 계획서 (표지 · 목차 · 부품 전부 · 20쪽 안팎)
 }
 
 # 웹 보드. 슬라이드도 A4 도 아닌 제3의 계통이다 — 지면 크기가 없고 화면 폭에

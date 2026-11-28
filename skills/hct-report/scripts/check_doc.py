@@ -156,7 +156,16 @@ def check_render(path, rep, shots=None):
             });
             const body = pgel.querySelector('.bd-body');
             const cs = getComputedStyle(pgel);
-            return { i, w: pgel.scrollWidth, h: pgel.clientHeight,
+            // 쪽 끝에 홀로 남은 제목 — 장 · 절 제목, 또는 제목 바로 뒤 도입 문단으로 쪽이 끝난다(다음 쪽에 이어지는 내용이 있을 때)
+            let stranded = '';
+            const last = body && body.lastElementChild;
+            const isH = n => n && /\bbd-h[12]\b/.test(n.className || '');
+            if (last && !pgel.classList.contains('bd-cover') && pgel.nextElementSibling && body.children.length > 1) {
+              if (isH(last)) stranded = last.textContent.trim().slice(0, 24);
+              else if (/\bbd-p\b/.test(last.className || '') && isH(last.previousElementSibling))
+                stranded = last.previousElementSibling.textContent.trim().slice(0, 24) + ' (+ 도입 문단)';
+            }
+            return { i, w: pgel.scrollWidth, h: pgel.clientHeight, stranded,
                      land: pgel.classList.contains('bd-page--land'),
                      bg: cs.backgroundColor,
                      fg: body ? getComputedStyle(body).color : cs.color,
@@ -164,9 +173,11 @@ def check_render(path, rep, shots=None):
           });
         }""")
 
-        size_bad, collide_all, small_all, contrast_bad = [], [], [], []
+        size_bad, collide_all, small_all, contrast_bad, strand_all = [], [], [], [], []
         for s in data:
             here = f"{s['i']+1}쪽"
+            if s.get("stranded"):
+                strand_all.append(f"{here} 끝: 「{s['stranded']}」")
             w, h = (PAGE_W_LAND, PAGE_H_LAND) if s.get("land") else (PAGE_W, PAGE_H)
             if s["w"] != w or s["h"] != h:
                 size_bad.append(f"{here}: {s['w']}x{s['h']} (기대 {w}x{h} · "
@@ -189,6 +200,8 @@ def check_render(path, rep, shots=None):
              "본문이 머리말·꼬리말을 침범", "→ 내용을 다음 쪽으로 넘기거나 여백을 줄인다"),
             (small_all, f"글자 크기 — {MIN_BODY_PX}px(10.5pt) 미만 본문 없음",
              f"{MIN_BODY_PX}px 미만 본문", None),
+            (strand_all, "쪽 끝 제목 — 장 · 절 제목이 내용 없이 쪽 끝에 남지 않는다",
+             "제목만 쪽 끝에 남음", "→ 양식 page.breaks 가 flow 면 뷰어가 넘긴다. authored 면 그 제목부터 다음 쪽 <section> 으로 옮긴다"),
             (contrast_bad, f"본문 대비 — 지면 대비 {MIN_TEXT_CONTRAST}:1 이상",
              f"본문 대비 {MIN_TEXT_CONTRAST}:1 미달", None),
         ):

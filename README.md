@@ -284,7 +284,7 @@ python .claude/skills/blue-report/scripts/check_doc.py decks-out/회의록.html
 | 묶음 | `--deck` 이름 | 비고 |
 |---|---|---|
 | 고정 지면 덱 1920x1080 · 12종 | `internal` 사내 보고 · `weekly` 주간보고 · `ax` 1장 보고 · `team` 팀 주간 · `exec` 경영진 · `allhands` 전직원 · `sales` 제안 · `project` 프로젝트 · `training` 교육 · `strategy` 전략 · `report` 고밀도 · `catalog` 레이아웃 19종 | PPTX 빌드(`pptx/`)의 원본 |
-| A4 문서 4종 | `policy` 사규 · `manual` 매뉴얼 · `notice` 공지 · `a4report` 사내 보고서 | |
+| A4 문서 5종 | `policy` 사규 · `manual` 매뉴얼 · `notice` 공지 · `a4report` 사내 보고서 · `a4plan` 종합 계획서(20쪽 · 부품 전부) | |
 | 웹 보드 4종 | `board` 과제 · `execboard` 실행 · `teamboard` 팀 칸반 · `gapcheck` 점검 | |
 | 라이브 브리핑 | `live` | 기준 덱의 축소판 |
 | FCC/KC 보고서 14종 | `assets/archive/fcc-kc/` | 인증 시험 보고서 전용 |
